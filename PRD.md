@@ -14,6 +14,8 @@ This platform is not a standard storefront; it is a high-velocity transaction en
 
 In Egypt, Cash-On-Delivery (COD) remains the dominant payment method, carrying inherently high operational risks of fake orders and costly Return to Origin (RTO) rates. The architecture is specifically optimized for this environment. It utilizes a **\'Verification-First Hybrid COD\'** model. Unlike standard payment gateways, the system captures user intent immediately upon data entry, creates a PENDING_PAYMENT_INPUT order, and triggers an automated WhatsApp workflow instructing the customer to transfer the required shipping fee via mobile wallets (Vodafone Cash/InstaPay). \"**Inventory Strategy:** To maximize top-of-funnel conversion during high-traffic events, inventory is **NOT reserved** at the order creation stage. The system accepts orders beyond physical stock levels to capture all potential leads. Stock deduction occurs strictly and atomically at the **CONFIRMED** stage. This creates a \'First-to-Pay, First-Served\' dynamic, accepting the operational necessity of refunding/apologizing to customers who pay after stock depletion.\"
 
+**Required Relations:** Every Product creation mutation must validate the existence of a valid, active categoryId. Orphaned products are not permitted by the database schema.
+
 The system is built for extreme concurrency (e.g., Flash Sales), requiring atomic data integrity to prevent overselling, and strict data segregation to protect business intelligence (margins, COGS) from operational staff.
 
 ### 1.2 Core Architectural Principles {#core-architectural-principles}
@@ -260,6 +262,16 @@ Warranty is treated as a dynamic attribute of the SKU, not a static page.
 
 - **Portal Actions:** If eligible, the customer can submit a claim. If ineligible, the system displays the \"Warranty Expired\" status along with the expiration date.
 
+**4.X Category Architecture & Management**
+
+- Entity Hierarchy: The catalog is structured hierarchically. A Category serves as the primary container, and every Product must be strictly linked to one active Category via a \`categoryId\` reference.
+
+- Localization & Presentation: Each Category must enforce dual-language fields (Arabic/English) for \`name\` and \`description\` to support the localized Storefront UI.
+
+- State Management (Soft Deletion): Categories are never permanently deleted from the Convex database to preserve historical analytics and order integrity. Instead, an \`isActive\` boolean flag is utilized.
+
+- Zero-Trust Constraints: A Product cannot be transitioned from \'Draft\' to \'Published\' status via a Convex mutation unless its parent Category is currently \`isActive = true\`. If a Category is toggled to inactive, all associated products immediately inherit a hidden state on the Storefront without altering their individual published statuses.
+
 ## 5. The RBAC & Permissions Framework {#the-rbac-permissions-framework}
 
 ### 5.1 Dynamic Role Architecture {#dynamic-role-architecture}
@@ -297,6 +309,8 @@ Permissions define the boundaries of authority. The Convex backend will evaluate
   - ADJUST_REAL_STOCK: Authority to manually override physical inventory counts.
 
   - MANAGE_DISPLAY_STOCK: Authority to alter frontend urgency numbers.
+
+  - MANAGE_CATEGORIES: Grants the ability to create new categories, edit localized names/descriptions, and toggle the \`isActive\` state from the Dashboard. Any mutation attempting to modify a category without this specific RBAC role will be rejected at the Convex server level (returning a 403 Forbidden).
 
 - **System & Financial Permissions (Highly Restricted):**
 
@@ -378,6 +392,8 @@ Analytics are restricted to users with the VIEW_ANALYTICS and VIEW_FINANCIALS pe
 
   - As a Customer, I want to see a clear, dynamically calculated shipping fee based on my selected Governorate before placing the order, so that there are no hidden costs.
 
+  - As a Customer, I want to browse and filter products by their respective Categories from the main navigation, so I can seamlessly find specific product types during high-traffic sales.
+
 - **The Hybrid COD Experience:**
 
   - As a Customer, I want to receive an automated WhatsApp message immediately after placing my order with clear instructions and the exact wallet number, so that I know exactly how to prepay my shipping fee.
@@ -423,6 +439,10 @@ Analytics are restricted to users with the VIEW_ANALYTICS and VIEW_FINANCIALS pe
   - As a Super Admin, I want to manually alter display_stock separately from real_stock, so I can create psychological scarcity on the storefront without impacting my warehouse\'s truth.
 
   - As a Super Admin, I want to be warned if I accidentally price a SKU below my defined MIN_PROFIT_THRESHOLD, so I don\'t run unprofitable campaigns by mistake.
+
+  - As a Super Admin, I want a dedicated module in the Dashboard to execute CRUD operations on Categories (including uploading category thumbnails and localized texts), so I can organize the storefront logically.
+
+  - As a Super Admin, I want to toggle the \`isActive\` status of any Category with a single click, instantly hiding it and all its child products from the Storefront without affecting backend order history.
 
 - **System Configuration & Agility:**
 
