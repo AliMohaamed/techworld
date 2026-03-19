@@ -21,7 +21,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. **Setup**: Identify the current feature number or name, then run `powershell.exe -ExecutionPolicy Bypass -NonInteractive -File .\.specify\scripts\powershell\setup-plan.ps1 "<Feature_Number_or_Name>" -Json` from the repo root. 
+1. **Setup**: Run `powershell.exe -ExecutionPolicy Bypass -NonInteractive -File .\.specify\scripts\powershell\setup-plan.ps1 -Json` from the repo root and parse the JSON object for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH.
 **CRITICAL**: The script output may contain plain text (e.g., "Copied plan template...") before the JSON object. You must ignore the plain text, extract ONLY the JSON object, and parse it for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH.
 2. **Load context**: Read FEATURE_SPEC and `.specify/memory/constitution.md`. Load IMPL_PLAN template (already copied).
 

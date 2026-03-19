@@ -1,4 +1,10 @@
-export type Permission = "VIEW_FINANCIALS" | "VERIFY_PAYMENTS";
+export type Permission =
+  | "VIEW_FINANCIALS"
+  | "VERIFY_PAYMENTS"
+  | "MANAGE_CATEGORIES"
+  | "MANAGE_PRODUCTS"
+  | "MANAGE_DISPLAY_STOCK"
+  | "ADJUST_REAL_STOCK";
 
 export async function requirePermission(ctx: { db: any, auth: any }, permission: Permission) {
   const identity = await ctx.auth.getUserIdentity();

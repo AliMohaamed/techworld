@@ -9,11 +9,15 @@
  */
 
 import type * as audit from "../audit.js";
+import type * as cart from "../cart.js";
+import type * as categories from "../categories.js";
 import type * as crons from "../crons.js";
 import type * as crons_internal from "../crons_internal.js";
 import type * as lib_rbac from "../lib/rbac.js";
 import type * as orders from "../orders.js";
+import type * as products from "../products.js";
 import type * as users from "../users.js";
+import type * as webhooks from "../webhooks.js";
 
 import type {
   ApiFromModules,
@@ -23,11 +27,15 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   audit: typeof audit;
+  cart: typeof cart;
+  categories: typeof categories;
   crons: typeof crons;
   crons_internal: typeof crons_internal;
   "lib/rbac": typeof lib_rbac;
   orders: typeof orders;
+  products: typeof products;
   users: typeof users;
+  webhooks: typeof webhooks;
 }>;
 
 /**

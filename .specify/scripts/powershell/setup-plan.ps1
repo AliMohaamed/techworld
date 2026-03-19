@@ -35,13 +35,16 @@ New-Item -ItemType Directory -Path $paths.FEATURE_DIR -Force | Out-Null
 $template = Resolve-Template -TemplateName 'plan-template' -RepoRoot $paths.REPO_ROOT
 if ($template -and (Test-Path $template)) { 
     Copy-Item $template $paths.IMPL_PLAN -Force
-    Write-Output "Copied plan template to $($paths.IMPL_PLAN)"
+    if (-not $Json) {
+        Write-Output "Copied plan template to $($paths.IMPL_PLAN)"
+    }
 } else {
-    Write-Warning "Plan template not found"
+    if (-not $Json) {
+        Write-Warning "Plan template not found"
+    }
     # Create a basic plan file if template doesn't exist
     New-Item -ItemType File -Path $paths.IMPL_PLAN -Force | Out-Null
 }
-
 # Output results
 if ($Json) {
     $result = [PSCustomObject]@{ 
