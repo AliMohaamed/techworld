@@ -1,3 +1,4 @@
+import { ConvexError } from "convex/values";
 import { QueryCtx } from "../_generated/server";
 import { Permission } from "./permissions";
 
@@ -8,7 +9,10 @@ export async function requirePermission(
   const identity = await ctx.auth.getUserIdentity();
 
   if (!identity) {
-    throw new Error("Unauthenticated call. Please log in first.");
+    throw new ConvexError({
+      code: "UNAUTHENTICATED",
+      message: "Unauthenticated call. Please log in first.",
+    });
   }
 
   const identifier = identity.subject ?? null;
@@ -29,12 +33,19 @@ export async function requirePermission(
       : null);
 
   if (!user) {
-    throw new Error("User record not found. Unauthorized.");
+    throw new ConvexError({
+      code: "USER_NOT_FOUND",
+      message: "User record not found. Unauthorized.",
+    });
   }
 
   if (!user.permissions.includes(permission)) {
-    throw new Error(`Unauthorized: Requires '${permission}' permission.`);
+    throw new ConvexError({
+      code: "FORBIDDEN",
+      message: `Unauthorized: Requires '${permission}' permission.`,
+    });
   }
 
   return user;
 }
+

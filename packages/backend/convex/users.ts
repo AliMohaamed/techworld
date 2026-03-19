@@ -57,7 +57,6 @@ export const createInitialAdmin = mutation({
       userId: staffUserId,
       entityId: staffUserId,
       actionType: "CREATE_INITIAL_ADMIN",
-      timestamp: Date.now(),
       changes: {
         email: normalizedEmail,
         permissions: permissionValues,
@@ -93,7 +92,6 @@ export const updateUserPermissions = mutation({
       userId: args.userId,
       entityId: args.userId,
       actionType: "USER_PERMISSIONS_UPDATED",
-      timestamp: Date.now(),
       changes: {
         before: oldUser.permissions,
         after: args.permissions,
@@ -142,3 +140,63 @@ export const getMe = query({
     );
   },
 });
+
+/**
+ * Super Admin Seeding Mutation
+ * Used to bootstrap or repair the initial staff user when the admin dashboard
+ * is locked due to 'User Record Not Found'.
+ */
+export const createSuperAdmin = mutation({
+  args: {
+    email: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const normalizedEmail = args.email.trim().toLowerCase();
+
+    // 1. Check if a staff record already exists for this email
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", normalizedEmail))
+      .unique();
+
+    if (existingUser) {
+      // 2. If it exists, ensure it has ALL permission flags
+      await ctx.db.patch(existingUser._id, {
+        permissions: [...permissionValues],
+      });
+
+      return {
+        status: "updated",
+        userId: existingUser._id,
+        email: normalizedEmail,
+        permissions: [...permissionValues],
+      };
+    }
+
+    // 3. Otherwise, create a new record in the 'users' table
+    const userId = await ctx.db.insert("users", {
+      name: "Super Admin", // Default name for bootstrap
+      email: normalizedEmail,
+      permissions: [...permissionValues],
+    });
+
+    // 4. Log the manual bootstrap action
+    await ctx.scheduler.runAfter(0, internal.audit.logAudit, {
+      userId: userId,
+      entityId: userId,
+      actionType: "SUPER_ADMIN_BOOTSTRAP",
+      changes: {
+        email: normalizedEmail,
+        method: "createSuperAdmin_seed",
+      },
+    });
+
+    return {
+      status: "created",
+      userId,
+      email: normalizedEmail,
+      permissions: [...permissionValues],
+    };
+  },
+});
+

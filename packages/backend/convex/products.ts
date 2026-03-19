@@ -1,6 +1,6 @@
+import { ConvexError, v } from "convex/values";
 import { mutation, query, QueryCtx } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
-import { v } from "convex/values";
 import { requirePermission } from "./lib/rbac";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
@@ -21,7 +21,80 @@ type CatalogProduct = {
   name?: string;
   price?: number;
   slug?: string;
+  cogs?: number;
 };
+
+function normalizeOptionalString(value: string | undefined) {
+  const normalized = value?.trim();
+  return normalized ? normalized : undefined;
+}
+
+function slugify(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function sanitizeNumber(value: number, fieldLabel: string) {
+  if (!Number.isFinite(value) || value < 0) {
+    throw new ConvexError({
+      code: "INVALID_NUMBER",
+      message: `${fieldLabel} must be a non-negative number.`,
+    });
+  }
+
+  return value;
+}
+
+async function ensureUniqueProductSlug(
+  ctx: Pick<QueryCtx, "db">,
+  slug: string,
+  excludeId?: Id<"products">,
+) {
+  const existing = await ctx.db
+    .query("products")
+    .withIndex("by_slug", (q) => q.eq("slug", slug))
+    .unique();
+
+  if (existing && existing._id !== excludeId) {
+    throw new ConvexError({
+      code: "PRODUCT_SLUG_CONFLICT",
+      message: "A product with this slug already exists.",
+    });
+  }
+}
+
+async function ensureCategoryExists(
+  ctx: Pick<QueryCtx, "db">,
+  categoryId: Id<"categories">,
+) {
+  const category = await ctx.db.get(categoryId);
+  if (!category) {
+    throw new ConvexError({
+      code: "CATEGORY_NOT_FOUND",
+      message: "Target category was not found.",
+    });
+  }
+
+  return category;
+}
+
+async function ensureActiveCategory(
+  ctx: Pick<QueryCtx, "db">,
+  categoryId: Id<"categories">,
+) {
+  const category = await ensureCategoryExists(ctx, categoryId);
+  if (!category.isActive) {
+    throw new ConvexError({
+      code: "CATEGORY_INACTIVE",
+      message: "Select an active category before publishing or creating products.",
+    });
+  }
+
+  return category;
+}
 
 const mapCatalogProduct = (product: CatalogProduct) => ({
   _id: product._id,
@@ -86,9 +159,6 @@ const paginateResults = <T>(
   };
 };
 
-/**
- * Helper to determine if the caller has VIEW_FINANCIALS permission.
- */
 async function canViewFinancials(ctx: Pick<QueryCtx, "auth" | "db">) {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity?.email) return false;
@@ -100,11 +170,23 @@ async function canViewFinancials(ctx: Pick<QueryCtx, "auth" | "db">) {
   return user?.permissions.includes("VIEW_FINANCIALS") ?? false;
 }
 
-/**
- * Public query to fetch a signle product with commercial data.
- * Redacts `cogs` server-side if caller lacks VIEW_FINANCIALS.
- * Follows SEO constraints: persists even if category is inactive (renders 'unavailable' state on frontend).
- */
+async function getPublicationBlocker(
+  ctx: Pick<QueryCtx, "db">,
+  categoryId: Id<"categories">,
+) {
+  const category = await ctx.db.get(categoryId);
+
+  if (!category) {
+    return "Missing category";
+  }
+
+  if (!category.isActive) {
+    return "Category inactive";
+  }
+
+  return null;
+}
+
 export const getProduct = query({
   args: { id: v.id("products") },
   handler: async (ctx, args) => {
@@ -115,9 +197,9 @@ export const getProduct = query({
     const result = {
       ...product,
       categoryName_en: category?.name_en ?? "Unknown",
-      categoryName_ar: category?.name_ar ?? "غير معروف",
+      categoryName_ar: category?.name_ar ?? "Unknown",
       categorySlug: category?.slug,
-      isCategoryActive: category?.isActive ?? false
+      isCategoryActive: category?.isActive ?? false,
     };
 
     if (!(await canViewFinancials(ctx))) {
@@ -141,9 +223,9 @@ export const getBySlug = query({
     const result = {
       ...product,
       categoryName_en: category?.name_en ?? "Unknown",
-      categoryName_ar: category?.name_ar ?? "غير معروف",
+      categoryName_ar: category?.name_ar ?? "Unknown",
       categorySlug: category?.slug,
-      isCategoryActive: category?.isActive ?? false
+      isCategoryActive: category?.isActive ?? false,
     };
 
     if (!(await canViewFinancials(ctx))) {
@@ -153,15 +235,10 @@ export const getBySlug = query({
   },
 });
 
-/**
- * Public query to list all published products for a specific active category.
- * If category is inactive, returns empty list.
- */
 export const listProductsByCategory = query({
   args: { categoryId: v.id("categories") },
   handler: async (ctx, args) => {
     const category = await ctx.db.get(args.categoryId);
-    // If category doesn't exist or is inactive, return nothing for list browsing.
     if (!category || !category.isActive) return [];
 
     const products = await ctx.db
@@ -207,20 +284,17 @@ export const searchAndFilter = query({
 
     let candidates: CatalogProduct[];
 
-    // BRANCH 1: Text Search (In-Memory Pagination)
-    // Convex's search indices do not support native .paginate() currently.
     if (normalizedSearch) {
-      candidates = await ctx.db
+      candidates = (await ctx.db
         .query("products")
         .withSearchIndex("search_name", (q) => q.search("name", normalizedSearch))
-        .take(250) as CatalogProduct[]; // Cap memory payload for scalability
+        .take(250)) as CatalogProduct[];
 
       if (candidates.length === 0) {
-        // Support older seeded products that may not have the legacy `name` field populated yet.
-        candidates = await ctx.db
+        candidates = (await ctx.db
           .query("products")
           .withIndex("by_status", (q) => q.eq("status", "PUBLISHED"))
-          .take(250) as CatalogProduct[];
+          .take(250)) as CatalogProduct[];
       }
 
       const filtered = candidates.filter((product) => {
@@ -233,16 +307,14 @@ export const searchAndFilter = query({
         return true;
       });
 
-      const sorted = sortCatalogProducts(filtered, args.sortOrder).map(p => {
+      const sorted = sortCatalogProducts(filtered, args.sortOrder).map((p) => {
         const mapped = mapCatalogProduct(p);
-        const category = activeCategories.find(c => c._id === p.categoryId);
+        const category = activeCategories.find((c) => c._id === p.categoryId);
         return { ...mapped, categoryName: category?.name_en || "UNKNOWN" };
       });
       return paginateResults(sorted, args.paginationOpts);
     }
 
-    // BRANCH 2: Facet Navigation Only (Native Database Pagination)
-    // Over 95% of traffic flows through this highly scalable pathway.
     let baseQuery;
 
     if (args.categoryId) {
@@ -250,7 +322,7 @@ export const searchAndFilter = query({
         baseQuery = ctx.db
           .query("products")
           .withIndex("by_category_status_price", (q) =>
-            q.eq("categoryId", args.categoryId as Id<"categories">).eq("status", "PUBLISHED")
+            q.eq("categoryId", args.categoryId as Id<"categories">).eq("status", "PUBLISHED"),
           );
       } else {
         baseQuery = ctx.db
@@ -258,46 +330,39 @@ export const searchAndFilter = query({
           .withIndex("by_category", (q) => q.eq("categoryId", args.categoryId as Id<"categories">))
           .filter((q) => q.eq(q.field("status"), "PUBLISHED"));
       }
+    } else if (args.sortOrder === "price_asc" || args.sortOrder === "price_desc") {
+      baseQuery = ctx.db
+        .query("products")
+        .withIndex("by_status_price", (q) => q.eq("status", "PUBLISHED"));
     } else {
-      if (args.sortOrder === "price_asc" || args.sortOrder === "price_desc") {
-        baseQuery = ctx.db
-          .query("products")
-          .withIndex("by_status_price", (q) => q.eq("status", "PUBLISHED"));
-      } else {
-        baseQuery = ctx.db
-          .query("products")
-          .withIndex("by_status", (q) => q.eq("status", "PUBLISHED"));
-      }
+      baseQuery = ctx.db
+        .query("products")
+        .withIndex("by_status", (q) => q.eq("status", "PUBLISHED"));
     }
 
     if (args.sortOrder === "price_desc") {
       baseQuery = baseQuery.order("desc");
     } else if (args.sortOrder === "newest") {
-      baseQuery = baseQuery.order("desc"); // Newest relies on ID creation time natively
+      baseQuery = baseQuery.order("desc");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let nativeFiltered = baseQuery as any;
     if (args.minPrice !== undefined || args.maxPrice !== undefined) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       nativeFiltered = baseQuery.filter((q: any) => {
         const filters = [];
-        if (args.minPrice !== undefined) filters.push(q.gte(q.field("selling_price"), args.minPrice!));
-        if (args.maxPrice !== undefined) filters.push(q.lte(q.field("selling_price"), args.maxPrice!));
+        if (args.minPrice !== undefined) filters.push(q.gte(q.field("selling_price"), args.minPrice));
+        if (args.maxPrice !== undefined) filters.push(q.lte(q.field("selling_price"), args.maxPrice));
         return filters.length > 1 ? q.and(...filters) : filters[0];
       });
     }
 
     const paginated = await nativeFiltered.paginate(args.paginationOpts);
 
-    // Safety check: Filter out edge-case orphaned products belonging to soft-deleted categories
     const finalItems = paginated.page
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .filter((p: any) => activeCategoryIds.has(p.categoryId))
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .map((p: any) => {
         const mapped = mapCatalogProduct(p as CatalogProduct);
-        const category = activeCategories.find(c => c._id === p.categoryId);
+        const category = activeCategories.find((c) => c._id === p.categoryId);
         return { ...mapped, categoryName: category?.name_en || "UNKNOWN" };
       });
 
@@ -335,17 +400,34 @@ export const getRecommendedProducts = query({
         .slice(0, 4)
         .map((product) => {
           const mapped = mapCatalogProduct(product as CatalogProduct);
-          const category = activeCategories.find(c => c._id === product.categoryId);
+          const category = activeCategories.find((c) => c._id === product.categoryId);
           return { ...mapped, categoryName: category?.name_en || "UNKNOWN" };
         }),
     };
   },
 });
 
-/**
- * Admin mutation to create a new product entry in DRAFT mode.
- * Enforces that products can only be created in active categories.
- */
+export const listAdminProducts = query({
+  args: {},
+  handler: async (ctx) => {
+    await requirePermission(ctx, "MANAGE_PRODUCTS");
+
+    const products = await ctx.db.query("products").order("desc").collect();
+
+    return Promise.all(
+      products.map(async (product) => {
+        const category = await ctx.db.get(product.categoryId);
+        return {
+          ...product,
+          categoryName: category?.name_en ?? "Missing category",
+          isCategoryActive: category?.isActive ?? false,
+          publicationBlockedReason: await getPublicationBlocker(ctx, product.categoryId),
+        };
+      }),
+    );
+  },
+});
+
 export const createProduct = mutation({
   args: {
     categoryId: v.id("categories"),
@@ -358,50 +440,164 @@ export const createProduct = mutation({
     cogs: v.optional(v.number()),
     display_stock: v.number(),
     real_stock: v.number(),
+    status: v.optional(v.union(v.literal("DRAFT"), v.literal("PUBLISHED"))),
+    slug: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const user = await requirePermission(ctx, "MANAGE_PRODUCTS");
 
-    const category = await ctx.db.get(args.categoryId);
-    if (!category) throw new Error("Target category not found");
-    if (!category.isActive) throw new Error("Cannot create products in an inactive category");
+    if (args.status === "PUBLISHED") {
+      await ensureActiveCategory(ctx, args.categoryId);
+    } else {
+      await ensureCategoryExists(ctx, args.categoryId);
+    }
 
-    const productId = await ctx.db.insert("products", {
-      ...args,
-      name: args.name_en,
+    const name_en = args.name_en.trim();
+    const name_ar = args.name_ar.trim();
+    const slug = slugify(args.slug?.trim() || name_en);
+
+    if (!name_en || !name_ar || !slug) {
+      throw new ConvexError({
+        code: "INVALID_PRODUCT",
+        message: "Product names and slug are required.",
+      });
+    }
+
+    const payload = {
+      categoryId: args.categoryId,
+      name_ar,
+      name_en,
+      description_ar: normalizeOptionalString(args.description_ar),
+      description_en: normalizeOptionalString(args.description_en),
+      images: args.images,
+      selling_price: sanitizeNumber(args.selling_price, "Selling price"),
+      cogs:
+        args.cogs !== undefined ? sanitizeNumber(args.cogs, "COGS") : undefined,
+      display_stock: sanitizeNumber(args.display_stock, "Display stock"),
+      real_stock: sanitizeNumber(args.real_stock, "Real stock"),
+      status: args.status ?? "DRAFT",
+      name: name_en,
       price: args.selling_price,
-      slug: args.name_en.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-      status: "DRAFT",
-    });
+      slug,
+    };
+
+    await ensureUniqueProductSlug(ctx, slug);
+
+    const productId = await ctx.db.insert("products", payload);
 
     await ctx.runMutation(internal.audit.logAudit, {
       userId: user._id,
       entityId: productId,
       actionType: "CREATE_PRODUCT",
-      timestamp: Date.now(),
-      changes: args,
+      changes: payload,
     });
 
     return productId;
   },
 });
 
-/**
- * Admin mutation to transition a product to PUBLISHED.
- * STRICTRULE: Cannot publish if the parent category is inactive.
- */
+export const updateProduct = mutation({
+  args: {
+    id: v.id("products"),
+    categoryId: v.optional(v.id("categories")),
+    name_ar: v.optional(v.string()),
+    name_en: v.optional(v.string()),
+    description_ar: v.optional(v.string()),
+    description_en: v.optional(v.string()),
+    images: v.optional(v.array(v.string())),
+    selling_price: v.optional(v.number()),
+    cogs: v.optional(v.number()),
+    display_stock: v.optional(v.number()),
+    real_stock: v.optional(v.number()),
+    status: v.optional(v.union(v.literal("DRAFT"), v.literal("PUBLISHED"))),
+    slug: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requirePermission(ctx, "MANAGE_PRODUCTS");
+
+    if (args.real_stock !== undefined) {
+      await requirePermission(ctx, "ADJUST_REAL_STOCK");
+      sanitizeNumber(args.real_stock, "Real stock");
+    }
+
+    if (args.display_stock !== undefined) {
+      await requirePermission(ctx, "MANAGE_DISPLAY_STOCK");
+      sanitizeNumber(args.display_stock, "Display stock");
+    }
+
+    const existing = await ctx.db.get(args.id);
+    if (!existing) {
+      throw new ConvexError({ code: "PRODUCT_NOT_FOUND", message: "Product not found." });
+    }
+
+    const nextCategoryId = args.categoryId ?? existing.categoryId;
+    const nextNameEn = args.name_en?.trim() || existing.name_en;
+    const nextSlug = args.slug !== undefined ? slugify(args.slug) : existing.slug || slugify(nextNameEn);
+    const nextStatus = args.status ?? existing.status;
+
+    if (!nextNameEn || !nextSlug) {
+      throw new ConvexError({
+        code: "INVALID_PRODUCT",
+        message: "Product must keep a valid English name and slug.",
+      });
+    }
+
+    if (nextStatus === "PUBLISHED") {
+      await ensureActiveCategory(ctx, nextCategoryId);
+    } else {
+      await ensureCategoryExists(ctx, nextCategoryId);
+    }
+
+    await ensureUniqueProductSlug(ctx, nextSlug, args.id);
+
+    const patch = {
+      ...(args.categoryId !== undefined ? { categoryId: nextCategoryId } : {}),
+      ...(args.name_ar !== undefined ? { name_ar: args.name_ar.trim() } : {}),
+      ...(args.name_en !== undefined ? { name_en: nextNameEn, name: nextNameEn } : {}),
+      ...(args.description_ar !== undefined
+        ? { description_ar: normalizeOptionalString(args.description_ar) }
+        : {}),
+      ...(args.description_en !== undefined
+        ? { description_en: normalizeOptionalString(args.description_en) }
+        : {}),
+      ...(args.images !== undefined ? { images: args.images } : {}),
+      ...(args.selling_price !== undefined
+        ? {
+            selling_price: sanitizeNumber(args.selling_price, "Selling price"),
+            price: sanitizeNumber(args.selling_price, "Selling price"),
+          }
+        : {}),
+      ...(args.cogs !== undefined ? { cogs: sanitizeNumber(args.cogs, "COGS") } : {}),
+      ...(args.display_stock !== undefined ? { display_stock: args.display_stock } : {}),
+      ...(args.real_stock !== undefined ? { real_stock: args.real_stock } : {}),
+      ...(args.status !== undefined ? { status: nextStatus } : {}),
+      slug: nextSlug,
+    };
+
+    await ctx.db.patch(args.id, patch);
+
+    await ctx.runMutation(internal.audit.logAudit, {
+      userId: user._id,
+      entityId: args.id,
+      actionType: "UPDATE_PRODUCT",
+      changes: { previous: existing, updated: patch },
+    });
+
+    return { success: true };
+  },
+});
+
 export const publishProduct = mutation({
   args: { id: v.id("products") },
   handler: async (ctx, args) => {
     const user = await requirePermission(ctx, "MANAGE_PRODUCTS");
 
     const product = await ctx.db.get(args.id);
-    if (!product) throw new Error("Product not found");
-
-    const category = await ctx.db.get(product.categoryId);
-    if (!category || !category.isActive) {
-      throw new Error("Cannot publish product. Parent category is inactive.");
+    if (!product) {
+      throw new ConvexError({ code: "PRODUCT_NOT_FOUND", message: "Product not found." });
     }
+
+    await ensureActiveCategory(ctx, product.categoryId);
 
     await ctx.db.patch(args.id, { status: "PUBLISHED" });
 
@@ -409,22 +605,20 @@ export const publishProduct = mutation({
       userId: user._id,
       entityId: args.id,
       actionType: "PUBLISH_PRODUCT",
-      timestamp: Date.now(),
       changes: { previousStatus: product.status, newStatus: "PUBLISHED" },
     });
   },
 });
 
-/**
- * Admin mutation to revert a product back to DRAFT.
- */
 export const unpublishProduct = mutation({
   args: { id: v.id("products") },
   handler: async (ctx, args) => {
     const user = await requirePermission(ctx, "MANAGE_PRODUCTS");
 
     const product = await ctx.db.get(args.id);
-    if (!product) throw new Error("Product not found");
+    if (!product) {
+      throw new ConvexError({ code: "PRODUCT_NOT_FOUND", message: "Product not found." });
+    }
 
     await ctx.db.patch(args.id, { status: "DRAFT" });
 
@@ -432,38 +626,30 @@ export const unpublishProduct = mutation({
       userId: user._id,
       entityId: args.id,
       actionType: "UNPUBLISH_PRODUCT",
-      timestamp: Date.now(),
       changes: { previousStatus: product.status, newStatus: "DRAFT" },
     });
   },
 });
 
-/**
- * Optimized query for the storefront homepage.
- * Returns only PUBLISHED products belonging to ACTIVE categories.
- */
 export const getForStorefront = query({
   args: {},
   handler: async (ctx) => {
-    // 1. Get all active categories first to filter products efficiently
     const activeCategories = await ctx.db
       .query("categories")
       .withIndex("by_active", (q) => q.eq("isActive", true))
       .collect();
 
-    const activeCategoryIds = new Set(activeCategories.map(c => c._id));
+    const activeCategoryIds = new Set(activeCategories.map((c) => c._id));
 
-    // 2. Fetch all published products
     const publishedProducts = await ctx.db
       .query("products")
       .withIndex("by_status", (q) => q.eq("status", "PUBLISHED"))
       .collect();
 
-    // 3. Filter products whose category is active and map to ProductDisplay shape
     return publishedProducts
-      .filter(p => activeCategoryIds.has(p.categoryId))
-      .map(p => {
-        const category = activeCategories.find(c => c._id === p.categoryId);
+      .filter((p) => activeCategoryIds.has(p.categoryId))
+      .map((p) => {
+        const category = activeCategories.find((c) => c._id === p.categoryId);
         return {
           _id: p._id,
           name_ar: p.name_ar,
@@ -479,3 +665,5 @@ export const getForStorefront = query({
       });
   },
 });
+
+

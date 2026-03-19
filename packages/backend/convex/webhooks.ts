@@ -72,7 +72,6 @@ export const processWebhookReceipt = internalMutation({
         await ctx.runMutation(internal.audit.logAudit, {
           entityId: order._id,
           actionType: "WEBHOOK_RECEIPT_MATCHED",
-          timestamp: Date.now(),
           changes: { paymentReceiptRef: mediaId, source: "WHATSAPP_WEBHOOK" },
         });
       }
@@ -100,7 +99,7 @@ export const processWebhookReceipt = internalMutation({
 export const attachReceiptManually = mutation({
   args: {
     orderId: v.id("orders"),
-    mediaStorageId: v.string(),
+    mediaStorageId: v.id("_storage"),
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -124,7 +123,6 @@ export const attachReceiptManually = mutation({
       userId: user._id,
       entityId: args.orderId,
       actionType: "MANUAL_RECEIPT_ATTACHED",
-      timestamp,
       changes: { 
         paymentReceiptRef: args.mediaStorageId,
         notes: args.notes 
@@ -133,7 +131,8 @@ export const attachReceiptManually = mutation({
 
     return {
       success: true,
-      timestamp,
     };
   },
 });
+
+

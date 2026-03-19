@@ -57,12 +57,12 @@ description: "Task list for Standalone Admin Dashboard Architecture"
 
 ### Implementation for User Story 1
 
-- [ ] T009 [P] [US1] Create order list query returning AWAITING_VERIFICATION orders in `packages/backend/convex/orders.ts`
-- [ ] T010 [P] [US1] Implement `updateOrderStatus` mutation in `packages/backend/convex/orders.ts` handling `CONFIRMED` transition and stock deductions
-- [ ] T011 [US1] Build upload file mutation for manual fallback receipts interacting with Convex File Storage in `packages/backend/convex/files.ts`
-- [ ] T012 [P] [US1] Implement Next.js presentation data-table component for orders queue in `apps/admin/src/app/orders/page.tsx`
-- [ ] T013 [US1] Implement Upload Receipt UI modal bound to the order details page in `apps/admin/src/app/orders/[id]/page.tsx`
-- [ ] T014 [US1] Implement Negative Concurrency Collision catching logic (real_stock <= 0) strictly via try/catch in `apps/admin/src/app/orders/[id]/page.tsx`
+- [X] T009 [P] [US1] Create order list query returning AWAITING_VERIFICATION orders in `packages/backend/convex/orders.ts`
+- [X] T010 [P] [US1] Implement `updateOrderStatus` mutation in `packages/backend/convex/orders.ts` handling `CONFIRMED` transition and stock deductions
+- [X] T011 [US1] Build upload file mutation for manual fallback receipts interacting with Convex File Storage in `packages/backend/convex/files.ts`
+- [X] T012 [P] [US1] Implement Next.js presentation data-table component for orders queue in `apps/admin/src/app/orders/page.tsx`
+- [X] T013 [US1] Implement Upload Receipt UI modal bound to the order details page in `apps/admin/src/app/orders/[id]/page.tsx`
+- [X] T014 [US1] Implement Negative Concurrency Collision catching logic (real_stock <= 0) strictly via try/catch in `apps/admin/src/app/orders/[id]/page.tsx`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -76,11 +76,11 @@ description: "Task list for Standalone Admin Dashboard Architecture"
 
 ### Implementation for User Story 2
 
-- [ ] T015 [P] [US2] Implement `createCategory` & `toggleCategoryStatus` mutations in `packages/backend/convex/categories.ts`
-- [ ] T016 [US2] Create Product mutations allowing independent `real_stock` and `display_stock` edits in `packages/backend/convex/products.ts`
-- [ ] T017 [P] [US2] Layout Categories CRUD views utilizing desktop-first data tables in `apps/admin/src/app/catalog/categories/page.tsx`
-- [ ] T018 [US2] Layout Products listing and variant creation modal in `apps/admin/src/app/catalog/products/page.tsx`
-- [ ] T019 [US2] Hook product unpublish validation logic if category is missing/inactive into `packages/backend/convex/products.ts`
+- [X] T015 [P] [US2] Implement `createCategory` & `toggleCategoryStatus` mutations in `packages/backend/convex/categories.ts`
+- [X] T016 [US2] Create Product mutations allowing independent `real_stock` and `display_stock` edits in `packages/backend/convex/products.ts`
+- [X] T017 [P] [US2] Layout Categories CRUD views utilizing desktop-first data tables in `apps/admin/src/app/catalog/categories/page.tsx`
+- [X] T018 [US2] Layout Products listing and variant creation modal in `apps/admin/src/app/catalog/products/page.tsx`
+- [X] T019 [US2] Hook product unpublish validation logic if category is missing/inactive into `packages/backend/convex/products.ts`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -151,5 +151,7 @@ description: "Task list for Standalone Admin Dashboard Architecture"
 2. Add User Story 1 → Confirm operational queue functions (MVP)
 3. Add User Story 2 → Release catalog management UI incrementally
 4. Add User Story 3 → Toggle RBAC logic on existing mutations
+
+
 
 

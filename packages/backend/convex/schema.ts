@@ -94,10 +94,11 @@ export default defineSchema({
       v.literal("CANCELLED")
     ),
     shortCode: v.optional(v.string()),
-    paymentReceiptRef: v.optional(v.string()),
+    paymentReceiptRef: v.optional(v.union(v.string(), v.id("_storage"))),
   })
     .index("by_shortCode", ["shortCode"])
-    .index("by_session", ["sessionId"]),
+    .index("by_session", ["sessionId"])
+    .index("by_state", ["state"]),
 
   audit_logs: defineTable({
     userId: v.optional(v.id("users")),
@@ -107,3 +108,4 @@ export default defineSchema({
     changes: v.any(),
   }),
 });
+
