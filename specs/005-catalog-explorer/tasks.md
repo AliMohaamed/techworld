@@ -15,7 +15,7 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Review `specs/005-catalog-explorer/contracts/api.ts` to ensure understanding of the required Convex queries.
+- [X] T001 Review `specs/005-catalog-explorer/contracts/api.ts` to ensure understanding of the required Convex queries.
 
 ---
 
@@ -25,9 +25,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T002 Update `convex/schema.ts` to add `searchIndex("search_name", { searchField: "name" })` to the `products` table.
-- [ ] T003 Update `convex/schema.ts` to add `index("by_category", ["categoryId"])` to the `products` table.
-- [ ] T004 Update `convex/schema.ts` to ensure `categories` table has necessary active indices (`by_active`).
+- [X] T002 Update `convex/schema.ts` to add `searchIndex("search_name", { searchField: "name" })` to the `products` table.
+- [X] T003 Update `convex/schema.ts` to add `index("by_category", ["categoryId"])` to the `products` table.
+- [X] T004 Update `convex/schema.ts` to ensure `categories` table has necessary active indices (`by_active`).
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -41,12 +41,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T005 [P] [US1] Implement Convex query `searchAndFilter` in `convex/products.ts` supporting `paginationOpts` and branching logic for `searchQuery`.
-- [ ] T006 [P] [US1] Create Convex query `getRecommendedProducts` in `convex/products.ts` to power the empty state fallback.
-- [ ] T007 [P] [US1] Create UI component `FilterDrawer` in `src/components/storefront/filter-drawer.tsx` syncing state to the URL via `useRouter` or `nuqs`.
-- [ ] T008 [P] [US1] Create UI component `LoadMoreButton` in `src/components/storefront/load-more-button.tsx`.
-- [ ] T009 [US1] Implement presentation page `src/app/(store)/products/page.tsx` utilizing `usePaginatedQuery("api.products.searchAndFilter")`.
-- [ ] T010 [US1] Implement empty state fallback rendering in `src/app/(store)/products/page.tsx` using `getRecommendedProducts` if search yields zero results.
+- [X] T005 [P] [US1] Implement Convex query `searchAndFilter` in `convex/products.ts` supporting `paginationOpts` and branching logic for `searchQuery`.
+- [X] T006 [P] [US1] Create Convex query `getRecommendedProducts` in `convex/products.ts` to power the empty state fallback.
+- [X] T007 [P] [US1] Create UI component `FilterDrawer` in `src/components/storefront/filter-drawer.tsx` syncing state to the URL via `useRouter` or `nuqs`.
+- [X] T008 [P] [US1] Create UI component `LoadMoreButton` in `src/components/storefront/load-more-button.tsx`.
+- [X] T009 [US1] Implement presentation page `src/app/(store)/products/page.tsx` utilizing `usePaginatedQuery("api.products.searchAndFilter")`.
+- [X] T010 [US1] Implement empty state fallback rendering in `src/app/(store)/products/page.tsx` using `getRecommendedProducts` if search yields zero results.
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently.
 
@@ -60,10 +60,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T011 [P] [US2] Implement Convex query `listActiveCategories` in `convex/categories.ts`.
-- [ ] T012 [P] [US2] Create UI component `CategoryGridCard` in `src/components/storefront/category-grid-card.tsx` to display category visuals and route to the specific category page.
-- [ ] T013 [US2] Implement presentation layout in `src/app/(store)/categories/page.tsx` rendering the `CategoryGridCard` elements.
-- [ ] T014 [US2] Implement filtered routing view in `src/app/(store)/categories/[id]/page.tsx` acting as a wrapper that invokes the US1 catalog list but strictly locked to the URL parameter `id`.
+- [X] T011 [P] [US2] Implement Convex query `listActiveCategories` in `convex/categories.ts`.
+- [X] T012 [P] [US2] Create UI component `CategoryGridCard` in `src/components/storefront/category-grid-card.tsx` to display category visuals and route to the specific category page.
+- [X] T013 [US2] Implement presentation layout in `src/app/(store)/categories/page.tsx` rendering the `CategoryGridCard` elements.
+- [X] T014 [US2] Implement filtered routing view in `src/app/(store)/categories/[id]/page.tsx` acting as a wrapper that invokes the US1 catalog list but strictly locked to the URL parameter `id`.
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently.
 
@@ -73,8 +73,8 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T015 [P] Verify Dark Mode and Space Grotesk styling across both `/products` and `/categories` layouts.
-- [ ] T016 [P] Verify that the `FilterDrawer` transforms correctly between mobile bottom-sheet and desktop sidebar layout.
+- [X] T015 [P] Verify Dark Mode and Space Grotesk styling across both `/products` and `/categories` layouts.
+- [X] T016 [P] Verify that the `FilterDrawer` transforms correctly between mobile bottom-sheet and desktop sidebar layout.
 
 ---
 

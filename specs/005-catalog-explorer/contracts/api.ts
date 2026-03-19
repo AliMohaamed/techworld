@@ -2,6 +2,23 @@
 // File: contracts/api.ts
 // Details the exact shape of the new/required Convex Queries
 
+interface CatalogProduct {
+  _id: string;
+  categoryId: string;
+  name_ar: string;
+  name_en: string;
+  selling_price: number;
+  display_stock: number;
+  images: string[];
+}
+
+interface Category {
+  _id: string;
+  name_ar: string;
+  name_en: string;
+  slug: string;
+}
+
 /**
  * Convex Query: api.products.searchAndFilter
  * Designed for paginated fetching of the catalog adhering to absolute server authority.

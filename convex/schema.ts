@@ -51,7 +51,10 @@ export default defineSchema({
     price: v.optional(v.number()),
   })
     .index("by_category", ["categoryId"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_category_status_price", ["categoryId", "status", "selling_price"])
+    .index("by_status_price", ["status", "selling_price"])
+    .searchIndex("search_name", { searchField: "name" }),
 
   cart_sessions: defineTable({
     sessionId: v.string(),

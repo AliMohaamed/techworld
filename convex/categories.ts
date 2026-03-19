@@ -19,10 +19,14 @@ export const getCategoryById = query({
 export const listActiveCategories = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db
+    const categories = await ctx.db
       .query("categories")
       .withIndex("by_active", (q) => q.eq("isActive", true))
       .collect();
+
+    return {
+      categories: categories.sort((a, b) => a.name_en.localeCompare(b.name_en)),
+    };
   },
 });
 

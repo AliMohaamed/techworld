@@ -6,7 +6,8 @@ import { api } from "../../../convex/_generated/api";
 import { ArrowUpRight, Cpu, MousePointer2, Headphones } from "lucide-react";
 
 export default function CategorySection() {
-  const categories = useQuery(api.categories.listActiveCategories);
+  const categoryResult = useQuery(api.categories.listActiveCategories);
+  const categories = categoryResult?.categories;
 
   const getCategoryIcon = (slug: string) => {
     switch (slug?.toLowerCase()) {
@@ -37,7 +38,7 @@ export default function CategorySection() {
           {categories.slice(0, 3).map((category) => (
             <Link 
               key={category._id} 
-              href={`/categories/${category.slug}`}
+              href={`/categories/${category._id}`}
               className="group relative h-64 overflow-hidden rounded-[24px] bg-zinc-900 border border-white/5 p-8 flex flex-col justify-between hover:border-[#ffc105]/40 transition-all"
             >
               <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center text-[#ffc105] group-hover:scale-110 transition-transform">
