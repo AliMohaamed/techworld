@@ -166,19 +166,19 @@ export function ProductFormSheet({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70">
-      <div className="absolute inset-y-0 right-0 w-full max-w-4xl overflow-y-auto border-l border-white/10 bg-[#0b0b0b] p-6 shadow-2xl shadow-black/40">
-        <div className="mb-6 flex items-center justify-between gap-4">
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-[2px]">
+      <div className="absolute inset-x-0 bottom-0 top-6 w-full overflow-y-auto rounded-t-[32px] border border-white/10 bg-[#0b0b0b] p-4 shadow-2xl shadow-black/40 sm:inset-y-0 sm:left-auto sm:right-0 sm:max-w-4xl sm:rounded-none sm:border-l sm:border-t-0 sm:p-6">
+        <div className="sticky top-0 z-10 -mx-4 mb-6 flex items-start justify-between gap-4 border-b border-white/10 bg-[#0b0b0b]/95 px-4 pb-4 pt-1 backdrop-blur sm:static sm:mx-0 sm:border-b-0 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-0">
           <div>
             <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Product Sheet</p>
-            <h2 className="mt-2 text-2xl font-semibold text-white">
+            <h2 className="mt-2 text-xl font-semibold text-white sm:text-2xl">
               {product ? "Edit advanced product" : "Create advanced product"}
             </h2>
           </div>
           <Button type="button" variant="ghost" onClick={onClose}>Close</Button>
         </div>
 
-        <form className="space-y-8" onSubmit={(event) => void submit(event)}>
+        <form className="space-y-8 pb-24 sm:pb-8" onSubmit={(event) => void submit(event)}>
           <section className="grid gap-4 md:grid-cols-2">
             <Field label="Category" error={errors.categoryId?.message}>
               <select className="field" {...register("categoryId")}>
@@ -245,7 +245,7 @@ export function ProductFormSheet({
           </section>
 
           <section className="space-y-4">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Variants</p>
                 <h3 className="mt-2 text-xl font-semibold text-white">SKU configuration</h3>
@@ -269,7 +269,7 @@ export function ProductFormSheet({
             <div className="space-y-4">
               {fields.map((field, index) => (
                 <div key={field.id} className="rounded-[24px] border border-white/10 bg-black/30 p-5">
-                  <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-sm font-medium text-white">Variant {index + 1}</p>
                     {fields.length > 1 ? (
                       <Button type="button" variant="ghost" onClick={() => remove(index)}>
@@ -317,11 +317,11 @@ export function ProductFormSheet({
             </div>
           </section>
 
-          <div className="flex gap-3">
-            <Button disabled={isSubmitting} type="submit">
+          <div className="sticky bottom-0 -mx-4 flex flex-col gap-3 border-t border-white/10 bg-[#0b0b0b]/95 px-4 pb-2 pt-4 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:border-t-0 sm:bg-transparent sm:px-0 sm:pb-0">
+            <Button className="w-full sm:w-auto" disabled={isSubmitting} type="submit">
               {isSubmitting ? "Saving..." : product ? "Update Product" : "Create Product"}
             </Button>
-            <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button className="w-full sm:w-auto" type="button" variant="ghost" onClick={onClose}>Cancel</Button>
           </div>
         </form>
       </div>
@@ -380,6 +380,7 @@ function buildPayload(values: ProductFormSubmitValues) {
     })),
   };
 }
+
 
 
 

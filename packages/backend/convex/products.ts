@@ -195,30 +195,30 @@ async function getProductSkus(ctx: Pick<QueryCtx, "db">, productId: Id<"products
     .collect();
 }
 
-function isResolvedAssetUrl(value: string) {
+export function isResolvedAssetUrl(value: string) {
   return value.startsWith("/") || value.startsWith("http://") || value.startsWith("https://");
 }
 
-async function resolveStorageRef(
+export async function resolveStorageRef(
   ctx: Pick<QueryCtx, "storage">,
   fileRef: string | Id<"_storage"> | undefined,
 ) {
   if (!fileRef) {
     return undefined;
   }
-
+ 
   if (typeof fileRef === "string" && isResolvedAssetUrl(fileRef)) {
     return fileRef;
   }
-
+ 
   try {
     return (await ctx.storage.getUrl(fileRef as Id<"_storage">)) ?? undefined;
   } catch {
-    return typeof fileRef === "string" ? fileRef : undefined;
+    return undefined;
   }
 }
 
-async function resolveProductImages(
+export async function resolveProductImages(
   ctx: Pick<QueryCtx, "storage">,
   images: Array<string | Id<"_storage">>,
 ) {
@@ -791,6 +791,37 @@ function sanitizeOptionalNumber(value: number | undefined, fieldLabel: string) {
   return sanitizeNumber(value, fieldLabel);
 }
 
+function buildNormalizedAdvancedVariants(args: {
+  variants: Array<{
+    id?: Id<"skus">;
+    variantName: string;
+    variantAttributes: { color?: string; size?: string; type?: string };
+    real_stock: number;
+    display_stock: number;
+    price: number;
+    compareAtPrice?: number;
+    linkedImageId?: string | Id<"_storage">;
+    isDefault?: boolean;
+  }>;
+  name_en: string;
+  selling_price: number;
+  compareAtPrice?: number;
+  images: Array<string | Id<"_storage">>;
+}) {
+  const fallbackVariant = {
+    variantName: `${args.name_en} Default`,
+    variantAttributes: {},
+    real_stock: 0,
+    display_stock: 0,
+    price: args.selling_price,
+    compareAtPrice: args.compareAtPrice,
+    linkedImageId: args.images[0],
+    isDefault: true,
+  };
+
+  return (args.variants.length > 0 ? args.variants : [fallbackVariant]).map(normalizeAdvancedVariant);
+}
+
 function normalizeAdvancedVariant(variant: {
   id?: Id<"skus">;
   variantName: string;
@@ -905,18 +936,13 @@ export const createAdvancedProduct = mutation({
       });
     }
 
-    const normalizedVariants = (args.variants.length > 0
-      ? args.variants
-      : [{
-          variantName: `${name_en} Default`,
-          variantAttributes: {},
-          real_stock: 0,
-          display_stock: 0,
-          price: args.selling_price,
-          compareAtPrice: args.compareAtPrice,
-          linkedImageId: args.images[0],
-          isDefault: true,
-        }]).map(normalizeAdvancedVariant);
+    const normalizedVariants = buildNormalizedAdvancedVariants({
+      variants: args.variants,
+      name_en,
+      selling_price: args.selling_price,
+      compareAtPrice: args.compareAtPrice,
+      images: args.images,
+    });
 
     const displayStock = normalizedVariants.reduce((sum, variant) => sum + variant.display_stock, 0);
     const realStock = normalizedVariants.reduce((sum, variant) => sum + variant.real_stock, 0);
@@ -1002,18 +1028,13 @@ export const updateAdvancedProduct = mutation({
 
     await ensureUniqueProductSlug(ctx, slug, args.id);
 
-    const normalizedVariants = (args.variants.length > 0
-      ? args.variants
-      : [{
-          variantName: `${name_en} Default`,
-          variantAttributes: {},
-          real_stock: 0,
-          display_stock: 0,
-          price: args.selling_price,
-          compareAtPrice: args.compareAtPrice,
-          linkedImageId: args.images[0],
-          isDefault: true,
-        }]).map(normalizeAdvancedVariant);
+    const normalizedVariants = buildNormalizedAdvancedVariants({
+      variants: args.variants,
+      name_en,
+      selling_price: args.selling_price,
+      compareAtPrice: args.compareAtPrice,
+      images: args.images,
+    });
 
     const displayStock = normalizedVariants.reduce((sum, variant) => sum + variant.display_stock, 0);
     const realStock = normalizedVariants.reduce((sum, variant) => sum + variant.real_stock, 0);
@@ -1055,6 +1076,9 @@ export const updateAdvancedProduct = mutation({
     return { success: true };
   },
 });
+
+
+
 
 
 

@@ -79,8 +79,8 @@ description: "Task list for Phase 7 - Advanced Catalog, Variants, Media Gallery 
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T017 [P] Execute full QA walk-through validating Mobile UI layouts for `ProductFormSheet.tsx` 
-- [ ] T018 Confirm "Default" SKU creation fallback successfully works for purely simple products containing no manual variants
+- [X] T017 [P] Execute full QA walk-through validating Mobile UI layouts for `ProductFormSheet.tsx` 
+- [X] T018 Confirm "Default" SKU creation fallback successfully works for purely simple products containing no manual variants
 
 ---
 
@@ -130,6 +130,7 @@ Task: "Implement conditional semantic rendering <s> for compareAtPrice..."
 1. Complete Setup + Foundational → Foundation ready
 2. Add User Story 1 → Test independently → Admin Functionality Active (MVP)
 3. Add User Story 2 → Test storefront dynamic syncing independently.
+
 
 
 

@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { resolveProductImages } from "./products";
 
 /**
  * Guest-first mutation to add or update an item in the persistent shopping cart.
@@ -105,7 +106,13 @@ export const getCart = query({
         // We strip cogs here as it is a public-facing guest query
         if (product) {
           const { cogs, ...publicProduct } = product;
-          return { ...item, product: publicProduct };
+          return {
+            ...item,
+            product: {
+              ...publicProduct,
+              images: await resolveProductImages(ctx, publicProduct.images),
+            },
+          };
         }
         return { ...item, product: null };
       })
