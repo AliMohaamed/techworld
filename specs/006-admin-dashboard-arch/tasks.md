@@ -94,10 +94,10 @@ description: "Task list for Standalone Admin Dashboard Architecture"
 
 ### Implementation for User Story 3
 
-- [ ] T020 [P] [US3] Extract `hasPermission` utility function for mutation authorization checks in `packages/backend/convex/utils/permissions.ts`
-- [ ] T021 [US3] Mask and redact financial fields dynamically inside the `getOrderDetails` query for users without `VIEW_FINANCIALS` in `packages/backend/convex/orders.ts`
-- [ ] T022 [P] [US3] Implement dynamic client-side Sidebar navigation filtering based on permissions in `apps/admin/src/components/Sidebar.tsx`
-- [ ] T023 [US3] Create unprivileged view logic to mask/hide COGS and margins inside `apps/admin/src/app/orders/[id]/page.tsx`
+- [X] T020 [P] [US3] Extract `hasPermission` utility function for mutation authorization checks in `packages/backend/convex/utils/permissions.ts`
+- [X] T021 [US3] Mask and redact financial fields dynamically inside the `getOrderDetails` query for users without `VIEW_FINANCIALS` in `packages/backend/convex/orders.ts`
+- [X] T022 [P] [US3] Implement dynamic client-side Sidebar navigation filtering based on permissions in `apps/admin/src/components/Sidebar.tsx`
+- [X] T023 [US3] Create unprivileged view logic to mask/hide COGS and margins inside `apps/admin/src/app/orders/[id]/page.tsx`
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -151,6 +151,7 @@ description: "Task list for Standalone Admin Dashboard Architecture"
 2. Add User Story 1 → Confirm operational queue functions (MVP)
 3. Add User Story 2 → Release catalog management UI incrementally
 4. Add User Story 3 → Toggle RBAC logic on existing mutations
+
 
 
 

@@ -108,7 +108,7 @@ export default function OrderDetailsPage() {
             <InfoCard label="Phone" value={order.customerPhone ?? "Not provided"} />
             <InfoCard label="Address" value={order.customerAddress ?? "Not provided"} />
             <InfoCard label="Order State" value={order.state} />
-            <InfoCard label="Total" value={`${order.total_price.toLocaleString()} EGP`} />
+            <InfoCard label="Total Revenue" value={formatFinancialValue(order.financials.total_revenue)} />
           </div>
 
           <div className="rounded-[24px] border border-white/10 bg-black/30 p-6">
@@ -119,6 +119,34 @@ export default function OrderDetailsPage() {
               <span>Quantity: {order.quantity}</span>
               <span>Real stock: {order.product?.real_stock ?? "Unknown"}</span>
             </div>
+          </div>
+
+          <div className="rounded-[24px] border border-white/10 bg-black/30 p-6">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Financial Visibility</p>
+                <h2 className="mt-3 text-xl font-semibold text-white">Profitability Snapshot</h2>
+              </div>
+              <span
+                className={`rounded-full border px-3 py-1 text-xs ${
+                  order.canViewFinancials
+                    ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+                    : "border-amber-400/30 bg-amber-400/10 text-amber-200"
+                }`}
+              >
+                {order.canViewFinancials ? "Visible" : "Masked"}
+              </span>
+            </div>
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              <InfoCard label="Unit COGS" value={formatFinancialValue(order.financials.unit_cogs)} />
+              <InfoCard label="Total COGS" value={formatFinancialValue(order.financials.total_cogs)} />
+              <InfoCard label="Net Margin" value={formatFinancialValue(order.financials.net_margin)} />
+            </div>
+            {!order.canViewFinancials ? (
+              <p className="mt-4 text-sm text-zinc-500">
+                This staff account can process the order, but financial metrics are redacted server-side.
+              </p>
+            ) : null}
           </div>
         </div>
 
@@ -197,4 +225,16 @@ function InfoCard({ label, value }: { label: string; value: string }) {
       <p className="mt-3 text-sm leading-6 text-white">{value}</p>
     </div>
   );
+}
+
+function formatFinancialValue(value: number | string | null) {
+  if (typeof value === "number") {
+    return `${value.toLocaleString()} EGP`;
+  }
+
+  if (value === null) {
+    return "N/A";
+  }
+
+  return value;
 }

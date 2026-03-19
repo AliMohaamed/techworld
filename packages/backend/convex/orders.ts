@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query, QueryCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { requirePermission } from "./lib/rbac";
+import { hasPermission } from "./lib/permissions";
 import { Id } from "./_generated/dataModel";
 
 async function getActorUserId(ctx: Parameters<typeof requirePermission>[0]) {
@@ -40,6 +41,32 @@ async function getReceiptUrl(ctx: Pick<QueryCtx, "storage">, receiptRef: string 
   } catch {
     return null;
   }
+}
+
+async function canViewFinancials(ctx: Pick<QueryCtx, "db" | "auth">) {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    return false;
+  }
+
+  const identifier = identity.subject ?? null;
+  const email = identity.email ?? null;
+
+  const user =
+    (identifier
+      ? await ctx.db
+          .query("users")
+          .withIndex("by_identifier", (q) => q.eq("identifier", identifier))
+          .unique()
+      : null) ??
+    (email
+      ? await ctx.db
+          .query("users")
+          .withIndex("by_email", (q) => q.eq("email", email))
+          .unique()
+      : null);
+
+  return hasPermission(user, "VIEW_FINANCIALS");
 }
 
 export const listAwaitingVerificationOrders = query({
@@ -84,13 +111,30 @@ export const getOrderDetails = query({
     const category = product ? await ctx.db.get(product.categoryId) : null;
     const customer = order.userId ? await ctx.db.get(order.userId) : null;
     const receiptUrl = await getReceiptUrl(ctx, order.paymentReceiptRef);
+    const viewFinancials = await canViewFinancials(ctx);
+    const unitCogs = product?.cogs ?? null;
+    const totalCogs = unitCogs === null ? null : unitCogs * order.quantity;
+    const netMargin = totalCogs === null ? null : order.total_price - totalCogs;
 
     return {
       ...order,
-      product,
+      total_price: viewFinancials ? order.total_price : null,
+      product: product
+        ? {
+            ...product,
+            ...(viewFinancials ? {} : { cogs: undefined }),
+          }
+        : null,
       category,
       customer,
       receiptUrl,
+      canViewFinancials: viewFinancials,
+      financials: {
+        unit_cogs: viewFinancials ? unitCogs : "***",
+        total_cogs: viewFinancials ? totalCogs : "***",
+        total_revenue: viewFinancials ? order.total_price : "***",
+        net_margin: viewFinancials ? netMargin : "***",
+      },
     };
   },
 });
@@ -319,4 +363,6 @@ export const getOrdersByShortCode = query({
       .collect();
   },
 });
+
+
 

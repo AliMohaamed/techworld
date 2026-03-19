@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query, QueryCtx } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
 import { requirePermission } from "./lib/rbac";
+import { hasPermission } from "./lib/permissions";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 
@@ -167,7 +168,7 @@ async function canViewFinancials(ctx: Pick<QueryCtx, "auth" | "db">) {
     .query("users")
     .withIndex("by_email", (q) => q.eq("email", email))
     .unique();
-  return user?.permissions.includes("VIEW_FINANCIALS") ?? false;
+  return hasPermission(user, "VIEW_FINANCIALS");
 }
 
 async function getPublicationBlocker(
@@ -665,5 +666,6 @@ export const getForStorefront = query({
       });
   },
 });
+
 
 

@@ -1,6 +1,6 @@
 import { ConvexError } from "convex/values";
 import { QueryCtx } from "../_generated/server";
-import { Permission } from "./permissions";
+import { hasPermission, Permission } from "./permissions";
 
 export async function requirePermission(
   ctx: Pick<QueryCtx, "db" | "auth">,
@@ -39,7 +39,7 @@ export async function requirePermission(
     });
   }
 
-  if (!user.permissions.includes(permission)) {
+  if (!hasPermission(user, permission)) {
     throw new ConvexError({
       code: "FORBIDDEN",
       message: `Unauthorized: Requires '${permission}' permission.`,
@@ -48,4 +48,5 @@ export async function requirePermission(
 
   return user;
 }
+
 

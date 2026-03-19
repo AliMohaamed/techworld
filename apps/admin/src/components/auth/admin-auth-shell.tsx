@@ -3,12 +3,13 @@
 import { usePathname } from "next/navigation";
 import { Authenticated, AuthLoading, Unauthenticated, useQuery } from "convex/react";
 import { useForm } from "react-hook-form";
-import { ShieldCheck, LogOut, Boxes, FolderTree, ClipboardList, Home } from "lucide-react";
+import { ShieldCheck, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@techworld/ui/button";
 import { api } from "@backend/convex/_generated/api";
 import { authClient } from "@/lib/auth-client";
+import { Sidebar } from "@/components/Sidebar";
 
 const signInSchema = z.object({
   email: z.string().trim().email("Enter a valid admin email address."),
@@ -19,13 +20,6 @@ const signInSchema = z.object({
 });
 
 type SignInValues = z.infer<typeof signInSchema>;
-
-const navItems = [
-  { href: "/", label: "Overview", icon: Home },
-  { href: "/orders", label: "Orders", icon: ClipboardList },
-  { href: "/catalog/categories", label: "Categories", icon: FolderTree },
-  { href: "/catalog/products", label: "Products", icon: Boxes },
-] as const;
 
 export function AdminAuthShell({ children }: { children: React.ReactNode }) {
   return (
@@ -205,44 +199,7 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <div className="mx-auto flex max-w-7xl gap-6 px-6 py-6">
-        <aside className="hidden w-72 shrink-0 rounded-[24px] border border-white/10 bg-[#0b0b0b] p-5 lg:block">
-          <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Navigation</p>
-          <nav className="mt-4 space-y-2">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-              const Icon = item.icon;
-              return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition ${
-                    isActive
-                      ? "border-[#ffc105]/30 bg-[#ffc105]/10 text-[#ffc105]"
-                      : "border-white/10 text-zinc-300 hover:border-white/20 hover:text-white"
-                  }`}
-                >
-                  <Icon size={16} />
-                  {item.label}
-                </a>
-              );
-            })}
-          </nav>
-          <p className="mt-8 text-[11px] uppercase tracking-[0.35em] text-zinc-500">Permissions</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {profile.permissions.length ? (
-              profile.permissions.map((permission) => (
-                <span
-                  key={String(permission)}
-                  className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300"
-                >
-                  {permission}
-                </span>
-              ))
-            ) : (
-              <span className="text-sm text-zinc-500">No staff permissions mapped yet.</span>
-            )}
-          </div>
-        </aside>
+        <Sidebar pathname={pathname} permissions={profile.permissions} />
         <div className="min-w-0 flex-1">{children}</div>
       </div>
     </div>
