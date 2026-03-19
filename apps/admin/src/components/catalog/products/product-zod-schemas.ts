@@ -17,6 +17,18 @@ export const variantSchema = z.object({
   compareAtPrice: optionalNonNegative,
   linkedImageId: z.string().optional(),
   isDefault: z.boolean().default(false),
+}).superRefine((value, ctx) => {
+  // H2 FIX: Validate compareAtPrice at the variant level, not just the product level.
+  if (
+    value.compareAtPrice !== undefined &&
+    value.compareAtPrice < value.price
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["compareAtPrice"],
+      message: "Compare-at price must be greater than or equal to the variant price.",
+    });
+  }
 });
 
 export const productSchema = z.object({

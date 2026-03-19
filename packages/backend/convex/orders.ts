@@ -4,6 +4,7 @@ import { requirePermission } from "./lib/rbac";
 import { hasPermission } from "./lib/permissions";
 import { scheduleAuditLog, writeAuditLog } from "./lib/audit";
 import { Id } from "./_generated/dataModel";
+import { internal } from "./_generated/api";
 
 async function getActorUserId(ctx: Parameters<typeof requirePermission>[0]) {
   const identity = await ctx.auth.getUserIdentity();
@@ -83,12 +84,14 @@ export const listAwaitingVerificationOrders = query({
     return Promise.all(
       orders.map(async (order) => {
         const product = await ctx.db.get(order.productId);
+        const sku = await ctx.db.get(order.skuId);
         const category = product ? await ctx.db.get(product.categoryId) : null;
         const receiptUrl = await getReceiptUrl(ctx, order.paymentReceiptRef);
 
         return {
           ...order,
           product,
+          sku,
           category,
           receiptUrl,
         };
@@ -108,10 +111,12 @@ export const getOrderDetails = query({
     }
 
     const product = await ctx.db.get(order.productId);
+    const sku = await ctx.db.get(order.skuId);
     const category = product ? await ctx.db.get(product.categoryId) : null;
     const customer = order.userId ? await ctx.db.get(order.userId) : null;
     const receiptUrl = await getReceiptUrl(ctx, order.paymentReceiptRef);
     const viewFinancials = await canViewFinancials(ctx);
+    // Cost of goods is per unit on the product, profit margin computed against SKU sale price
     const unitCogs = product?.cogs ?? null;
     const totalCogs = unitCogs === null ? null : unitCogs * order.quantity;
     const netMargin = totalCogs === null ? null : order.total_price - totalCogs;
@@ -119,6 +124,7 @@ export const getOrderDetails = query({
     return {
       ...order,
       total_price: viewFinancials ? order.total_price : null,
+      sku,
       product: product
         ? {
             ...product,
@@ -174,17 +180,11 @@ export const updateOrderStatus = mutation({
     }
 
     if (args.newState === "CONFIRMED") {
-      const product = await ctx.db.get(order.productId);
-      if (!product) {
-        throw new ConvexError({ code: "PRODUCT_NOT_FOUND", message: "Product not found" });
-      }
-
-      if (product.real_stock < order.quantity) {
-        throw new ConvexError({ code: "OUT_OF_STOCK", message: "Product is out of stock." });
-      }
-
-      await ctx.db.patch(order.productId, {
-        real_stock: product.real_stock - order.quantity,
+      // C2 FIX: Deduct real_stock from the specific SKU, not the product root.
+      // Uses the internal decrementSkuRealStock which enforces the Zero Floor guard.
+      await ctx.runMutation(internal.skus.decrementSkuRealStock, {
+        skuId: order.skuId,
+        quantity: order.quantity,
       });
     }
 
@@ -197,6 +197,7 @@ export const updateOrderStatus = mutation({
       changes: {
         from: order.state,
         to: args.newState,
+        skuId: order.skuId,
         manualReceiptId: args.manualReceiptId,
       },
     });
@@ -208,6 +209,7 @@ export const updateOrderStatus = mutation({
 export const createOrder = mutation({
   args: {
     productId: v.id("products"),
+    skuId: v.id("skus"),
     quantity: v.number(),
   },
   handler: async (ctx, args) => {
@@ -231,20 +233,29 @@ export const createOrder = mutation({
       throw new ConvexError({ code: "PRODUCT_NOT_FOUND", message: "Product not found" });
     }
 
-    if (product.display_stock < args.quantity) {
+    // Validate stock at SKU level (Unified SKU Architecture)
+    const sku = await ctx.db.get(args.skuId);
+    if (!sku) {
+      throw new ConvexError({ code: "SKU_NOT_FOUND", message: "Selected variant not found." });
+    }
+    if (sku.productId !== args.productId) {
+      throw new ConvexError({ code: "SKU_PRODUCT_MISMATCH", message: "Variant does not belong to this product." });
+    }
+    if (sku.display_stock < args.quantity) {
       throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: "Insufficient display stock available for this order." });
     }
 
-    const newDisplayStock = product.display_stock - args.quantity;
-    await ctx.db.patch(args.productId, {
-      display_stock: newDisplayStock,
+    // Deduct display_stock at SKU level (does not touch real_stock — deferred to CONFIRMED state)
+    await ctx.db.patch(args.skuId, {
+      display_stock: sku.display_stock - args.quantity,
     });
 
     const orderId = await ctx.db.insert("orders", {
       userId: user._id,
       productId: args.productId,
+      skuId: args.skuId,
       quantity: args.quantity,
-      total_price: product.selling_price * args.quantity,
+      total_price: sku.price * args.quantity,
       state: "PENDING_PAYMENT_INPUT",
     });
 
@@ -254,8 +265,9 @@ export const createOrder = mutation({
       actionType: "ORDER_CREATED_PENDING",
       changes: {
         productId: args.productId,
+        skuId: args.skuId,
+        variantName: sku.variantName,
         quantity: args.quantity,
-        newDisplayStock,
         state: "PENDING_PAYMENT_INPUT",
       },
     });
@@ -284,76 +296,6 @@ export const payOrder = mutation({
   },
 });
 
-function generateShortCode() {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let code = "";
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return `TW-${code}`;
-}
-
-export const placeOrderFromSession = mutation({
-  args: {
-    sessionId: v.string(),
-    customerName: v.string(),
-    customerPhone: v.string(),
-    customerAddress: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("cart_sessions")
-      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
-      .unique();
-
-    if (!session || session.items.length === 0) {
-      throw new Error("Cannot place order with an empty cart");
-    }
-
-    const shortCode = generateShortCode();
-
-    for (const item of session.items) {
-      const product = await ctx.db.get(item.productId);
-      if (!product) continue;
-
-      if (product.display_stock < item.quantity) {
-        throw new Error(`Insufficient stock for product: ${product.name_en}`);
-      }
-
-      await ctx.db.patch(item.productId, {
-        display_stock: product.display_stock - item.quantity,
-      });
-
-      await ctx.db.insert("orders", {
-        sessionId: args.sessionId,
-        customerName: args.customerName,
-        customerPhone: args.customerPhone,
-        customerAddress: args.customerAddress,
-        productId: item.productId,
-        quantity: item.quantity,
-        total_price: product.selling_price * item.quantity,
-        state: "PENDING_PAYMENT_INPUT",
-        shortCode,
-      });
-
-      await writeAuditLog(ctx, {
-        entityId: args.sessionId,
-        actionType: "GUEST_ORDER_CREATED",
-        changes: {
-          productId: item.productId,
-          quantity: item.quantity,
-          shortCode,
-          customerName: args.customerName,
-        },
-      });
-    }
-
-    await ctx.db.delete(session._id);
-
-    return shortCode;
-  },
-});
-
 export const getOrdersByShortCode = query({
   args: { shortCode: v.string() },
   handler: async (ctx, args) => {
@@ -363,7 +305,3 @@ export const getOrdersByShortCode = query({
       .collect();
   },
 });
-
-
-
-

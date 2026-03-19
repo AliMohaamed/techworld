@@ -25,8 +25,9 @@ type AdminProduct = {
   status: "DRAFT" | "PUBLISHED";
   thumbnail?: string;
   images: string[];
-  display_stock: number;
-  real_stock: number;
+  // display_stock and real_stock are optional on the root — advanced products store them on SKUs.
+  display_stock?: number;
+  real_stock?: number;
   skus?: Array<{
     _id: Id<"skus">;
     variantName: string;
@@ -73,8 +74,8 @@ export default function AdminProductsPage() {
     setIsSheetOpen(false);
   };
 
-  const saveDisplayStock = async (id: Id<"products">, fallbackValue: number) => {
-    const nextValue = Number(displayDrafts[id] ?? fallbackValue);
+  const saveDisplayStock = async (id: Id<"products">, fallbackValue: number | undefined) => {
+    const nextValue = Number(displayDrafts[id] ?? fallbackValue ?? 0);
     setBusyId(id);
     try {
       await updateProduct({ id, display_stock: nextValue });
@@ -87,8 +88,8 @@ export default function AdminProductsPage() {
     }
   };
 
-  const saveRealStock = async (id: Id<"products">, fallbackValue: number) => {
-    const nextValue = Number(realDrafts[id] ?? fallbackValue);
+  const saveRealStock = async (id: Id<"products">, fallbackValue: number | undefined) => {
+    const nextValue = Number(realDrafts[id] ?? fallbackValue ?? 0);
     setBusyId(id);
     try {
       await updateProduct({ id, real_stock: nextValue });
@@ -193,46 +194,68 @@ export default function AdminProductsPage() {
                     </p>
                   </td>
                   <td className="py-4 pr-4">
-                    <div className="flex items-center gap-2">
-                      <input
-                        className="w-24 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-white outline-none"
-                        type="number"
-                        value={displayDrafts[product._id] ?? String(product.display_stock)}
-                        onChange={(event) =>
-                          setDisplayDrafts((current) => ({ ...current, [product._id]: event.target.value }))
-                        }
-                      />
-                      <Button
-                        size="sm"
-                        type="button"
-                        variant="outline"
-                        disabled={busyId === product._id}
-                        onClick={() => void saveDisplayStock(product._id, product.display_stock)}
-                      >
-                        Save
-                      </Button>
-                    </div>
+                    {product.skus && product.skus.length > 0 ? (
+                      // Advanced product: show aggregated SKU display_stock
+                      <div className="space-y-1">
+                        <p className="text-sm text-white">
+                          {product.skus.reduce((s, sku) => s + sku.display_stock, 0)} total
+                        </p>
+                        <p className="text-xs text-zinc-500">Managed via SKUs — use Edit</p>
+                      </div>
+                    ) : (
+                      // Simple product: legacy inline edit
+                      <div className="flex items-center gap-2">
+                        <input
+                          className="w-24 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-white outline-none"
+                          type="number"
+                          value={displayDrafts[product._id] ?? String(product.display_stock ?? 0)}
+                          onChange={(event) =>
+                            setDisplayDrafts((current) => ({ ...current, [product._id]: event.target.value }))
+                          }
+                        />
+                        <Button
+                          size="sm"
+                          type="button"
+                          variant="outline"
+                          disabled={busyId === product._id}
+                          onClick={() => void saveDisplayStock(product._id, product.display_stock)}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    )}
                   </td>
                   <td className="py-4 pr-4">
-                    <div className="flex items-center gap-2">
-                      <input
-                        className="w-24 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-white outline-none"
-                        type="number"
-                        value={realDrafts[product._id] ?? String(product.real_stock)}
-                        onChange={(event) =>
-                          setRealDrafts((current) => ({ ...current, [product._id]: event.target.value }))
-                        }
-                      />
-                      <Button
-                        size="sm"
-                        type="button"
-                        variant="outline"
-                        disabled={busyId === product._id}
-                        onClick={() => void saveRealStock(product._id, product.real_stock)}
-                      >
-                        Save
-                      </Button>
-                    </div>
+                    {product.skus && product.skus.length > 0 ? (
+                      // Advanced product: show aggregated SKU real_stock
+                      <div className="space-y-1">
+                        <p className="text-sm text-white">
+                          {product.skus.reduce((s, sku) => s + sku.real_stock, 0)} total
+                        </p>
+                        <p className="text-xs text-zinc-500">Managed via SKUs — use Edit</p>
+                      </div>
+                    ) : (
+                      // Simple product: legacy inline edit
+                      <div className="flex items-center gap-2">
+                        <input
+                          className="w-24 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-white outline-none"
+                          type="number"
+                          value={realDrafts[product._id] ?? String(product.real_stock ?? 0)}
+                          onChange={(event) =>
+                            setRealDrafts((current) => ({ ...current, [product._id]: event.target.value }))
+                          }
+                        />
+                        <Button
+                          size="sm"
+                          type="button"
+                          variant="outline"
+                          disabled={busyId === product._id}
+                          onClick={() => void saveRealStock(product._id, product.real_stock)}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    )}
                   </td>
                   <td className="py-4 pr-4">
                     <span

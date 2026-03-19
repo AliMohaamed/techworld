@@ -75,7 +75,7 @@ export default function ProductDetailPage() {
   const displayPrice = selectedVariant?.price ?? product?.selling_price ?? 0;
   const compareAtPrice = selectedVariant?.compareAtPrice ?? product?.compareAtPrice;
   const hasSalePrice = compareAtPrice !== undefined && compareAtPrice > displayPrice;
-  const availableUnits = selectedVariant?.display_stock ?? product?.display_stock ?? 0;
+  const availableUnits = selectedVariant?.display_stock ?? 0;
 
   useEffect(() => {
     setSelectedImage(activeImage);
@@ -83,10 +83,13 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = async () => {
     if (!product) return;
+    const skuId = selectedSkuId ?? selectedVariant?._id;
+    if (!skuId) return;
     try {
       await addToCart({
         sessionId,
         productId: product._id,
+        skuId,
         quantity: 1,
       });
       openCart();

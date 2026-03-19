@@ -9,10 +9,16 @@ type FeaturedProduct = {
   name_en: string;
   selling_price: number;
   compareAtPrice?: number;
-  display_stock: number;
+  display_stock?: number;
   images: string[];
   description_en?: string;
   slug?: string;
+  skus?: Array<{
+    _id: Id<"skus">;
+    price: number;
+    display_stock: number;
+    isDefault?: boolean;
+  }>;
 };
 
 interface FeaturedProductsProps {

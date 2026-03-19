@@ -18,17 +18,22 @@ export default function CartDrawer() {
 
   if (!isOpen) return null;
 
-  const handleUpdateQuantity = async (productId: Id<"products">, currentQty: number, delta: number) => {
+  const handleUpdateQuantity = async (
+    productId: Id<"products">,
+    skuId: Id<"skus">,
+    currentQty: number,
+    delta: number,
+  ) => {
     const newQty = Math.max(1, currentQty + delta);
     try {
-      await addToCart({ sessionId, productId, quantity: newQty });
+      await addToCart({ sessionId, productId, skuId, quantity: newQty });
     } catch (e) {
       console.error("Cart update failed", e);
     }
   };
 
-  const handleRemove = async (productId: Id<"products">) => {
-    await removeFromCart({ sessionId, productId });
+  const handleRemove = async (productId: Id<"products">, skuId: Id<"skus">) => {
+    await removeFromCart({ sessionId, productId, skuId });
   };
 
   return (
@@ -76,7 +81,7 @@ export default function CartDrawer() {
               </div>
             ) : (
               cart.items.map((item) => (
-                <div key={item.productId} className="flex gap-4">
+                <div key={`${item.productId}-${item.skuId}`} className="flex gap-4">
                   <div className="relative aspect-square h-24 w-24 overflow-hidden rounded-xl border border-white/5 bg-zinc-950">
                     {item.product?.images?.[0] ? (
                       <Image
@@ -103,21 +108,21 @@ export default function CartDrawer() {
                           {item.product?.name_en}
                         </Link>
                         <button 
-                          onClick={() => handleRemove(item.productId)}
+                          onClick={() => handleRemove(item.productId, item.skuId)}
                           className="text-zinc-600 hover:text-red-400 transition-colors"
                         >
                           <Trash2 size={16} />
                         </button>
                       </div>
-                      <p className="text-right font-arabic text-[10px] text-zinc-500">
-                        {item.product?.name_ar}
-                      </p>
+                      {item.sku?.variantName && item.sku.variantName !== "Default" ? (
+                        <p className="text-xs text-zinc-500">{item.sku.variantName}</p>
+                      ) : null}
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 rounded-lg border border-white/5 bg-zinc-900/50 p-1">
                         <button 
-                          onClick={() => handleUpdateQuantity(item.productId, item.quantity, -1)}
+                          onClick={() => handleUpdateQuantity(item.productId, item.skuId, item.quantity, -1)}
                           className="p-1 text-zinc-400 hover:text-white"
                         >
                           <Minus size={14} />
@@ -126,14 +131,14 @@ export default function CartDrawer() {
                           {item.quantity}
                         </span>
                         <button 
-                          onClick={() => handleUpdateQuantity(item.productId, item.quantity, 1)}
+                          onClick={() => handleUpdateQuantity(item.productId, item.skuId, item.quantity, 1)}
                           className="p-1 text-zinc-400 hover:text-white"
                         >
                           <Plus size={14} />
                         </button>
                       </div>
                       <span className="font-space-grotesk text-sm font-bold text-[#ffc105]">
-                        {(item.product?.selling_price! * item.quantity).toLocaleString()} EGP
+                        {((item.sku?.price ?? item.product?.selling_price ?? 0) * item.quantity).toLocaleString()} EGP
                       </span>
                     </div>
                   </div>

@@ -18,10 +18,17 @@ interface ProductCardProps {
     description_en?: string;
     selling_price: number;
     compareAtPrice?: number;
-    display_stock: number;
+    display_stock?: number;
     images: string[];
     slug?: string;
     categoryName?: string;
+    skus?: Array<{
+      _id: Id<"skus">;
+      price: number;
+      display_stock: number;
+      isDefault?: boolean;
+      variantName: string;
+    }>;
   };
 }
 
@@ -29,16 +36,23 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { sessionId } = useSession();
   const { openCart } = useCart();
   const addToCart = useMutation(api.cart.addToCart);
-  const isOutOfStock = product.display_stock <= 0;
-  const hasSalePrice = product.compareAtPrice !== undefined && product.compareAtPrice > product.selling_price;
+
+  // Resolve the default SKU for stock display and cart purposes
+  const defaultSku = product.skus?.find((s) => s.isDefault) ?? product.skus?.[0];
+  const displayStock = defaultSku?.display_stock ?? product.display_stock ?? 0;
+  const displayPrice = defaultSku?.price ?? product.selling_price;
+  const isOutOfStock = displayStock <= 0;
+  const hasSalePrice = product.compareAtPrice !== undefined && product.compareAtPrice > displayPrice;
 
   const handleAddToCart = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
+    if (!defaultSku) return;
     try {
       await addToCart({
         sessionId,
         productId: product._id,
+        skuId: defaultSku._id,
         quantity: 1,
       });
       openCart();

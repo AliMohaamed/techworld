@@ -5,6 +5,7 @@ import { requirePermission } from "./lib/rbac";
 import { hasPermission } from "./lib/permissions";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
+import { writeAuditLog } from "./lib/audit";
 
 type CatalogProduct = {
   _id: Id<"products">;
@@ -16,8 +17,8 @@ type CatalogProduct = {
   description_en?: string;
   images: Array<string | Id<"_storage">>;
   selling_price: number;
-  display_stock: number;
-  real_stock: number;
+  // display_stock and real_stock are no longer on the product root.
+  // They live exclusively on the skus table (Unified SKU Architecture).
   status: "DRAFT" | "PUBLISHED";
   name?: string;
   price?: number;
@@ -107,8 +108,6 @@ const mapCatalogProduct = (product: CatalogProduct) => ({
   description_en: product.description_en,
   images: product.images,
   selling_price: product.selling_price,
-  display_stock: product.display_stock,
-  real_stock: product.real_stock,
   slug: product.slug,
 });
 
@@ -474,12 +473,7 @@ export const getRecommendedProducts = query({
       products: await Promise.all(
         products
           .filter((product) => activeCategoryIds.has(product.categoryId))
-          .sort((a, b) => {
-            if (b.display_stock !== a.display_stock) {
-              return b.display_stock - a.display_stock;
-            }
-            return b._creationTime - a._creationTime;
-          })
+          .sort((a, b) => b._creationTime - a._creationTime)
           .slice(0, 4)
           .map(async (product) => {
             const mapped = mapCatalogProduct(product as CatalogProduct);
@@ -748,7 +742,6 @@ export const getForStorefront = query({
             selling_price: p.selling_price,
             compareAtPrice: p.compareAtPrice,
             thumbnail: await resolveStorageRef(ctx, p.thumbnail),
-            display_stock: p.display_stock,
             images: await resolveProductImages(ctx, p.images),
             categoryId: p.categoryId,
             slug: p.slug,
@@ -862,6 +855,7 @@ async function replaceAdvancedProductSkus(
   ctx: Pick<MutationCtx, "db">,
   productId: Id<"products">,
   variants: Array<ReturnType<typeof normalizeAdvancedVariant>>,
+  actorId?: Id<"users">,
 ) {
   const existingSkus = await ctx.db
     .query("skus")
@@ -893,8 +887,20 @@ async function replaceAdvancedProductSkus(
     }
   }
 
+  // M2 FIX: Audit log every deleted SKU for full immutable trail.
   for (const existingSku of existingSkus) {
     if (!retainedIds.has(String(existingSku._id))) {
+      await writeAuditLog(ctx, {
+        userId: actorId,
+        entityId: existingSku._id,
+        actionType: "SKU_DELETED",
+        changes: {
+          productId,
+          variantName: existingSku.variantName,
+          variantAttributes: existingSku.variantAttributes,
+          real_stock: existingSku.real_stock,
+        },
+      });
       await ctx.db.delete(existingSku._id);
     }
   }
@@ -944,9 +950,7 @@ export const createAdvancedProduct = mutation({
       images: args.images,
     });
 
-    const displayStock = normalizedVariants.reduce((sum, variant) => sum + variant.display_stock, 0);
-    const realStock = normalizedVariants.reduce((sum, variant) => sum + variant.real_stock, 0);
-
+    // C1 FIX: Do NOT aggregate stock onto the product root. Stock lives on skus table only.
     const payload = {
       categoryId: args.categoryId,
       name_ar,
@@ -958,8 +962,6 @@ export const createAdvancedProduct = mutation({
       selling_price: sanitizeNumber(args.selling_price, "Selling price"),
       compareAtPrice: sanitizeOptionalNumber(args.compareAtPrice, "Compare-at price"),
       cogs: sanitizeOptionalNumber(args.cogs, "COGS"),
-      display_stock: displayStock,
-      real_stock: realStock,
       status: args.status ?? "DRAFT",
       name: name_en,
       price: args.selling_price,
@@ -969,7 +971,7 @@ export const createAdvancedProduct = mutation({
 
     await ensureUniqueProductSlug(ctx, slug);
     const productId = await ctx.db.insert("products", payload);
-    await replaceAdvancedProductSkus(ctx, productId, normalizedVariants);
+    await replaceAdvancedProductSkus(ctx, productId, normalizedVariants, user._id);
 
     await ctx.runMutation(internal.audit.logAudit, {
       userId: user._id,
@@ -1036,9 +1038,7 @@ export const updateAdvancedProduct = mutation({
       images: args.images,
     });
 
-    const displayStock = normalizedVariants.reduce((sum, variant) => sum + variant.display_stock, 0);
-    const realStock = normalizedVariants.reduce((sum, variant) => sum + variant.real_stock, 0);
-
+    // C1 FIX: Do NOT aggregate stock onto the product root. Stock lives on skus table only.
     const patch = {
       categoryId: args.categoryId,
       name_ar,
@@ -1050,8 +1050,6 @@ export const updateAdvancedProduct = mutation({
       selling_price: sanitizeNumber(args.selling_price, "Selling price"),
       compareAtPrice: sanitizeOptionalNumber(args.compareAtPrice, "Compare-at price"),
       cogs: sanitizeOptionalNumber(args.cogs, "COGS"),
-      display_stock: displayStock,
-      real_stock: realStock,
       status: args.status ?? "DRAFT",
       name: name_en,
       price: args.selling_price,
@@ -1060,7 +1058,7 @@ export const updateAdvancedProduct = mutation({
     };
 
     await ctx.db.patch(args.id, patch);
-    await replaceAdvancedProductSkus(ctx, args.id, normalizedVariants);
+    await replaceAdvancedProductSkus(ctx, args.id, normalizedVariants, user._id);
 
     await ctx.runMutation(internal.audit.logAudit, {
       userId: user._id,

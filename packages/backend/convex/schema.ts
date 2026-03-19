@@ -27,8 +27,6 @@ export default defineSchema({
     .index("by_active", ["isActive"]),
 
   products: defineTable({
-    display_stock: v.number(),
-    real_stock: v.number(),
     categoryId: v.id("categories"),
     name_ar: v.string(),
     name_en: v.string(),
@@ -76,6 +74,7 @@ export default defineSchema({
     items: v.array(
       v.object({
         productId: v.id("products"),
+        skuId: v.id("skus"),
         quantity: v.number(),
         addedAt: v.number(),
       })
@@ -108,7 +107,7 @@ export default defineSchema({
     customerPhone: v.optional(v.string()),
     customerAddress: v.optional(v.string()),
     productId: v.id("products"),
-    skuId: v.optional(v.id("skus")),
+    skuId: v.id("skus"),
     quantity: v.number(),
     total_price: v.number(),
     state: v.union(
