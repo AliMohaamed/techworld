@@ -44,6 +44,7 @@ export const createOrder = mutation({
       userId: user._id,
       productId: args.productId,
       quantity: args.quantity,
+      total_price: product.selling_price * args.quantity,
       state: "PENDING_PAYMENT_INPUT",
     });
 
@@ -153,9 +154,99 @@ export const rejectPayment = mutation({
   },
 });
 
-export const getOrder = query({
-  args: { orderId: v.id("orders") },
+function generateShortCode() {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let code = "";
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return `TW-${code}`;
+}
+
+/**
+ * Public mutation to convert a guest's cart session into one or more PENDING_PAYMENT_INPUT orders.
+ * Returns the shortCode.
+ */
+export const placeOrderFromSession = mutation({
+  args: {
+    sessionId: v.string(),
+    customerName: v.string(),
+    customerPhone: v.string(),
+    customerAddress: v.string(),
+  },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.orderId);
+    // 1. Fetch current cart
+    const session = await ctx.db
+      .query("cart_sessions")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .unique();
+
+    if (!session || session.items.length === 0) {
+      throw new Error("Cannot place order with an empty cart");
+    }
+
+    const shortCode = generateShortCode();
+    const now = Date.now();
+
+    // 2. Process each item (Atomic in Convex)
+    for (const item of session.items) {
+      const product = await ctx.db.get(item.productId);
+      if (!product) continue;
+
+      // Ensure we have display stock (Virtual Reservation)
+      if (product.display_stock < item.quantity) {
+        throw new Error(`Insufficient stock for product: ${product.name_en}`);
+      }
+
+      // Update product display_stock
+      await ctx.db.patch(item.productId, {
+        display_stock: product.display_stock - item.quantity,
+      });
+
+      // Insert order record
+      await ctx.db.insert("orders", {
+        sessionId: args.sessionId,
+        customerName: args.customerName,
+        customerPhone: args.customerPhone,
+        customerAddress: args.customerAddress,
+        productId: item.productId,
+        quantity: item.quantity,
+        total_price: product.selling_price * item.quantity,
+        state: "PENDING_PAYMENT_INPUT",
+        shortCode,
+      });
+
+      // Audit Log for this line item creation
+      await ctx.runMutation(internal.audit.logAudit, {
+        entityId: args.sessionId,
+        actionType: "GUEST_ORDER_CREATED",
+        timestamp: now,
+        changes: {
+          productId: item.productId,
+          quantity: item.quantity,
+          shortCode,
+          customerName: args.customerName
+        },
+      });
+    }
+
+    // 3. Clear the cart
+    await ctx.db.delete(session._id);
+
+    return shortCode;
+  },
+});
+
+/**
+ * Public query to fetch all order line items for a specific shortCode.
+ * Used for the Success page verification.
+ */
+export const getOrdersByShortCode = query({
+  args: { shortCode: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("orders")
+      .withIndex("by_shortCode", (q) => q.eq("shortCode", args.shortCode))
+      .collect();
   },
 });

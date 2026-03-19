@@ -162,3 +162,39 @@ export const unpublishProduct = mutation({
     });
   },
 });
+
+/**
+ * Optimized query for the storefront homepage.
+ * Returns only PUBLISHED products belonging to ACTIVE categories.
+ */
+export const getForStorefront = query({
+  args: {},
+  handler: async (ctx) => {
+    // 1. Get all active categories first to filter products efficiently
+    const activeCategories = await ctx.db
+      .query("categories")
+      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .collect();
+    
+    const activeCategoryIds = new Set(activeCategories.map(c => c._id));
+
+    // 2. Fetch all published products
+    const publishedProducts = await ctx.db
+      .query("products")
+      .withIndex("by_status", (q) => q.eq("status", "PUBLISHED"))
+      .collect();
+
+    // 3. Filter products whose category is active and map to ProductDisplay shape
+    return publishedProducts
+      .filter(p => activeCategoryIds.has(p.categoryId))
+      .map(p => ({
+        _id: p._id,
+        name_ar: p.name_ar,
+        name_en: p.name_en,
+        selling_price: p.selling_price,
+        display_stock: p.display_stock,
+        images: p.images,
+        categoryId: p.categoryId,
+      }));
+  },
+});

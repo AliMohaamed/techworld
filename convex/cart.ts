@@ -111,7 +111,14 @@ export const getCart = query({
       })
     );
 
-    return { items };
+    const total = items.reduce((sum, item) => {
+      if (item.product?.selling_price) {
+        return sum + item.product.selling_price * item.quantity;
+      }
+      return sum;
+    }, 0);
+
+    return { items, total };
   },
 });
 

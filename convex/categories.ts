@@ -105,3 +105,16 @@ export const toggleCategoryActive = mutation({
     });
   },
 });
+
+/**
+ * Public query to fetch a category by its slug.
+ */
+export const getCategoryBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("categories")
+      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .unique();
+  },
+});

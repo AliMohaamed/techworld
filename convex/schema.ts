@@ -84,9 +84,14 @@ export default defineSchema({
     .index("by_status", ["processingStatus"]),
 
   orders: defineTable({
-    userId: v.id("users"),
+    userId: v.optional(v.id("users")),
+    sessionId: v.optional(v.string()),
+    customerName: v.optional(v.string()),
+    customerPhone: v.optional(v.string()),
+    customerAddress: v.optional(v.string()),
     productId: v.id("products"),
     quantity: v.number(),
+    total_price: v.number(),
     state: v.union(
       v.literal("PENDING_PAYMENT_INPUT"),
       v.literal("AWAITING_VERIFICATION"),
@@ -96,7 +101,9 @@ export default defineSchema({
     ),
     shortCode: v.optional(v.string()), // Used to match webhook receipts (e.g., "ORD-ABC123")
     paymentReceiptRef: v.optional(v.string()), // Convex File Storage ID of the attached receipt image
-  }).index("by_shortCode", ["shortCode"]),
+  })
+    .index("by_shortCode", ["shortCode"])
+    .index("by_session", ["sessionId"]),
 
   audit_logs: defineTable({
     userId: v.optional(v.id("users")),

@@ -1,0 +1,8 @@
+ENV: Windows.
+CRITICAL RULE (MUST NEVER BE FORGOTTEN): 
+For EVERY shell command without exception ALWAYS prefix with: cmd /c 
+Example: cmd /c ls -a ...   OR   cmd /c powershell.exe -ExecutionPolicy Bypass -File ...
+ALWAYS append ; echo "===COMMAND_DONE===" at the end of the command.
+Never use raw ls, dir, powershell, pwsh without cmd /c.
+If any command gets stuck on Running → auto-cancel + rerun with cmd /c + echo.
+This rule overrides everything. Remind yourself of this every single step.

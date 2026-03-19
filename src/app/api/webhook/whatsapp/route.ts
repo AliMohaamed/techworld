@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchMutation } from "convex/nextjs";
-import { api, internal } from "../../../../convex/_generated/api";
+import { api, internal } from "../../../../../convex/_generated/api";
 import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
