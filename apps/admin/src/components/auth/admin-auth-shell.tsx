@@ -1,11 +1,23 @@
 "use client";
 
-import { FormEvent, useState } from "react";
 import { Authenticated, AuthLoading, Unauthenticated, useQuery } from "convex/react";
+import { useForm } from "react-hook-form";
 import { ShieldCheck, LogOut } from "lucide-react";
+import { toast } from "sonner";
+import { z } from "zod";
 import { Button } from "@techworld/ui/button";
 import { api } from "@backend/convex/_generated/api";
 import { authClient } from "@/lib/auth-client";
+
+const signInSchema = z.object({
+  email: z.string().trim().email("Enter a valid admin email address."),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters.")
+    .max(128, "Password is too long."),
+});
+
+type SignInValues = z.infer<typeof signInSchema>;
 
 export function AdminAuthShell({ children }: { children: React.ReactNode }) {
   return (
@@ -26,100 +38,90 @@ export function AdminAuthShell({ children }: { children: React.ReactNode }) {
 }
 
 function LoginScreen() {
-  const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    setError,
+    clearErrors,
+    formState: { errors, isSubmitting },
+  } = useForm<SignInValues>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    mode: "onBlur",
+  });
 
-  const submit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
+  const submit = handleSubmit(async (values) => {
+    clearErrors();
+    const parsed = signInSchema.safeParse(values);
+
+    if (!parsed.success) {
+      for (const issue of parsed.error.issues) {
+        const field = issue.path[0];
+        if (field === "email" || field === "password") {
+          setError(field, { message: issue.message, type: "manual" });
+        }
+      }
+      return;
+    }
 
     try {
-      if (mode === "signUp") {
-        await authClient.signUp.email({
-          email,
-          password,
-          name,
-        });
-      } else {
-        await authClient.signIn.email({
-          email,
-          password,
-        });
-      }
+      await authClient.signIn.email({
+        email: parsed.data.email,
+        password: parsed.data.password,
+      });
     } catch (caughtError) {
       const message =
-        caughtError instanceof Error ? caughtError.message : "Authentication failed.";
-      setError(message);
-    } finally {
-      setIsSubmitting(false);
+        caughtError instanceof Error ? caughtError.message : "Invalid admin credentials.";
+      toast.error("Sign-in failed", {
+        description: message,
+      });
     }
-  };
+  });
 
   return (
     <main className="grid min-h-screen place-items-center bg-[radial-gradient(circle_at_top,#222,transparent_45%),#050505] px-6 py-10">
       <div className="w-full max-w-md rounded-[28px] border border-white/10 bg-[#101010] p-8 shadow-2xl shadow-black/30">
         <div className="mb-8 space-y-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[#ffc105]">
-            Admin Access
+            Internal Admin Access
           </p>
           <h1 className="text-3xl font-semibold uppercase tracking-tight text-white">
-            {mode === "signIn" ? "Sign In" : "Create Admin Session"}
+            Sign In
           </h1>
           <p className="text-sm leading-6 text-zinc-400">
-            Convex Better Auth is wired for the admin workspace. Permissions remain enforced in Convex.
+            Admin accounts are provisioned internally only. Contact the platform owner if you need access.
           </p>
         </div>
 
         <form className="space-y-4" onSubmit={submit}>
-          {mode === "signUp" ? (
+          <div className="space-y-2">
             <input
               className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none"
-              placeholder="Full name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
+              placeholder="Email address"
+              type="email"
+              {...register("email")}
             />
-          ) : null}
-          <input
-            className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none"
-            placeholder="Email address"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-          />
-          <input
-            className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none"
-            placeholder="Password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-          {error ? <p className="text-sm text-red-400">{error}</p> : null}
+            {errors.email ? (
+              <p className="text-sm text-red-400">{errors.email.message}</p>
+            ) : null}
+          </div>
+          <div className="space-y-2">
+            <input
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none"
+              placeholder="Password"
+              type="password"
+              {...register("password")}
+            />
+            {errors.password ? (
+              <p className="text-sm text-red-400">{errors.password.message}</p>
+            ) : null}
+          </div>
           <Button className="w-full" disabled={isSubmitting} type="submit">
-            {isSubmitting
-              ? "Submitting..."
-              : mode === "signIn"
-                ? "Sign In"
-                : "Create Account"}
+            {isSubmitting ? "Signing in..." : "Sign In"}
           </Button>
         </form>
-
-        <div className="mt-4">
-          <Button
-            className="w-full"
-            onClick={() => setMode((current) => (current === "signIn" ? "signUp" : "signIn"))}
-            type="button"
-            variant="ghost"
-          >
-            {mode === "signIn"
-              ? "Need an account? Create one"
-              : "Already have an account? Sign in"}
-          </Button>
-        </div>
       </div>
     </main>
   );

@@ -2,18 +2,83 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { requirePermission } from "./lib/rbac";
 import { internal } from "./_generated/api";
+import { createAuth } from "./auth";
+import { permissionValidators, permissionValues } from "./lib/permissions";
+
+export const createInitialAdmin = mutation({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    password: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const existingStaffUser = await ctx.db.query("users").first();
+    if (existingStaffUser) {
+      throw new Error("Initial admin bootstrap is already locked. A staff user already exists.");
+    }
+
+    const auth = createAuth(ctx);
+    const authContext = await auth.$context;
+    const normalizedEmail = args.email.trim().toLowerCase();
+    const normalizedName = args.name.trim();
+
+    const existingAuthUser = await authContext.internalAdapter.findUserByEmail(
+      normalizedEmail,
+      { includeAccounts: false },
+    );
+
+    if (existingAuthUser) {
+      throw new Error("An authentication user with this email already exists.");
+    }
+
+    const authUser = await authContext.internalAdapter.createUser({
+      email: normalizedEmail,
+      emailVerified: true,
+      name: normalizedName,
+    });
+
+    const passwordHash = await authContext.password.hash(args.password);
+
+    await authContext.internalAdapter.createAccount({
+      accountId: normalizedEmail,
+      password: passwordHash,
+      providerId: "credential",
+      userId: authUser.id,
+    });
+
+    const staffUserId = await ctx.db.insert("users", {
+      name: normalizedName,
+      email: normalizedEmail,
+      identifier: authUser.id,
+      permissions: [...permissionValues],
+    });
+
+    await ctx.scheduler.runAfter(0, internal.audit.logAudit, {
+      userId: staffUserId,
+      entityId: staffUserId,
+      actionType: "CREATE_INITIAL_ADMIN",
+      timestamp: Date.now(),
+      changes: {
+        email: normalizedEmail,
+        permissions: permissionValues,
+      },
+    });
+
+    return {
+      email: normalizedEmail,
+      permissions: permissionValues,
+      userId: staffUserId,
+    };
+  },
+});
 
 export const updateUserPermissions = mutation({
   args: {
     userId: v.id("users"),
-    permissions: v.array(v.union(v.literal("VIEW_FINANCIALS"), v.literal("VERIFY_PAYMENTS"))),
+    permissions: v.array(v.union(...permissionValidators)),
   },
   handler: async (ctx, args) => {
-    // Only admins (or those with a specific permission if defined) can update permissions
-    // For now, we'll require VERIFY_PAYMENTS as a proxy for admin-level actions or 
-    // simply rely on the fact that this is an administrative mutation.
-    // In a real scenario, we might have an 'ADMIN' permission.
-    await requirePermission(ctx, "VERIFY_PAYMENTS");
+    await requirePermission(ctx, "MANAGE_USERS");
 
     const oldUser = await ctx.db.get(args.userId);
     if (!oldUser) {
@@ -24,11 +89,11 @@ export const updateUserPermissions = mutation({
       permissions: args.permissions,
     });
 
-    // Log the audit record
     await ctx.scheduler.runAfter(0, internal.audit.logAudit, {
-      userId: (await ctx.auth.getUserIdentity())?.subject as any, // ID of the person making the change
+      userId: args.userId,
       entityId: args.userId,
       actionType: "USER_PERMISSIONS_UPDATED",
+      timestamp: Date.now(),
       changes: {
         before: oldUser.permissions,
         after: args.permissions,
@@ -54,11 +119,26 @@ export const getMe = query({
   args: {},
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity || !identity.email) return null;
+    if (!identity) {
+      return null;
+    }
 
-    return await ctx.db
-      .query("users")
-      .withIndex("by_email", (q) => q.eq("email", identity.email!))
-      .unique();
+    const identifier = identity.subject ?? null;
+    const email = identity.email ?? null;
+
+    return (
+      (identifier
+        ? await ctx.db
+            .query("users")
+            .withIndex("by_identifier", (q) => q.eq("identifier", identifier))
+            .unique()
+        : null) ??
+      (email
+        ? await ctx.db
+            .query("users")
+            .withIndex("by_email", (q) => q.eq("email", email))
+            .unique()
+        : null)
+    );
   },
 });

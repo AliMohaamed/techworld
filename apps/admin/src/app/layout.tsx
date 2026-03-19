@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from "@techworld/ui/toaster";
 import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
 import { AdminAuthShell } from "@/components/auth/admin-auth-shell";
 import { getToken } from "@/lib/auth-server";
@@ -21,6 +22,7 @@ export default async function RootLayout({
       <body>
         <ConvexClientProvider initialToken={initialToken}>
           <AdminAuthShell>{children}</AdminAuthShell>
+          <Toaster />
         </ConvexClientProvider>
       </body>
     </html>

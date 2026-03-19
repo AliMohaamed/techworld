@@ -25,17 +25,28 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
   });
 };
 
+async function getSafeAuthUser(ctx: Parameters<typeof authComponent.getAuthUser>[0]) {
+  try {
+    return await authComponent.getAuthUser(ctx);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("Unauthenticated")) {
+      return null;
+    }
+    throw error;
+  }
+}
+
 export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
-    return authComponent.getAuthUser(ctx);
+    return getSafeAuthUser(ctx);
   },
 });
 
 export const getCurrentStaffProfile = query({
   args: {},
   handler: async (ctx) => {
-    const authUser = await authComponent.getAuthUser(ctx);
+    const authUser = await getSafeAuthUser(ctx);
     if (!authUser) {
       return null;
     }
