@@ -220,7 +220,6 @@ export const placeOrderFromSession = mutation({
       await ctx.runMutation(internal.audit.logAudit, {
         entityId: args.sessionId,
         actionType: "GUEST_ORDER_CREATED",
-        timestamp: now,
         changes: {
           productId: item.productId,
           quantity: item.quantity,

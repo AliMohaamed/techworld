@@ -93,6 +93,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-800 text-white transition-colors hover:bg-[#ffc105] hover:text-black disabled:opacity-20 disabled:hover:bg-zinc-800 disabled:hover:text-white"
           >
             <ShoppingCart size={18} />
+            {/* <span className="sr-only">Add to Cart</span> */}
           </button>
         </div>
       </div>
