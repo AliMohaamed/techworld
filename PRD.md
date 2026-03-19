@@ -519,3 +519,31 @@ Analytics are restricted to users with the VIEW_ANALYTICS and VIEW_FINANCIALS pe
 - **Webhook Listener:** The system must expose a secure webhook endpoint to asynchronously receive incoming messages and media (e.g., Vodafone Cash payment screenshots) from the 3rd-party WhatsApp API provider.
 
 - **Automated Routing:** Incoming media and messages must be automatically parsed and attached to the relevant order in the AWAITING_VERIFICATION operational queue, matching the payload via the sender\'s Phone Number.
+
+
+## Future Phases & Advanced Architecture (Production Roadmap)
+
+To transition from MVP to a Production-Ready Enterprise System, the following phases and features MUST be implemented sequentially. All code comments generated for these features MUST be in English.
+
+### 1. Advanced Catalog, Variants & Media (Phase 7)
+* **Media Gallery & Uploads:** Deprecate string URLs for images. Use Convex File Storage. Products must support a main `thumbnail` and a gallery of `images`. Admin UI must support direct file uploads.
+* **Dynamic Variants (SKUs):** Products can optionally have variants (e.g., Color, Size). Inventory (`real_stock` and `display_stock`) MUST be tracked at the variant level. 
+* **Variant Image Sync:** Admins can link specific uploaded images to specific colors. On the storefront, selecting a color dynamically updates the main product image.
+* **Sale Pricing:** Add an optional `compareAtPrice` field. If `compareAtPrice` > `price`, the storefront must display it with a strikethrough next to the current sale price.
+* **Catalog UI/UX:** Admin forms for Category and Product creation must be refactored into modern Modals/Sheets (using shadcn/ui).
+
+### 2. Operations, Returns & Logistics (Phase 8)
+* **Dynamic Shipping:** Implement a `governorates` table with distinct shipping fees to dynamically calculate the total order cost at checkout.
+* **Returns Workflow:** Implement an RTO (Return to Origin) workflow to accurately restock returned items to `real_stock`.
+* **Staff Provisioning:** A secure view for the Super Admin to create and manage staff accounts and their RBAC permissions.
+
+### 3. Analytics, Intelligence & System Settings (Phase 9)
+* **Analytics Dashboard:** Display KPIs including Total Orders, RTO Rate, Fraud Rate, Net Profit, Total Collected, Courier Fees, Total COGS, Sales Velocity, Order Status Breakdown, and Top Governorates.
+* **System Settings & Governance:** A centralized hub for global configs (e.g., toggle COD), an IP/Phone Blacklist, and an interface to view `audit_logs`.
+* **Low Stock Alerts:** Automated warnings when `real_stock` falls below configured thresholds.
+
+### 4. Marketing, Retention & Advanced SEO (Phase 10)
+* **Promo Codes:** Engine for percentage, fixed-amount, and free-shipping discounts.
+* **WhatsApp Webhooks:** Automated order confirmation messages via Convex HTTP actions.
+* **Cross-selling/Up-selling:** Display complementary products on the Product Details Page.
+* **Advanced SEO:** Automated Dynamic XML Sitemap and OpenGraph metadata integration.

@@ -2,6 +2,8 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import { permissionValidators } from "./lib/permissions";
 
+const storageRef = v.union(v.string(), v.id("_storage"));
+
 export default defineSchema({
   users: defineTable({
     name: v.string(),
@@ -17,7 +19,7 @@ export default defineSchema({
     name_en: v.string(),
     description_ar: v.optional(v.string()),
     description_en: v.optional(v.string()),
-    thumbnailImageId: v.optional(v.string()),
+    thumbnailImageId: v.optional(storageRef),
     isActive: v.boolean(),
     slug: v.string(),
   })
@@ -32,10 +34,13 @@ export default defineSchema({
     name_en: v.string(),
     description_ar: v.optional(v.string()),
     description_en: v.optional(v.string()),
-    images: v.array(v.string()),
+    thumbnail: v.optional(storageRef),
+    images: v.array(storageRef),
     selling_price: v.number(),
+    compareAtPrice: v.optional(v.number()),
     cogs: v.optional(v.number()),
     status: v.union(v.literal("DRAFT"), v.literal("PUBLISHED")),
+    isActive: v.optional(v.boolean()),
     name: v.optional(v.string()),
     price: v.optional(v.number()),
     slug: v.optional(v.string()),
@@ -46,6 +51,25 @@ export default defineSchema({
     .index("by_status_price", ["status", "selling_price"])
     .index("by_slug", ["slug"])
     .searchIndex("search_name", { searchField: "name" }),
+
+  skus: defineTable({
+    productId: v.id("products"),
+    variantName: v.string(),
+    variantAttributes: v.object({
+      color: v.optional(v.string()),
+      size: v.optional(v.string()),
+      type: v.optional(v.string()),
+    }),
+    real_stock: v.number(),
+    display_stock: v.number(),
+    price: v.number(),
+    compareAtPrice: v.optional(v.number()),
+    linkedImageId: v.optional(storageRef),
+    isDefault: v.optional(v.boolean()),
+    isActive: v.optional(v.boolean()),
+  })
+    .index("by_product", ["productId"])
+    .index("by_product_default", ["productId", "isDefault"]),
 
   cart_sessions: defineTable({
     sessionId: v.string(),
@@ -84,6 +108,7 @@ export default defineSchema({
     customerPhone: v.optional(v.string()),
     customerAddress: v.optional(v.string()),
     productId: v.id("products"),
+    skuId: v.optional(v.id("skus")),
     quantity: v.number(),
     total_price: v.number(),
     state: v.union(
@@ -108,4 +133,3 @@ export default defineSchema({
     changes: v.any(),
   }),
 });
-

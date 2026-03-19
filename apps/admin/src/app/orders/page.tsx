@@ -7,7 +7,14 @@ import { api } from "@backend/convex/_generated/api";
 import { Button } from "@techworld/ui/button";
 
 export default function OrdersPage() {
-  const orders = useQuery(api.orders.listAwaitingVerificationOrders);
+  const profile = useQuery(api.auth.getCurrentStaffProfile);
+  const canViewOrders =
+    profile?.permissions?.some((permission) => String(permission) === "VIEW_ORDERS") ?? false;
+  const orders = useQuery(
+    api.orders.listAwaitingVerificationOrders,
+    profile && canViewOrders ? {} : "skip",
+  );
+  const visibleOrders = orders ?? [];
 
   return (
     <main className="space-y-6">
@@ -28,9 +35,14 @@ export default function OrdersPage() {
           <h2 className="text-lg font-semibold text-white">Pending Orders</h2>
         </div>
 
-        {orders === undefined ? (
+        {profile === undefined || (canViewOrders && orders === undefined) ? (
           <div className="px-6 py-10 text-sm text-zinc-400">Loading order queue...</div>
-        ) : orders.length === 0 ? (
+        ) : !canViewOrders ? (
+          <div className="flex items-center gap-3 px-6 py-10 text-sm text-zinc-400">
+            <ShieldAlert size={18} className="text-[#ffc105]" />
+            Your staff account does not have permission to view orders.
+          </div>
+        ) : visibleOrders.length === 0 ? (
           <div className="flex items-center gap-3 px-6 py-10 text-sm text-zinc-400">
             <ShieldAlert size={18} className="text-[#ffc105]" />
             No orders are currently waiting for verification.
@@ -49,7 +61,7 @@ export default function OrdersPage() {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) => (
+                {visibleOrders.map((order) => (
                   <tr key={order._id} className="border-t border-white/5">
                     <td className="px-6 py-4 align-top">
                       <div className="font-medium text-white">{order.customerName ?? "Walk-in customer"}</div>
@@ -88,3 +100,4 @@ export default function OrdersPage() {
     </main>
   );
 }
+

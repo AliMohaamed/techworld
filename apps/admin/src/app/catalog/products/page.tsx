@@ -1,54 +1,54 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
 import { Button } from "@techworld/ui/button";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
+import { ProductFormSheet } from "@/components/catalog/products/ProductFormSheet";
 
-type ProductFormState = {
-  categoryId: "" | Id<"categories">;
+type AdminProduct = {
+  _id: Id<"products">;
+  categoryId: Id<"categories">;
+  categoryName: string;
+  isCategoryActive: boolean;
+  publicationBlockedReason?: string | null;
   name_en: string;
   name_ar: string;
-  slug: string;
-  description_en: string;
-  description_ar: string;
-  selling_price: string;
-  cogs: string;
-  display_stock: string;
-  real_stock: string;
-  images: string;
+  slug?: string;
+  description_en?: string;
+  description_ar?: string;
+  selling_price: number;
+  compareAtPrice?: number;
+  cogs?: number;
   status: "DRAFT" | "PUBLISHED";
-};
-
-const emptyForm: ProductFormState = {
-  categoryId: "",
-  name_en: "",
-  name_ar: "",
-  slug: "",
-  description_en: "",
-  description_ar: "",
-  selling_price: "0",
-  cogs: "",
-  display_stock: "0",
-  real_stock: "0",
-  images: "",
-  status: "DRAFT",
+  thumbnail?: string;
+  images: string[];
+  display_stock: number;
+  real_stock: number;
+  skus?: Array<{
+    _id: Id<"skus">;
+    variantName: string;
+    variantAttributes?: { color?: string; size?: string; type?: string };
+    real_stock: number;
+    display_stock: number;
+    price: number;
+    compareAtPrice?: number;
+    linkedImageId?: string;
+    isDefault?: boolean;
+  }>;
 };
 
 export default function AdminProductsPage() {
-  const products = useQuery(api.products.listAdminProducts);
+  const products = useQuery(api.products.listAdminProducts) as AdminProduct[] | undefined;
   const activeCategories = useQuery(api.categories.listActiveCategories);
-  const createProduct = useMutation(api.products.createProduct);
   const updateProduct = useMutation(api.products.updateProduct);
   const publishProduct = useMutation(api.products.publishProduct);
   const unpublishProduct = useMutation(api.products.unpublishProduct);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingId, setEditingId] = useState<Id<"products"> | null>(null);
-  const [form, setForm] = useState<ProductFormState>(emptyForm);
-  const [isSaving, setIsSaving] = useState(false);
   const [busyId, setBusyId] = useState<Id<"products"> | null>(null);
   const [displayDrafts, setDisplayDrafts] = useState<Record<string, string>>({});
   const [realDrafts, setRealDrafts] = useState<Record<string, string>>({});
@@ -58,86 +58,19 @@ export default function AdminProductsPage() {
     [products, editingId],
   );
 
-  useEffect(() => {
-    if (!editingProduct) {
-      return;
-    }
-
-    setForm({
-      categoryId: editingProduct.categoryId,
-      name_en: editingProduct.name_en,
-      name_ar: editingProduct.name_ar,
-      slug: editingProduct.slug ?? "",
-      description_en: editingProduct.description_en ?? "",
-      description_ar: editingProduct.description_ar ?? "",
-      selling_price: String(editingProduct.selling_price),
-      cogs: editingProduct.cogs === undefined ? "" : String(editingProduct.cogs),
-      display_stock: String(editingProduct.display_stock),
-      real_stock: String(editingProduct.real_stock),
-      images: editingProduct.images.join(", "),
-      status: editingProduct.status,
-    });
-    setIsModalOpen(true);
-  }, [editingProduct]);
-
-  const openCreateModal = () => {
+  const openCreateSheet = () => {
     setEditingId(null);
-    setForm(emptyForm);
-    setIsModalOpen(true);
+    setIsSheetOpen(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setEditingId(null);
-    setForm(emptyForm);
+  const openEditSheet = (productId: Id<"products">) => {
+    setEditingId(productId);
+    setIsSheetOpen(true);
   };
 
-  const submit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!form.categoryId) {
-      toast.error("Product details are incomplete.", {
-        description: "Choose an active category before saving a product.",
-      });
-      return;
-    }
-
-    setIsSaving(true);
-
-    try {
-      const payload = {
-        categoryId: form.categoryId,
-        name_en: form.name_en,
-        name_ar: form.name_ar,
-        slug: form.slug,
-        description_en: form.description_en,
-        description_ar: form.description_ar,
-        selling_price: Number(form.selling_price),
-        cogs: form.cogs.trim() ? Number(form.cogs) : undefined,
-        display_stock: Number(form.display_stock),
-        real_stock: Number(form.real_stock),
-        images: form.images
-          .split(",")
-          .map((value) => value.trim())
-          .filter(Boolean),
-        status: form.status,
-      };
-
-      if (editingId) {
-        await updateProduct({ id: editingId, ...payload });
-        toast.success("Product updated.");
-      } else {
-        await createProduct(payload);
-        toast.success("Product created.");
-      }
-
-      closeModal();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Product save failed.";
-      toast.error("Catalog update failed.", { description: message });
-    } finally {
-      setIsSaving(false);
-    }
+  const closeSheet = () => {
+    setEditingId(null);
+    setIsSheetOpen(false);
   };
 
   const saveDisplayStock = async (id: Id<"products">, fallbackValue: number) => {
@@ -193,14 +126,14 @@ export default function AdminProductsPage() {
           <div>
             <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">Catalog</p>
             <h1 className="mt-3 text-4xl font-semibold uppercase tracking-tight text-white">
-              Product Management
+              Advanced Product Management
             </h1>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-zinc-400">
-              Manage SKU metadata, control publish state, and update real versus display stock independently.
+              Manage product galleries, sale pricing, and variant-level SKU inventory from an in-page product sheet.
             </p>
           </div>
-          <Button type="button" onClick={openCreateModal}>
-            Create SKU
+          <Button type="button" onClick={openCreateSheet}>
+            Create Product
           </Button>
         </div>
       </section>
@@ -222,7 +155,8 @@ export default function AdminProductsPage() {
               <tr>
                 <th className="pb-3 pr-4">Product</th>
                 <th className="pb-3 pr-4">Category</th>
-                <th className="pb-3 pr-4">Price</th>
+                <th className="pb-3 pr-4">Pricing</th>
+                <th className="pb-3 pr-4">Variants</th>
                 <th className="pb-3 pr-4">Display Stock</th>
                 <th className="pb-3 pr-4">Real Stock</th>
                 <th className="pb-3 pr-4">Status</th>
@@ -246,7 +180,18 @@ export default function AdminProductsPage() {
                       <p className="mt-2 text-xs text-amber-300">{product.publicationBlockedReason}</p>
                     ) : null}
                   </td>
-                  <td className="py-4 pr-4">EGP {product.selling_price.toFixed(2)}</td>
+                  <td className="py-4 pr-4">
+                    <p>EGP {product.selling_price.toFixed(2)}</p>
+                    {product.compareAtPrice ? (
+                      <p className="mt-1 text-xs text-zinc-500 line-through">EGP {product.compareAtPrice.toFixed(2)}</p>
+                    ) : null}
+                  </td>
+                  <td className="py-4 pr-4">
+                    <p>{product.skus?.length ?? 0} variants</p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {product.skus?.map((sku) => sku.variantName).join(", ") || "Default SKU only"}
+                    </p>
+                  </td>
                   <td className="py-4 pr-4">
                     <div className="flex items-center gap-2">
                       <input
@@ -302,12 +247,7 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="py-4">
                     <div className="flex flex-wrap gap-2">
-                      <Button
-                        size="sm"
-                        type="button"
-                        variant="outline"
-                        onClick={() => setEditingId(product._id)}
-                      >
+                      <Button size="sm" type="button" variant="outline" onClick={() => openEditSheet(product._id)}>
                         Edit
                       </Button>
                       <Button
@@ -329,7 +269,7 @@ export default function AdminProductsPage() {
               ))}
               {products?.length === 0 ? (
                 <tr>
-                  <td className="py-8 text-zinc-500" colSpan={7}>
+                  <td className="py-8 text-zinc-500" colSpan={8}>
                     No products created yet.
                   </td>
                 </tr>
@@ -339,161 +279,13 @@ export default function AdminProductsPage() {
         </div>
       </section>
 
-      {isModalOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6 py-10">
-          <div className="max-h-full w-full max-w-3xl overflow-y-auto rounded-[28px] border border-white/10 bg-[#0b0b0b] p-6 shadow-2xl shadow-black/40">
-            <div className="mb-6 flex items-center justify-between gap-4">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Variant Form</p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">
-                  {editingId ? "Edit product" : "Create product"}
-                </h2>
-              </div>
-              <Button type="button" variant="ghost" onClick={closeModal}>
-                Close
-              </Button>
-            </div>
-
-            <form className="grid gap-4 md:grid-cols-2" onSubmit={submit}>
-              <label className="block space-y-2 text-sm text-zinc-200">
-                <span>Category</span>
-                <select
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
-                  value={form.categoryId}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      categoryId: event.target.value as Id<"categories"> | "",
-                    }))
-                  }
-                >
-                  <option value="">Select category</option>
-                  {activeCategories?.categories.map((category) => (
-                    <option key={category._id} value={category._id}>
-                      {category.name_en}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="block space-y-2 text-sm text-zinc-200">
-                <span>Status</span>
-                <select
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
-                  value={form.status}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      status: event.target.value as "DRAFT" | "PUBLISHED",
-                    }))
-                  }
-                >
-                  <option value="DRAFT">Draft</option>
-                  <option value="PUBLISHED">Published</option>
-                </select>
-              </label>
-              <label className="block space-y-2 text-sm text-zinc-200">
-                <span>English name</span>
-                <input
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
-                  value={form.name_en}
-                  onChange={(event) => setForm((current) => ({ ...current, name_en: event.target.value }))}
-                />
-              </label>
-              <label className="block space-y-2 text-sm text-zinc-200">
-                <span>Arabic name</span>
-                <input
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
-                  dir="rtl"
-                  value={form.name_ar}
-                  onChange={(event) => setForm((current) => ({ ...current, name_ar: event.target.value }))}
-                />
-              </label>
-              <label className="block space-y-2 text-sm text-zinc-200">
-                <span>Slug</span>
-                <input
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
-                  value={form.slug}
-                  onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))}
-                />
-              </label>
-              <label className="block space-y-2 text-sm text-zinc-200">
-                <span>Selling price</span>
-                <input
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
-                  type="number"
-                  value={form.selling_price}
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, selling_price: event.target.value }))
-                  }
-                />
-              </label>
-              <label className="block space-y-2 text-sm text-zinc-200">
-                <span>COGS</span>
-                <input
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
-                  type="number"
-                  value={form.cogs}
-                  onChange={(event) => setForm((current) => ({ ...current, cogs: event.target.value }))}
-                />
-              </label>
-              <label className="block space-y-2 text-sm text-zinc-200">
-                <span>Display stock</span>
-                <input
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
-                  type="number"
-                  value={form.display_stock}
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, display_stock: event.target.value }))
-                  }
-                />
-              </label>
-              <label className="block space-y-2 text-sm text-zinc-200">
-                <span>Real stock</span>
-                <input
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
-                  type="number"
-                  value={form.real_stock}
-                  onChange={(event) => setForm((current) => ({ ...current, real_stock: event.target.value }))}
-                />
-              </label>
-              <label className="block space-y-2 text-sm text-zinc-200 md:col-span-2">
-                <span>English description</span>
-                <textarea
-                  className="min-h-24 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
-                  value={form.description_en}
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, description_en: event.target.value }))
-                  }
-                />
-              </label>
-              <label className="block space-y-2 text-sm text-zinc-200 md:col-span-2">
-                <span>Arabic description</span>
-                <textarea
-                  className="min-h-24 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
-                  dir="rtl"
-                  value={form.description_ar}
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, description_ar: event.target.value }))
-                  }
-                />
-              </label>
-              <label className="block space-y-2 text-sm text-zinc-200 md:col-span-2">
-                <span>Images (comma-separated URLs)</span>
-                <textarea
-                  className="min-h-24 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
-                  value={form.images}
-                  onChange={(event) => setForm((current) => ({ ...current, images: event.target.value }))}
-                />
-              </label>
-              <div className="md:col-span-2 flex gap-3 pt-2">
-                <Button disabled={isSaving} type="submit">
-                  {isSaving ? "Saving..." : editingId ? "Update Product" : "Create Product"}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      ) : null}
+      <ProductFormSheet
+        open={isSheetOpen}
+        onClose={closeSheet}
+        categories={activeCategories?.categories ?? []}
+        product={editingProduct}
+        onSaved={(label) => toast.success(label)}
+      />
     </main>
   );
 }
