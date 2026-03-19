@@ -107,10 +107,10 @@ description: "Task list for Standalone Admin Dashboard Architecture"
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T024 [P] Configure pure Dark Mode natively via `next-themes` exclusively for `apps/admin/`
-- [ ] T025 Ensure localized strings (AR/EN) display properly via RTL layout adjustments in `apps/admin/src/app/layout.tsx`
-- [ ] T026 Wire general state transitions (like Confirm Order) to write to an immutable `audit_logs` table via Convex helper
-- [ ] T027 Validate Quickstart process and Turborepo caching
+- [X] T024 [P] Configure pure Dark Mode natively via `next-themes` exclusively for `apps/admin/`
+- [X] T025 Ensure localized strings (AR/EN) display properly via RTL layout adjustments in `apps/admin/src/app/layout.tsx`
+- [X] T026 Wire general state transitions (like Confirm Order) to write to an immutable `audit_logs` table via Convex helper
+- [X] T027 Validate Quickstart process and Turborepo caching
 
 ---
 
@@ -151,6 +151,7 @@ description: "Task list for Standalone Admin Dashboard Architecture"
 2. Add User Story 1 → Confirm operational queue functions (MVP)
 3. Add User Story 2 → Release catalog management UI incrementally
 4. Add User Story 3 → Toggle RBAC logic on existing mutations
+
 
 
 

@@ -16,12 +16,13 @@ export const permissionValues = [
 ] as const;
 
 export type Permission = (typeof permissionValues)[number];
+type PermissionValue = string | number | bigint | boolean;
 
 export function hasPermission(
-  user: { permissions?: readonly Permission[] | undefined } | null | undefined,
+  user: { permissions?: readonly PermissionValue[] | undefined } | null | undefined,
   permission: Permission,
 ) {
-  return user?.permissions?.includes(permission) ?? false;
+  return user?.permissions?.some((grantedPermission) => String(grantedPermission) === permission) ?? false;
 }
 
 export const permissionValidators = permissionValues.map((permission) =>
@@ -30,4 +31,3 @@ export const permissionValidators = permissionValues.map((permission) =>
   ReturnType<typeof v.literal>,
   ...ReturnType<typeof v.literal>[]
 ];
-

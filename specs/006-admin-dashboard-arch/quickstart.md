@@ -2,28 +2,34 @@
 
 ## Quickstart
 
-Since the project operates as a Turborepo orchestrating multiple workspaces, the developer experience runs universally from the root.
+Since the project operates as a Turborepo orchestrating multiple workspaces, the developer experience runs from the repository root.
 
-1.  **Dependencies**:
-    ```bash
-    cd D:\Freelance\techworld\website
-    npm install
-    ```
+1. **Dependencies**
+   ```bash
+   cd D:\Freelance\techworld\website
+   npm install
+   ```
 
-2.  **Environment Setup**:
-    Storefront `.env.local` handles public keys. You will need analogous keys configured locally for `apps/admin`.
-    `CONVEX_DEPLOYMENT` must correctly map to the existing unified real-time database to view order data synchronously.
+2. **Environment Setup**
+   Storefront `.env.local` handles public keys. Configure the analogous admin values locally as well.
+   `CONVEX_DEPLOYMENT` must map to the unified Convex deployment so the dashboard can resolve the shared data model.
 
-3.  **Bootstrapping Convex**:
-    Before running the Next.js servers, verify the backend typings are correct and generating:
-    ```bash
-    npm run dev:backend
-    ```
+3. **Bootstrapping Convex**
+   Before running the Next.js servers, verify the backend typings are current:
+   ```bash
+   npm run dev:backend
+   ```
 
-4.  **Running the Dashboard Locally**:
-    Utilize the generalized turborepo scripts to launch only the admin app (or both together).
-    ```bash
-    # e.g. Turborepo filter
-    npx turbo run dev --filter=admin
-    ```
-    This successfully streams the Vite/Next.js HMR process on port 3001 while keeping the Storefront unbothered on 3000.
+4. **Running the Admin Dashboard**
+   Use the root Turborepo scripts so the admin app stays isolated from the storefront shell:
+   ```bash
+   npm run dev:admin
+   ```
+
+5. **Workspace Validation**
+   Validate the workspace build pipeline and Turbo task graph from the root:
+   ```bash
+   npm run build
+   npm run lint --workspace @techworld/admin
+   ```
+   Re-running `npm run build` should reuse Turbo cache entries for unchanged workspaces.

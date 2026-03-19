@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import type { FunctionReturnType } from "convex/server";
+import type { Route } from "next";
 import { Boxes, ClipboardList, FolderTree, Home, type LucideIcon } from "lucide-react";
-import { api } from "@backend/convex/_generated/api";
 import type { Permission } from "@backend/convex/lib/permissions";
 
-type StaffProfile = FunctionReturnType<typeof api.auth.getCurrentStaffProfile>;
+type StaffPermissionValue = string | number | bigint | boolean;
+type SidebarRoute = "/" | "/orders" | "/catalog/categories" | "/catalog/products";
 
 type NavItem = {
-  href: string;
+  href: SidebarRoute;
   label: string;
   icon: LucideIcon;
   requiredPermissions?: Permission[];
@@ -23,17 +23,18 @@ const navItems: NavItem[] = [
 ];
 
 function hasRequiredPermission(
-  permissions: readonly Permission[],
+  permissions: readonly StaffPermissionValue[],
   requiredPermissions: readonly Permission[] | undefined,
 ) {
   if (!requiredPermissions?.length) {
     return true;
   }
 
-  return requiredPermissions.some((permission) => permissions.includes(permission));
+  const grantedPermissions = new Set(permissions.map((permission) => String(permission)));
+  return requiredPermissions.some((permission) => grantedPermissions.has(permission));
 }
 
-function isActivePath(pathname: string, href: string) {
+function isActivePath(pathname: string, href: SidebarRoute) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -42,7 +43,7 @@ export function Sidebar({
   permissions,
 }: {
   pathname: string;
-  permissions: StaffProfile["permissions"];
+  permissions: readonly StaffPermissionValue[];
 }) {
   const visibleItems = navItems.filter((item) =>
     hasRequiredPermission(permissions, item.requiredPermissions),
@@ -59,7 +60,7 @@ export function Sidebar({
           return (
             <Link
               key={item.href}
-              href={item.href}
+              href={item.href as Route}
               className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition ${
                 isActive
                   ? "border-[#ffc105]/30 bg-[#ffc105]/10 text-[#ffc105]"
@@ -80,7 +81,7 @@ export function Sidebar({
               key={String(permission)}
               className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300"
             >
-              {permission}
+              {String(permission)}
             </span>
           ))
         ) : (

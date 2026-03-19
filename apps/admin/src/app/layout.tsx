@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@techworld/ui/toaster";
 import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
+import { AdminThemeProvider } from "@/components/providers/theme-provider";
 import { AdminAuthShell } from "@/components/auth/admin-auth-shell";
 import { getToken } from "@/lib/auth-server";
 
@@ -18,11 +19,13 @@ export default async function RootLayout({
   const initialToken = await getToken();
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en" dir="ltr" suppressHydrationWarning>
       <body>
         <ConvexClientProvider initialToken={initialToken}>
-          <AdminAuthShell>{children}</AdminAuthShell>
-          <Toaster />
+          <AdminThemeProvider>
+            <AdminAuthShell>{children}</AdminAuthShell>
+            <Toaster />
+          </AdminThemeProvider>
         </ConvexClientProvider>
       </body>
     </html>

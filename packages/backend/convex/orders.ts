@@ -1,8 +1,8 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query, QueryCtx } from "./_generated/server";
-import { internal } from "./_generated/api";
 import { requirePermission } from "./lib/rbac";
 import { hasPermission } from "./lib/permissions";
+import { scheduleAuditLog, writeAuditLog } from "./lib/audit";
 import { Id } from "./_generated/dataModel";
 
 async function getActorUserId(ctx: Parameters<typeof requirePermission>[0]) {
@@ -190,7 +190,7 @@ export const updateOrderStatus = mutation({
 
     await ctx.db.patch(args.orderId, patch);
 
-    await ctx.scheduler.runAfter(0, internal.audit.logAudit, {
+    await scheduleAuditLog(ctx, {
       userId: actor._id,
       entityId: args.orderId,
       actionType: "ORDER_STATUS_UPDATED",
@@ -248,7 +248,7 @@ export const createOrder = mutation({
       state: "PENDING_PAYMENT_INPUT",
     });
 
-    await ctx.scheduler.runAfter(0, internal.audit.logAudit, {
+    await scheduleAuditLog(ctx, {
       userId: user._id,
       entityId: orderId,
       actionType: "ORDER_CREATED_PENDING",
@@ -275,7 +275,7 @@ export const payOrder = mutation({
 
     await ctx.db.patch(args.orderId, { state: "AWAITING_VERIFICATION" });
 
-    await ctx.scheduler.runAfter(0, internal.audit.logAudit, {
+    await scheduleAuditLog(ctx, {
       userId: await getActorUserId(ctx),
       entityId: args.orderId,
       actionType: "ORDER_PAYMENT_SUBMITTED",
@@ -336,7 +336,7 @@ export const placeOrderFromSession = mutation({
         shortCode,
       });
 
-      await ctx.runMutation(internal.audit.logAudit, {
+      await writeAuditLog(ctx, {
         entityId: args.sessionId,
         actionType: "GUEST_ORDER_CREATED",
         changes: {
@@ -363,6 +363,7 @@ export const getOrdersByShortCode = query({
       .collect();
   },
 });
+
 
 
 
