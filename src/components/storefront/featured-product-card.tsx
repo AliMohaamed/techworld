@@ -17,6 +17,7 @@ interface FeaturedProductCardProps {
     display_stock: number;
     images: string[];
     description_en?: string;
+    slug?: string;
   };
 }
 
@@ -41,7 +42,7 @@ export default function FeaturedProductCard({ product }: FeaturedProductCardProp
   };
 
   return (
-    <Link href={`/products/${product._id}`} className="block group relative w-full h-[500px] overflow-hidden rounded-[32px] bg-zinc-900/40 border border-white/5 transition-all hover:border-[#ffc105]/20">
+    <Link href={`/products/${product.slug || product._id}`} className="block group relative w-full h-[500px] overflow-hidden rounded-[32px] bg-zinc-900/40 border border-white/5 transition-all hover:border-[#ffc105]/20">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         {product.images?.[0] ? (

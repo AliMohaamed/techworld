@@ -16,7 +16,7 @@ type CategoryGridCardProps = {
 export default function CategoryGridCard({ category }: CategoryGridCardProps) {
   return (
     <Link
-      href={`/categories/${category._id}`}
+      href={`/categories/${category.slug || category._id}`}
       className="group relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top,#2a2a2a,transparent_55%),linear-gradient(135deg,#111111,#050505)] p-6 transition-all hover:-translate-y-1 hover:border-[#ffc105]/40"
     >
       <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,193,5,0.12),transparent_40%)] opacity-60 transition-opacity group-hover:opacity-100" />

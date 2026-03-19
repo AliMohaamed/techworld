@@ -49,11 +49,13 @@ export default defineSchema({
     // Legacy fields
     name: v.optional(v.string()),
     price: v.optional(v.number()),
+    slug: v.optional(v.string()),
   })
     .index("by_category", ["categoryId"])
     .index("by_status", ["status"])
     .index("by_category_status_price", ["categoryId", "status", "selling_price"])
     .index("by_status_price", ["status", "selling_price"])
+    .index("by_slug", ["slug"])
     .searchIndex("search_name", { searchField: "name" }),
 
   cart_sessions: defineTable({

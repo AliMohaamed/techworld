@@ -20,6 +20,7 @@ type CatalogProduct = {
   status: "DRAFT" | "PUBLISHED";
   name?: string;
   price?: number;
+  slug?: string;
 };
 
 const mapCatalogProduct = (product: CatalogProduct) => ({
@@ -34,6 +35,7 @@ const mapCatalogProduct = (product: CatalogProduct) => ({
   selling_price: product.selling_price,
   display_stock: product.display_stock,
   real_stock: product.real_stock,
+  slug: product.slug,
 });
 
 const matchesSearch = (product: CatalogProduct, rawQuery: string) => {
@@ -110,11 +112,38 @@ export const getProduct = query({
     if (!product) return null;
 
     const category = await ctx.db.get(product.categoryId);
-    const result = { 
-      ...product, 
+    const result = {
+      ...product,
       categoryName_en: category?.name_en ?? "Unknown",
       categoryName_ar: category?.name_ar ?? "غير معروف",
-      isCategoryActive: category?.isActive ?? false 
+      categorySlug: category?.slug,
+      isCategoryActive: category?.isActive ?? false
+    };
+
+    if (!(await canViewFinancials(ctx))) {
+      delete result.cogs;
+    }
+    return result;
+  },
+});
+
+export const getBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, args) => {
+    const product = await ctx.db
+      .query("products")
+      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .unique();
+
+    if (!product) return null;
+
+    const category = await ctx.db.get(product.categoryId);
+    const result = {
+      ...product,
+      categoryName_en: category?.name_en ?? "Unknown",
+      categoryName_ar: category?.name_ar ?? "غير معروف",
+      categorySlug: category?.slug,
+      isCategoryActive: category?.isActive ?? false
     };
 
     if (!(await canViewFinancials(ctx))) {
@@ -177,7 +206,7 @@ export const searchAndFilter = query({
     const normalizedSearch = args.searchQuery?.trim() ?? "";
 
     let candidates: CatalogProduct[];
-    
+
     // BRANCH 1: Text Search (In-Memory Pagination)
     // Convex's search indices do not support native .paginate() currently.
     if (normalizedSearch) {
@@ -204,7 +233,11 @@ export const searchAndFilter = query({
         return true;
       });
 
-      const sorted = sortCatalogProducts(filtered, args.sortOrder).map(mapCatalogProduct);
+      const sorted = sortCatalogProducts(filtered, args.sortOrder).map(p => {
+        const mapped = mapCatalogProduct(p);
+        const category = activeCategories.find(c => c._id === p.categoryId);
+        return { ...mapped, categoryName: category?.name_en || "UNKNOWN" };
+      });
       return paginateResults(sorted, args.paginationOpts);
     }
 
@@ -216,7 +249,7 @@ export const searchAndFilter = query({
       if (args.sortOrder === "price_asc" || args.sortOrder === "price_desc") {
         baseQuery = ctx.db
           .query("products")
-          .withIndex("by_category_status_price", (q) => 
+          .withIndex("by_category_status_price", (q) =>
             q.eq("categoryId", args.categoryId as Id<"categories">).eq("status", "PUBLISHED")
           );
       } else {
@@ -256,13 +289,17 @@ export const searchAndFilter = query({
     }
 
     const paginated = await nativeFiltered.paginate(args.paginationOpts);
-    
+
     // Safety check: Filter out edge-case orphaned products belonging to soft-deleted categories
     const finalItems = paginated.page
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .filter((p: any) => activeCategoryIds.has(p.categoryId))
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map((p: any) => mapCatalogProduct(p as CatalogProduct));
+      .map((p: any) => {
+        const mapped = mapCatalogProduct(p as CatalogProduct);
+        const category = activeCategories.find(c => c._id === p.categoryId);
+        return { ...mapped, categoryName: category?.name_en || "UNKNOWN" };
+      });
 
     return {
       ...paginated,
@@ -296,7 +333,11 @@ export const getRecommendedProducts = query({
           return b._creationTime - a._creationTime;
         })
         .slice(0, 4)
-        .map((product) => mapCatalogProduct(product as CatalogProduct)),
+        .map((product) => {
+          const mapped = mapCatalogProduct(product as CatalogProduct);
+          const category = activeCategories.find(c => c._id === product.categoryId);
+          return { ...mapped, categoryName: category?.name_en || "UNKNOWN" };
+        }),
     };
   },
 });
@@ -329,6 +370,7 @@ export const createProduct = mutation({
       ...args,
       name: args.name_en,
       price: args.selling_price,
+      slug: args.name_en.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       status: "DRAFT",
     });
 
@@ -408,7 +450,7 @@ export const getForStorefront = query({
       .query("categories")
       .withIndex("by_active", (q) => q.eq("isActive", true))
       .collect();
-    
+
     const activeCategoryIds = new Set(activeCategories.map(c => c._id));
 
     // 2. Fetch all published products
@@ -420,14 +462,20 @@ export const getForStorefront = query({
     // 3. Filter products whose category is active and map to ProductDisplay shape
     return publishedProducts
       .filter(p => activeCategoryIds.has(p.categoryId))
-      .map(p => ({
-        _id: p._id,
-        name_ar: p.name_ar,
-        name_en: p.name_en,
-        selling_price: p.selling_price,
-        display_stock: p.display_stock,
-        images: p.images,
-        categoryId: p.categoryId,
-      }));
+      .map(p => {
+        const category = activeCategories.find(c => c._id === p.categoryId);
+        return {
+          _id: p._id,
+          name_ar: p.name_ar,
+          name_en: p.name_en,
+          description_en: p.description_en,
+          selling_price: p.selling_price,
+          display_stock: p.display_stock,
+          images: p.images,
+          categoryId: p.categoryId,
+          slug: p.slug,
+          categoryName: category?.name_en || "UNKNOWN",
+        };
+      });
   },
 });

@@ -8,14 +8,13 @@ import { useCart } from "@/providers/cart-provider";
 import Image from "next/image";
 import { ChevronRight, ShoppingBag, Truck, ShieldCheck, Zap } from "lucide-react";
 import Link from "next/link";
-import { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function ProductDetailPage() {
-  const { id } = useParams();
+  const { slug } = useParams();
   const { sessionId } = useSession();
   const { openCart } = useCart();
   const addToCart = useMutation(api.cart.addToCart);
-  const product = useQuery(api.products.getProduct, { id: id as Id<"products"> });
+  const product = useQuery(api.products.getBySlug, slug ? { slug: slug as string } : "skip");
 
   const handleAddToCart = async () => {
     if (!product) return;
@@ -67,7 +66,7 @@ export default function ProductDetailPage() {
         <div className="flex items-center space-x-2">
           <Link href="/" className="hover:text-white transition-colors">STORE</Link>
           <ChevronRight size={12} />
-          <span className="text-zinc-600 truncate uppercase">{product.categoryName_en || "CATEGORY"}</span>
+          <Link href={`/categories/${product.categorySlug || product.categoryId}`} className="hover:text-white transition-colors truncate uppercase">{product.categoryName_en || "CATEGORY"}</Link>
           <ChevronRight size={12} />
           <span className="text-white truncate uppercase">{product.name_en}</span>
         </div>
