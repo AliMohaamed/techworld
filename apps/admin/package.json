@@ -9,6 +9,11 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@convex-dev/better-auth": "^0.10.2",
+    "@techworld/ui": "*",
+    "better-auth": "1.4.9",
+    "convex": "^1.33.1",
+    "lucide-react": "^0.577.0",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"
@@ -24,3 +29,4 @@
     "typescript": "^5"
   }
 }
+

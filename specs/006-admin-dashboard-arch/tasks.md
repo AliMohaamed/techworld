@@ -40,10 +40,10 @@ description: "Task list for Standalone Admin Dashboard Architecture"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Setup Tailwind CSS v4 and shadcn/ui centrally in `packages/ui/`
-- [ ] T006 Initialize Convex Auth securely inside `packages/backend/convex/auth.ts`
-- [ ] T007 Configure `ConvexProvider` and authentication shells in `apps/admin/src/app/layout.tsx`
-- [ ] T008 [P] Abstract `permissions` arrays onto the User entity schema inside `packages/backend/convex/schema.ts`
+- [X] T005 Setup Tailwind CSS v4 and shadcn/ui centrally in `packages/ui/`
+- [X] T006 Initialize Convex Auth securely inside `packages/backend/convex/auth.ts`
+- [X] T007 Configure `ConvexProvider` and authentication shells in `apps/admin/src/app/layout.tsx`
+- [X] T008 [P] Abstract `permissions` arrays onto the User entity schema inside `packages/backend/convex/schema.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -151,4 +151,5 @@ description: "Task list for Standalone Admin Dashboard Architecture"
 2. Add User Story 1 → Confirm operational queue functions (MVP)
 3. Add User Story 2 → Release catalog management UI incrementally
 4. Add User Story 3 → Toggle RBAC logic on existing mutations
+
 

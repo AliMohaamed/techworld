@@ -1,0 +1,28 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+:root {
+  --ui-background: #050505;
+  --ui-surface: #111111;
+  --ui-muted: #a1a1aa;
+  --ui-border: rgba(255, 255, 255, 0.1);
+  --ui-accent: #ffc105;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    min-height: 100%;
+    background: var(--ui-background);
+    color: white;
+  }
+
+  body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}

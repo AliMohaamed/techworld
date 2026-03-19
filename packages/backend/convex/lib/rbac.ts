@@ -1,23 +1,32 @@
-export type Permission =
-  | "VIEW_FINANCIALS"
-  | "VERIFY_PAYMENTS"
-  | "MANAGE_CATEGORIES"
-  | "MANAGE_PRODUCTS"
-  | "MANAGE_DISPLAY_STOCK"
-  | "ADJUST_REAL_STOCK";
+import { QueryCtx } from "../_generated/server";
+import { Permission } from "./permissions";
 
-export async function requirePermission(ctx: { db: any, auth: any }, permission: Permission) {
+export async function requirePermission(
+  ctx: Pick<QueryCtx, "db" | "auth">,
+  permission: Permission,
+) {
   const identity = await ctx.auth.getUserIdentity();
-  
+
   if (!identity) {
     throw new Error("Unauthenticated call. Please log in first.");
   }
 
-  // Requires the user to be synchronized with the users table via email
-  const user = await ctx.db
-    .query("users")
-    .withIndex("by_email", (q: any) => q.eq("email", identity.email))
-    .unique();
+  const identifier = identity.subject ?? null;
+  const email = identity.email ?? null;
+
+  const user =
+    (identifier
+      ? await ctx.db
+          .query("users")
+          .withIndex("by_identifier", (q) => q.eq("identifier", identifier))
+          .unique()
+      : null) ??
+    (email
+      ? await ctx.db
+          .query("users")
+          .withIndex("by_email", (q) => q.eq("email", email))
+          .unique()
+      : null);
 
   if (!user) {
     throw new Error("User record not found. Unauthorized.");

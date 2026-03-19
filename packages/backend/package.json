@@ -8,6 +8,8 @@
     "lint": "eslint convex --ext .ts"
   },
   "dependencies": {
+    "@convex-dev/better-auth": "^0.10.2",
+    "better-auth": "1.4.9",
     "convex": "^1.33.1"
   },
   "devDependencies": {
@@ -15,3 +17,4 @@
     "typescript": "^5"
   }
 }
+

@@ -1,21 +1,16 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { permissionValidators } from "./lib/permissions";
 
 export default defineSchema({
   users: defineTable({
     name: v.string(),
     email: v.string(),
-    permissions: v.array(
-      v.union(
-        v.literal("VIEW_FINANCIALS"), 
-        v.literal("VERIFY_PAYMENTS"),
-        v.literal("MANAGE_CATEGORIES"),
-        v.literal("MANAGE_PRODUCTS"),
-        v.literal("MANAGE_DISPLAY_STOCK"),
-        v.literal("ADJUST_REAL_STOCK")
-      )
-    ),
-  }).index("by_email", ["email"]),
+    identifier: v.optional(v.string()),
+    permissions: v.array(v.union(...permissionValidators)),
+  })
+    .index("by_email", ["email"])
+    .index("by_identifier", ["identifier"]),
 
   categories: defineTable({
     name_ar: v.string(),
@@ -30,13 +25,8 @@ export default defineSchema({
     .index("by_active", ["isActive"]),
 
   products: defineTable({
-    // Virtual stock available for new PENDING_PAYMENT_INPUT orders.
     display_stock: v.number(),
-    // Physical stock. Strictly permitted to drop to -5 (Oversell Buffer). 
-    // Mutations must throw error if below -5.
     real_stock: v.number(),
-
-    // New Commercial Fields
     categoryId: v.id("categories"),
     name_ar: v.string(),
     name_en: v.string(),
@@ -46,7 +36,6 @@ export default defineSchema({
     selling_price: v.number(),
     cogs: v.optional(v.number()),
     status: v.union(v.literal("DRAFT"), v.literal("PUBLISHED")),
-    // Legacy fields
     name: v.optional(v.string()),
     price: v.optional(v.number()),
     slug: v.optional(v.string()),
@@ -104,8 +93,8 @@ export default defineSchema({
       v.literal("STALLED_PAYMENT"),
       v.literal("CANCELLED")
     ),
-    shortCode: v.optional(v.string()), // Used to match webhook receipts (e.g., "ORD-ABC123")
-    paymentReceiptRef: v.optional(v.string()), // Convex File Storage ID of the attached receipt image
+    shortCode: v.optional(v.string()),
+    paymentReceiptRef: v.optional(v.string()),
   })
     .index("by_shortCode", ["shortCode"])
     .index("by_session", ["sessionId"]),

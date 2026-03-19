@@ -32,6 +32,9 @@ To maximize conversion during high-traffic events, orders begin in the `PENDING_
 ### IV. Permission-Driven RBAC
 Hardcoded roles (e.g., `role === 'admin'`) MUST NOT exist in the system logic. Granular permission flags (e.g., `VIEW_FINANCIALS`, `VERIFY_PAYMENTS`) MUST be utilized at the Convex mutation level. Financial opacity is mandatory, and unprivileged users MUST have financial fields stripped before the payload leaves the server.
 
+### V. Strict Form & UI Validation
+ALL forms across the entire application (Storefront and Admin) MUST strictly use `react-hook-form` for state management. ALL forms MUST use `zod` for strict schema validation. Never rely solely on native HTML validation. The UI MUST display proper inline error messages for invalid fields.
+
 ## State Machine Constraint
 
 The system operates on deterministic state transitions. Direct database writes to an order's status field are forbidden. Status changes MUST ONLY occur via defined Convex transition mutations that validate current state, permissions, and execute required side effects atomically.
