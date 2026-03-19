@@ -66,10 +66,10 @@ description: "Task list for Phase 7 - Advanced Catalog, Variants, Media Gallery 
 
 ### Implementation for User Story 2
 
-- [ ] T013 [P] [US2] Construct responsive dynamic main image gallery container in `apps/web/app/(store)/components/DynamicProductGallery.tsx`
-- [ ] T014 [US2] Refactor Storefront PDP to isolate client state for variant selection in `apps/web/app/(store)/products/[id]/page.tsx`
-- [ ] T015 [US2] Bind color swatch clicks to state mutations triggering `DynamicProductGallery` URL swaps mapped to backend file IDs
-- [ ] T016 [P] [US2] Implement conditional semantic rendering `<s>` for `compareAtPrice` vs `price` inside frontend product cards
+- [X] T013 [P] [US2] Construct responsive dynamic main image gallery container in `apps/web/app/(store)/components/DynamicProductGallery.tsx`
+- [X] T014 [US2] Refactor Storefront PDP to isolate client state for variant selection in `apps/web/app/(store)/products/[id]/page.tsx`
+- [X] T015 [US2] Bind color swatch clicks to state mutations triggering `DynamicProductGallery` URL swaps mapped to backend file IDs
+- [X] T016 [P] [US2] Implement conditional semantic rendering `<s>` for `compareAtPrice` vs `price` inside frontend product cards
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -130,5 +130,6 @@ Task: "Implement conditional semantic rendering <s> for compareAtPrice..."
 1. Complete Setup + Foundational → Foundation ready
 2. Add User Story 1 → Test independently → Admin Functionality Active (MVP)
 3. Add User Story 2 → Test storefront dynamic syncing independently.
+
 
 

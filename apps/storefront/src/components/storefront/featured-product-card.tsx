@@ -1,19 +1,22 @@
 "use client";
 
+import type { MouseEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useMutation } from "convex/react";
 import { api } from "@backend/convex/_generated/api";
+import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
 import { useCart } from "@/providers/cart-provider";
 import { ArrowRight, ShoppingCart, Zap } from "lucide-react";
 
 interface FeaturedProductCardProps {
   product: {
-    _id: string;
+    _id: Id<"products">;
     name_ar: string;
     name_en: string;
     selling_price: number;
+    compareAtPrice?: number;
     display_stock: number;
     images: string[];
     description_en?: string;
@@ -25,15 +28,16 @@ export default function FeaturedProductCard({ product }: FeaturedProductCardProp
   const { sessionId } = useSession();
   const { openCart } = useCart();
   const addToCart = useMutation(api.cart.addToCart);
-  
-  const handleAddToCart = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const hasSalePrice = product.compareAtPrice !== undefined && product.compareAtPrice > product.selling_price;
+
+  const handleAddToCart = async (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
     try {
       await addToCart({
         sessionId,
-        productId: product._id as any,
-        quantity: 1
+        productId: product._id,
+        quantity: 1,
       });
       openCart();
     } catch (err) {
@@ -42,53 +46,59 @@ export default function FeaturedProductCard({ product }: FeaturedProductCardProp
   };
 
   return (
-    <Link href={`/products/${product.slug || product._id}`} className="block group relative w-full h-[500px] overflow-hidden rounded-[32px] bg-zinc-900/40 border border-white/5 transition-all hover:border-[#ffc105]/20">
-      {/* Background Image */}
+    <Link
+      href={`/products/${product.slug || product._id}`}
+      className="group relative block h-[500px] w-full overflow-hidden rounded-[32px] border border-white/5 bg-zinc-900/40 transition-all hover:border-[#ffc105]/20"
+    >
       <div className="absolute inset-0 z-0">
         {product.images?.[0] ? (
           <Image
             src={product.images[0]}
             alt={product.name_en}
             fill
-            className="object-cover opacity-60 transition-transform duration-700 group-hover:scale-105 group-hover:rotate-1"
+            className="object-cover opacity-60 transition-transform duration-700 group-hover:rotate-1 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full bg-zinc-950" />
+          <div className="h-full w-full bg-zinc-950" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-black/40 to-transparent" />
       </div>
 
-      {/* Content */}
-      <div className="absolute inset-0 z-20 p-8 flex flex-col justify-end items-start space-y-4">
-        <div className="flex items-center space-x-2 bg-[#ffc105] rounded-full px-3 py-1 scale-90 origin-left">
-          <Zap size={12} className="text-black fill-black" />
-          <span className="text-[10px] font-black text-black uppercase tracking-widest">Featured Drop</span>
+      <div className="absolute inset-0 z-20 flex flex-col items-start justify-end space-y-4 p-8">
+        <div className="flex items-center space-x-2 rounded-full bg-[#ffc105] px-3 py-1 scale-90 origin-left">
+          <Zap size={12} className="fill-black text-black" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-black">Featured Drop</span>
         </div>
 
         <div className="space-y-1">
-          <h3 className="font-space-grotesk text-2xl lg:text-3xl font-black text-white uppercase tracking-tighter leading-none">
+          <h3 className="font-space-grotesk text-2xl font-black uppercase tracking-tighter leading-none text-white lg:text-3xl">
             {product.name_en}
           </h3>
-          <p className="font-arabic text-zinc-400 text-sm">
-            {product.name_ar}
-          </p>
+          <p className="font-arabic text-sm text-zinc-400">{product.name_ar}</p>
         </div>
 
-        <p className="text-zinc-400 text-sm line-clamp-2 max-w-sm">
+        <p className="max-w-sm line-clamp-2 text-sm text-zinc-400">
           {product.description_en || "Premium quality, limited edition performance gear."}
         </p>
 
-        <div className="w-full pt-4 flex items-center justify-between border-t border-white/10">
-          <span className="font-space-grotesk text-2xl font-black text-[#ffc105]">
-            {product.selling_price.toLocaleString()} EGP
-          </span>
+        <div className="w-full border-t border-white/10 pt-4 flex items-center justify-between">
+          <div>
+            {hasSalePrice ? (
+              <s className="mb-1 block font-space-grotesk text-sm font-bold text-zinc-500">
+                {product.compareAtPrice?.toLocaleString()} EGP
+              </s>
+            ) : null}
+            <span className="font-space-grotesk text-2xl font-black text-[#ffc105]">
+              {product.selling_price.toLocaleString()} EGP
+            </span>
+          </div>
           <div className="flex items-center space-x-3">
-            <div className="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center text-white group-hover:bg-white/20 transition-all">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white transition-all group-hover:bg-white/20">
               <ArrowRight size={20} />
             </div>
-            <button 
+            <button
               onClick={handleAddToCart}
-              className="h-12 px-6 rounded-2xl bg-[#ffc105] text-black font-space-grotesk font-black uppercase tracking-widest text-xs flex items-center justify-center space-x-2 hover:bg-[#e6ae00] transition-colors"
+              className="flex h-12 items-center justify-center space-x-2 rounded-2xl bg-[#ffc105] px-6 font-space-grotesk text-xs font-black uppercase tracking-widest text-black transition-colors hover:bg-[#e6ae00]"
             >
               <ShoppingCart size={16} />
               <span>Add</span>
@@ -99,7 +109,3 @@ export default function FeaturedProductCard({ product }: FeaturedProductCardProp
     </Link>
   );
 }
-
-
-
-
