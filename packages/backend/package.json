@@ -1,0 +1,17 @@
+{
+  "name": "@techworld/backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "convex dev",
+    "codegen": "convex codegen",
+    "lint": "eslint convex --ext .ts"
+  },
+  "dependencies": {
+    "convex": "^1.33.1"
+  },
+  "devDependencies": {
+    "eslint": "^9",
+    "typescript": "^5"
+  }
+}

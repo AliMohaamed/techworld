@@ -27,10 +27,10 @@ description: "Task list for Standalone Admin Dashboard Architecture"
 
 **Purpose**: Project initialization and basic monorepo structure
 
-- [ ] T001 Create project structure per implementation plan by adding `turbo.json` and workspaces to `package.json`
-- [ ] T002 Move existing Next.js frontend codebase into `apps/storefront/`
-- [ ] T003 Initialize completely isolated Next.js 16 app at `apps/admin/`
-- [ ] T004 [P] Relocate existing `convex/` logic into `packages/backend/` and verify workspace access
+- [X] T001 Create project structure per implementation plan by adding `turbo.json` and workspaces to `package.json`
+- [X] T002 Move existing Next.js frontend codebase into `apps/storefront/`
+- [X] T003 Initialize completely isolated Next.js 16 app at `apps/admin/`
+- [X] T004 [P] Relocate existing `convex/` logic into `packages/backend/` and verify workspace access
 
 ---
 
@@ -151,3 +151,4 @@ description: "Task list for Standalone Admin Dashboard Architecture"
 2. Add User Story 1 → Confirm operational queue functions (MVP)
 3. Add User Story 2 → Release catalog management UI incrementally
 4. Add User Story 3 → Toggle RBAC logic on existing mutations
+

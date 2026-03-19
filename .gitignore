@@ -15,7 +15,15 @@
 
 # next.js
 /.next/
+**/.next/
 /out/
+/dist/
+/apps/*/out/
+/apps/*/dist/
+/packages/*/dist/
+/packages/backend/convex/_generated/
+/packages/backend/convex/.convex/
+/.turbo/
 
 # production
 /build
@@ -39,3 +47,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
