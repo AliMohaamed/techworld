@@ -41,8 +41,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#121212] transition-all hover:border-[#ffc105]/30">
-      <Link href={`/products/${product._id}`} className="relative aspect-square overflow-hidden">
+    <Link href={`/products/${product._id}`} className="group relative flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#121212] transition-all hover:border-[#ffc105]/30">
+      <div className="relative aspect-square overflow-hidden">
         {product.images?.[0] ? (
           <Image
             src={product.images[0]}
@@ -63,18 +63,18 @@ export default function ProductCard({ product }: ProductCardProps) {
             </span>
           </div>
         )}
-      </Link>
+      </div>
 
       <div className="flex flex-1 flex-col p-4">
         <div className="mb-2 flex items-start justify-between">
-          <Link href={`/products/${product._id}`} className="block">
+          <div className="block">
             <h3 className="line-clamp-1 font-space-grotesk text-sm font-medium text-white transition-colors group-hover:text-[#ffc105]">
               {product.name_en}
             </h3>
             <p className="line-clamp-1 text-right font-arabic text-xs text-zinc-400">
               {product.name_ar}
             </p>
-          </Link>
+          </div>
         </div>
 
         <div className="mt-auto flex items-end justify-between">
@@ -97,6 +97,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
