@@ -12,17 +12,24 @@ function toRemoteUrl(urlValue: string | undefined) {
   }
 }
 
-const remotePatterns = [
-  toRemoteUrl(process.env.NEXT_PUBLIC_CONVEX_SITE_URL),
-  toRemoteUrl(process.env.NEXT_PUBLIC_CONVEX_URL),
-]
-  .filter((url): url is URL => url !== null)
-  .map((url) => ({
-    protocol: url.protocol.replace(":", "") as "http" | "https",
-    hostname: url.hostname,
-    port: url.port,
+const remotePatterns: any[] = [
+  ...[
+    toRemoteUrl(process.env.NEXT_PUBLIC_CONVEX_SITE_URL),
+    toRemoteUrl(process.env.NEXT_PUBLIC_CONVEX_URL),
+  ]
+    .filter((url): url is URL => url !== null)
+    .map((url) => ({
+      protocol: url.protocol.replace(":", "") as "http" | "https",
+      hostname: url.hostname,
+      port: url.port,
+      pathname: "/**",
+    })),
+  {
+    protocol: "https",
+    hostname: "clean-heron-293.convex.cloud",
     pathname: "/**",
-  }));
+  },
+];
 
 const nextConfig: NextConfig = {
   images: {
