@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Authenticated, AuthLoading, Unauthenticated, useQuery } from "convex/react";
 import { useForm } from "react-hook-form";
-import { ShieldCheck, LogOut } from "lucide-react";
+import { ShieldCheck, ShieldX, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@techworld/ui/button";
@@ -153,6 +153,32 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
           <h1 className="mb-2 text-2xl font-semibold text-white">Access Denied</h1>
           <p className="mb-8 text-sm leading-6 text-zinc-400">
             Your authentication session is valid, but no staff record was found for <strong>{profile?.authUser?.email}</strong>. Admin access must be provisioned by the platform owner.
+          </p>
+          <Button
+            onClick={() => void authClient.signOut()}
+            className="w-full"
+            variant="outline"
+          >
+            <LogOut size={14} className="mr-2" />
+            Sign Out
+          </Button>
+        </div>
+      </main>
+    );
+  }
+
+  if (profile.staffUser.isActive === false) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-[radial-gradient(circle_at_top,#222,transparent_45%),#050505] px-6 py-10">
+        <div className="w-full max-w-md rounded-[28px] border border-white/10 bg-[#101010] p-8 text-center shadow-2xl shadow-black/30">
+          <div className="mb-6 flex justify-center">
+            <div className="rounded-2xl bg-red-500/10 p-4 text-red-500">
+              <ShieldX size={48} />
+            </div>
+          </div>
+          <h1 className="mb-2 text-2xl font-semibold text-white">Account Suspended</h1>
+          <p className="mb-8 text-sm leading-6 text-zinc-400">
+            Your staff account has been deactivated by the platform administrator. Access to the dashboard is currently restricted.
           </p>
           <Button
             onClick={() => void authClient.signOut()}

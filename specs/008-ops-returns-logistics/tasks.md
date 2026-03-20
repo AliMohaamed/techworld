@@ -75,8 +75,8 @@ description: "Task list for Phase 8 – Operations, Returns & Logistics feature 
 
 ### Implementation for User Story 3
 
-- [ ] T009 [P] [US3] Implement `provisionStaff` and tightly bound `updateUserPermissions` mutations natively in `packages/backend/convex/users.ts`. Ensure bounds-checking strictly prevents privilege escalation (cannot grant what delegator doesn't own). Add audit logs.
-- [ ] T010 [US3] Implement Team Management UI dashboard in `apps/admin/src/app/(dashboard)/team/page.tsx`.
+- [X] T009 [P] [US3] Implement `provisionStaff` and tightly bound `updateUserPermissions` mutations natively in `packages/backend/convex/users.ts`. Ensure bounds-checking strictly prevents privilege escalation (cannot grant what delegator doesn't own). Add audit logs.
+- [X] T010 [US3] Implement Team Management UI dashboard in `apps/admin/src/app/(dashboard)/team/page.tsx`.
 
 **Checkpoint**: Platform can safely scale operational staff.
 
@@ -90,8 +90,8 @@ description: "Task list for Phase 8 – Operations, Returns & Logistics feature 
 
 ### Implementation for User Story 4
 
-- [ ] T011 [P] [US4] Implement the `api.orders.updateRto` mutation in `packages/backend/convex/orders.ts`. Enforce `SHIPPED` -> `RTO` path only. Call `incrementSkuRealStock` operation natively inside mutation, including handling bundle BOMs if applicable. Add audit logs.
-- [ ] T012 [US4] Expose the RTO transition button in the Admin Order details view (`apps/admin/src/app/(dashboard)/orders/[orderId]/page.tsx`).
+- [X] T011 [P] [US4] Implement the `api.orders.updateRto` mutation in `packages/backend/convex/orders.ts`. Enforce `SHIPPED` -> `RTO` path only. Call `incrementSkuRealStock` operation natively inside mutation, including handling bundle BOMs if applicable. Add audit logs.
+- [X] T012 [US4] Expose the RTO transition button in the Admin Order details view (`apps/admin/src/app/(dashboard)/orders/[orderId]/page.tsx`).
 
 **Checkpoint**: Courier failure tracking accurately recovers inventory.
 
@@ -105,9 +105,9 @@ description: "Task list for Phase 8 – Operations, Returns & Logistics feature 
 
 ### Implementation for User Story 5
 
-- [ ] T013 [P] [US5] Modify the existing `cancelOrder` mutation in `packages/backend/convex/orders.ts` to automatically increment SKU `real_stock` *only* if the previous state was `CONFIRMED`.
-- [ ] T014 [P] [US5] Create an independent `api.skus.restockItem` mutation bounded by `PROCESS_RETURNS` in `packages/backend/convex/skus.ts` to support ad-hoc post-delivery variants returns.
-- [ ] T015 [US5] Expose the independent `restockItem` functionality dynamically in the Admin SKU/Product dashboard.
+- [X] T013 [P] [US5] Modify the existing `updateGenericStatus` mutation in `packages/backend/convex/orders.ts` to automatically increment SKU `real_stock` *only* if the previous state was `CONFIRMED` or later.
+- [X] T014 [P] [US5] Create an independent `api.skus.restockItem` mutation bounded by `PROCESS_RETURNS` in `packages/backend/convex/skus.ts` to support ad-hoc post-delivery variants returns.
+- [X] T015 [US5] Expose the independent `restockItem` functionality dynamically in the Admin SKU/Product dashboard.
 
 **Checkpoint**: All user stories should now be independently functional.
 
@@ -117,9 +117,9 @@ description: "Task list for Phase 8 – Operations, Returns & Logistics feature 
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T016 [P] Code cleanup, un-used artifact deletion, component standardization.
-- [ ] T017 Verify all UI interactions strictly utilize proper loading states and display Zod validation errors inline.
-- [ ] T018 Final manually-run smoke test validating the "Negative Concurrency Collisions" strict bounding via the Storefront using multiple parallel checkouts.
+- [X] T016 [P] Code cleanup, un-used artifact deletion, component standardization.
+- [X] T017 Verify all UI interactions strictly utilize proper loading states and display Zod validation errors inline.
+- [X] T018 Final manually-run smoke test validating the "Negative Concurrency Collisions" strict bounding via the Storefront using multiple parallel checkouts.
 
 ---
 

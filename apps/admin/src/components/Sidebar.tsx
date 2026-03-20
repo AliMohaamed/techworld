@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import type { Route } from "next";
-import { Boxes, ClipboardList, FolderTree, Home, MapPinned, type LucideIcon } from "lucide-react";
+import { Boxes, ClipboardList, FolderTree, Home, MapPinned, Users, type LucideIcon } from "lucide-react";
 import type { Permission } from "@backend/convex/lib/permissions";
 
 type StaffPermissionValue = string | number | bigint | boolean;
-type SidebarRoute = "/" | "/orders" | "/catalog/categories" | "/catalog/products" | "/settings/governorates";
+type SidebarRoute = "/" | "/orders" | "/catalog/categories" | "/catalog/products" | "/settings/governorates" | "/team";
 
 type NavItem = {
   href: SidebarRoute;
@@ -21,6 +21,7 @@ const navItems: NavItem[] = [
   { href: "/catalog/categories", label: "Categories", icon: FolderTree, requiredPermissions: ["MANAGE_CATEGORIES"] },
   { href: "/catalog/products", label: "Products", icon: Boxes, requiredPermissions: ["MANAGE_PRODUCTS"] },
   { href: "/settings/governorates", label: "Governorates", icon: MapPinned, requiredPermissions: ["MANAGE_SYSTEM_CONFIG"] },
+  { href: "/team", label: "Team", icon: Users, requiredPermissions: ["MANAGE_USERS"] },
 ];
 
 function hasRequiredPermission(

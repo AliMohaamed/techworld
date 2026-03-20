@@ -3,8 +3,17 @@ import { mutation, query, QueryCtx } from "./_generated/server";
 import { requirePermission } from "./lib/rbac";
 import { hasPermission } from "./lib/permissions";
 import { scheduleAuditLog, writeAuditLog } from "./lib/audit";
-import { Id } from "./_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
+import { orderStateValidator } from "./schema";
+
+async function getOrderOrThrow(ctx: { db: { get: (id: Id<"orders">) => Promise<Doc<"orders"> | null> } }, orderId: Id<"orders">) {
+  const order = await ctx.db.get(orderId);
+  if (!order) {
+    throw new ConvexError({ code: "ORDER_NOT_FOUND", message: "Order not found" });
+  }
+  return order;
+}
 
 async function getActorUserId(ctx: Parameters<typeof requirePermission>[0]) {
   const identity = await ctx.auth.getUserIdentity();
@@ -310,3 +319,91 @@ export const getOrdersByShortCode = query({
       .collect();
   },
 });
+
+export const updateRto = mutation({
+  args: { orderId: v.id("orders") },
+  handler: async (ctx, args) => {
+    const actor = await requirePermission(ctx, "MANAGE_SHIPPING_STATUS");
+
+    const order = await getOrderOrThrow(ctx, args.orderId);
+
+
+    if (order.state !== "SHIPPED") {
+      throw new ConvexError({ 
+        code: "INVALID_TRANSITION", 
+        message: `Only SHIPPED orders can be marked as RTO (currently: ${order.state})` 
+      });
+    }
+
+    // Atomic Restocking: US4 Requirement
+    // FR-015: "Return to Origin (RTO) or customer returns ... accurately restock the real_stock at the strict SKU level."
+    await ctx.runMutation(internal.skus.incrementSkuRealStock, {
+      skuId: order.skuId,
+      quantity: order.quantity,
+    });
+
+    await ctx.db.patch(args.orderId, { state: "RTO" });
+
+    await scheduleAuditLog(ctx, {
+      userId: actor._id,
+      entityId: args.orderId,
+      actionType: "ORDER_RTO_TRIGGERED",
+      changes: { from: order.state, to: "RTO", skuId: order.skuId, quantity: order.quantity },
+    });
+
+    return { success: true };
+  },
+});
+
+export const updateGenericStatus = mutation({
+  args: {
+    orderId: v.id("orders"),
+    newState: orderStateValidator,
+  },
+  handler: async (ctx, args) => {
+    const actor = await requirePermission(ctx, "MANAGE_SHIPPING_STATUS");
+
+    const order = await getOrderOrThrow(ctx, args.orderId);
+    if (!order) {
+      throw new ConvexError({ code: "ORDER_NOT_FOUND", message: "Order not found" });
+    }
+
+    // Validation logic for sequential flow:
+    // CONFIRMED -> READY_FOR_SHIPPING -> SHIPPED -> DELIVERED
+    const transitions: Record<string, string[]> = {
+      CONFIRMED: ["READY_FOR_SHIPPING", "CANCELLED"],
+      READY_FOR_SHIPPING: ["SHIPPED", "CONFIRMED", "CANCELLED"],
+      SHIPPED: ["DELIVERED", "RTO", "CANCELLED"],
+    };
+
+    if (args.newState !== order.state && !transitions[order.state]?.includes(args.newState)) {
+      throw new ConvexError({ 
+        code: "INVALID_TRANSITION", 
+        message: `Manual status override failed. The transition from ${order.state} to ${args.newState} is not permitted by the standard FSM.` 
+      });
+    }
+
+    // US5: Auto-restock on cancellation after confirmation
+    if (args.newState === "CANCELLED") {
+      const statesThatDeductStock = ["CONFIRMED", "READY_FOR_SHIPPING", "SHIPPED", "DELIVERED"];
+      if (statesThatDeductStock.includes(order.state)) {
+        await ctx.runMutation(internal.skus.incrementSkuRealStock, {
+          skuId: order.skuId,
+          quantity: order.quantity,
+        });
+      }
+    }
+
+    await ctx.db.patch(args.orderId, { state: args.newState });
+
+    await scheduleAuditLog(ctx, {
+      userId: actor._id,
+      entityId: args.orderId,
+      actionType: "ORDER_STATUS_CHANGED",
+      changes: { from: order.state, to: args.newState },
+    });
+
+    return { success: true };
+  },
+});
+

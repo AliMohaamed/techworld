@@ -3,7 +3,8 @@
 import { useEffect } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useMutation } from "convex/react";
-import { Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { Plus, Trash2, TrendingUp } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { Button } from "@techworld/ui/button";
@@ -86,6 +87,7 @@ export function ProductFormSheet({
 }) {
   const createAdvancedProduct = useMutation(api.products.createAdvancedProduct);
   const updateAdvancedProduct = useMutation(api.products.updateAdvancedProduct);
+  const restockItem = useMutation(api.skus.restockItem);
   const {
     control,
     register,
@@ -99,6 +101,31 @@ export function ProductFormSheet({
   });
   const { fields, append, remove } = useFieldArray({ control, name: "variants" });
   const images = useWatch({ control, name: "images" }) ?? [];
+
+  const handleRestock = async (index: number) => {
+    const variant = getValues(`variants.${index}`);
+    if (!variant.id) {
+      toast.error("Please save the product first to create the SKU before restocking.");
+      return;
+    }
+
+    const amount = prompt(`Enter restock quantity for ${variant.variantName}:`, "0");
+    const quantity = parseInt(amount || "0", 10);
+
+    if (isNaN(quantity) || quantity <= 0) {
+      if (amount !== null) toast.error("Invalid quantity");
+      return;
+    }
+
+    try {
+      const result = await restockItem({ skuId: variant.id as Id<"skus">, quantity });
+      toast.success(`Restocked ${quantity} items. New real stock: ${result.real_stock}`);
+      // Update form state to reflect new stock
+      setValue(`variants.${index}.real_stock`, result.real_stock);
+    } catch (error) {
+      toast.error("Restock failed", { description: error instanceof Error ? error.message : "Restock failed" });
+    }
+  };
 
   useEffect(() => {
     if (!open) {
@@ -292,7 +319,18 @@ export function ProductFormSheet({
                       <input className="field" {...register(`variants.${index}.type`)} />
                     </Field>
                     <Field label="Real stock" error={errors.variants?.[index]?.real_stock?.message}>
-                      <input className="field" type="number" {...register(`variants.${index}.real_stock`)} />
+                      <div className="flex gap-2">
+                        <input className="field" type="number" {...register(`variants.${index}.real_stock`)} />
+                        <Button
+                          className="h-11 px-3 border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white"
+                          type="button"
+                          variant="outline"
+                          onClick={() => void handleRestock(index)}
+                          title="Ad-hoc restock from returns or new shipments"
+                        >
+                          <TrendingUp size={16} />
+                        </Button>
+                      </div>
                     </Field>
                     <Field label="Display stock" error={errors.variants?.[index]?.display_stock?.message}>
                       <input className="field" type="number" {...register(`variants.${index}.display_stock`)} />

@@ -91,3 +91,59 @@ export const decrementSkuRealStock = internalMutation({
     return { success: true, real_stock: nextRealStock };
   },
 });
+
+export const incrementSkuRealStock = internalMutation({
+  args: {
+    skuId: v.id("skus"),
+    quantity: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const sku = await getSkuOrThrow(ctx, args.skuId);
+    const quantity = sanitizeStock(args.quantity, "Quantity");
+
+    if (quantity === 0) {
+      return { success: true, real_stock: sku.real_stock };
+    }
+
+    const nextRealStock = sku.real_stock + quantity;
+    await ctx.db.patch(args.skuId, { real_stock: nextRealStock });
+
+    await writeAuditLog(ctx, {
+      entityId: args.skuId,
+      actionType: "SKU_REAL_STOCK_INCREMENTED",
+      changes: { previousRealStock: sku.real_stock, quantity, nextRealStock },
+    });
+
+    return { success: true, real_stock: nextRealStock };
+  },
+});
+
+export const restockItem = mutation({
+  args: {
+    skuId: v.id("skus"),
+    quantity: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const user = await requirePermission(ctx, "PROCESS_RETURNS");
+    const sku = await getSkuOrThrow(ctx, args.skuId);
+    const quantity = sanitizeStock(args.quantity, "Restock quantity");
+
+    if (quantity === 0) {
+      return { success: true, real_stock: sku.real_stock };
+    }
+
+    const nextRealStock = sku.real_stock + quantity;
+    await ctx.db.patch(args.skuId, { real_stock: nextRealStock });
+
+    await writeAuditLog(ctx, {
+      userId: user._id,
+      entityId: args.skuId,
+      actionType: "SKU_AD_HOC_RESTOCK",
+      changes: { previousRealStock: sku.real_stock, quantity, nextRealStock },
+    });
+
+    return { success: true, real_stock: nextRealStock };
+  },
+});
+
+

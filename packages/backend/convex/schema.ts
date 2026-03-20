@@ -3,7 +3,7 @@ import { v } from "convex/values";
 import { permissionValidators } from "./lib/permissions";
 
 const storageRef = v.union(v.string(), v.id("_storage"));
-const orderStateValidator = v.union(
+export const orderStateValidator = v.union(
   v.literal("PENDING_PAYMENT_INPUT"),
   v.literal("AWAITING_VERIFICATION"),
   v.literal("CONFIRMED"),
@@ -21,6 +21,7 @@ export default defineSchema({
     email: v.string(),
     identifier: v.optional(v.string()),
     permissions: v.array(v.union(...permissionValidators)),
+    isActive: v.optional(v.boolean()),
   })
     .index("by_email", ["email"])
     .index("by_identifier", ["identifier"]),

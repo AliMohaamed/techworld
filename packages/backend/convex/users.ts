@@ -1,5 +1,5 @@
 import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { requirePermission } from "./lib/rbac";
 import { internal } from "./_generated/api";
 import { createAuth } from "./auth";
@@ -51,6 +51,7 @@ export const createInitialAdmin = mutation({
       email: normalizedEmail,
       identifier: authUser.id,
       permissions: [...permissionValues],
+      isActive: true,
     });
 
     await ctx.scheduler.runAfter(0, internal.audit.logAudit, {
@@ -71,17 +72,101 @@ export const createInitialAdmin = mutation({
   },
 });
 
-export const updateUserPermissions = mutation({
+export const provisionStaff = mutation({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    password: v.string(),
+    permissions: v.array(v.union(...permissionValidators)),
+  },
+  handler: async (ctx, args) => {
+    const actor = await requirePermission(ctx, "MANAGE_USERS");
+    const normalizedEmail = args.email.trim().toLowerCase();
+    const normalizedName = args.name.trim();
+
+    // 1. BOUND PERMISSION CHECK
+    for (const permission of args.permissions) {
+      if (!actor.permissions.includes(permission)) {
+        throw new ConvexError({ 
+          code: "PERMISSION_ESCALATION", 
+          message: `You cannot grant '${permission}' because you do not have it.` 
+        });
+      }
+    }
+
+    // 2. AUTH SYSTEM REGISTRATION (CRITICAL UX FIX)
+    const auth = createAuth(ctx);
+    const authContext = await auth.$context;
+    
+    // Check if auth user exists
+    const existingAuthUser = await authContext.internalAdapter.findUserByEmail(
+      normalizedEmail,
+      { includeAccounts: false }
+    );
+    if (existingAuthUser) {
+      throw new ConvexError({ code: "USER_EXISTS", message: "An authentication user with this email already exists." });
+    }
+
+    const authUser = await authContext.internalAdapter.createUser({
+      email: normalizedEmail,
+      emailVerified: true,
+      name: normalizedName,
+    });
+
+    const passwordHash = await authContext.password.hash(args.password);
+
+    await authContext.internalAdapter.createAccount({
+      accountId: normalizedEmail,
+      password: passwordHash,
+      providerId: "credential",
+      userId: authUser.id,
+    });
+
+    // 3. CONVEX USER RECORD
+    const userId = await ctx.db.insert("users", {
+      name: normalizedName,
+      email: normalizedEmail,
+      identifier: authUser.id,
+      permissions: args.permissions,
+      isActive: true,
+    });
+
+    await ctx.scheduler.runAfter(0, internal.audit.logAudit, {
+      userId: actor._id,
+      entityId: userId,
+      actionType: "STAFF_PROVISIONED",
+      changes: { email: normalizedEmail, permissions: args.permissions, identifier: authUser.id },
+    });
+
+    return userId;
+  },
+});
+
+export const updateStaffPermissions = mutation({
   args: {
     userId: v.id("users"),
     permissions: v.array(v.union(...permissionValidators)),
   },
   handler: async (ctx, args) => {
-    await requirePermission(ctx, "MANAGE_USERS");
+    const actor = await requirePermission(ctx, "MANAGE_USERS");
+
+    if (actor._id === args.userId) {
+      throw new ConvexError({ code: "SELF_MODIFICATION_LOCKED", message: "You cannot modify your own permissions." });
+    }
 
     const oldUser = await ctx.db.get(args.userId);
     if (!oldUser) {
-      throw new Error("User not found");
+      throw new ConvexError({ code: "USER_NOT_FOUND", message: "Staff record not found" });
+    }
+
+    // ESCALATION GUARD (US3 Bound Check)
+    for (const permission of args.permissions) {
+      if (!actor.permissions.includes(permission)) {
+        throw new ConvexError({ 
+          code: "PERMISSION_ESCALATION", 
+          message: `You cannot grant '${permission}' because you do not have it.` 
+        });
+      }
     }
 
     await ctx.db.patch(args.userId, {
@@ -89,16 +174,74 @@ export const updateUserPermissions = mutation({
     });
 
     await ctx.scheduler.runAfter(0, internal.audit.logAudit, {
-      userId: args.userId,
+      userId: actor._id,
       entityId: args.userId,
       actionType: "USER_PERMISSIONS_UPDATED",
       changes: {
-        before: oldUser.permissions,
-        after: args.permissions,
+        from: oldUser.permissions,
+        to: args.permissions,
       },
     });
 
     return { success: true };
+  },
+});
+
+export const toggleStaffStatus = mutation({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const actor = await requirePermission(ctx, "MANAGE_USERS");
+    
+    if (actor._id === args.userId) {
+      throw new ConvexError({ code: "SELF_MODIFICATION_LOCKED", message: "You cannot deactivate your own account." });
+    }
+
+    const user = await ctx.db.get(args.userId);
+    if (!user) {
+      throw new ConvexError({ code: "USER_NOT_FOUND", message: "Staff record not found" });
+    }
+
+    const nextIsActive = user.isActive === false; // If it was false, it'll become true. If it was true or undefined, it'll become false.
+    await ctx.db.patch(args.userId, { isActive: nextIsActive });
+
+    await ctx.scheduler.runAfter(0, internal.audit.logAudit, {
+      userId: actor._id,
+      entityId: args.userId,
+      actionType: "STAFF_STATUS_TOGGLED",
+      changes: { from: user.isActive ?? true, to: nextIsActive },
+    });
+
+    return { isActive: nextIsActive };
+  },
+});
+
+/**
+ * Migration/Repair Mutation: Ensures all staff user records have isActive: true
+ * Run this from the Convex Dashboard to fix schema validation errors.
+ */
+export const repairStaffSchema = mutation({
+  args: {},
+  handler: async (ctx) => {
+    // Requires a Super Admin or similar to run manually if needed
+    const users = await ctx.db.query("users").collect();
+    let count = 0;
+    for (const user of users) {
+      if (user.isActive === undefined) {
+        await ctx.db.patch(user._id, { isActive: true });
+        count++;
+      }
+    }
+    return { success: true, repairedCount: count };
+  },
+});
+
+export const updateUserPermissions = updateStaffPermissions;
+
+export const listStaff = query({
+  args: {},
+  handler: async (ctx) => {
+    await requirePermission(ctx, "MANAGE_USERS");
+    return await ctx.db.query("users").collect();
   },
 });
 
@@ -141,6 +284,7 @@ export const getMe = query({
   },
 });
 
+
 /**
  * Super Admin Seeding Mutation
  * Used to bootstrap or repair the initial staff user when the admin dashboard
@@ -160,15 +304,17 @@ export const createSuperAdmin = mutation({
       .unique();
 
     if (existingUser) {
-      // 2. If it exists, ensure it has ALL permission flags
+      // 2. If it exists, ensure it has ALL permission flags and is ACTIVE
       await ctx.db.patch(existingUser._id, {
         permissions: [...permissionValues],
+        isActive: true,
       });
 
       return {
         status: "updated",
         userId: existingUser._id,
         email: normalizedEmail,
+        isActive: true,
         permissions: [...permissionValues],
       };
     }
@@ -178,12 +324,13 @@ export const createSuperAdmin = mutation({
       name: "Super Admin", // Default name for bootstrap
       email: normalizedEmail,
       permissions: [...permissionValues],
+      isActive: true,
     });
 
     // 4. Log the manual bootstrap action
     await ctx.scheduler.runAfter(0, internal.audit.logAudit, {
       userId: userId,
-      entityId: userId,
+      entityId: String(userId),
       actionType: "SUPER_ADMIN_BOOTSTRAP",
       changes: {
         email: normalizedEmail,
@@ -195,6 +342,7 @@ export const createSuperAdmin = mutation({
       status: "created",
       userId,
       email: normalizedEmail,
+      isActive: true,
       permissions: [...permissionValues],
     };
   },

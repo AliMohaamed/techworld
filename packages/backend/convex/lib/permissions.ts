@@ -22,7 +22,12 @@ export function hasPermission(
   user: { permissions?: readonly PermissionValue[] | undefined } | null | undefined,
   permission: Permission,
 ) {
-  return user?.permissions?.some((grantedPermission) => String(grantedPermission) === permission) ?? false;
+  const target = String(permission).trim().toUpperCase();
+  return (
+    user?.permissions?.some((granted) => {
+      return String(granted).trim().toUpperCase() === target;
+    }) ?? false
+  );
 }
 
 export const permissionValidators = permissionValues.map((permission) =>

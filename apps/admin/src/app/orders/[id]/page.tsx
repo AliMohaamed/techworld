@@ -16,10 +16,25 @@ export default function OrderDetailsPage() {
   const orderId = params.id as Id<"orders">;
   const order = useQuery(api.orders.getOrderDetails, { orderId });
   const updateOrderStatus = useMutation(api.orders.updateOrderStatus);
+  const updateRto = useMutation(api.orders.updateRto);
   const generateReceiptUploadUrl = useMutation(api.files.generateReceiptUploadUrl);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleRto = async () => {
+    if (!confirm("Are you sure you want to mark this order as Return to Origin? This will automatically restock the SKU.")) return;
+    setIsSubmitting(true);
+    try {
+      await updateRto({ orderId });
+      toast.success("Order marked as RTO. Inventory restocked.");
+      router.push("/orders");
+    } catch (error) {
+      toast.error("RTO failed", { description: error instanceof Error ? error.message : "Unknown error" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const uploadLabel = useMemo(() => {
     if (!selectedFile) return "No fallback receipt selected";
@@ -163,18 +178,36 @@ export default function OrderDetailsPage() {
           </div>
 
           <div className="space-y-3">
-            <Button className="w-full" onClick={() => setIsModalOpen(true)} type="button">
-              <UploadCloud size={16} />
-              Manual Fallback
-            </Button>
-            <Button className="w-full" disabled={isSubmitting} onClick={() => void handleStatusChange("CANCELLED")} type="button" variant="ghost">
-              <XCircle size={16} />
-              Cancel Order
-            </Button>
-            <Button className="w-full" disabled={isSubmitting} onClick={() => void handleStatusChange("STALLED_PAYMENT")} type="button" variant="outline">
-              <AlertTriangle size={16} />
-              Mark Stalled
-            </Button>
+            {order.state === "AWAITING_VERIFICATION" && (
+              <>
+                <Button className="w-full" onClick={() => setIsModalOpen(true)} type="button">
+                  <UploadCloud size={16} />
+                  Manual Fallback
+                </Button>
+                <Button className="w-full" disabled={isSubmitting} onClick={() => void handleStatusChange("CANCELLED")} type="button" variant="ghost">
+                  <XCircle size={16} />
+                  Cancel Order
+                </Button>
+                <Button className="w-full" disabled={isSubmitting} onClick={() => void handleStatusChange("STALLED_PAYMENT")} type="button" variant="outline">
+                  <AlertTriangle size={16} />
+                  Mark Stalled
+                </Button>
+              </>
+            )}
+
+            {order.state === "SHIPPED" && (
+              <Button className="w-full border-red-500/50 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white" disabled={isSubmitting} onClick={handleRto} type="button" variant="outline">
+                <AlertTriangle size={16} />
+                Return to Origin (RTO)
+              </Button>
+            )}
+
+            {["CONFIRMED", "READY_FOR_SHIPPING", "SHIPPED"].includes(order.state) && (
+              <p className="mt-4 text-center text-xs text-zinc-500 italic">
+                Shipping and logistical transitions beyond verification take place here. 
+                Full FSM extension for Courier tracking pending.
+              </p>
+            )}
           </div>
         </div>
       </section>
