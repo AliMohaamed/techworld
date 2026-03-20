@@ -4,9 +4,6 @@ import { Id } from "./_generated/dataModel";
 import { resolveProductImages, resolveStorageRef } from "./products";
 import { writeAuditLog } from "./lib/audit";
 
-/**
- * Resolves a SKU or throws if it is not found or belongs to a different product.
- */
 async function getSkuOrThrow(
   ctx: { db: { get: (id: Id<"skus">) => Promise<{ _id: Id<"skus">; productId: Id<"products">; price: number; display_stock: number; real_stock: number; variantName: string; variantAttributes: { color?: string; size?: string; type?: string }; compareAtPrice?: number; linkedImageId?: string; isDefault?: boolean; isActive?: boolean } | null> } },
   skuId: Id<"skus">,
@@ -22,10 +19,20 @@ async function getSkuOrThrow(
   return sku;
 }
 
-/**
- * Guest-first mutation to add or update an item in the persistent shopping cart.
- * Validates quantity against the specific SKU display_stock (Unified SKU Architecture).
- */
+async function getActiveGovernorateOrThrow(
+  ctx: { db: { get: (id: Id<"governorates">) => Promise<{ _id: Id<"governorates">; name_en: string; name_ar: string; shippingFee: number; isActive: boolean } | null> } },
+  governorateId: Id<"governorates">,
+) {
+  const governorate = await ctx.db.get(governorateId);
+  if (!governorate) {
+    throw new ConvexError({ code: "GOVERNORATE_NOT_FOUND", message: "Selected governorate was not found." });
+  }
+  if (!governorate.isActive) {
+    throw new ConvexError({ code: "GOVERNORATE_INACTIVE", message: "Selected governorate is not available for delivery." });
+  }
+  return governorate;
+}
+
 export const addToCart = mutation({
   args: {
     sessionId: v.string(),
@@ -37,7 +44,6 @@ export const addToCart = mutation({
     const product = await ctx.db.get(args.productId);
     if (!product) throw new ConvexError({ code: "PRODUCT_NOT_FOUND", message: "Product not found." });
 
-    // Validate against SKU-level display_stock (Unified SKU Architecture)
     const sku = await getSkuOrThrow(ctx, args.skuId, args.productId);
     if (sku.display_stock < args.quantity) {
       throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: "Insufficient display stock for the selected variant." });
@@ -57,7 +63,6 @@ export const addToCart = mutation({
     };
 
     if (session) {
-      // Match on both productId AND skuId so different color variants are tracked separately
       const existingItemIndex = session.items.findIndex(
         (item) => item.productId === args.productId && item.skuId === args.skuId,
       );
@@ -84,9 +89,6 @@ export const addToCart = mutation({
   },
 });
 
-/**
- * Removes a specific SKU item from the guest's persistent cart.
- */
 export const removeFromCart = mutation({
   args: {
     sessionId: v.string(),
@@ -108,9 +110,6 @@ export const removeFromCart = mutation({
   },
 });
 
-/**
- * Retrieves the current cart session populated with product and SKU data.
- */
 export const getCart = query({
   args: { sessionId: v.string() },
   handler: async (ctx, args) => {
@@ -119,7 +118,7 @@ export const getCart = query({
       .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
       .unique();
 
-    if (!session) return { items: [] };
+    if (!session) return { items: [], total: 0 };
 
     const items = await Promise.all(
       session.items.map(async (item) => {
@@ -143,7 +142,6 @@ export const getCart = query({
     );
 
     const total = items.reduce((sum, item) => {
-      // Use SKU price if available, fall back to product selling_price
       const unitPrice = item.sku?.price ?? item.product?.selling_price ?? 0;
       return sum + unitPrice * item.quantity;
     }, 0);
@@ -152,9 +150,6 @@ export const getCart = query({
   },
 });
 
-/**
- * Strict server-side validation of the entire cart against live SKU-level data.
- */
 export const validateCart = query({
   args: { sessionId: v.string() },
   handler: async (ctx, args) => {
@@ -185,7 +180,6 @@ export const validateCart = query({
         continue;
       }
 
-      // Validate against SKU-level display_stock
       const sku = await ctx.db.get(item.skuId);
       if (!sku) {
         failedItems.push({ productId: item.productId, skuId: item.skuId, reason: "SKU_NOT_FOUND" });
@@ -207,16 +201,13 @@ export const validateCart = query({
   },
 });
 
-/**
- * Places guest orders from the cart session, referencing each item's specific skuId.
- * Deducts display_stock at SKU level atomically per item.
- */
 export const placeOrderFromSession = mutation({
   args: {
     sessionId: v.string(),
     customerName: v.string(),
     customerPhone: v.string(),
     customerAddress: v.string(),
+    governorateId: v.id("governorates"),
   },
   handler: async (ctx, args) => {
     const session = await ctx.db
@@ -228,6 +219,7 @@ export const placeOrderFromSession = mutation({
       throw new ConvexError({ code: "EMPTY_CART", message: "Cannot place order with an empty cart." });
     }
 
+    const governorate = await getActiveGovernorateOrThrow(ctx, args.governorateId);
     const shortCode = generateShortCode();
 
     for (const item of session.items) {
@@ -243,26 +235,28 @@ export const placeOrderFromSession = mutation({
         throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: `Insufficient stock for: ${product.name_en} (${sku.variantName})` });
       }
 
-      // Deduct display_stock at SKU level
       await ctx.db.patch(item.skuId, {
         display_stock: sku.display_stock - item.quantity,
       });
 
+      const lineSubtotal = sku.price * item.quantity;
       const orderId = await ctx.db.insert("orders", {
         sessionId: args.sessionId,
         customerName: args.customerName,
         customerPhone: args.customerPhone,
         customerAddress: args.customerAddress,
+        governorateId: args.governorateId,
+        appliedShippingFee: governorate.shippingFee,
         productId: item.productId,
         skuId: item.skuId,
         quantity: item.quantity,
-        total_price: sku.price * item.quantity,
+        total_price: lineSubtotal,
         state: "PENDING_PAYMENT_INPUT",
         shortCode,
       });
 
       await writeAuditLog(ctx, {
-        entityId: orderId,
+        entityId: String(orderId),
         actionType: "GUEST_ORDER_CREATED",
         changes: {
           productId: item.productId,
@@ -271,6 +265,9 @@ export const placeOrderFromSession = mutation({
           quantity: item.quantity,
           shortCode,
           customerName: args.customerName,
+          governorateId: args.governorateId,
+          appliedShippingFee: governorate.shippingFee,
+          lineSubtotal,
         },
       });
     }
@@ -289,9 +286,6 @@ function generateShortCode() {
   return `TW-${code}`;
 }
 
-/**
- * Empties the persistent cart session.
- */
 export const clearCart = mutation({
   args: { sessionId: v.string() },
   handler: async (ctx, args) => {

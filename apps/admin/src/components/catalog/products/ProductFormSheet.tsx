@@ -143,8 +143,12 @@ export function ProductFormSheet({
   }, [open, product, reset]);
 
   const submit = handleSubmit(async (values) => {
-    // zodResolver ensures values are already validated at this point.
-    const payload = buildPayload(values as ProductFormSubmitValues);
+    const parsed = productSchema.safeParse(values);
+    if (!parsed.success) {
+      throw new Error(parsed.error.issues[0]?.message ?? "Product form is invalid.");
+    }
+
+    const payload = buildPayload(parsed.data);
 
     if (product) {
       await updateAdvancedProduct({ id: product._id, ...payload });
@@ -376,6 +380,7 @@ function buildPayload(values: ProductFormSubmitValues) {
     })),
   };
 }
+
 
 
 

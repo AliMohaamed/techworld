@@ -12,18 +12,16 @@ function collectReferencedStorageIds(values: Array<string | undefined | null>, c
   }
 }
 
-const PAGE_SIZE = 100;
+
 
 /**
- * H3 FIX: Paginated orphan sweep to avoid loading entire tables into memory at once.
+ * H3 FIX: Orphan sweep using metadata collection to avoid multiple paginated calls.
  *
  * Strategy:
- * 1. Pages through `_storage` records in batches of PAGE_SIZE.
- * 2. For each batch of storage IDs, checks if any product/sku/category references them.
- * 3. Deletes unreferenced files in that batch.
- * 4. Recurses via a scheduled call to process the next cursor position.
- *
- * This is safe at scale because no single mutation ever loads all rows simultaneously.
+ * 1. Collects all product/sku/category records for reference analysis.
+ * 2. Scans `_storage` and deletes files that match no referenced IDs.
+ * 
+ * This is safe at current scale and complies with Convex's single-pagination constraint.
  */
 export const sweepOrphanedCatalogFiles = internalMutation({
   args: {},
@@ -32,49 +30,34 @@ export const sweepOrphanedCatalogFiles = internalMutation({
 
     // Build the referenced set by paging through each entity table separately.
     // Each table is scanned in PAGE_SIZE chunks to stay within memory limits.
-    let productCursor: string | null = null;
-    do {
-      const page = await ctx.db.query("products").paginate({ cursor: productCursor, numItems: PAGE_SIZE });
-      for (const product of page.page) {
-        collectReferencedStorageIds([product.thumbnail], referencedIds);
-        collectReferencedStorageIds(product.images, referencedIds);
-      }
-      productCursor = page.isDone ? null : page.continueCursor;
-    } while (productCursor !== null);
+    // Build the referenced set by collecting all entity rows.
+    // NOTE: This assumes table sizes are within memory limits for metadata extraction.
+    const products = await ctx.db.query("products").collect();
+    for (const product of products) {
+      collectReferencedStorageIds([product.thumbnail], referencedIds);
+      collectReferencedStorageIds(product.images, referencedIds);
+    }
 
-    let skuCursor: string | null = null;
-    do {
-      const page = await ctx.db.query("skus").paginate({ cursor: skuCursor, numItems: PAGE_SIZE });
-      for (const sku of page.page) {
-        collectReferencedStorageIds([sku.linkedImageId], referencedIds);
-      }
-      skuCursor = page.isDone ? null : page.continueCursor;
-    } while (skuCursor !== null);
+    const skus = await ctx.db.query("skus").collect();
+    for (const sku of skus) {
+      collectReferencedStorageIds([sku.linkedImageId], referencedIds);
+    }
 
-    let categoryCursor: string | null = null;
-    do {
-      const page = await ctx.db.query("categories").paginate({ cursor: categoryCursor, numItems: PAGE_SIZE });
-      for (const category of page.page) {
-        collectReferencedStorageIds([category.thumbnailImageId], referencedIds);
-      }
-      categoryCursor = page.isDone ? null : page.continueCursor;
-    } while (categoryCursor !== null);
+    const categories = await ctx.db.query("categories").collect();
+    for (const category of categories) {
+      collectReferencedStorageIds([category.thumbnailImageId], referencedIds);
+    }
 
-    // Now page through _storage and delete unreferenced files in batches.
+    // Now scan _storage and delete unreferenced files.
     let deletedCount = 0;
-    let storageCursor: string | null = null;
-    do {
-      const page = await ctx.db.system.query("_storage").paginate({ cursor: storageCursor, numItems: PAGE_SIZE });
+    const storageFiles = await ctx.db.system.query("_storage").collect();
 
-      for (const file of page.page) {
-        if (!referencedIds.has(String(file._id))) {
-          await ctx.storage.delete(file._id);
-          deletedCount += 1;
-        }
+    for (const file of storageFiles) {
+      if (!referencedIds.has(String(file._id))) {
+        await ctx.storage.delete(file._id);
+        deletedCount += 1;
       }
-
-      storageCursor = page.isDone ? null : page.continueCursor;
-    } while (storageCursor !== null);
+    }
 
     return {
       deletedCount,

@@ -73,6 +73,11 @@ async function canViewFinancials(ctx: Pick<QueryCtx, "db" | "auth">) {
 export const listAwaitingVerificationOrders = query({
   args: {},
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return null;
+    }
+
     await requirePermission(ctx, "VIEW_ORDERS");
 
     const orders = await ctx.db

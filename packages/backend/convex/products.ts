@@ -492,6 +492,11 @@ export const getRecommendedProducts = query({
 export const listAdminProducts = query({
   args: {},
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return null;
+    }
+
     await requirePermission(ctx, "MANAGE_PRODUCTS");
 
     const products = await ctx.db.query("products").order("desc").collect();

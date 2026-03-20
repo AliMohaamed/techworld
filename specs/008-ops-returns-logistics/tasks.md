@@ -44,9 +44,9 @@ description: "Task list for Phase 8 – Operations, Returns & Logistics feature 
 
 ### Implementation for User Story 2
 
-- [ ] T004 [P] [US2] Create Convex mutation and query endpoints (`createGovernorate`, `updateGovernorate`, `toggleGovernorateStatus`, `listActiveGovernorates`) with `MANAGE_SYSTEM_CONFIG` RBAC in `packages/backend/convex/governorates.ts`.
-- [ ] T005 [P] [US2] Generate immutable Audit Log entries for all governorate mutations in `packages/backend/convex/governorates.ts`.
-- [ ] T006 [US2] Implement the Governorate Management Next.js specialized UI components and page in `apps/admin/src/app/(dashboard)/settings/governorates/page.tsx` utilizing `react-hook-form` and `zod`.
+- [X] T004 [P] [US2] Create Convex mutation and query endpoints (`createGovernorate`, `updateGovernorate`, `toggleGovernorateStatus`, `listActiveGovernorates`) with `MANAGE_SYSTEM_CONFIG` RBAC in `packages/backend/convex/governorates.ts`.
+- [X] T005 [P] [US2] Generate immutable Audit Log entries for all governorate mutations in `packages/backend/convex/governorates.ts`.
+- [X] T006 [US2] Implement the Governorate Management Next.js specialized UI components and page in `apps/admin/src/app/(dashboard)/settings/governorates/page.tsx` utilizing `react-hook-form` and `zod`.
 
 **Checkpoint**: At this point, the backend can permanently supply accurate governorate pricing logic.
 
@@ -60,8 +60,8 @@ description: "Task list for Phase 8 – Operations, Returns & Logistics feature 
 
 ### Implementation for User Story 1
 
-- [ ] T007 [P] [US1] Modify `api.cart.placeOrderFromSession` in `packages/backend/convex/cart.ts` to accept `governorateId`, validate it's active, dynamically inject its fee into the subtotal, and save the snapshot into the created order.
-- [ ] T008 [US1] Modify the Storefront Checkout component (`apps/storefront/src/app/(store)/checkout/page.tsx` or its linked components like `checkout-form.tsx`) to query `api.governorates.listActive` and drive real-time selection.
+- [X] T007 [P] [US1] Modify `api.cart.placeOrderFromSession` in `packages/backend/convex/cart.ts` to accept `governorateId`, validate it's active, dynamically inject its fee into the subtotal, and save the snapshot into the created order.
+- [X] T008 [US1] Modify the Storefront Checkout component (`apps/storefront/src/app/(store)/checkout/page.tsx` or its linked components like `checkout-form.tsx`) to query `api.governorates.listActive` and drive real-time selection.
 
 **Checkpoint**: Core operational checkout logic is completely restored and functional with dynamic fees.
 
@@ -143,4 +143,6 @@ description: "Task list for Phase 8 – Operations, Returns & Logistics feature 
 2. Build Governorates backend and config Dashboard (US2).
 3. Connect dynamic shipping config to Storefront Checkout (US1).
 4. **Deploy MVP**. Checkout dynamically enforces live geographical shipping fees.
+
+
 

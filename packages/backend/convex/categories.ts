@@ -59,6 +59,11 @@ export const listActiveCategories = query({
 export const listCategoriesForAdmin = query({
   args: {},
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return null;
+    }
+
     await requirePermission(ctx, "MANAGE_CATEGORIES");
 
     const categories = await ctx.db.query("categories").order("desc").collect();

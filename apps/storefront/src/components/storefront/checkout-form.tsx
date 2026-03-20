@@ -1,29 +1,63 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useMemo, useState } from "react";
+import { useMutation } from "convex/react";
 import { api } from "@backend/convex/_generated/api";
+import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
 import { useRouter } from "next/navigation";
-import { User, Phone, MapPin, Loader2, ArrowRight } from "lucide-react";
+import { User, Phone, MapPin, Loader2, ArrowRight, MapPinned } from "lucide-react";
 
-export default function CheckoutForm() {
+type GovernorateOption = {
+  _id: Id<"governorates">;
+  name_ar: string;
+  name_en: string;
+  shippingFee: number;
+  isActive: boolean;
+};
+
+export default function CheckoutForm({
+  cartTotal,
+  governorates,
+  governoratesLoading,
+}: {
+  cartTotal: number;
+  governorates: GovernorateOption[];
+  governoratesLoading?: boolean;
+}) {
   const { sessionId } = useSession();
   const router = useRouter();
-  const cart = useQuery(api.cart.getCart, { sessionId });
-  const placeOrder = useMutation(api.orders.placeOrderFromSession);
+  const placeOrder = useMutation(api.cart.placeOrderFromSession);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     address: "",
+    governorateId: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!cart || cart.items.length === 0) return;
+  const selectedGovernorate = useMemo(
+    () => governorates.find((governorate) => governorate._id === formData.governorateId),
+    [formData.governorateId, governorates],
+  );
+  const shippingFee = selectedGovernorate?.shippingFee ?? 0;
+  const grandTotal = cartTotal + shippingFee;
+  const deliveryUnavailable = !governoratesLoading && governorates.length === 0;
 
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (deliveryUnavailable) {
+      setErrorMessage("Delivery is currently unavailable. Please try again later.");
+      return;
+    }
+    if (!formData.governorateId) {
+      setErrorMessage("Select your governorate to calculate delivery and continue.");
+      return;
+    }
+
+    setErrorMessage(null);
     setIsLoading(true);
     try {
       const shortCode = await placeOrder({
@@ -31,16 +65,17 @@ export default function CheckoutForm() {
         customerName: formData.name,
         customerPhone: formData.phone,
         customerAddress: formData.address,
+        governorateId: formData.governorateId as Id<"governorates">,
       });
 
       router.push(`/success?code=${shortCode}`);
     } catch (err) {
+      const message = err instanceof Error ? err.message : "Order placement failed.";
       console.error("Order placement failed", err);
+      setErrorMessage(message);
       setIsLoading(false);
     }
   };
-
-  if (!cart || cart.items.length === 0) return null;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -48,7 +83,7 @@ export default function CheckoutForm() {
         <h3 className="font-space-grotesk text-sm font-bold uppercase tracking-widest text-[#ffc105]">
           Shipping Information
         </h3>
-        
+
         <div className="space-y-4">
           <div className="relative">
             <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
@@ -58,7 +93,7 @@ export default function CheckoutForm() {
               placeholder="Full Name"
               className="w-full rounded-xl border border-white/5 bg-zinc-900/50 py-4 pl-12 pr-4 text-sm text-white placeholder:text-zinc-600 focus:border-[#ffc105]/50 focus:outline-none focus:ring-1 focus:ring-[#ffc105]/50"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(event) => setFormData({ ...formData, name: event.target.value })}
             />
           </div>
 
@@ -70,8 +105,26 @@ export default function CheckoutForm() {
               placeholder="Phone Number (WhatsApp preferred)"
               className="w-full rounded-xl border border-white/5 bg-zinc-900/50 py-4 pl-12 pr-4 text-sm text-white placeholder:text-zinc-600 focus:border-[#ffc105]/50 focus:outline-none focus:ring-1 focus:ring-[#ffc105]/50"
               value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              onChange={(event) => setFormData({ ...formData, phone: event.target.value })}
             />
+          </div>
+
+          <div className="relative">
+            <MapPinned className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+            <select
+              required
+              className="w-full appearance-none rounded-xl border border-white/5 bg-zinc-900/50 py-4 pl-12 pr-4 text-sm text-white focus:border-[#ffc105]/50 focus:outline-none focus:ring-1 focus:ring-[#ffc105]/50 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={deliveryUnavailable}
+              value={formData.governorateId}
+              onChange={(event) => setFormData({ ...formData, governorateId: event.target.value })}
+            >
+              <option value="">Select governorate</option>
+              {governorates.map((governorate) => (
+                <option key={governorate._id} value={governorate._id}>
+                  {governorate.name_en} - {governorate.shippingFee.toLocaleString()} EGP
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="relative">
@@ -82,22 +135,41 @@ export default function CheckoutForm() {
               rows={3}
               className="w-full rounded-xl border border-white/5 bg-zinc-900/50 py-4 pl-12 pr-4 text-sm text-white placeholder:text-zinc-600 focus:border-[#ffc105]/50 focus:outline-none focus:ring-1 focus:ring-[#ffc105]/50"
               value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              onChange={(event) => setFormData({ ...formData, address: event.target.value })}
             />
           </div>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/5 bg-zinc-950 p-6 space-y-4 shadow-sm">
-        <div className="flex justify-between items-center">
-          <span className="text-zinc-400 text-xs font-bold uppercase tracking-widest">Order Total</span>
-          <span className="text-[#ffc105] font-space-grotesk text-2xl font-black">
-            {(cart?.total || 0).toLocaleString()} EGP
+      <div className="space-y-4 rounded-2xl border border-white/5 bg-zinc-950 p-6 shadow-sm">
+        <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-zinc-400">
+          <span>Items subtotal</span>
+          <span className="text-zinc-200">{cartTotal.toLocaleString()} EGP</span>
+        </div>
+        <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-zinc-400">
+          <span>Shipping</span>
+          <span className="text-zinc-200">
+            {selectedGovernorate ? `${shippingFee.toLocaleString()} EGP` : governoratesLoading ? "Loading..." : deliveryUnavailable ? "Unavailable" : "Select governorate"}
           </span>
         </div>
-        
+        <div className="flex items-center justify-between border-t border-white/5 pt-4">
+          <span className="text-zinc-400 text-xs font-bold uppercase tracking-widest">Order Total</span>
+          <span className="font-space-grotesk text-2xl font-black text-[#ffc105]">
+            {grandTotal.toLocaleString()} EGP
+          </span>
+        </div>
+
+        {governoratesLoading ? (
+          <p className="text-sm text-zinc-500">Loading available delivery governorates...</p>
+        ) : deliveryUnavailable ? (
+          <p className="text-sm text-red-400">
+            Delivery is currently unavailable because no active governorates are configured.
+          </p>
+        ) : null}
+        {errorMessage ? <p className="text-sm text-red-400">{errorMessage}</p> : null}
+
         <button
-          disabled={isLoading}
+          disabled={isLoading || governoratesLoading || deliveryUnavailable}
           type="submit"
           className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#ffc105] py-5 font-space-grotesk text-sm font-black uppercase tracking-[0.2em] text-black transition-all hover:scale-[1.02] active:scale-95 disabled:grayscale disabled:opacity-50"
         >
@@ -110,7 +182,7 @@ export default function CheckoutForm() {
             </>
           )}
         </button>
-        
+
         <p className="text-center text-[10px] uppercase tracking-wider text-zinc-600">
           By confirming, you agree to receive a confirmation via WhatsApp.
         </p>
@@ -118,7 +190,4 @@ export default function CheckoutForm() {
     </form>
   );
 }
-
-
-
 
