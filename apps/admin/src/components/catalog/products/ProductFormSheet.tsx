@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
 import { Plus, Trash2 } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
@@ -96,8 +95,6 @@ export function ProductFormSheet({
     reset,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormValues>({
-    // C5 FIX: zodResolver wires Zod validation into RHF so inline errors appear on every field.
-    resolver: zodResolver(productSchema),
     defaultValues: emptyValues,
   });
   const { fields, append, remove } = useFieldArray({ control, name: "variants" });
@@ -379,6 +376,8 @@ function buildPayload(values: ProductFormSubmitValues) {
     })),
   };
 }
+
+
 
 
 

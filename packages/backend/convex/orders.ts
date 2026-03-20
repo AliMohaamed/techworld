@@ -18,15 +18,15 @@ async function getActorUserId(ctx: Parameters<typeof requirePermission>[0]) {
   const actor =
     (identifier
       ? await ctx.db
-          .query("users")
-          .withIndex("by_identifier", (q) => q.eq("identifier", identifier))
-          .unique()
+        .query("users")
+        .withIndex("by_identifier", (q) => q.eq("identifier", identifier))
+        .unique()
       : null) ??
     (email
       ? await ctx.db
-          .query("users")
-          .withIndex("by_email", (q) => q.eq("email", email))
-          .unique()
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", email))
+        .unique()
       : null);
 
   return actor?._id;
@@ -56,15 +56,15 @@ async function canViewFinancials(ctx: Pick<QueryCtx, "db" | "auth">) {
   const user =
     (identifier
       ? await ctx.db
-          .query("users")
-          .withIndex("by_identifier", (q) => q.eq("identifier", identifier))
-          .unique()
+        .query("users")
+        .withIndex("by_identifier", (q) => q.eq("identifier", identifier))
+        .unique()
       : null) ??
     (email
       ? await ctx.db
-          .query("users")
-          .withIndex("by_email", (q) => q.eq("email", email))
-          .unique()
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", email))
+        .unique()
       : null);
 
   return hasPermission(user, "VIEW_FINANCIALS");
@@ -127,9 +127,9 @@ export const getOrderDetails = query({
       sku,
       product: product
         ? {
-            ...product,
-            ...(viewFinancials ? {} : { cogs: undefined }),
-          }
+          ...product,
+          ...(viewFinancials ? {} : { cogs: undefined }),
+        }
         : null,
       category,
       customer,

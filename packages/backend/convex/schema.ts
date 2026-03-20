@@ -3,6 +3,17 @@ import { v } from "convex/values";
 import { permissionValidators } from "./lib/permissions";
 
 const storageRef = v.union(v.string(), v.id("_storage"));
+const orderStateValidator = v.union(
+  v.literal("PENDING_PAYMENT_INPUT"),
+  v.literal("AWAITING_VERIFICATION"),
+  v.literal("CONFIRMED"),
+  v.literal("READY_FOR_SHIPPING"),
+  v.literal("SHIPPED"),
+  v.literal("DELIVERED"),
+  v.literal("RTO"),
+  v.literal("STALLED_PAYMENT"),
+  v.literal("CANCELLED"),
+);
 
 export default defineSchema({
   users: defineTable({
@@ -13,6 +24,15 @@ export default defineSchema({
   })
     .index("by_email", ["email"])
     .index("by_identifier", ["identifier"]),
+
+  governorates: defineTable({
+    name_ar: v.string(),
+    name_en: v.string(),
+    shippingFee: v.number(),
+    isActive: v.boolean(),
+  })
+    .index("by_active", ["isActive"])
+    .index("by_name_en", ["name_en"]),
 
   categories: defineTable({
     name_ar: v.string(),
@@ -77,7 +97,7 @@ export default defineSchema({
         skuId: v.id("skus"),
         quantity: v.number(),
         addedAt: v.number(),
-      })
+      }),
     ),
     lastUpdated: v.number(),
   }).index("by_session", ["sessionId"]),
@@ -93,7 +113,7 @@ export default defineSchema({
       v.literal("MATCHED"),
       v.literal("UNMATCHED"),
       v.literal("DUPLICATE"),
-      v.literal("INVALID")
+      v.literal("INVALID"),
     ),
     receivedAt: v.number(),
   })
@@ -106,23 +126,20 @@ export default defineSchema({
     customerName: v.optional(v.string()),
     customerPhone: v.optional(v.string()),
     customerAddress: v.optional(v.string()),
+    governorateId: v.optional(v.id("governorates")),
+    appliedShippingFee: v.optional(v.number()),
     productId: v.id("products"),
     skuId: v.id("skus"),
     quantity: v.number(),
     total_price: v.number(),
-    state: v.union(
-      v.literal("PENDING_PAYMENT_INPUT"),
-      v.literal("AWAITING_VERIFICATION"),
-      v.literal("CONFIRMED"),
-      v.literal("STALLED_PAYMENT"),
-      v.literal("CANCELLED")
-    ),
+    state: orderStateValidator,
     shortCode: v.optional(v.string()),
-    paymentReceiptRef: v.optional(v.union(v.string(), v.id("_storage"))),
+    paymentReceiptRef: v.optional(storageRef),
   })
     .index("by_shortCode", ["shortCode"])
     .index("by_session", ["sessionId"])
-    .index("by_state", ["state"]),
+    .index("by_state", ["state"])
+    .index("by_governorate", ["governorateId"]),
 
   audit_logs: defineTable({
     userId: v.optional(v.id("users")),

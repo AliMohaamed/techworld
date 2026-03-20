@@ -120,7 +120,7 @@ function LoginScreen() {
               <p className="text-sm text-red-400">{errors.password.message}</p>
             ) : null}
           </div>
-          <Button className="w-full" disabled={isSubmitting} type="submit">
+          <Button className="w-full py-2 text-sm cursor-pointer font-bold" disabled={isSubmitting} type="submit">
             {isSubmitting ? "Signing in..." : "Sign In"}
           </Button>
         </form>

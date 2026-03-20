@@ -117,7 +117,7 @@ export default function OrderDetailsPage() {
             <div className="mt-4 grid gap-3 text-sm text-zinc-400 md:grid-cols-3">
               <span>Category: {order.category?.name_en ?? "Unknown"}</span>
               <span>Quantity: {order.quantity}</span>
-              <span>Real stock: {order.product?.real_stock ?? "Unknown"}</span>
+              <span>Real stock: {order.sku?.real_stock ?? "Unknown"}</span>
             </div>
           </div>
 
@@ -238,3 +238,4 @@ function formatFinancialValue(value: number | string | null) {
 
   return value;
 }
+
