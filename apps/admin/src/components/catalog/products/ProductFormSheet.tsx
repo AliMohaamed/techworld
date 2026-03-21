@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm, useWatch, Controller } from "react-hook-form";
 import { useMutation } from "convex/react";
 import { toast } from "sonner";
 import {
@@ -20,7 +20,11 @@ import {
   Button,
   Input,
   Label,
-  SelectNative,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Textarea,
   cn,
   Sheet,
@@ -276,19 +280,24 @@ export function ProductFormSheet({
                   label={t("form.fields.category")}
                   error={errors.categoryId?.message}
                 >
-                  <SelectNative
-                    {...register("categoryId")}
-                    className="rounded-xl border-border bg-background h-12 font-bold uppercase text-[11px] tracking-widest pl-4"
-                  >
-                    <option value="">
-                      {t("form.placeholders.selectCategory")}
-                    </option>
-                    {categories.map((category) => (
-                      <option key={category._id} value={category._id}>
-                        {category.name_en}
-                      </option>
-                    ))}
-                  </SelectNative>
+                  <Controller
+                    control={control}
+                    name="categoryId"
+                    render={({ field }) => (
+                      <Select value={field.value || undefined} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full rounded-xl border border-border bg-background px-4 h-12 font-bold uppercase text-[11px] tracking-widest text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
+                          <SelectValue placeholder={t("form.placeholders.selectCategory")} />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl border-border bg-card">
+                          {categories.map((category) => (
+                            <SelectItem key={category._id} value={category._id} className="font-bold uppercase tracking-widest text-[11px] cursor-pointer">
+                              {category.name_en}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </Field>
                 <Field
                   label={t("form.fields.status")}
@@ -445,19 +454,24 @@ export function ProductFormSheet({
                   label={t("form.fields.thumbnail")}
                   error={errors.thumbnail?.message}
                 >
-                  <SelectNative
-                    {...register("thumbnail")}
-                    className="rounded-xl border-border bg-background h-12 font-mono text-[10px] tracking-widest uppercase pl-4"
-                  >
-                    <option value="">
-                      {t("form.placeholders.selectThumbnail")}
-                    </option>
-                    {images.map((imageId) => (
-                      <option key={imageId} value={imageId}>
-                        {imageId}
-                      </option>
-                    ))}
-                  </SelectNative>
+                  <Controller
+                    control={control}
+                    name="thumbnail"
+                    render={({ field }) => (
+                      <Select value={field.value || undefined} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full rounded-xl border border-border bg-background px-4 h-12 font-mono text-[10px] tracking-widest uppercase text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
+                          <SelectValue placeholder={t("form.placeholders.selectThumbnail")} />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl border-border bg-card">
+                          {images.map((imageId) => (
+                            <SelectItem key={imageId} value={imageId} className="font-mono uppercase tracking-widest text-[10px] cursor-pointer">
+                              {imageId}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </Field>
               </div>
             </section>
@@ -629,19 +643,24 @@ export function ProductFormSheet({
                         label={t("form.fields.skus.linkedImage")}
                         error={errors.variants?.[index]?.linkedImageId?.message}
                       >
-                        <SelectNative
-                          {...register(`variants.${index}.linkedImageId`)}
-                          className="rounded-xl border-border bg-background h-11 font-mono text-[9px] tracking-tightest uppercase pl-3"
-                        >
-                          <option value="">
-                            {t("form.placeholders.noLinkedImage")}
-                          </option>
-                          {images.map((imageId) => (
-                            <option key={imageId} value={imageId}>
-                              {imageId}
-                            </option>
-                          ))}
-                        </SelectNative>
+                        <Controller
+                          control={control}
+                          name={`variants.${index}.linkedImageId` as const}
+                          render={({ field }) => (
+                            <Select value={field.value || undefined} onValueChange={field.onChange}>
+                              <SelectTrigger className="w-full rounded-xl border border-border bg-background px-3 h-11 font-mono text-[9px] tracking-tightest uppercase text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
+                                <SelectValue placeholder={t("form.placeholders.noLinkedImage")} />
+                              </SelectTrigger>
+                              <SelectContent className="rounded-xl border-border bg-card">
+                                {images.map((imageId) => (
+                                  <SelectItem key={imageId} value={imageId} className="font-mono uppercase tracking-widest text-[9px] cursor-pointer">
+                                    {imageId}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
                       </Field>
                     </div>
                   </div>

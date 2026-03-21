@@ -8,7 +8,7 @@ import { api } from "@backend/convex/_generated/api";
 import { Id } from "@backend/convex/_generated/dataModel";
 import { Button } from "@techworld/ui/button";
 import { useTranslations, useLocale } from "next-intl";
-import { cn } from "@techworld/ui";
+import { cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@techworld/ui";
 import { toast } from "sonner";
 
 type OrderState = 
@@ -257,32 +257,49 @@ export default function OrdersPage() {
                     </td>
                     <td className="py-4 px-6 align-middle text-right">
                       <div className="flex items-center justify-end gap-3 flex-nowrap">
-                        <div className="relative">
-                          <select 
-                            value={order.state} 
-                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleStatusChange(order._id, order.state as OrderState, e.target.value as OrderState)}
-                            className="appearance-none bg-background border border-border/50 text-foreground w-36 h-9 text-[10px] py-0 pl-3 pr-8 uppercase tracking-widest font-bold font-mono rounded-xl outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 disabled:opacity-50 transition-all hover:bg-accent/20 cursor-pointer"
-                            disabled={!canManageShipping && order.state !== "AWAITING_VERIFICATION"}
-                          >
-                            <option value={order.state} disabled>{tStates(order.state as OrderState)}</option>
-                            {order.state === "AWAITING_VERIFICATION" && <option value="CONFIRMED">{tStates("CONFIRMED")}</option>}
-                            {order.state === "AWAITING_VERIFICATION" && <option value="CANCELLED">{tStates("CANCELLED")}</option>}
-                            {order.state === "AWAITING_VERIFICATION" && <option value="STALLED_PAYMENT">{tStates("STALLED_PAYMENT")}</option>}
+                        <Select
+                          value={order.state}
+                          onValueChange={(value) => value && handleStatusChange(order._id, order.state as OrderState, value as OrderState)}
+                          disabled={!canManageShipping && order.state !== "AWAITING_VERIFICATION"}
+                        >
+                          <SelectTrigger className="w-36 h-9 text-[10px] uppercase tracking-widest font-bold font-mono rounded-xl bg-background border-border/50 hover:bg-accent/20 focus:ring-primary/50 text-foreground">
+                            <SelectValue placeholder={tStates(order.state as OrderState)} />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-xl border-border bg-card">
+                            <SelectItem value={order.state} disabled className="text-[10px] uppercase tracking-widest font-bold cursor-not-allowed opacity-50 transition-colors">
+                              {tStates(order.state as OrderState)}
+                            </SelectItem>
+                            {order.state === "AWAITING_VERIFICATION" && (
+                              <>
+                                <SelectItem value="CONFIRMED" className="text-[10px] uppercase tracking-widest cursor-pointer hover:bg-accent hover:text-accent-foreground">{tStates("CONFIRMED")}</SelectItem>
+                                <SelectItem value="CANCELLED" className="text-[10px] uppercase tracking-widest cursor-pointer hover:bg-accent hover:text-accent-foreground text-destructive focus:text-destructive">{tStates("CANCELLED")}</SelectItem>
+                                <SelectItem value="STALLED_PAYMENT" className="text-[10px] uppercase tracking-widest cursor-pointer hover:bg-accent hover:text-accent-foreground">{tStates("STALLED_PAYMENT")}</SelectItem>
+                              </>
+                            )}
                             
-                            {order.state === "CONFIRMED" && <option value="READY_FOR_SHIPPING">{tStates("READY_FOR_SHIPPING")}</option>}
-                            {order.state === "CONFIRMED" && <option value="CANCELLED">{tStates("CANCELLED")}</option>}
+                            {order.state === "CONFIRMED" && (
+                              <>
+                                <SelectItem value="READY_FOR_SHIPPING" className="text-[10px] uppercase tracking-widest cursor-pointer hover:bg-accent hover:text-accent-foreground">{tStates("READY_FOR_SHIPPING")}</SelectItem>
+                                <SelectItem value="CANCELLED" className="text-[10px] uppercase tracking-widest cursor-pointer text-destructive focus:text-destructive hover:bg-accent">{tStates("CANCELLED")}</SelectItem>
+                              </>
+                            )}
                             
-                            {order.state === "READY_FOR_SHIPPING" && <option value="SHIPPED">{tStates("SHIPPED")}</option>}
-                            {order.state === "READY_FOR_SHIPPING" && <option value="CANCELLED">{tStates("CANCELLED")}</option>}
+                            {order.state === "READY_FOR_SHIPPING" && (
+                              <>
+                                <SelectItem value="SHIPPED" className="text-[10px] uppercase tracking-widest cursor-pointer hover:bg-accent hover:text-accent-foreground">{tStates("SHIPPED")}</SelectItem>
+                                <SelectItem value="CANCELLED" className="text-[10px] uppercase tracking-widest cursor-pointer text-destructive focus:text-destructive hover:bg-accent">{tStates("CANCELLED")}</SelectItem>
+                              </>
+                            )}
                             
-                            {order.state === "SHIPPED" && <option value="DELIVERED">{tStates("DELIVERED")}</option>}
-                            {order.state === "SHIPPED" && <option value="RTO">{tStates("RTO")}</option>}
-                            {order.state === "SHIPPED" && <option value="CANCELLED">{tStates("CANCELLED")}</option>}
-                          </select>
-                          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground/60">
-                            <ChevronDown size={14} />
-                          </div>
-                        </div>
+                            {order.state === "SHIPPED" && (
+                              <>
+                                <SelectItem value="DELIVERED" className="text-[10px] uppercase tracking-widest cursor-pointer hover:bg-accent hover:text-accent-foreground">{tStates("DELIVERED")}</SelectItem>
+                                <SelectItem value="RTO" className="text-[10px] uppercase tracking-widest cursor-pointer text-destructive focus:text-destructive hover:bg-accent">{tStates("RTO")}</SelectItem>
+                                <SelectItem value="CANCELLED" className="text-[10px] uppercase tracking-widest cursor-pointer text-destructive focus:text-destructive hover:bg-accent">{tStates("CANCELLED")}</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
                         
                         <Link href={`/orders/${order._id}`}>
                           <Button

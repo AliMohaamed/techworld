@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useMutation } from "convex/react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
@@ -16,6 +16,11 @@ import {
   SheetTitle,
   SheetDescription,
   cn,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@techworld/ui";
 import { api } from "@backend/convex/_generated/api";
 import type { Doc } from "@backend/convex/_generated/dataModel";
@@ -56,6 +61,7 @@ export function PromoCodeFormSheet({
     handleSubmit,
     reset,
     watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<PromoFormValues>({
     resolver: zodResolver(promoSchema),
@@ -178,29 +184,26 @@ export function PromoCodeFormSheet({
 
               <div className="space-y-3">
                 <Label
-                  htmlFor="promo-type"
                   className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40"
                 >
                   {t("form.fields.type")}
                 </Label>
-                <div className="relative">
-                  <select
-                    id="promo-type"
-                    className="w-full rounded-xl border border-border bg-background px-5 py-4 text-sm font-black uppercase tracking-widest text-foreground transition-all outline-none hover:border-border/80 focus:border-[#ffc105] appearance-none cursor-pointer shadow-sm"
-                    {...register("type")}
-                  >
-                    <option value="percentage">
-                      {t("form.types.percentage")}
-                    </option>
-                    <option value="fixed">{t("form.types.fixed")}</option>
-                    <option value="free_shipping">
-                      {t("form.types.freeShipping")}
-                    </option>
-                  </select>
-                  <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground/30">
-                    ▼
-                  </div>
-                </div>
+                <Controller
+                  control={control}
+                  name="type"
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full rounded-xl border border-border bg-background px-5 h-[54px] text-sm font-black uppercase tracking-widest text-foreground transition-all outline-none hover:border-border/80 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50 shadow-sm">
+                        <SelectValue placeholder={t("form.fields.type")} />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-border bg-card">
+                        <SelectItem value="percentage" className="font-black uppercase tracking-widest text-xs cursor-pointer">{t("form.types.percentage")}</SelectItem>
+                        <SelectItem value="fixed" className="font-black uppercase tracking-widest text-xs cursor-pointer">{t("form.types.fixed")}</SelectItem>
+                        <SelectItem value="free_shipping" className="font-black uppercase tracking-widest text-xs cursor-pointer">{t("form.types.freeShipping")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
 
               {selectedType !== "free_shipping" && (

@@ -63,7 +63,7 @@ export function Sidebar({
   );
 
   return (
-    <aside className={cn("hidden w-72 shrink-0 rounded-[24px] border border-border bg-card p-5 lg:block shadow-xl dark:shadow-none", className)}>
+    <aside className={cn("hidden w-72 shrink-0 rounded-[24px] border border-border bg-card p-5 lg:block shadow-xl dark:shadow-none sticky top-[104px] h-[calc(100vh-128px)] overflow-y-auto", className)}>
       <p className="text-[11px] uppercase tracking-[0.35em] text-muted-foreground/50">{t('headers.navigation')}</p>
       <nav className="mt-4 space-y-2">
         {visibleItems.map((item) => {

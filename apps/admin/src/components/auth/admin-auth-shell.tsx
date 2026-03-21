@@ -242,7 +242,7 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors">
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <div className="flex w-full items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <button
@@ -329,7 +329,7 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <div className="mx-auto flex max-w-7xl gap-6 px-6 py-6 transition-all">
+      <div className="flex gap-6 px-6 py-6 transition-all min-h-[calc(100vh-80px)]">
         <Sidebar pathname={pathname} permissions={profile.permissions} />
         <div className="min-w-0 flex-1">{children}</div>
       </div>
