@@ -129,7 +129,7 @@ export default function GovernoratesSettingsPage() {
         </p>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1fr,1.6fr]">
+      <section className="grid gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1fr,1.6fr]">
         <form className="rounded-[24px] border border-white/10 bg-[#0b0b0b] p-6" onSubmit={submit}>
           <div className="mb-6 flex items-center justify-between gap-3">
             <div>
@@ -194,7 +194,7 @@ export default function GovernoratesSettingsPage() {
             <table className="min-w-full text-left text-sm text-zinc-300">
               <thead className="text-xs uppercase tracking-[0.2em] text-zinc-500">
                 <tr>
-                  <th className="pb-3 pr-4">Name</th>
+                  <th className="sticky left-0 bg-[#0b0b0b] pb-3 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Name</th>
                   <th className="pb-3 pr-4">Fee</th>
                   <th className="pb-3 pr-4">Status</th>
                   <th className="pb-3">Actions</th>
@@ -203,7 +203,7 @@ export default function GovernoratesSettingsPage() {
               <tbody>
                 {governorates?.map((governorate) => (
                   <tr key={governorate._id} className="border-t border-white/10 align-top">
-                    <td className="py-4 pr-4">
+                    <td className="sticky left-0 bg-[#0b0b0b] py-4 max-lg:py-5 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                       <p className="font-medium text-white">{governorate.name_en}</p>
                       <p className="text-xs text-zinc-500" dir="rtl">{governorate.name_ar}</p>
                     </td>

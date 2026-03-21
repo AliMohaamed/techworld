@@ -25,7 +25,7 @@ export default function Hero() {
 
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <Link 
-              href="#featured" 
+              href="/products" 
               className="group h-16 px-10 bg-[#ffc105] text-black font-space-grotesk font-black text-lg uppercase tracking-widest rounded-2xl flex items-center justify-center hover:bg-[#e6ae00] hover:scale-105 active:scale-95 transition-all w-full sm:w-auto"
             >
               Shop Now
@@ -33,20 +33,6 @@ export default function Hero() {
             </Link>
           </div>
 
-          {/* Stats/Badges */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 pt-10">
-            {[
-              { label: "Precision Engineering", value: "24-bit" },
-              { label: "Active Noise Cancellation", value: "98%" },
-              { label: "Wireless Latency", value: "<15ms" },
-              { label: "Battery Performance", value: "48H" }
-            ].map((stat) => (
-              <div key={stat.label} className="space-y-1">
-                <div className="text-2xl font-black text-white font-space-grotesk tracking-tighter uppercase">{stat.value}</div>
-                <div className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">{stat.label}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>

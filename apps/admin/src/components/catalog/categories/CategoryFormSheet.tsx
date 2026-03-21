@@ -1,0 +1,205 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useMutation } from "convex/react";
+import { toast } from "sonner";
+import { api } from "@backend/convex/_generated/api";
+import type { Id } from "@backend/convex/_generated/dataModel";
+import { Button } from "@techworld/ui/button";
+
+type CategoryFormState = {
+  name_en: string;
+  name_ar: string;
+  slug: string;
+  description_en: string;
+  description_ar: string;
+  thumbnailImageId: string;
+  isActive: boolean;
+};
+
+const emptyForm: CategoryFormState = {
+  name_en: "",
+  name_ar: "",
+  slug: "",
+  description_en: "",
+  description_ar: "",
+  thumbnailImageId: "",
+  isActive: true,
+};
+
+interface CategoryFormSheetProps {
+  open: boolean;
+  onClose: () => void;
+  category: any | null; // Replacing with concrete type if available
+}
+
+export function CategoryFormSheet({
+  open,
+  onClose,
+  category,
+}: CategoryFormSheetProps) {
+  const createCategory = useMutation(api.categories.createCategory);
+  const updateCategory = useMutation(api.categories.updateCategory);
+
+  const [form, setForm] = useState<CategoryFormState>(emptyForm);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    if (!category) {
+      setForm(emptyForm);
+      return;
+    }
+
+    setForm({
+      name_en: category.name_en,
+      name_ar: category.name_ar,
+      slug: category.slug,
+      description_en: category.description_en ?? "",
+      description_ar: category.description_ar ?? "",
+      thumbnailImageId: category.thumbnailImageId ?? "",
+      isActive: category.isActive,
+    });
+  }, [open, category]);
+
+  const submit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!form.name_en.trim() || !form.name_ar.trim()) {
+      toast.error("Category details are incomplete.", {
+        description: "English and Arabic names are required.",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (category?._id) {
+        await updateCategory({
+          id: category._id,
+          name_en: form.name_en,
+          name_ar: form.name_ar,
+          slug: form.slug,
+          description_en: form.description_en,
+          description_ar: form.description_ar,
+          thumbnailImageId: form.thumbnailImageId,
+        });
+        toast.success("Category updated.");
+      } else {
+        await createCategory({
+          name_en: form.name_en,
+          name_ar: form.name_ar,
+          slug: form.slug,
+          description_en: form.description_en,
+          description_ar: form.description_ar,
+          thumbnailImageId: form.thumbnailImageId,
+          isActive: form.isActive,
+        });
+        toast.success("Category created.");
+      }
+
+      onClose();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Category save failed.";
+      toast.error("Catalog update failed.", { description: message });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-[2px]">
+      <div className="absolute inset-x-0 bottom-0 top-6 w-full overflow-y-auto rounded-t-[32px] border border-white/10 bg-[#0b0b0b] p-4 shadow-2xl shadow-black/40 sm:inset-y-0 sm:left-auto sm:right-0 sm:max-w-xl sm:rounded-none sm:border-l sm:border-t-0 sm:p-6">
+        <div className="sticky top-0 z-10 -mx-4 mb-6 flex items-start justify-between gap-4 border-b border-white/10 bg-[#0b0b0b]/95 px-4 pb-4 pt-1 backdrop-blur sm:static sm:mx-0 sm:border-b-0 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-0">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Category Sheet</p>
+            <h2 className="mt-2 text-xl font-semibold text-white sm:text-2xl">
+              {category ? "Edit Category" : "New Category"}
+            </h2>
+          </div>
+          <Button type="button" variant="ghost" onClick={onClose}>Close</Button>
+        </div>
+
+        <form className="space-y-6 pb-24 sm:pb-8" onSubmit={submit}>
+          <div className="space-y-4 text-sm text-zinc-200">
+            <label className="block space-y-2">
+              <span>English name</span>
+              <input
+                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
+                value={form.name_en}
+                onChange={(event) => setForm((current) => ({ ...current, name_en: event.target.value }))}
+              />
+            </label>
+            <label className="block space-y-2">
+              <span>Arabic name</span>
+              <input
+                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
+                dir="rtl"
+                value={form.name_ar}
+                onChange={(event) => setForm((current) => ({ ...current, name_ar: event.target.value }))}
+              />
+            </label>
+            <label className="block space-y-2">
+              <span>Slug</span>
+              <input
+                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
+                placeholder="mobile-accessories"
+                value={form.slug}
+                onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))}
+              />
+            </label>
+            <label className="block space-y-2">
+              <span>English description</span>
+              <textarea
+                className="min-h-24 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
+                value={form.description_en}
+                onChange={(event) => setForm((current) => ({ ...current, description_en: event.target.value }))}
+              />
+            </label>
+            <label className="block space-y-2">
+              <span>Arabic description</span>
+              <textarea
+                className="min-h-24 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
+                dir="rtl"
+                value={form.description_ar}
+                onChange={(event) => setForm((current) => ({ ...current, description_ar: event.target.value }))}
+              />
+            </label>
+            <label className="block space-y-2">
+              <span>Thumbnail image ID</span>
+              <input
+                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
+                value={form.thumbnailImageId}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, thumbnailImageId: event.target.value }))
+                }
+              />
+            </label>
+            {!category?._id ? (
+              <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-zinc-300">
+                <input
+                  checked={form.isActive}
+                  type="checkbox"
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, isActive: event.target.checked }))
+                  }
+                />
+                Start this category as active
+              </label>
+            ) : null}
+          </div>
+
+          <div className="sticky bottom-0 -mx-4 flex flex-col gap-3 border-t border-white/10 bg-[#0b0b0b]/95 px-4 pb-2 pt-4 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:border-t-0 sm:bg-transparent sm:px-0 sm:pb-0">
+            <Button className="w-full sm:w-auto" disabled={isSubmitting} type="submit">
+              {isSubmitting ? "Saving..." : category ? "Update Category" : "Create Category"}
+            </Button>
+            <Button className="w-full sm:w-auto" type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

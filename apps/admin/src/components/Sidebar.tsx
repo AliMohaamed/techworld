@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { Boxes, ClipboardList, FolderTree, Home, MapPinned, Users, type LucideIcon } from "lucide-react";
+import { cn } from "@techworld/ui";
 import type { Permission } from "@backend/convex/lib/permissions";
 
 type StaffPermissionValue = string | number | bigint | boolean;
@@ -43,16 +44,20 @@ function isActivePath(pathname: string, href: SidebarRoute) {
 export function Sidebar({
   pathname,
   permissions,
+  className,
+  onItemClick,
 }: {
   pathname: string;
   permissions: readonly StaffPermissionValue[];
+  className?: string;
+  onItemClick?: () => void;
 }) {
   const visibleItems = navItems.filter((item) =>
     hasRequiredPermission(permissions, item.requiredPermissions),
   );
 
   return (
-    <aside className="hidden w-72 shrink-0 rounded-[24px] border border-white/10 bg-[#0b0b0b] p-5 lg:block">
+    <aside className={cn("hidden w-72 shrink-0 rounded-[24px] border border-white/10 bg-[#0b0b0b] p-5 lg:block", className)}>
       <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Navigation</p>
       <nav className="mt-4 space-y-2">
         {visibleItems.map((item) => {
@@ -63,11 +68,13 @@ export function Sidebar({
             <Link
               key={item.href}
               href={item.href as Route}
-              className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition ${
+              onClick={onItemClick}
+              className={cn(
+                "flex min-h-[44px] items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition",
                 isActive
                   ? "border-[#ffc105]/30 bg-[#ffc105]/10 text-[#ffc105]"
                   : "border-white/10 text-zinc-300 hover:border-white/20 hover:text-white"
-              }`}
+              )}
             >
               <Icon size={16} />
               {item.label}

@@ -3,13 +3,14 @@
 import { usePathname } from "next/navigation";
 import { Authenticated, AuthLoading, Unauthenticated, useQuery } from "convex/react";
 import { useForm } from "react-hook-form";
-import { ShieldCheck, ShieldX, LogOut } from "lucide-react";
+import { ShieldCheck, ShieldX, LogOut, Menu } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@techworld/ui/button";
 import { api } from "@backend/convex/_generated/api";
 import { authClient } from "@/lib/auth-client";
 import { Sidebar } from "@/components/Sidebar";
+import { Sheet, SheetTrigger, SheetPortal, SheetBackdrop, SheetPopup, cn } from "@techworld/ui";
 
 const signInSchema = z.object({
   email: z.string().trim().email("Enter a valid admin email address."),
@@ -195,31 +196,62 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white">
-      <header className="border-b border-white/10 bg-black/30">
+      <header className="border-b border-white/10 bg-black/30 sticky top-0 z-40 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-[#ffc105] p-2 text-black">
-              <ShieldCheck size={18} />
-            </div>
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">
-                TechWorld Ops
-              </p>
-              <h1 className="text-lg font-semibold uppercase tracking-tight">
-                Admin Dashboard
-              </h1>
+            <Sheet>
+              <SheetTrigger className={cn(
+                "inline-flex shrink-0 items-center justify-center rounded-xl border border-white/10 bg-transparent text-white hover:border-[#ffc105]/40 hover:text-[#ffc105] h-9 w-9 max-lg:h-11 max-lg:w-11 lg:hidden"
+              )}>
+                <Menu size={18} />
+              </SheetTrigger>
+              <SheetPortal>
+                <SheetBackdrop />
+                <SheetPopup side="left" className="p-0 border-r border-white/10">
+                  <div className="flex flex-col h-full bg-[#050505] p-6">
+                    <div className="flex items-center gap-3 mb-8">
+                      <div className="rounded-xl bg-[#ffc105] p-2 text-black">
+                        <ShieldCheck size={18} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] uppercase tracking-[0.35em] text-[#ffc105] truncate">
+                          TechWorld Ops
+                        </p>
+                        <h1 className="text-base font-semibold uppercase tracking-tight truncate">
+                          Admin Dashboard
+                        </h1>
+                      </div>
+                    </div>
+                    <Sidebar pathname={pathname} permissions={profile.permissions} className="lg:block w-full border-none bg-transparent p-0" />
+                  </div>
+                </SheetPopup>
+              </SheetPortal>
+            </Sheet>
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl bg-[#ffc105] p-2 text-black hidden sm:block">
+                <ShieldCheck size={18} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">
+                  TechWorld Ops
+                </p>
+                <h1 className="text-lg font-semibold uppercase tracking-tight truncate max-w-[150px] sm:max-w-none">
+                  Admin Dashboard
+                </h1>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-4 text-sm text-zinc-400">
-            <span>{profile.authUser?.email ?? "Authenticated user"}</span>
+          <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-zinc-400">
+            <span className="hidden md:inline">{profile.authUser?.email}</span>
             <Button
               onClick={() => void authClient.signOut()}
               size="sm"
               type="button"
               variant="outline"
+              className="px-2 sm:px-3"
             >
-              <LogOut size={14} />
-              Sign Out
+              <LogOut size={14} className="sm:mr-2" />
+              <span className="hidden sm:inline">Sign Out</span>
             </Button>
           </div>
         </div>

@@ -221,7 +221,7 @@ export default function TeamManagementPage() {
           <table className="min-w-full text-left text-sm text-zinc-300">
             <thead className="text-xs uppercase tracking-[0.2em] text-zinc-500">
               <tr>
-                <th className="pb-3 pr-4 whitespace-nowrap">Name</th>
+                <th className="sticky left-0 bg-[#0b0b0b] pb-3 pr-4 whitespace-nowrap z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Name</th>
                 <th className="pb-3 pr-4 whitespace-nowrap">Status</th>
                 <th className="pb-3 pr-4">Active Permissions</th>
                 <th className="pb-3">Actions</th>
@@ -230,7 +230,7 @@ export default function TeamManagementPage() {
             <tbody>
               {staff?.map((user) => (
                 <tr key={user._id} className="border-t border-white/10 align-top">
-                  <td className="py-4 pr-4">
+                  <td className="sticky left-0 bg-[#0b0b0b] py-4 max-lg:py-5 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                     <p className="font-medium text-white">{user.name}</p>
                     <p className="text-xs text-zinc-500">{user.email}</p>
                     {me?._id === user._id && <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-1 block">You</span>}
@@ -281,7 +281,7 @@ export default function TeamManagementPage() {
                         </div>
                       ) : (
                         user.permissions.map((perm) => (
-                          <span key={perm} className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wider text-zinc-400">
+                          <span key={String(perm)} className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wider text-zinc-400">
                             {perm}
                           </span>
                         ))

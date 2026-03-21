@@ -52,7 +52,7 @@ export default function OrdersPage() {
             <table className="min-w-full text-left text-sm text-zinc-300">
               <thead className="bg-black/30 text-[11px] uppercase tracking-[0.25em] text-zinc-500">
                 <tr>
-                  <th className="px-6 py-4">Customer</th>
+                  <th className="sticky left-0 bg-[#0b0b0b] px-6 py-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Customer</th>
                   <th className="px-6 py-4">Product</th>
                   <th className="px-6 py-4">Quantity</th>
                   <th className="px-6 py-4">Total</th>
@@ -63,7 +63,7 @@ export default function OrdersPage() {
               <tbody>
                 {visibleOrders.map((order) => (
                   <tr key={order._id} className="border-t border-white/5">
-                    <td className="px-6 py-4 align-top">
+                    <td className="sticky left-0 bg-[#0b0b0b] px-6 py-4 max-lg:py-5 align-top z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                       <div className="font-medium text-white">{order.customerName ?? "Walk-in customer"}</div>
                       <div className="mt-1 text-xs text-zinc-500">{order.customerPhone ?? "No phone"}</div>
                     </td>

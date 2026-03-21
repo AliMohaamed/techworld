@@ -154,7 +154,7 @@ export default function AdminProductsPage() {
           <table className="min-w-full text-left text-sm text-zinc-300">
             <thead className="text-xs uppercase tracking-[0.2em] text-zinc-500">
               <tr>
-                <th className="pb-3 pr-4">Product</th>
+                <th className="sticky left-0 bg-[#0b0b0b] pb-3 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Product</th>
                 <th className="pb-3 pr-4">Category</th>
                 <th className="pb-3 pr-4">Pricing</th>
                 <th className="pb-3 pr-4">Variants</th>
@@ -167,7 +167,7 @@ export default function AdminProductsPage() {
             <tbody>
               {products?.map((product) => (
                 <tr key={product._id} className="border-t border-white/10 align-top">
-                  <td className="py-4 pr-4">
+                  <td className="sticky left-0 bg-[#0b0b0b] py-4 max-lg:py-5 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                     <p className="font-medium text-white">{product.name_en}</p>
                     <p className="text-xs text-zinc-500" dir="rtl">{product.name_ar}</p>
                     <p className="mt-1 text-xs text-zinc-500">/{product.slug ?? "no-slug"}</p>

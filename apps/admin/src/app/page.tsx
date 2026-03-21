@@ -12,7 +12,7 @@ export default function AdminHomePage() {
           Convex Better Auth, the shared backend package, and the centralized UI package are now wired into the admin workspace. Order queues and catalog management screens can build on top of this shell in the next phase.
         </p>
       </section>
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {[
           "Order verification workspace",
           "Catalog and category operations",

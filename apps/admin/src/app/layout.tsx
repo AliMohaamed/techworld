@@ -20,7 +20,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
-      <body>
+      <body className="overflow-x-hidden">
         <ConvexClientProvider initialToken={initialToken}>
           <AdminThemeProvider>
             <AdminAuthShell>{children}</AdminAuthShell>
