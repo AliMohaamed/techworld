@@ -271,6 +271,7 @@ export const createOrder = mutation({
       quantity: args.quantity,
       total_price: sku.price * args.quantity,
       state: "PENDING_PAYMENT_INPUT",
+      unit_cogs: product.cogs,
     });
 
     await scheduleAuditLog(ctx, {

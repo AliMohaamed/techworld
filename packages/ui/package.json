@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@types/react": "^19",
+    "shadcn": "^4.0.2",
     "typescript": "^5"
   }
 }

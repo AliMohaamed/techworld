@@ -257,6 +257,7 @@ export const placeOrderFromSession = mutation({
         total_price: lineSubtotal,
         state: isBlacklisted ? "FLAGGED_FRAUD" : "PENDING_PAYMENT_INPUT",
         shortCode,
+        unit_cogs: product.cogs,
       });
 
       await writeAuditLog(ctx, {

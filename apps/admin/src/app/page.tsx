@@ -6,13 +6,45 @@ import { api } from "@backend/convex/_generated/api";
 import { useState } from "react";
 import { SalesVelocityChart } from "@/components/charts/SalesVelocityChart";
 import { StatusBreakdownChart } from "@/components/charts/StatusBreakdownChart";
-import { TrendingUp, ShoppingCart, DollarSign, Truck, AlertCircle } from "lucide-react";
+import { TrendingUp, ShoppingCart, DollarSign, Truck, AlertCircle, ShieldX } from "lucide-react";
+import { hasPermission } from "@backend/convex/lib/permissions";
 
 export default function AdminDashboardPage() {
+  const me = useQuery(api.users.getMe);
   const [timeWindow, setTimeWindow] = useState<"today" | "last7days" | "last30days">("last7days");
-  const metrics = useQuery(api.analytics.dashboardMetrics, { timeWindow });
+  
+  const canViewAnalytics = React.useMemo(() => {
+    if (!me) return false;
+    return hasPermission(me, "VIEW_ANALYTICS");
+  }, [me]);
 
-  const loading = metrics === undefined;
+  const metrics = useQuery(
+    api.analytics.dashboardMetrics, 
+    canViewAnalytics ? { timeWindow } : "skip"
+  );
+
+  const loading = (me === undefined) || (canViewAnalytics && metrics === undefined);
+
+  if (!loading && !canViewAnalytics) {
+    return (
+      <main className="flex min-h-[60vh] flex-col items-center justify-center space-y-6 text-center animate-in fade-in duration-700">
+        <div className="relative">
+          <div className="absolute inset-0 blur-3xl bg-red-500/10 rounded-full" />
+          <div className="relative h-24 w-24 bg-[#24201a] border border-white/10 rounded-[32px] flex items-center justify-center shadow-2xl">
+            <ShieldX size={48} className="text-red-500/50" />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold text-white tracking-tight">Access Restricted</h2>
+          <p className="max-w-md text-zinc-500 text-sm leading-relaxed font-light">
+            Your staff account does not have the <code className="text-[#ffc105] bg-[#ffc105]/5 px-1.5 py-0.5 rounded border border-[#ffc105]/10 font-mono text-[11px]">VIEW_ANALYTICS</code> permission required to access the executive dashboard.
+          </p>
+        </div>
+        <div className="h-px w-16 bg-white/10" />
+        <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-600 font-medium">Compliance & Security Policy</p>
+      </main>
+    );
+  }
 
   return (
     <main className="space-y-8 animate-in fade-in duration-500 pb-12">
@@ -49,13 +81,13 @@ export default function AdminDashboardPage() {
       <section className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard 
           label="Total Orders" 
-          value={metrics?.totalOrders} 
+          value={metrics?.totalOrders ?? "-"} 
           icon={<ShoppingCart size={20} />} 
           loading={loading}
         />
         <KpiCard 
           label="Net Profit" 
-          value={metrics?.netProfit !== null ? `EGP ${metrics?.netProfit?.toLocaleString()}` : "***"} 
+          value={metrics?.netProfit !== undefined && metrics?.netProfit !== null ? `EGP ${metrics.netProfit.toLocaleString()}` : "***"} 
           icon={<DollarSign size={20} />} 
           mask={metrics?.netProfit === null}
           loading={loading}
@@ -63,16 +95,16 @@ export default function AdminDashboardPage() {
         />
         <KpiCard 
           label="Courier Fees" 
-          value={`EGP ${metrics?.courierFees?.toLocaleString()}`} 
+          value={metrics?.courierFees !== undefined ? `EGP ${metrics.courierFees.toLocaleString()}` : "-"} 
           icon={<Truck size={20} />} 
           loading={loading}
         />
         <KpiCard 
           label="RTO Rate" 
-          value={`${metrics?.rtoRate?.toFixed(1)}%`} 
+          value={metrics?.rtoRate !== undefined ? `${metrics.rtoRate.toFixed(1)}%` : "-"} 
           icon={<AlertCircle size={20} />} 
           loading={loading}
-          warning={metrics?.rtoRate && metrics.rtoRate > 20}
+          warning={metrics?.rtoRate !== undefined && metrics.rtoRate > 20}
         />
       </section>
 

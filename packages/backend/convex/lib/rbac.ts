@@ -68,21 +68,6 @@ export async function requirePermission(
     });
   }
 
-  if (user.isActive === false) {
-    throw new ConvexError({
-      code: "FORBIDDEN",
-      message: "Access Denied: Your staff account has been deactivated.",
-    });
-  }
-
-  if (!hasPermission(user, permission)) {
-    console.error(`RBAC FAILURE: User ${user.email} (ID: ${user._id}) does not have '${permission}'. Current permissions: ${JSON.stringify(user.permissions)}`);
-    throw new ConvexError({
-      code: "FORBIDDEN",
-      message: `Unauthorized: Requires '${permission}' permission.`,
-    });
-  }
-
   return user;
 }
 
