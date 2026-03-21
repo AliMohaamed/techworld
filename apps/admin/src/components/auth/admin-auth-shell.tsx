@@ -1,5 +1,7 @@
 "use client";
 
+import * as React from "react";
+
 import { usePathname } from "next/navigation";
 import { Authenticated, AuthLoading, Unauthenticated, useQuery } from "convex/react";
 import { useForm } from "react-hook-form";
@@ -134,6 +136,8 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
   const profile = useQuery(api.auth.getCurrentStaffProfile);
   const pathname = usePathname();
 
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
   if (profile === undefined) {
     return (
       <div className="grid min-h-screen place-items-center bg-[#1a1814] text-zinc-400">
@@ -196,15 +200,17 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#1a1814] text-white">
-      <header className="border-b border-white/10 bg-[#2a261f] sticky top-0 z-40 backdrop-blur-md transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#2a261f]/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <Sheet>
-              <SheetTrigger className={cn(
-                "inline-flex shrink-0 items-center justify-center rounded-xl border border-white/5 bg-transparent text-white hover:border-[#ffc105]/40 hover:text-[#ffc105] h-9 w-9 max-lg:h-11 max-lg:w-11 lg:hidden"
-              )}>
-                <Menu size={18} />
-              </SheetTrigger>
+            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+              <button 
+                type="button"
+                onClick={() => setIsMenuOpen(true)}
+                className="inline-flex shrink-0 items-center justify-center rounded-xl border border-white/5 bg-transparent text-white hover:border-[#ffc105]/40 hover:text-[#ffc105] h-10 w-10 lg:hidden cursor-pointer"
+              >
+                <Menu size={20} />
+              </button>
               <SheetPortal>
                 <SheetBackdrop />
                 <SheetPopup side="left" className="p-0 border-r border-white/5">
@@ -213,7 +219,7 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
                       <div className="rounded-xl bg-[#ffc105] p-2 text-black">
                         <ShieldCheck size={18} />
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 text-left">
                         <p className="text-[10px] uppercase tracking-[0.35em] text-[#ffc105] truncate">
                           TechWorld Ops
                         </p>
@@ -222,7 +228,12 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
                         </h1>
                       </div>
                     </div>
-                    <Sidebar pathname={pathname} permissions={profile.permissions} className="lg:block w-full border-none bg-transparent p-0" />
+                    <Sidebar 
+                      pathname={pathname} 
+                      permissions={profile.permissions} 
+                      className="block w-full border-none bg-transparent p-0" 
+                      onItemClick={() => setIsMenuOpen(false)}
+                    />
                   </div>
                 </SheetPopup>
               </SheetPortal>

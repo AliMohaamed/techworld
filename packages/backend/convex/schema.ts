@@ -13,6 +13,7 @@ export const orderStateValidator = v.union(
   v.literal("RTO"),
   v.literal("STALLED_PAYMENT"),
   v.literal("CANCELLED"),
+  v.literal("FLAGGED_FRAUD"),
 );
 
 export default defineSchema({
@@ -149,7 +150,7 @@ export default defineSchema({
     actionType: v.string(),
     timestamp: v.number(),
     changes: v.any(),
-  }),
+  }).index("by_timestamp", ["timestamp"]),
 
   system_configs: defineTable({
     key: v.string(),

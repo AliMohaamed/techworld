@@ -12,6 +12,8 @@ export const permissionValues = [
   "VIEW_FINANCIALS",
   "MANAGE_SYSTEM_CONFIG",
   "RESOLVE_FRAUD",
+  "VIEW_ANALYTICS",
+  "VIEW_AUDIT_LOGS",
   "MANAGE_USERS"
 ] as const;
 

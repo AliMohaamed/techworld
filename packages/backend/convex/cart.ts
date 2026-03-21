@@ -221,6 +221,10 @@ export const placeOrderFromSession = mutation({
 
     const governorate = await getActiveGovernorateOrThrow(ctx, args.governorateId);
     const shortCode = generateShortCode();
+    const isBlacklisted = await ctx.db
+      .query("blacklist")
+      .withIndex("by_phone", (q) => q.eq("phoneNumber", args.customerPhone))
+      .unique();
 
     for (const item of session.items) {
       const product = await ctx.db.get(item.productId);
@@ -251,7 +255,7 @@ export const placeOrderFromSession = mutation({
         skuId: item.skuId,
         quantity: item.quantity,
         total_price: lineSubtotal,
-        state: "PENDING_PAYMENT_INPUT",
+        state: isBlacklisted ? "FLAGGED_FRAUD" : "PENDING_PAYMENT_INPUT",
         shortCode,
       });
 

@@ -21,7 +21,7 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Install `recharts` and init UI components via shadcn (e.g., `npx shadcn@latest add chart`) in `apps/admin`.
+- [x] T001 Install `recharts` and init UI components via shadcn (e.g., `npx shadcn@latest add chart`) in `apps/admin`.
 
 ---
 
@@ -31,7 +31,7 @@ description: "Task list template for feature implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T002 Update `packages/backend/convex/schema.ts` to add `unit_cogs` to `orders`, and define `system_configs` and `blacklist` tables.
+- [x] T002 Update `packages/backend/convex/schema.ts` to add `unit_cogs` to `orders`, and define `system_configs` and `blacklist` tables.
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -45,9 +45,9 @@ description: "Task list template for feature implementation"
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Create `packages/backend/convex/analytics.ts` and implement `dashboardMetrics` bounded aggregation query with `VIEW_FINANCIALS` validation.
-- [ ] T004 [P] [US1] Create visual chart components in `apps/admin/src/components/charts/` (e.g., `SalesVelocityChart.tsx`).
-- [ ] T005 [US1] Overwrite the root `apps/admin/src/app/page.tsx` wrapper to securely query `api.analytics.dashboardMetrics` and render KPIs.
+- [x] T003 [US1] Create `packages/backend/convex/analytics.ts` and implement `dashboardMetrics` bounded aggregation query with `VIEW_FINANCIALS` validation.
+- [x] T004 [P] [US1] Create visual chart components in `apps/admin/src/components/charts/` (e.g., `SalesVelocityChart.tsx`).
+- [x] T005 [US1] Overwrite the root `apps/admin/src/app/page.tsx` wrapper to securely query `api.analytics.dashboardMetrics` and render KPIs.
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -61,11 +61,12 @@ description: "Task list template for feature implementation"
 
 ### Implementation for User Story 2
 
-- [ ] T006 [P] [US2] Create `packages/backend/convex/settings.ts` exposing `getSystemConfig` and `updateSystemConfig` mutations restricting write-access.
-- [ ] T007 [P] [US2] Create `packages/backend/convex/blacklist.ts` exposing queries/mutations to manage blocked numbers.
-- [ ] T008 [US2] Update `packages/backend/convex/orders.ts` (specifically checkout/place order mutation) to query the `blacklist` table and silently shift orders to `FLAGGED_FRAUD` if matched.
-- [ ] T009 [P] [US2] Create `apps/admin/src/app/(dashboard)/settings/page.tsx` UI to manage configs and the blacklist table.
-- [ ] T010 [US2] Add a WebSocket active listener to Storefront (e.g., in a root layout/provider) that forces a fallback banner/redirect if `MAINTENANCE_MODE` is `true`.
+- [x] T006 [P] [US2] Create `packages/backend/convex/settings.ts` exposing `getSystemConfig` and `updateSystemConfig` mutations restricting write-access.
+- [x] T007 [P] [US2] Create `packages/backend/convex/blacklist.ts` exposing queries/mutations to manage blocked numbers.
+- [x] T008 [US2] Update `packages/backend/convex/orders.ts` (specifically checkout/place order mutation) to query the `blacklist` table and silently shift orders to `FLAGGED_FRAUD` if matched.
+- [x] T009 [P] [US2] Create `apps/admin/src/app/(dashboard)/settings/page.tsx` UI to manage configs and the blacklist table.
+- [x] T010 [US2] Add a WebSocket active listener to Storefront (e.g., in a root layout/provider) that forces a fallback banner/redirect if `MAINTENANCE_MODE` is `true`.
+
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -79,8 +80,8 @@ description: "Task list template for feature implementation"
 
 ### Implementation for User Story 3
 
-- [ ] T011 [P] [US3] Create `packages/backend/convex/audit.ts` exposing `paginatedList` using the Convex pagination API to read `audit_logs`.
-- [ ] T012 [P] [US3] Create `apps/admin/src/app/(dashboard)/audit/page.tsx` featuring a read-only shadcn Data Table bound to `paginatedList`.
+- [x] T011 [P] [US3] Create `packages/backend/convex/audit.ts` exposing `paginatedList` using the Convex pagination API to read `audit_logs`.
+- [x] T012 [P] [US3] Create `apps/admin/src/app/(dashboard)/audit/page.tsx` featuring a read-only shadcn Data Table bound to `paginatedList`.
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -90,8 +91,8 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T013 [P] Verify typing accuracy and run ESLint across `/apps/admin` and `/packages/backend`.
-- [ ] T014 Execute manual sandbox scenarios defined in `quickstart.md`.
+- [x] T013 [P] Verify typing accuracy and run ESLint across `/apps/admin` and `/packages/backend`.
+- [x] T014 Execute manual sandbox scenarios defined in `quickstart.md`.
 
 ---
 

@@ -23,8 +23,5 @@
     "eslint": "^9",
     "turbo": "^2.8.19",
     "typescript": "^5"
-  },
-  "dependencies": {
-    "recharts": "^3.8.0"
   }
 }
