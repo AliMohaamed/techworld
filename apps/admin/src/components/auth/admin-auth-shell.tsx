@@ -26,7 +26,7 @@ export function AdminAuthShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       <AuthLoading>
-        <div className="grid min-h-screen place-items-center bg-[#050505] text-zinc-400">
+        <div className="grid min-h-screen place-items-center bg-[#1a1814] text-zinc-400">
           Checking admin session...
         </div>
       </AuthLoading>
@@ -84,8 +84,8 @@ function LoginScreen() {
   });
 
   return (
-    <main className="grid min-h-screen place-items-center bg-[radial-gradient(circle_at_top,#222,transparent_45%),#050505] px-6 py-10">
-      <div className="w-full max-w-md rounded-[28px] border border-white/10 bg-[#101010] p-8 shadow-2xl shadow-black/30">
+    <main className="grid min-h-screen place-items-center bg-[radial-gradient(circle_at_top,#222,transparent_45%),#1a1814] px-6 py-10">
+      <div className="w-full max-w-md rounded-[28px] border border-white/5 bg-[#24201a] p-8 shadow-2xl shadow-black/30">
         <div className="mb-8 space-y-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[#ffc105]">
             Internal Admin Access
@@ -101,7 +101,7 @@ function LoginScreen() {
         <form className="space-y-4" onSubmit={submit}>
           <div className="space-y-2">
             <input
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none"
+              className="w-full rounded-xl border border-white/10 bg-[#2a261f] px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50"
               placeholder="Email address"
               type="email"
               {...register("email")}
@@ -112,7 +112,7 @@ function LoginScreen() {
           </div>
           <div className="space-y-2">
             <input
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none"
+              className="w-full rounded-xl border border-white/10 bg-[#2a261f] px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50"
               placeholder="Password"
               type="password"
               {...register("password")}
@@ -136,7 +136,7 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
 
   if (profile === undefined) {
     return (
-      <div className="grid min-h-screen place-items-center bg-[#050505] text-zinc-400">
+      <div className="grid min-h-screen place-items-center bg-[#1a1814] text-zinc-400">
         Loading staff profile...
       </div>
     );
@@ -144,8 +144,8 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
 
   if (!profile || !profile.staffUser) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[radial-gradient(circle_at_top,#222,transparent_45%),#050505] px-6 py-10">
-        <div className="w-full max-w-md rounded-[28px] border border-white/10 bg-[#101010] p-8 text-center shadow-2xl shadow-black/30">
+      <main className="grid min-h-screen place-items-center bg-[radial-gradient(circle_at_top,#222,transparent_45%),#1a1814] px-6 py-10">
+        <div className="w-full max-w-md rounded-[28px] border border-white/5 bg-[#24201a] p-8 text-center shadow-2xl shadow-black/30">
           <div className="mb-6 flex justify-center">
             <div className="rounded-2xl bg-red-500/10 p-4 text-red-500">
               <ShieldCheck size={48} />
@@ -170,8 +170,8 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
 
   if (profile.staffUser.isActive === false) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[radial-gradient(circle_at_top,#222,transparent_45%),#050505] px-6 py-10">
-        <div className="w-full max-w-md rounded-[28px] border border-white/10 bg-[#101010] p-8 text-center shadow-2xl shadow-black/30">
+      <main className="grid min-h-screen place-items-center bg-[radial-gradient(circle_at_top,#222,transparent_45%),#1a1814] px-6 py-10">
+        <div className="w-full max-w-md rounded-[28px] border border-white/5 bg-[#24201a] p-8 text-center shadow-2xl shadow-black/30">
           <div className="mb-6 flex justify-center">
             <div className="rounded-2xl bg-red-500/10 p-4 text-red-500">
               <ShieldX size={48} />
@@ -195,20 +195,20 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
-      <header className="border-b border-white/10 bg-black/30 sticky top-0 z-40 backdrop-blur-md">
+    <div className="min-h-screen bg-[#1a1814] text-white">
+      <header className="border-b border-white/10 bg-[#2a261f] sticky top-0 z-40 backdrop-blur-md transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <Sheet>
               <SheetTrigger className={cn(
-                "inline-flex shrink-0 items-center justify-center rounded-xl border border-white/10 bg-transparent text-white hover:border-[#ffc105]/40 hover:text-[#ffc105] h-9 w-9 max-lg:h-11 max-lg:w-11 lg:hidden"
+                "inline-flex shrink-0 items-center justify-center rounded-xl border border-white/5 bg-transparent text-white hover:border-[#ffc105]/40 hover:text-[#ffc105] h-9 w-9 max-lg:h-11 max-lg:w-11 lg:hidden"
               )}>
                 <Menu size={18} />
               </SheetTrigger>
               <SheetPortal>
                 <SheetBackdrop />
-                <SheetPopup side="left" className="p-0 border-r border-white/10">
-                  <div className="flex flex-col h-full bg-[#050505] p-6">
+                <SheetPopup side="left" className="p-0 border-r border-white/5">
+                  <div className="flex flex-col h-full bg-[#1a1814] p-6">
                     <div className="flex items-center gap-3 mb-8">
                       <div className="rounded-xl bg-[#ffc105] p-2 text-black">
                         <ShieldCheck size={18} />

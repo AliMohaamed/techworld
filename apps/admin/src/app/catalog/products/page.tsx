@@ -122,7 +122,7 @@ export default function AdminProductsPage() {
 
   return (
     <main className="space-y-6">
-      <section className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#0b0b0b] px-8 py-8">
+      <section className="rounded-[28px] border border-white/5 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#24201a] px-8 py-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">Catalog</p>
@@ -139,13 +139,13 @@ export default function AdminProductsPage() {
         </div>
       </section>
 
-      <section className="rounded-[24px] border border-white/10 bg-[#0b0b0b] p-6">
+      <section className="rounded-[24px] border border-white/5 bg-[#24201a] p-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Data Table</p>
             <h2 className="mt-2 text-xl font-semibold text-white">All products</h2>
           </div>
-          <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300">
+          <span className="rounded-full border border-white/5 px-3 py-1 text-xs text-zinc-300">
             {products ? `${products.length} total` : "Loading..."}
           </span>
         </div>
@@ -154,7 +154,7 @@ export default function AdminProductsPage() {
           <table className="min-w-full text-left text-sm text-zinc-300">
             <thead className="text-xs uppercase tracking-[0.2em] text-zinc-500">
               <tr>
-                <th className="sticky left-0 bg-[#0b0b0b] pb-3 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Product</th>
+                <th className="sticky left-0 bg-[#24201a] pb-3 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Product</th>
                 <th className="pb-3 pr-4">Category</th>
                 <th className="pb-3 pr-4">Pricing</th>
                 <th className="pb-3 pr-4">Variants</th>
@@ -166,8 +166,8 @@ export default function AdminProductsPage() {
             </thead>
             <tbody>
               {products?.map((product) => (
-                <tr key={product._id} className="border-t border-white/10 align-top">
-                  <td className="sticky left-0 bg-[#0b0b0b] py-4 max-lg:py-5 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                <tr key={product._id} className="border-t border-white/5 align-top">
+                  <td className="sticky left-0 bg-[#24201a] py-4 max-lg:py-5 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                     <p className="font-medium text-white">{product.name_en}</p>
                     <p className="text-xs text-zinc-500" dir="rtl">{product.name_ar}</p>
                     <p className="mt-1 text-xs text-zinc-500">/{product.slug ?? "no-slug"}</p>
@@ -206,7 +206,7 @@ export default function AdminProductsPage() {
                       // Simple product: legacy inline edit
                       <div className="flex items-center gap-2">
                         <input
-                          className="w-24 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-white outline-none"
+                          className="w-24 rounded-xl border border-white/10 bg-[#2a261f] px-3 py-2 text-zinc-100 placeholder:text-zinc-500 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50"
                           type="number"
                           value={displayDrafts[product._id] ?? String(product.display_stock ?? 0)}
                           onChange={(event) =>
@@ -238,7 +238,7 @@ export default function AdminProductsPage() {
                       // Simple product: legacy inline edit
                       <div className="flex items-center gap-2">
                         <input
-                          className="w-24 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-white outline-none"
+                          className="w-24 rounded-xl border border-white/10 bg-[#2a261f] px-3 py-2 text-zinc-100 placeholder:text-zinc-500 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50"
                           type="number"
                           value={realDrafts[product._id] ?? String(product.real_stock ?? 0)}
                           onChange={(event) =>
@@ -262,7 +262,7 @@ export default function AdminProductsPage() {
                       className={`rounded-full border px-3 py-1 text-xs ${
                         product.status === "PUBLISHED"
                           ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-                          : "border-white/10 bg-white/5 text-zinc-300"
+                          : "border-white/5 bg-white/5 text-zinc-300"
                       }`}
                     >
                       {product.status}

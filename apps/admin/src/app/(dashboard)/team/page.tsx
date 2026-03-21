@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
-import { Button } from "@techworld/ui/button";
+import { Button, Input, Label, Switch } from "@techworld/ui";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { permissionValues, type Permission } from "@backend/convex/lib/permissions";
@@ -104,7 +104,7 @@ export default function TeamManagementPage() {
 
   return (
     <main className="space-y-6">
-      <section className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#0b0b0b] px-8 py-8">
+      <section className="rounded-[28px] border border-white/5 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#24201a] px-8 py-8">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
             <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">Administration</p>
@@ -123,7 +123,7 @@ export default function TeamManagementPage() {
       </section>
 
       {isProvisioning && (
-        <section className="rounded-[24px] border border-white/10 bg-[#0b0b0b] p-6 animate-in fade-in slide-in-from-top-4">
+        <section className="rounded-[24px] border border-white/5 bg-[#24201a] p-6 animate-in fade-in slide-in-from-top-4">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-white">New Staff Account</h2>
             <Button variant="ghost" size="sm" onClick={() => setIsProvisioning(false)}>
@@ -133,18 +133,18 @@ export default function TeamManagementPage() {
           <form onSubmit={handleProvision} className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="space-y-2">
-                <label className="text-sm text-zinc-400">FullName</label>
-                <input
-                  className="field"
+                <Label htmlFor="staff-name">Full Name</Label>
+                <Input
+                  id="staff-name"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="John Doe"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm text-zinc-400">Email Address</label>
-                <input
-                  className="field"
+                <Label htmlFor="staff-email">Email Address</Label>
+                <Input
+                  id="staff-email"
                   type="email"
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
@@ -152,15 +152,17 @@ export default function TeamManagementPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm text-zinc-400">Initial Password</label>
+                <Label htmlFor="staff-password">Initial Password</Label>
                 <div className="flex gap-2">
-                  <input
-                    className="field font-mono"
+                  <Input
+                    id="staff-password"
+                    className="font-mono"
                     value={formPassword}
                     readOnly
                     placeholder="Auto-generated"
+                    icon={<Key size={16} />}
                   />
-                  <Button type="button" variant="outline" size="sm" onClick={generatePassword}>
+                  <Button type="button" variant="outline" size="sm" onClick={generatePassword} className="h-12 w-12 shrink-0">
                     <Key className="h-4 w-4" />
                   </Button>
                 </div>
@@ -168,7 +170,7 @@ export default function TeamManagementPage() {
             </div>
 
             <div className="space-y-4">
-              <label className="text-sm text-zinc-400">Assign Permissions (Only what you own)</label>
+              <Label>Assign Permissions (Only what you own)</Label>
               <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
                 {permissionValues.map((perm) => {
                   const owned = myPermissions.includes(perm);
@@ -179,7 +181,7 @@ export default function TeamManagementPage() {
                         owned 
                           ? formPermissions.includes(perm) 
                             ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-300" 
-                            : "border-white/10 bg-black/40 text-zinc-400 hover:border-white/20"
+                            : "border-white/5 bg-[#2a261f] text-zinc-400 hover:border-white/20"
                           : "border-white/5 bg-transparent text-zinc-600 cursor-not-allowed opacity-50"
                       }`}
                     >
@@ -206,13 +208,13 @@ export default function TeamManagementPage() {
         </section>
       )}
 
-      <section className="rounded-[24px] border border-white/10 bg-[#0b0b0b] p-6">
+      <section className="rounded-[24px] border border-white/5 bg-[#24201a] p-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Staff List</p>
             <h2 className="mt-2 text-xl font-semibold text-white">Active Team Members</h2>
           </div>
-          <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300">
+          <span className="rounded-full border border-white/5 px-3 py-1 text-xs text-zinc-300">
             {staff ? `${staff.length} users` : "Loading..."}
           </span>
         </div>
@@ -221,7 +223,7 @@ export default function TeamManagementPage() {
           <table className="min-w-full text-left text-sm text-zinc-300">
             <thead className="text-xs uppercase tracking-[0.2em] text-zinc-500">
               <tr>
-                <th className="sticky left-0 bg-[#0b0b0b] pb-3 pr-4 whitespace-nowrap z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Name</th>
+                <th className="sticky left-0 bg-[#24201a] pb-3 pr-4 whitespace-nowrap z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Name</th>
                 <th className="pb-3 pr-4 whitespace-nowrap">Status</th>
                 <th className="pb-3 pr-4">Active Permissions</th>
                 <th className="pb-3">Actions</th>
@@ -229,8 +231,8 @@ export default function TeamManagementPage() {
             </thead>
             <tbody>
               {staff?.map((user) => (
-                <tr key={user._id} className="border-t border-white/10 align-top">
-                  <td className="sticky left-0 bg-[#0b0b0b] py-4 max-lg:py-5 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                <tr key={user._id} className="border-t border-white/5 align-top">
+                  <td className="sticky left-0 bg-[#24201a] py-4 max-lg:py-5 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                     <p className="font-medium text-white">{user.name}</p>
                     <p className="text-xs text-zinc-500">{user.email}</p>
                     {me?._id === user._id && <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-1 block">You</span>}
@@ -258,7 +260,7 @@ export default function TeamManagementPage() {
                                   owned 
                                     ? has 
                                       ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-300" 
-                                      : "border-white/10 text-zinc-500 hover:border-white/20"
+                                      : "border-white/5 text-zinc-500 hover:border-white/20"
                                     : "opacity-40"
                                 } cursor-pointer`}
                               >
@@ -281,7 +283,7 @@ export default function TeamManagementPage() {
                         </div>
                       ) : (
                         user.permissions.map((perm) => (
-                          <span key={String(perm)} className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wider text-zinc-400">
+                          <span key={String(perm)} className="rounded-full border border-white/5 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wider text-zinc-400">
                             {perm}
                           </span>
                         ))

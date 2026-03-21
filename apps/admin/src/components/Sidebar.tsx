@@ -57,7 +57,7 @@ export function Sidebar({
   );
 
   return (
-    <aside className={cn("hidden w-72 shrink-0 rounded-[24px] border border-white/10 bg-[#0b0b0b] p-5 lg:block", className)}>
+    <aside className={cn("hidden w-72 shrink-0 rounded-[24px] border border-white/5 bg-[#24201a] p-5 lg:block", className)}>
       <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Navigation</p>
       <nav className="mt-4 space-y-2">
         {visibleItems.map((item) => {
@@ -73,7 +73,7 @@ export function Sidebar({
                 "flex min-h-[44px] items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition",
                 isActive
                   ? "border-[#ffc105]/30 bg-[#ffc105]/10 text-[#ffc105]"
-                  : "border-white/10 text-zinc-300 hover:border-white/20 hover:text-white"
+                  : "border-white/5 text-zinc-300 hover:border-white/20 hover:text-white"
               )}
             >
               <Icon size={16} />
@@ -88,7 +88,7 @@ export function Sidebar({
           permissions.map((permission) => (
             <span
               key={String(permission)}
-              className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300"
+              className="rounded-full border border-white/5 px-3 py-1 text-xs text-zinc-300"
             >
               {String(permission)}
             </span>

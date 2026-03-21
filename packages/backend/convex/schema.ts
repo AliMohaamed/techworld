@@ -136,6 +136,7 @@ export default defineSchema({
     state: orderStateValidator,
     shortCode: v.optional(v.string()),
     paymentReceiptRef: v.optional(storageRef),
+    unit_cogs: v.optional(v.number()),
   })
     .index("by_shortCode", ["shortCode"])
     .index("by_session", ["sessionId"])
@@ -149,4 +150,18 @@ export default defineSchema({
     timestamp: v.number(),
     changes: v.any(),
   }),
+
+  system_configs: defineTable({
+    key: v.string(),
+    value: v.any(),
+    updatedAt: v.number(),
+    updatedBy: v.optional(v.id("users")),
+  }).index("by_key", ["key"]),
+
+  blacklist: defineTable({
+    phoneNumber: v.string(),
+    reason: v.string(),
+    addedBy: v.id("users"),
+    addedAt: v.number(),
+  }).index("by_phone", ["phoneNumber"]),
 });

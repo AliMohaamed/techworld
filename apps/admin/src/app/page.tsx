@@ -1,7 +1,7 @@
 export default function AdminHomePage() {
   return (
     <main className="space-y-6">
-      <section className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#0b0b0b] px-8 py-10">
+      <section className="rounded-[28px] border border-white/5 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#24201a] px-8 py-10">
         <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">
           Foundational Phase
         </p>
@@ -20,7 +20,7 @@ export default function AdminHomePage() {
         ].map((item) => (
           <div
             key={item}
-            className="rounded-[24px] border border-white/10 bg-[#0b0b0b] p-6 text-sm text-zinc-300"
+            className="rounded-[24px] border border-white/5 bg-[#24201a] p-6 text-sm text-zinc-300"
           >
             {item}
           </div>

@@ -18,7 +18,7 @@ export default function OrdersPage() {
 
   return (
     <main className="space-y-6">
-      <section className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#0b0b0b] px-8 py-10">
+      <section className="rounded-[28px] border border-white/5 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#24201a] px-8 py-10">
         <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">
           User Story 1
         </p>
@@ -30,8 +30,8 @@ export default function OrdersPage() {
         </p>
       </section>
 
-      <section className="overflow-hidden rounded-[24px] border border-white/10 bg-[#0b0b0b]">
-        <div className="border-b border-white/10 px-6 py-4">
+      <section className="overflow-hidden rounded-[24px] border border-white/5 bg-[#24201a]">
+        <div className="border-b border-white/5 px-6 py-4">
           <h2 className="text-lg font-semibold text-white">Pending Orders</h2>
         </div>
 
@@ -50,9 +50,9 @@ export default function OrdersPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm text-zinc-300">
-              <thead className="bg-black/30 text-[11px] uppercase tracking-[0.25em] text-zinc-500">
+              <thead className="bg-[#2a261f] text-[11px] uppercase tracking-[0.25em] text-zinc-500 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50">
                 <tr>
-                  <th className="sticky left-0 bg-[#0b0b0b] px-6 py-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Customer</th>
+                  <th className="sticky left-0 bg-[#24201a] px-6 py-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Customer</th>
                   <th className="px-6 py-4">Product</th>
                   <th className="px-6 py-4">Quantity</th>
                   <th className="px-6 py-4">Total</th>
@@ -63,7 +63,7 @@ export default function OrdersPage() {
               <tbody>
                 {visibleOrders.map((order) => (
                   <tr key={order._id} className="border-t border-white/5">
-                    <td className="sticky left-0 bg-[#0b0b0b] px-6 py-4 max-lg:py-5 align-top z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                    <td className="sticky left-0 bg-[#24201a] px-6 py-4 max-lg:py-5 align-top z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                       <div className="font-medium text-white">{order.customerName ?? "Walk-in customer"}</div>
                       <div className="mt-1 text-xs text-zinc-500">{order.customerPhone ?? "No phone"}</div>
                     </td>

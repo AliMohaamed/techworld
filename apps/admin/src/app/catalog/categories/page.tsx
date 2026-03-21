@@ -51,7 +51,7 @@ export default function AdminCategoriesPage() {
 
   return (
     <main className="space-y-6">
-      <section className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#0b0b0b] px-8 py-8">
+      <section className="rounded-[28px] border border-white/5 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#24201a] px-8 py-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">Catalog</p>
@@ -68,13 +68,13 @@ export default function AdminCategoriesPage() {
         </div>
       </section>
 
-      <section className="rounded-[24px] border border-white/10 bg-[#0b0b0b] p-6">
+      <section className="rounded-[24px] border border-white/5 bg-[#24201a] p-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Data Table</p>
             <h2 className="mt-2 text-xl font-semibold text-white">All categories</h2>
           </div>
-          <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300">
+          <span className="rounded-full border border-white/5 px-3 py-1 text-xs text-zinc-300">
             {categories ? `${categories.length} total` : "Loading..."}
           </span>
         </div>
@@ -83,7 +83,7 @@ export default function AdminCategoriesPage() {
           <table className="min-w-full text-left text-sm text-zinc-300">
             <thead className="text-xs uppercase tracking-[0.2em] text-zinc-500">
               <tr>
-                <th className="sticky left-0 bg-[#0b0b0b] pb-3 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Name</th>
+                <th className="sticky left-0 bg-[#24201a] pb-3 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Name</th>
                 <th className="pb-3 pr-4">Slug</th>
                 <th className="pb-3 pr-4">Products</th>
                 <th className="pb-3 pr-4">Status</th>
@@ -92,8 +92,8 @@ export default function AdminCategoriesPage() {
             </thead>
             <tbody>
               {categories?.map((category) => (
-                <tr key={category._id} className="border-t border-white/10 align-top">
-                  <td className="sticky left-0 bg-[#0b0b0b] py-4 max-lg:py-5 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                <tr key={category._id} className="border-t border-white/5 align-top">
+                  <td className="sticky left-0 bg-[#24201a] py-4 max-lg:py-5 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                     <p className="font-medium text-white">{category.name_en}</p>
                     <p className="text-xs text-zinc-500" dir="rtl">{category.name_ar}</p>
                   </td>

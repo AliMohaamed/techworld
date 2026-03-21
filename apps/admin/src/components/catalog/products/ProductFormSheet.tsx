@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Plus, Trash2, TrendingUp } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
-import { Button } from "@techworld/ui/button";
+import { Button, Input, Label, Select, Switch, Textarea, cn } from "@techworld/ui";
 import { ConvexStorageUpload } from "./ConvexStorageUpload";
 import { productSchema, type ProductFormSubmitValues, type ProductFormValues } from "./product-zod-schemas";
 
@@ -194,8 +194,8 @@ export function ProductFormSheet({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-[2px]">
-      <div className="absolute inset-x-0 bottom-0 top-6 w-full overflow-y-auto rounded-t-[32px] border border-white/10 bg-[#0b0b0b] p-4 shadow-2xl shadow-black/40 sm:inset-y-0 sm:left-auto sm:right-0 sm:max-w-4xl sm:rounded-none sm:border-l sm:border-t-0 sm:p-6">
-        <div className="sticky top-0 z-10 -mx-4 mb-6 flex items-start justify-between gap-4 border-b border-white/10 bg-[#0b0b0b]/95 px-4 pb-4 pt-1 backdrop-blur sm:static sm:mx-0 sm:border-b-0 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-0">
+      <div className="absolute inset-x-0 bottom-0 top-6 w-full overflow-y-auto rounded-t-[32px] border border-white/5 bg-[#24201a] p-4 shadow-2xl shadow-black/40 sm:inset-y-0 sm:left-auto sm:right-0 sm:max-w-4xl sm:rounded-none sm:border-l sm:border-t-0 sm:p-6">
+        <div className="sticky top-0 z-10 -mx-4 mb-6 flex items-start justify-between gap-4 border-b border-white/5 bg-[#24201a]/95 px-4 pb-4 pt-1 backdrop-blur sm:static sm:mx-0 sm:border-b-0 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-0">
           <div>
             <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Product Sheet</p>
             <h2 className="mt-2 text-xl font-semibold text-white sm:text-2xl">
@@ -208,42 +208,42 @@ export function ProductFormSheet({
         <form className="space-y-8 pb-24 sm:pb-8" onSubmit={(event) => void submit(event)}>
           <section className="grid gap-4 md:grid-cols-2">
             <Field label="Category" error={errors.categoryId?.message}>
-              <select className="field" {...register("categoryId")}>
+              <Select {...register("categoryId")}>
                 <option value="">Select category</option>
                 {categories.map((category) => (
                   <option key={category._id} value={category._id}>{category.name_en}</option>
                 ))}
-              </select>
+              </Select>
             </Field>
             <Field label="Status" error={errors.status?.message}>
-              <select className="field" {...register("status")}>
+              <Select {...register("status")}>
                 <option value="DRAFT">Draft</option>
                 <option value="PUBLISHED">Published</option>
-              </select>
+              </Select>
             </Field>
             <Field label="English name" error={errors.name_en?.message}>
-              <input className="field" {...register("name_en")} />
+              <Input {...register("name_en")} placeholder="e.g. Ultra HD Pro Watch" />
             </Field>
             <Field label="Arabic name" error={errors.name_ar?.message}>
-              <input className="field" dir="rtl" {...register("name_ar")} />
+              <Input dir="rtl" {...register("name_ar")} placeholder="e.g. ساعة ألترا أتش دي برو" />
             </Field>
             <Field label="Slug" error={errors.slug?.message}>
-              <input className="field" {...register("slug")} />
+              <Input {...register("slug")} placeholder="ultra-hd-pro-watch" />
             </Field>
             <Field label="Selling price" error={errors.selling_price?.message}>
-              <input className="field" type="number" step="0.01" {...register("selling_price")} />
+              <Input type="number" step="0.01" {...register("selling_price")} placeholder="0.00" />
             </Field>
             <Field label="Compare-at price" error={errors.compareAtPrice?.message?.toString()}>
-              <input className="field" type="number" step="0.01" {...register("compareAtPrice")} />
+              <Input type="number" step="0.01" {...register("compareAtPrice")} placeholder="0.00" />
             </Field>
             <Field label="COGS" error={errors.cogs?.message?.toString()}>
-              <input className="field" type="number" step="0.01" {...register("cogs")} />
+              <Input type="number" step="0.01" {...register("cogs")} placeholder="0.00" />
             </Field>
             <Field label="English description" error={errors.description_en?.message} className="md:col-span-2">
-              <textarea className="field min-h-24" {...register("description_en")} />
+              <Textarea {...register("description_en")} placeholder="Product features and overview..." />
             </Field>
             <Field label="Arabic description" error={errors.description_ar?.message} className="md:col-span-2">
-              <textarea className="field min-h-24" dir="rtl" {...register("description_ar")} />
+              <Textarea dir="rtl" {...register("description_ar")} placeholder="مميزات المنتج ونظرة عامة..." />
             </Field>
           </section>
 
@@ -262,12 +262,12 @@ export function ProductFormSheet({
               }}
             />
             <Field label="Primary thumbnail storage ID" error={errors.thumbnail?.message}>
-              <select className="field" {...register("thumbnail")}>
+              <Select {...register("thumbnail")}>
                 <option value="">Select primary image</option>
                 {images.map((imageId) => (
                   <option key={imageId} value={imageId}>{imageId}</option>
                 ))}
-              </select>
+              </Select>
             </Field>
           </section>
 
@@ -295,7 +295,7 @@ export function ProductFormSheet({
             </div>
             <div className="space-y-4">
               {fields.map((field, index) => (
-                <div key={field.id} className="rounded-[24px] border border-white/10 bg-black/30 p-5">
+                <div key={field.id} className="rounded-[24px] border border-white/10 bg-[#2a261f] p-5 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50">
                   <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-sm font-medium text-white">Variant {index + 1}</p>
                     {fields.length > 1 ? (
@@ -307,22 +307,22 @@ export function ProductFormSheet({
                   </div>
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                     <Field label="Variant name" error={errors.variants?.[index]?.variantName?.message}>
-                      <input className="field" {...register(`variants.${index}.variantName`)} />
+                      <Input {...register(`variants.${index}.variantName`)} placeholder="Default" />
                     </Field>
                     <Field label="Color" error={errors.variants?.[index]?.color?.message}>
-                      <input className="field" {...register(`variants.${index}.color`)} />
+                      <Input {...register(`variants.${index}.color`)} placeholder="e.g. Midnight Black" />
                     </Field>
                     <Field label="Size" error={errors.variants?.[index]?.size?.message}>
-                      <input className="field" {...register(`variants.${index}.size`)} />
+                      <Input {...register(`variants.${index}.size`)} placeholder="e.g. XL or 44mm" />
                     </Field>
                     <Field label="Type" error={errors.variants?.[index]?.type?.message}>
-                      <input className="field" {...register(`variants.${index}.type`)} />
+                      <Input {...register(`variants.${index}.type`)} placeholder="e.g. Leather or Mesh" />
                     </Field>
                     <Field label="Real stock" error={errors.variants?.[index]?.real_stock?.message}>
                       <div className="flex gap-2">
-                        <input className="field" type="number" {...register(`variants.${index}.real_stock`)} />
+                        <Input type="number" {...register(`variants.${index}.real_stock`)} placeholder="0" />
                         <Button
-                          className="h-11 px-3 border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white"
+                          className="h-12 w-12 border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white shrink-0"
                           type="button"
                           variant="outline"
                           onClick={() => void handleRestock(index)}
@@ -333,21 +333,21 @@ export function ProductFormSheet({
                       </div>
                     </Field>
                     <Field label="Display stock" error={errors.variants?.[index]?.display_stock?.message}>
-                      <input className="field" type="number" {...register(`variants.${index}.display_stock`)} />
+                      <Input type="number" {...register(`variants.${index}.display_stock`)} placeholder="0" />
                     </Field>
                     <Field label="Variant price" error={errors.variants?.[index]?.price?.message}>
-                      <input className="field" type="number" step="0.01" {...register(`variants.${index}.price`)} />
+                      <Input type="number" step="0.01" {...register(`variants.${index}.price`)} placeholder="0.00" />
                     </Field>
                     <Field label="Variant compare-at" error={errors.variants?.[index]?.compareAtPrice?.message?.toString()}>
-                      <input className="field" type="number" step="0.01" {...register(`variants.${index}.compareAtPrice`)} />
+                      <Input type="number" step="0.01" {...register(`variants.${index}.compareAtPrice`)} placeholder="0.00" />
                     </Field>
                     <Field label="Linked image" error={errors.variants?.[index]?.linkedImageId?.message}>
-                      <select className="field" {...register(`variants.${index}.linkedImageId`)}>
+                      <Select {...register(`variants.${index}.linkedImageId`)}>
                         <option value="">No linked image</option>
                         {images.map((imageId) => (
                           <option key={imageId} value={imageId}>{imageId}</option>
                         ))}
-                      </select>
+                      </Select>
                     </Field>
                   </div>
                 </div>
@@ -355,7 +355,7 @@ export function ProductFormSheet({
             </div>
           </section>
 
-          <div className="sticky bottom-0 -mx-4 flex flex-col gap-3 border-t border-white/10 bg-[#0b0b0b]/95 px-4 pb-2 pt-4 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:border-t-0 sm:bg-transparent sm:px-0 sm:pb-0">
+          <div className="sticky bottom-0 -mx-4 flex flex-col gap-3 border-t border-white/5 bg-[#24201a]/95 px-4 pb-2 pt-4 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:border-t-0 sm:bg-transparent sm:px-0 sm:pb-0">
             <Button className="w-full sm:w-auto" disabled={isSubmitting} type="submit">
               {isSubmitting ? "Saving..." : product ? "Update Product" : "Create Product"}
             </Button>
@@ -379,11 +379,15 @@ function Field({
   className?: string;
 }) {
   return (
-    <label className={`block space-y-2 text-sm text-zinc-200 ${className ?? ""}`}>
-      <span>{label}</span>
+    <div className={cn("space-y-2", className)}>
+      <Label>{label}</Label>
       {children}
-      {error ? <p className="text-xs text-red-400">{error}</p> : null}
-    </label>
+      {error && (
+        <p className="px-1 text-xs font-medium text-red-400 animate-in fade-in slide-in-from-top-1 duration-200">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }
 

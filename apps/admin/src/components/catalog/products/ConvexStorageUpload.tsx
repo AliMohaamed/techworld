@@ -55,8 +55,8 @@ export function ConvexStorageUpload({
   };
 
   return (
-    <div className="space-y-3 rounded-[20px] border border-white/10 bg-black/30 p-4">
-      <label className="block cursor-pointer rounded-2xl border border-dashed border-white/10 px-4 py-6 text-center text-sm text-zinc-400 hover:border-white/20 transition-colors">
+    <div className="space-y-3 rounded-[20px] border border-white/10 bg-[#2a261f] p-4 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50">
+      <label className="block cursor-pointer rounded-2xl border border-dashed border-white/5 px-4 py-6 text-center text-sm text-zinc-400 hover:border-white/20 transition-colors">
         <input
           accept="image/*"
           className="hidden"
@@ -78,7 +78,7 @@ export function ConvexStorageUpload({
             return (
               <div
                 key={imageId}
-                className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-zinc-900"
+                className="group relative aspect-square overflow-hidden rounded-2xl border border-white/5 bg-zinc-900"
               >
                 {/* Image preview */}
                 {previewUrl ? (

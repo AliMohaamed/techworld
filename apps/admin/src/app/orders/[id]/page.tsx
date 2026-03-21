@@ -108,7 +108,7 @@ export default function OrderDetailsPage() {
       </Link>
 
       <section className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-        <div className="space-y-6 rounded-[28px] border border-white/10 bg-[#0b0b0b] p-8">
+        <div className="space-y-6 rounded-[28px] border border-white/5 bg-[#24201a] p-8">
           <div>
             <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">Order Review</p>
             <h1 className="mt-3 text-3xl font-semibold uppercase tracking-tight text-white">
@@ -126,7 +126,7 @@ export default function OrderDetailsPage() {
             <InfoCard label="Total Revenue" value={formatFinancialValue(order.financials.total_revenue)} />
           </div>
 
-          <div className="rounded-[24px] border border-white/10 bg-black/30 p-6">
+          <div className="rounded-[24px] border border-white/10 bg-[#2a261f] p-6 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50">
             <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Product</p>
             <h2 className="mt-3 text-xl font-semibold text-white">{order.product?.name_en ?? "Unknown product"}</h2>
             <div className="mt-4 grid gap-3 text-sm text-zinc-400 md:grid-cols-3">
@@ -136,7 +136,7 @@ export default function OrderDetailsPage() {
             </div>
           </div>
 
-          <div className="rounded-[24px] border border-white/10 bg-black/30 p-6">
+          <div className="rounded-[24px] border border-white/10 bg-[#2a261f] p-6 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Financial Visibility</p>
@@ -165,7 +165,7 @@ export default function OrderDetailsPage() {
           </div>
         </div>
 
-        <div className="space-y-6 rounded-[28px] border border-white/10 bg-[#0b0b0b] p-8">
+        <div className="space-y-6 rounded-[28px] border border-white/5 bg-[#24201a] p-8">
           <div>
             <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Receipt Proof</p>
             {order.receiptUrl ? (
@@ -214,7 +214,7 @@ export default function OrderDetailsPage() {
 
       {isModalOpen ? (
         <div className="fixed inset-0 z-50 bg-black/70 px-6 py-10">
-          <div className="mx-auto max-w-xl rounded-[28px] border border-white/10 bg-[#101010] p-8 shadow-2xl shadow-black/40">
+          <div className="mx-auto max-w-xl rounded-[28px] border border-white/5 bg-[#24201a] p-8 shadow-2xl shadow-black/40">
             <div className="space-y-3">
               <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">Manual Fallback</p>
               <h2 className="text-2xl font-semibold uppercase tracking-tight text-white">Upload receipt and confirm</h2>
@@ -223,7 +223,7 @@ export default function OrderDetailsPage() {
               </p>
             </div>
 
-            <label className="mt-6 block rounded-[24px] border border-dashed border-white/10 bg-black/30 px-5 py-8 text-center text-sm text-zinc-400">
+            <label className="mt-6 block rounded-[24px] border border-dashed border-white/10 bg-[#2a261f] px-5 py-8 text-center text-sm text-zinc-400 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50">
               <input
                 accept="image/*"
                 className="hidden"
@@ -253,7 +253,7 @@ export default function OrderDetailsPage() {
 
 function InfoCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[20px] border border-white/10 bg-black/30 p-5">
+    <div className="rounded-[20px] border border-white/10 bg-[#2a261f] p-5 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50">
       <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">{label}</p>
       <p className="mt-3 text-sm leading-6 text-white">{value}</p>
     </div>

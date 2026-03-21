@@ -5,6 +5,14 @@
 **Status**: Draft  
 **Input**: Phase 9 - Analytics, Intelligence & System Settings
 
+## Clarifications
+
+### Session 2026-03-21
+
+- Q: When a blacklisted user attempts to check out, should the system provide an explicit UI error blocking the submission, or should it silently accept the order and transition it to FLAGGED_FRAUD? → A: Option B - Silent Flagging (Allow checkout to succeed but immediately move the order to FLAGGED_FRAUD).
+- Q: Given database pagination and query limits, how should the Analytics Dashboard aggregate performance data across potentially tens of thousands of historical orders? → A: Option A - Real-Time Bounded Queries (Calculate metrics on-the-fly, but restrict the dashboard to defined time windows using index ranges).
+- Q: If a customer is actively browsing or is mid-checkout when Maintenance Mode is toggled ON, what should happen? → A: Option B - Immediate Interruption via WebSockets (Instantly show an overlay/redirect forcing the Maintenance state).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Analytics & Intelligence Dashboard (Priority: P1)
@@ -32,8 +40,8 @@ As a Super Admin, I want to manage global application toggles and block maliciou
 
 **Acceptance Scenarios**:
 
-1. **Given** a customer attempting checkout, **When** they enter a phone number present in the `blacklist` table, **Then** the system automatically transitions their order to a flagged/quarantined state or blocks the checkout entirely.
-2. **Given** a Super Admin navigating to the Settings view, **When** they toggle "Maintenance Mode" or "COD Enabled" in the `system_configs`, **Then** the storefront immediately respects this state for all subsequent user sessions.
+1. **Given** a customer attempting checkout, **When** they enter a phone number present in the `blacklist` table, **Then** the system silently accepts the checkout on the frontend but automatically transitions the backend order directly to the `FLAGGED_FRAUD` state without notifying the malicious user.
+2. **Given** a Super Admin navigating to the Settings view, **When** they toggle "Maintenance Mode" in the `system_configs`, **Then** the storefront immediately intercepts all active user sessions globally via Convex WebSockets, instantly forcing a redirect or overlay that halts mid-checkout processes.
 
 ---
 
@@ -53,7 +61,6 @@ As a Super Admin, I want to view a comprehensive ledger of all critical system a
 ### Edge Cases
 
 - **Concurrent Config Updates**: What happens if two admins try to update the `system_configs` at the exact same millisecond? Convex's atomic transaction guarantees should serialize these updates.
-- **Historic RTO vs Live Data**: How do we efficiently calculate the RTO rate if the number of historic orders is massive?
 - **Mass Blacklisting**: How does the system handle an admin attempting to blacklist hundreds of numbers at once?
 
 ## Requirements *(mandatory)*
@@ -61,8 +68,8 @@ As a Super Admin, I want to view a comprehensive ledger of all critical system a
 ### Functional & Technical Specifications
 
 - **FR-001**: **Analytics Dashboard Queries (Convex)**
-  - Define aggregations for:
-    - *Total Orders*: Count of orders (filtered by time range).
+  - Define aggregations for top-level KPIs, ensuring performance horizontally by forcing the UI and backend to only process **bounded time windows** via indexed ranges (e.g., Today, Last 7 Days, Last 30 Days) rather than all-time calculations:
+    - *Total Orders*: Count of orders within the selected time range.
     - *Net Profit*: `Sum(Net Revenue) - Sum(Snapshot COGS)` across DELIVERED orders.
     - *RTO Rate*: `(Total RTO Orders / Total Shipped Orders) * 100`.
     - *Courier Fees*: Sum of `applied_shipping_fee` on shipped/delivered orders.
@@ -81,7 +88,7 @@ As a Super Admin, I want to view a comprehensive ledger of all critical system a
 
 - **FR-004**: **Blacklist Schema & Logic**
   - Define a `blacklist` table mapping phone numbers to block reasons and timestamps.
-  - Integrate a check into the checkout validation mutation: if the user's phone number exists in the `blacklist`, immediately flag or block the transaction.
+  - Integrate a check into the checkout validation mutation: if the user's phone number exists in the `blacklist`, the backend should silently allow the frontend checkout to succeed, but immediately transition the order to `FLAGGED_FRAUD` to avoid alerting the bad actor.
 
 - **FR-005**: **Audit Logs Viewer**
   - Expose a read-only Convex query for the existing `audit_logs` table (filtering by actor, action type, date range).

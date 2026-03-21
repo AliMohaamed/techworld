@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQuery } from "convex/react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Button } from "@techworld/ui/button";
+import { Button, Input, Label, Switch, cn } from "@techworld/ui";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 
@@ -119,7 +119,7 @@ export default function GovernoratesSettingsPage() {
 
   return (
     <main className="space-y-6">
-      <section className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#0b0b0b] px-8 py-8">
+      <section className="rounded-[28px] border border-white/5 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#24201a] px-8 py-8">
         <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">Operations</p>
         <h1 className="mt-3 text-4xl font-semibold uppercase tracking-tight text-white">
           Governorate Shipping Fees
@@ -130,7 +130,7 @@ export default function GovernoratesSettingsPage() {
       </section>
 
       <section className="grid gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1fr,1.6fr]">
-        <form className="rounded-[24px] border border-white/10 bg-[#0b0b0b] p-6" onSubmit={submit}>
+        <form className="rounded-[24px] border border-white/5 bg-[#24201a] p-6" onSubmit={submit}>
           <div className="mb-6 flex items-center justify-between gap-3">
             <div>
               <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">
@@ -156,19 +156,21 @@ export default function GovernoratesSettingsPage() {
 
           <div className="space-y-4 text-sm text-zinc-200">
             <FormField label="English name" error={errors.name_en?.message}>
-              <input className="field" {...register("name_en")} />
+              <Input {...register("name_en")} placeholder="e.g. Cairo" />
             </FormField>
             <FormField label="Arabic name" error={errors.name_ar?.message}>
-              <input className="field" dir="rtl" {...register("name_ar")} />
+              <Input dir="rtl" {...register("name_ar")} placeholder="e.g. القاهرة" />
             </FormField>
             <FormField label="Shipping fee (EGP)" error={errors.shippingFee?.message}>
-              <input className="field" step="0.01" type="number" {...register("shippingFee")} />
+              <Input step="0.01" type="number" {...register("shippingFee")} placeholder="0.00" />
             </FormField>
             {!editingId ? (
-              <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-zinc-300">
-                <input type="checkbox" {...register("isActive")} />
-                Start this governorate as active
-              </label>
+              <div className="pt-2">
+                <Switch
+                  label="Start this governorate as active"
+                  {...register("isActive")}
+                />
+              </div>
             ) : null}
           </div>
 
@@ -179,13 +181,13 @@ export default function GovernoratesSettingsPage() {
           </div>
         </form>
 
-        <section className="rounded-[24px] border border-white/10 bg-[#0b0b0b] p-6">
+        <section className="rounded-[24px] border border-white/5 bg-[#24201a] p-6">
           <div className="mb-6 flex items-center justify-between">
             <div>
               <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Data Table</p>
               <h2 className="mt-2 text-xl font-semibold text-white">All governorates</h2>
             </div>
-            <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300">
+            <span className="rounded-full border border-white/5 px-3 py-1 text-xs text-zinc-300">
               {governorates ? `${governorates.length} total` : "Loading..."}
             </span>
           </div>
@@ -194,7 +196,7 @@ export default function GovernoratesSettingsPage() {
             <table className="min-w-full text-left text-sm text-zinc-300">
               <thead className="text-xs uppercase tracking-[0.2em] text-zinc-500">
                 <tr>
-                  <th className="sticky left-0 bg-[#0b0b0b] pb-3 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Name</th>
+                  <th className="sticky left-0 bg-[#24201a] pb-3 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Name</th>
                   <th className="pb-3 pr-4">Fee</th>
                   <th className="pb-3 pr-4">Status</th>
                   <th className="pb-3">Actions</th>
@@ -202,8 +204,8 @@ export default function GovernoratesSettingsPage() {
               </thead>
               <tbody>
                 {governorates?.map((governorate) => (
-                  <tr key={governorate._id} className="border-t border-white/10 align-top">
-                    <td className="sticky left-0 bg-[#0b0b0b] py-4 max-lg:py-5 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                  <tr key={governorate._id} className="border-t border-white/5 align-top">
+                    <td className="sticky left-0 bg-[#24201a] py-4 max-lg:py-5 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                       <p className="font-medium text-white">{governorate.name_en}</p>
                       <p className="text-xs text-zinc-500" dir="rtl">{governorate.name_ar}</p>
                     </td>
@@ -267,11 +269,15 @@ function FormField({
   children: React.ReactNode;
 }) {
   return (
-    <label className="block space-y-2">
-      <span>{label}</span>
+    <div className="space-y-2">
+      <Label>{label}</Label>
       {children}
-      {error ? <p className="text-xs text-red-400">{error}</p> : null}
-    </label>
+      {error && (
+        <p className="px-1 text-xs font-medium text-red-400 animate-in fade-in slide-in-from-top-1 duration-200">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }
 
