@@ -40,7 +40,7 @@ export function PromoCodeInput({
 
   if (appliedCode && !error) {
     return (
-      <div className="group relative flex items-center justify-between rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5 transition-all hover:border-emerald-500/40 shadow-inner">
+      <div className="group relative flex items-center justify-between rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5 transition-all hover:border-emerald-500/40  ">
         <div className="flex items-center gap-4">
           <div className="rounded-xl bg-emerald-500/10 p-2.5 text-emerald-500 shadow-sm">
             <CheckCircle2 size={20} />
@@ -78,8 +78,8 @@ export function PromoCodeInput({
             type="text"
             placeholder={placeholder}
             className={cn(
-               "w-full rounded-2xl border border-white/5 bg-zinc-900/50 py-5 ltr:pl-14 rtl:pr-14 ltr:pr-5 rtl:pl-5 font-mono text-sm font-black tracking-widest text-white uppercase placeholder:text-zinc-700 focus:border-[#ffc105]/30 focus:outline-none transition-all shadow-inner",
-               error && "border-red-500/30 focus:border-red-500/50"
+              "w-full rounded-2xl border border-white/5 bg-zinc-900/50 py-5 ltr:pl-14 rtl:pr-14 ltr:pr-5 rtl:pl-5 font-mono text-sm font-black tracking-widest text-white uppercase placeholder:text-zinc-700 focus:border-[#ffc105]/30 focus:outline-none transition-all  ",
+              error && "border-red-500/30 focus:border-red-500/50"
             )}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
@@ -94,7 +94,7 @@ export function PromoCodeInput({
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : applyLabel}
         </Button>
       </div>
-      
+
       {error && (
         <div className="flex items-center gap-3 rounded-xl bg-red-500/5 border border-red-500/20 p-4 text-red-400 animate-in slide-in-from-top-2 duration-300">
           <AlertCircle size={16} />

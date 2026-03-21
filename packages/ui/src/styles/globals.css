@@ -52,7 +52,7 @@
 }
 
 .dark {
-  --background: oklch(0.129 0 0); /* #050505 deep charcoal */
+  --background: #1a1814;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.18 0 0); /* #111111 surface */
   --card-foreground: oklch(0.985 0 0);

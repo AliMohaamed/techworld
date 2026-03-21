@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "convex/react";
 import { UploadCloud, X } from "lucide-react";
 import Image from "next/image";
 import { api } from "@backend/convex/_generated/api";
+import { cn } from "@techworld/ui";
 
 export function ConvexStorageUpload({
   imageIds,
@@ -55,8 +56,8 @@ export function ConvexStorageUpload({
   };
 
   return (
-    <div className="space-y-3 rounded-[20px] border border-white/10 bg-[#2a261f] p-4 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50">
-      <label className="block cursor-pointer rounded-2xl border border-dashed border-white/5 px-4 py-6 text-center text-sm text-zinc-400 hover:border-white/20 transition-colors">
+    <div className="space-y-4 rounded-3xl border border-border bg-card p-6 shadow-sm transition-all focus-within:ring-2 focus-within:ring-[#ffc105]/20 focus-within:border-[#ffc105]/40">
+      <label className="block cursor-pointer rounded-2xl border-2 border-dashed border-border/60 bg-accent/20 px-6 py-10 text-center transition-all hover:border-[#ffc105]/30 hover:bg-[#ffc105]/5 group">
         <input
           accept="image/*"
           className="hidden"
@@ -64,21 +65,27 @@ export function ConvexStorageUpload({
           onChange={(event) => void handleFiles(event.target.files)}
           type="file"
         />
-        <span className="flex items-center justify-center gap-2 text-white">
-          <UploadCloud size={16} />
-          {isUploading ? "Uploading images..." : "Upload product images"}
-        </span>
-        <span className="mt-2 block text-xs text-zinc-500">Files are stored directly in Convex Storage.</span>
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-12 w-12 rounded-2xl bg-[#ffc105]/10 flex items-center justify-center text-[#ffc105] shadow-sm transform transition-transform group-hover:scale-110 group-hover:rotate-3">
+            <UploadCloud size={24} />
+          </div>
+          <span className="text-sm font-black uppercase tracking-widest text-foreground group-hover:text-[#ffc105] transition-colors">
+            {isUploading ? "Uploading images..." : "Upload product images"}
+          </span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/30">
+            JPG, PNG, WebP • Convex Edge Storage
+          </span>
+        </div>
       </label>
 
       {imageIds.length > 0 ? (
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+        <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 pt-2">
           {imageIds.map((imageId, index) => {
             const previewUrl = storageUrls?.[imageId];
             return (
               <div
                 key={imageId}
-                className="group relative aspect-square overflow-hidden rounded-2xl border border-white/5 bg-zinc-900"
+                className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-accent   transition-all hover:scale-105 hover:shadow-xl hover:border-[#ffc105]/30"
               >
                 {/* Image preview */}
                 {previewUrl ? (
@@ -86,18 +93,18 @@ export function ConvexStorageUpload({
                     src={previewUrl}
                     alt={`Uploaded image ${index + 1}`}
                     fill
-                    className="object-cover transition-opacity duration-200"
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
                     sizes="120px"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-zinc-700">
-                    <UploadCloud size={18} />
+                  <div className="flex h-full w-full items-center justify-center text-muted-foreground/10">
+                    <UploadCloud size={20} className="animate-pulse" />
                   </div>
                 )}
 
                 {/* Primary badge */}
                 {index === 0 ? (
-                  <div className="absolute left-1 top-1 rounded-full bg-[#ffc105] px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-black">
+                  <div className="absolute left-1.5 top-1.5 rounded-full bg-[#ffc105] px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-black  ">
                     Primary
                   </div>
                 ) : null}
@@ -105,11 +112,13 @@ export function ConvexStorageUpload({
                 {/* Remove button */}
                 <button
                   type="button"
-                  onClick={() => onChange(imageIds.filter((id) => id !== imageId))}
-                  className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                  onClick={() =>
+                    onChange(imageIds.filter((id) => id !== imageId))
+                  }
+                  className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-lg bg-destructive text-destructive-foreground opacity-0 transition-all hover:scale-110 group-hover:opacity-100  "
                   aria-label="Remove image"
                 >
-                  <X size={10} />
+                  <X size={12} strokeWidth={3} />
                 </button>
               </div>
             );

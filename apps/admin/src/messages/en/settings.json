@@ -69,6 +69,56 @@
         "title": "Access Denied",
         "message": "Your account requires the {permission} permission to access the audit trail. Please contact a Super Admin for authorization."
       }
+    },
+    "governorates": {
+      "badge": "Operations",
+      "title": "Governorate Shipping Fees",
+      "description": "Configure live delivery fees by governorate, toggle availability instantly, and keep the checkout pricing source under Super Admin control.",
+      "form": {
+        "new": "New Governorate",
+        "edit": "Edit Governorate",
+        "createTitle": "Create shipping profile",
+        "updateTitle": "Update shipping profile",
+        "nameEn": "English name",
+        "nameAr": "Arabic name",
+        "fee": "Shipping fee (EGP)",
+        "activeLabel": "Start this governorate as active",
+        "submitCreate": "Create Governorate",
+        "submitUpdate": "Update Governorate",
+        "saving": "Saving...",
+        "reset": "Reset"
+      },
+      "table": {
+        "badge": "Data Table",
+        "title": "All governorates",
+        "total": "{count} total",
+        "loading": "Loading...",
+        "columns": {
+          "name": "Name",
+          "fee": "Fee",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "actions": {
+          "edit": "Edit",
+          "activate": "Activate",
+          "deactivate": "Deactivate",
+          "updating": "Updating..."
+        },
+        "empty": "No governorates yet."
+      },
+      "messages": {
+        "created": "Governorate created.",
+        "updated": "Governorate updated.",
+        "activated": "Governorate activated.",
+        "deactivated": "Governorate deactivated.",
+        "updateFailed": "Governorate update failed.",
+        "statusFailed": "Status update failed."
+      }
     }
   }
 }

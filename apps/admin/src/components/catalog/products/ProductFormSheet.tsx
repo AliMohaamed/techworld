@@ -4,7 +4,16 @@ import { useEffect } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useMutation } from "convex/react";
 import { toast } from "sonner";
-import { Plus, Trash2, TrendingUp } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  TrendingUp,
+  Sparkles,
+  Box,
+  Info,
+  Image as ImageIcon,
+  Layers,
+} from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import {
@@ -21,7 +30,11 @@ import {
   SheetDescription,
 } from "@techworld/ui";
 import { ConvexStorageUpload } from "./ConvexStorageUpload";
-import { productSchema, type ProductFormSubmitValues, type ProductFormValues } from "./product-zod-schemas";
+import {
+  productSchema,
+  type ProductFormSubmitValues,
+  type ProductFormValues,
+} from "./product-zod-schemas";
 import { useTranslations } from "next-intl";
 
 type CategoryOption = {
@@ -98,7 +111,7 @@ export function ProductFormSheet({
   product: ProductRecord | null;
   onSaved: (label: string) => void;
 }) {
-  const t = useTranslations('Catalog.products');
+  const t = useTranslations("Catalog.products");
   const createAdvancedProduct = useMutation(api.products.createAdvancedProduct);
   const updateAdvancedProduct = useMutation(api.products.updateAdvancedProduct);
   const restockItem = useMutation(api.skus.restockItem);
@@ -109,35 +122,50 @@ export function ProductFormSheet({
     getValues,
     setValue,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormValues>({
     defaultValues: emptyValues,
   });
-  const { fields, append, remove } = useFieldArray({ control, name: "variants" });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "variants",
+  });
   const images = useWatch({ control, name: "images" }) ?? [];
 
   const handleRestock = async (index: number) => {
     const variant = getValues(`variants.${index}`);
     if (!variant.id) {
-      toast.error(t('messages.saveFirst'));
+      toast.error(t("messages.saveFirst"));
       return;
     }
 
-    const amount = prompt(t('messages.restockPrompt', { name: variant.variantName }), "0");
+    const amount = prompt(
+      t("messages.restockPrompt", { name: variant.variantName }),
+      "0",
+    );
     const quantity = parseInt(amount || "0", 10);
 
     if (isNaN(quantity) || quantity <= 0) {
-      if (amount !== null) toast.error(t('messages.restockInvalid'));
+      if (amount !== null) toast.error(t("messages.restockInvalid"));
       return;
     }
 
     try {
-      const result = await restockItem({ skuId: variant.id as Id<"skus">, quantity });
-      toast.success(t('messages.restockSuccess', { quantity, total: result.real_stock }));
+      const result = await restockItem({
+        skuId: variant.id as Id<"skus">,
+        quantity,
+      });
+      toast.success(
+        t("messages.restockSuccess", { quantity, total: result.real_stock }),
+      );
       // Update form state to reflect new stock
       setValue(`variants.${index}.real_stock`, result.real_stock);
     } catch (error) {
-      toast.error(t('messages.restockFailed'), { description: error instanceof Error ? error.message : t('messages.restockFailed') });
+      toast.error(t("messages.restockFailed"), {
+        description:
+          error instanceof Error ? error.message : t("messages.restockFailed"),
+      });
     }
   };
 
@@ -186,17 +214,19 @@ export function ProductFormSheet({
   const submit = handleSubmit(async (values) => {
     const parsed = productSchema.safeParse(values);
     if (!parsed.success) {
-      throw new Error(parsed.error.issues[0]?.message ?? "Product form is invalid.");
+      throw new Error(
+        parsed.error.issues[0]?.message ?? "Product form is invalid.",
+      );
     }
 
     const payload = buildPayload(parsed.data);
 
     if (product) {
       await updateAdvancedProduct({ id: product._id, ...payload });
-      onSaved(t('messages.updated'));
+      onSaved(t("messages.updated"));
     } else {
       await createAdvancedProduct(payload);
-      onSaved(t('messages.created'));
+      onSaved(t("messages.created"));
     }
 
     onClose();
@@ -204,173 +234,445 @@ export function ProductFormSheet({
 
   return (
     <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <SheetContent side="right" className="sm:max-w-4xl overflow-y-auto p-0 border-l border-white/10 dark:bg-[#0a0a0a]">
-        <SheetHeader className="p-6 pb-0">
-          <SheetTitle className="text-2xl font-bold text-white uppercase tracking-tight">
-            {product ? t('form.editTitle') : t('form.createTitle')}
-          </SheetTitle>
-          <SheetDescription className="text-zinc-500 uppercase tracking-[0.2em] text-[10px]">
-            {t('form.badge')}
-          </SheetDescription>
-        </SheetHeader>
+      <SheetContent
+        side="right"
+        className="sm:max-w-5xl overflow-y-auto p-0 border-l border-border bg-background transition-all"
+      >
+        <div className="flex h-full flex-col relative">
+          {/* Decorative background for light mode */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#ffc105]/5 to-transparent dark:hidden pointer-events-none" />
 
-        <form className="p-6 space-y-8 pb-24" onSubmit={(event) => void submit(event)}>
-          <section className="grid gap-4 md:grid-cols-2">
-            <Field label={t('form.fields.category')} error={errors.categoryId?.message}>
-              <SelectNative {...register("categoryId")}>
-                <option value="">{t('form.placeholders.selectCategory')}</option>
-                {categories.map((category) => (
-                  <option key={category._id} value={category._id}>{category.name_en}</option>
-                ))}
-              </SelectNative>
-            </Field>
-            <Field label={t('form.fields.status')} error={errors.status?.message}>
-              <SelectNative {...register("status")}>
-                <option value="DRAFT">{t('form.statusOptions.draft')}</option>
-                <option value="PUBLISHED">{t('form.statusOptions.published')}</option>
-              </SelectNative>
-            </Field>
-            <Field label={t('form.fields.nameEn')} error={errors.name_en?.message}>
-              <Input {...register("name_en")} placeholder={t('form.placeholders.nameEn')} />
-            </Field>
-            <Field label={t('form.fields.nameAr')} error={errors.name_ar?.message}>
-              <Input dir="rtl" {...register("name_ar")} placeholder={t('form.placeholders.nameAr')} />
-            </Field>
-            <Field label={t('form.fields.slug')} error={errors.slug?.message}>
-              <Input {...register("slug")} placeholder={t('form.placeholders.slug')} />
-            </Field>
-            <Field label={t('form.fields.sellingPrice')} error={errors.selling_price?.message}>
-              <Input type="number" step="0.01" {...register("selling_price")} placeholder="0.00" />
-            </Field>
-            <Field label={t('form.fields.compareAtPrice')} error={errors.compareAtPrice?.message?.toString()}>
-              <Input type="number" step="0.01" {...register("compareAtPrice")} placeholder="0.00" />
-            </Field>
-            <Field label={t('form.fields.cogs')} error={errors.cogs?.message?.toString()}>
-              <Input type="number" step="0.01" {...register("cogs")} placeholder="0.00" />
-            </Field>
-            <Field label={t('form.fields.descriptionEn')} error={errors.description_en?.message} className="md:col-span-2">
-              <Textarea {...register("description_en")} placeholder={t('form.placeholders.descriptionEn')} />
-            </Field>
-            <Field label={t('form.fields.descriptionAr')} error={errors.description_ar?.message} className="md:col-span-2">
-              <Textarea dir="rtl" {...register("description_ar")} placeholder={t('form.placeholders.descriptionAr')} />
-            </Field>
-          </section>
-
-          <section className="space-y-4">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">{t('form.fields.mediaGalleryTitle')}</p>
-              <h3 className="mt-2 text-xl font-semibold text-white uppercase tracking-tight">{t('form.fields.mediaGalleryDescription')}</h3>
+          <SheetHeader className="p-10 pb-10 border-b border-border bg-card relative z-10">
+            <div className="flex items-center gap-3 mb-4">
+              <Box className="text-[#ffc105]" size={24} />
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105] italic">
+                {t("form.badge")}
+              </p>
             </div>
-            <ConvexStorageUpload
-              imageIds={images}
-              onChange={(nextImages) => {
-                setValue("images", nextImages, { shouldValidate: true });
-                if (!getValues("thumbnail") && nextImages[0]) {
-                  setValue("thumbnail", nextImages[0]);
-                }
-              }}
-            />
-            <Field label={t('form.fields.thumbnail')} error={errors.thumbnail?.message}>
-              <SelectNative {...register("thumbnail")}>
-                <option value="">{t('form.placeholders.selectThumbnail')}</option>
-                {images.map((imageId) => (
-                  <option key={imageId} value={imageId}>{imageId}</option>
-                ))}
-              </SelectNative>
-            </Field>
-          </section>
+            <SheetTitle className="text-4xl font-black text-foreground uppercase tracking-tightest leading-tight italic">
+              {product ? t("form.editTitle") : t("form.createTitle")}
+            </SheetTitle>
+            <SheetDescription className="text-sm font-medium text-muted-foreground/60 max-w-2xl mt-2">
+              Configure core product attributes, SKUs, and media gallery for
+              global accessibility.
+            </SheetDescription>
+          </SheetHeader>
 
-          <section className="space-y-4">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">{t('form.fields.variants')}</p>
-                <h3 className="mt-2 text-xl font-semibold text-white uppercase tracking-tight">{t('form.fields.skuConfig')}</h3>
+          <form
+            className="p-10 space-y-12 pb-32 relative z-10 scrollbar-hide"
+            onSubmit={(event) => void submit(event)}
+          >
+            {/* Core Info Section */}
+            <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="flex items-center gap-3">
+                <Info size={18} className="text-[#ffc105]/60" />
+                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
+                  General Configuration
+                </h3>
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  append({
-                    ...emptyVariant,
-                    variantName: `Variant ${fields.length + 1}`,
-                    isDefault: false,
-                    price: getValues("selling_price") || 0,
-                  })
-                }
-              >
-                <Plus size={16} />
-                {t('form.fields.skus.add')}
-              </Button>
-            </div>
-            <div className="space-y-4">
-              {fields.map((field, index) => (
-                <div key={field.id} className="rounded-[24px] border border-white/10 bg-[#2a261f] p-5 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50">
-                  <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm font-medium text-white">{t('form.fields.variant', { index: index + 1 })}</p>
-                    {fields.length > 1 ? (
-                      <Button type="button" variant="ghost" onClick={() => remove(index)}>
-                        <Trash2 size={16} />
-                        {t('buttons.remove')}
-                      </Button>
-                    ) : null}
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    <Field label={t('form.fields.skus.name')} error={errors.variants?.[index]?.variantName?.message}>
-                      <Input {...register(`variants.${index}.variantName`)} placeholder={t('form.placeholders.variantName')} />
-                    </Field>
-                    <Field label={t('form.fields.skus.color')} error={errors.variants?.[index]?.color?.message}>
-                      <Input {...register(`variants.${index}.color`)} placeholder={t('form.placeholders.color')} />
-                    </Field>
-                    <Field label={t('form.fields.skus.size')} error={errors.variants?.[index]?.size?.message}>
-                      <Input {...register(`variants.${index}.size`)} placeholder={t('form.placeholders.size')} />
-                    </Field>
-                    <Field label={t('form.fields.skus.type')} error={errors.variants?.[index]?.type?.message}>
-                      <Input {...register(`variants.${index}.type`)} placeholder={t('form.placeholders.type')} />
-                    </Field>
-                    <Field label={t('form.fields.skus.realStock')} error={errors.variants?.[index]?.real_stock?.message}>
-                      <div className="flex gap-2">
-                        <Input type="number" {...register(`variants.${index}.real_stock`)} placeholder="0" />
-                        <Button
-                          className="h-12 w-12 border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white shrink-0"
-                          type="button"
-                          variant="outline"
-                          onClick={() => void handleRestock(index)}
-                          title="Ad-hoc restock from returns or new shipments"
-                        >
-                          <TrendingUp size={16} />
-                        </Button>
-                      </div>
-                    </Field>
-                    <Field label={t('form.fields.skus.displayStock')} error={errors.variants?.[index]?.display_stock?.message}>
-                      <Input type="number" {...register(`variants.${index}.display_stock`)} placeholder="0" />
-                    </Field>
-                    <Field label={t('form.fields.skus.price')} error={errors.variants?.[index]?.price?.message}>
-                      <Input type="number" step="0.01" {...register(`variants.${index}.price`)} placeholder="0.00" />
-                    </Field>
-                    <Field label={t('form.fields.skus.compareAt')} error={errors.variants?.[index]?.compareAtPrice?.message?.toString()}>
-                      <Input type="number" step="0.01" {...register(`variants.${index}.compareAtPrice`)} placeholder="0.00" />
-                    </Field>
-                    <Field label={t('form.fields.skus.linkedImage')} error={errors.variants?.[index]?.linkedImageId?.message}>
-                      <SelectNative {...register(`variants.${index}.linkedImageId`)}>
-                        <option value="">{t('form.placeholders.noLinkedImage')}</option>
-                        {images.map((imageId) => (
-                          <option key={imageId} value={imageId}>{imageId}</option>
-                        ))}
-                      </SelectNative>
-                    </Field>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
 
-          <div className="sticky bottom-0 -mx-4 flex flex-col gap-3 border-t border-white/5 bg-[#24201a]/95 px-4 pb-2 pt-4 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:border-t-0 sm:bg-transparent sm:px-0 sm:pb-0">
-            <Button className="w-full sm:w-auto" disabled={isSubmitting} type="submit">
-              {isSubmitting ? t('form.buttons.saving') : product ? t('form.buttons.update') : t('form.buttons.create')}
+              <div className="grid gap-8 md:grid-cols-2 p-8 rounded-[40px] border border-border bg-card  ">
+                <Field
+                  label={t("form.fields.category")}
+                  error={errors.categoryId?.message}
+                >
+                  <SelectNative
+                    {...register("categoryId")}
+                    className="rounded-xl border-border bg-background h-12 font-bold uppercase text-[11px] tracking-widest pl-4"
+                  >
+                    <option value="">
+                      {t("form.placeholders.selectCategory")}
+                    </option>
+                    {categories.map((category) => (
+                      <option key={category._id} value={category._id}>
+                        {category.name_en}
+                      </option>
+                    ))}
+                  </SelectNative>
+                </Field>
+                <Field
+                  label={t("form.fields.status")}
+                  error={errors.status?.message}
+                >
+                  <div className="grid grid-cols-2 gap-2 bg-accent/40 p-1.5 rounded-2xl border border-border">
+                    {["DRAFT", "PUBLISHED"].map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setValue("status", s as any)}
+                        className={cn(
+                          "py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                          watch("status") === s
+                            ? "bg-[#ffc105] text-black  "
+                            : "text-muted-foreground/40 hover:text-foreground",
+                        )}
+                      >
+                        {t(`form.statusOptions.${s.toLowerCase()}`)}
+                      </button>
+                    ))}
+                    <input type="hidden" {...register("status")} />
+                  </div>
+                </Field>
+                <Field
+                  label={t("form.fields.nameEn")}
+                  error={errors.name_en?.message}
+                >
+                  <Input
+                    {...register("name_en")}
+                    placeholder={t("form.placeholders.nameEn")}
+                    className="rounded-xl border-border bg-background h-12 font-black uppercase tracking-tightest placeholder:italic"
+                  />
+                </Field>
+                <Field
+                  label={t("form.fields.nameAr")}
+                  error={errors.name_ar?.message}
+                >
+                  <Input
+                    dir="rtl"
+                    {...register("name_ar")}
+                    placeholder={t("form.placeholders.nameAr")}
+                    className="rounded-xl border-border bg-background h-12 font-black tracking-tightest placeholder:italic"
+                  />
+                </Field>
+                <Field
+                  label={t("form.fields.slug")}
+                  error={errors.slug?.message}
+                >
+                  <Input
+                    {...register("slug")}
+                    placeholder={t("form.placeholders.slug")}
+                    className="rounded-xl border-border bg-background h-12 font-mono text-[10px] tracking-widest uppercase"
+                  />
+                </Field>
+                <div className="grid grid-cols-3 gap-4 md:col-span-2">
+                  <Field
+                    label={t("form.fields.sellingPrice")}
+                    error={errors.selling_price?.message}
+                  >
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        step="0.01"
+                        {...register("selling_price")}
+                        placeholder="0.00"
+                        className="rounded-xl border-border bg-background h-12 font-black tracking-tightest pr-12"
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-muted-foreground/30">
+                        EGP
+                      </span>
+                    </div>
+                  </Field>
+                  <Field
+                    label={t("form.fields.compareAtPrice")}
+                    error={errors.compareAtPrice?.message?.toString()}
+                  >
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        step="0.01"
+                        {...register("compareAtPrice")}
+                        placeholder="0.00"
+                        className="rounded-xl border-border bg-background h-12 font-black tracking-tightest pr-12 text-muted-foreground/60"
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-muted-foreground/30">
+                        EGP
+                      </span>
+                    </div>
+                  </Field>
+                  <Field
+                    label={t("form.fields.cogs")}
+                    error={errors.cogs?.message?.toString()}
+                  >
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        step="0.01"
+                        {...register("cogs")}
+                        placeholder="0.00"
+                        className="rounded-xl border-border bg-background h-12 font-black tracking-tightest pr-12 text-primary"
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-muted-foreground/30">
+                        EGP
+                      </span>
+                    </div>
+                  </Field>
+                </div>
+                <Field
+                  label={t("form.fields.descriptionEn")}
+                  error={errors.description_en?.message}
+                  className="md:col-span-2"
+                >
+                  <Textarea
+                    {...register("description_en")}
+                    placeholder={t("form.placeholders.descriptionEn")}
+                    className="rounded-[24px] border-border bg-background min-h-[140px] font-medium text-sm leading-relaxed p-6"
+                  />
+                </Field>
+                <Field
+                  label={t("form.fields.descriptionAr")}
+                  error={errors.description_ar?.message}
+                  className="md:col-span-2"
+                >
+                  <Textarea
+                    dir="rtl"
+                    {...register("description_ar")}
+                    placeholder={t("form.placeholders.descriptionAr")}
+                    className="rounded-[24px] border-border bg-background min-h-[140px] font-medium text-sm leading-relaxed p-6"
+                  />
+                </Field>
+              </div>
+            </section>
+
+            {/* Media Section */}
+            <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
+              <div className="flex items-center gap-3">
+                <ImageIcon size={18} className="text-[#ffc105]/60" />
+                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
+                  Media Assets
+                </h3>
+              </div>
+              <div className="p-8 rounded-[40px] border border-border bg-card   space-y-6">
+                <ConvexStorageUpload
+                  imageIds={images}
+                  onChange={(nextImages) => {
+                    setValue("images", nextImages, { shouldValidate: true });
+                    if (!getValues("thumbnail") && nextImages[0]) {
+                      setValue("thumbnail", nextImages[0]);
+                    }
+                  }}
+                />
+                <Field
+                  label={t("form.fields.thumbnail")}
+                  error={errors.thumbnail?.message}
+                >
+                  <SelectNative
+                    {...register("thumbnail")}
+                    className="rounded-xl border-border bg-background h-12 font-mono text-[10px] tracking-widest uppercase pl-4"
+                  >
+                    <option value="">
+                      {t("form.placeholders.selectThumbnail")}
+                    </option>
+                    {images.map((imageId) => (
+                      <option key={imageId} value={imageId}>
+                        {imageId}
+                      </option>
+                    ))}
+                  </SelectNative>
+                </Field>
+              </div>
+            </section>
+
+            {/* SKU Section */}
+            <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                  <Layers size={18} className="text-[#ffc105]/60" />
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
+                    Unified SKU Matrix
+                  </h3>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-full border-[#ffc105]/20 text-[#ffc105] font-black uppercase tracking-widest text-[9px] h-8 px-4 hover:bg-[#ffc105]/10"
+                  onClick={() =>
+                    append({
+                      ...emptyVariant,
+                      variantName: `Variant ${fields.length + 1}`,
+                      isDefault: false,
+                      price: getValues("selling_price") || 0,
+                    })
+                  }
+                >
+                  <Plus size={14} className="mr-2" />
+                  {t("form.fields.skus.add")}
+                </Button>
+              </div>
+              <div className="space-y-6">
+                {fields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className="group rounded-[40px] border border-border bg-card p-10 transition-all hover:border-[#ffc105]/20   overflow-hidden relative"
+                  >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#ffc105]/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-[#ffc105]/10 transition-colors" />
+
+                    <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between relative z-10">
+                      <div className="flex items-center gap-3">
+                        <div className="h-2 w-2 rounded-full bg-[#ffc105]" />
+                        <p className="text-[11px] font-black text-foreground uppercase tracking-widest italic">
+                          {t("form.fields.variant", { index: index + 1 })}
+                        </p>
+                      </div>
+                      {fields.length > 1 ? (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="h-9 px-4 rounded-full text-destructive/40 hover:text-destructive hover:bg-destructive/10 text-[9px] font-black uppercase tracking-widest"
+                          onClick={() => remove(index)}
+                        >
+                          <Trash2 size={12} className="mr-2" />
+                          {t("buttons.remove")}
+                        </Button>
+                      ) : null}
+                    </div>
+                    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 relative z-10">
+                      <Field
+                        label={t("form.fields.skus.name")}
+                        error={errors.variants?.[index]?.variantName?.message}
+                      >
+                        <Input
+                          {...register(`variants.${index}.variantName`)}
+                          placeholder={t("form.placeholders.variantName")}
+                          className="rounded-xl border-border bg-background h-11 text-xs font-black uppercase tracking-widest"
+                        />
+                      </Field>
+                      <Field
+                        label={t("form.fields.skus.color")}
+                        error={errors.variants?.[index]?.color?.message}
+                      >
+                        <Input
+                          {...register(`variants.${index}.color`)}
+                          placeholder={t("form.placeholders.color")}
+                          className="rounded-xl border-border bg-background h-11 text-xs font-bold"
+                        />
+                      </Field>
+                      <Field
+                        label={t("form.fields.skus.size")}
+                        error={errors.variants?.[index]?.size?.message}
+                      >
+                        <Input
+                          {...register(`variants.${index}.size`)}
+                          placeholder={t("form.placeholders.size")}
+                          className="rounded-xl border-border bg-background h-11 text-xs font-bold"
+                        />
+                      </Field>
+                      <Field
+                        label={t("form.fields.skus.type")}
+                        error={errors.variants?.[index]?.type?.message}
+                      >
+                        <Input
+                          {...register(`variants.${index}.type`)}
+                          placeholder={t("form.placeholders.type")}
+                          className="rounded-xl border-border bg-background h-11 text-xs font-bold"
+                        />
+                      </Field>
+                      <Field
+                        label={t("form.fields.skus.realStock")}
+                        error={errors.variants?.[index]?.real_stock?.message}
+                      >
+                        <div className="flex gap-2">
+                          <Input
+                            type="number"
+                            {...register(`variants.${index}.real_stock`)}
+                            placeholder="0"
+                            className="rounded-xl border-border bg-background h-11 text-xs font-black tracking-widest"
+                          />
+                          <Button
+                            className="h-11 w-11 rounded-xl border-border bg-accent text-accent-foreground hover:bg-[#ffc105] hover:text-black hover:border-[#ffc105] transition-all shrink-0"
+                            type="button"
+                            variant="outline"
+                            onClick={() => void handleRestock(index)}
+                            title="Ad-hoc restock from returns or new shipments"
+                          >
+                            <TrendingUp size={14} />
+                          </Button>
+                        </div>
+                      </Field>
+                      <Field
+                        label={t("form.fields.skus.displayStock")}
+                        error={errors.variants?.[index]?.display_stock?.message}
+                      >
+                        <Input
+                          type="number"
+                          {...register(`variants.${index}.display_stock`)}
+                          placeholder="0"
+                          className="rounded-xl border-border bg-background h-11 text-xs font-black tracking-widest"
+                        />
+                      </Field>
+                      <Field
+                        label={t("form.fields.skus.price")}
+                        error={errors.variants?.[index]?.price?.message}
+                      >
+                        <div className="relative">
+                          <Input
+                            type="number"
+                            step="0.01"
+                            {...register(`variants.${index}.price`)}
+                            placeholder="0.00"
+                            className="rounded-xl border-border bg-background h-11 text-xs font-black tracking-widest pr-10"
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[8px] font-black text-muted-foreground/30">
+                            EGP
+                          </span>
+                        </div>
+                      </Field>
+                      <Field
+                        label={t("form.fields.skus.compareAt")}
+                        error={errors.variants?.[
+                          index
+                        ]?.compareAtPrice?.message?.toString()}
+                      >
+                        <div className="relative">
+                          <Input
+                            type="number"
+                            step="0.01"
+                            {...register(`variants.${index}.compareAtPrice`)}
+                            placeholder="0.00"
+                            className="rounded-xl border-border bg-background h-11 text-xs font-black tracking-widest pr-10 text-muted-foreground/40"
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[8px] font-black text-muted-foreground/30">
+                            EGP
+                          </span>
+                        </div>
+                      </Field>
+                      <Field
+                        label={t("form.fields.skus.linkedImage")}
+                        error={errors.variants?.[index]?.linkedImageId?.message}
+                      >
+                        <SelectNative
+                          {...register(`variants.${index}.linkedImageId`)}
+                          className="rounded-xl border-border bg-background h-11 font-mono text-[9px] tracking-tightest uppercase pl-3"
+                        >
+                          <option value="">
+                            {t("form.placeholders.noLinkedImage")}
+                          </option>
+                          {images.map((imageId) => (
+                            <option key={imageId} value={imageId}>
+                              {imageId}
+                            </option>
+                          ))}
+                        </SelectNative>
+                      </Field>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </form>
+
+          <div className="sticky bottom-0 z-30 flex flex-col gap-4 border-t border-border bg-card/90 px-10 py-8 backdrop-blur   sm:flex-row sm:items-center sm:justify-end">
+            <Button
+              variant="outline"
+              className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] border-border hover:bg-accent transition-all"
+              type="button"
+              onClick={onClose}
+            >
+              {t("form.buttons.cancel")}
             </Button>
-            <Button className="w-full sm:w-auto" type="button" variant="ghost" onClick={onClose}>{t('form.buttons.cancel')}</Button>
+            <Button
+              className="h-12 px-10 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all   shadow-[#ffc105]/10"
+              disabled={isSubmitting}
+              type="submit"
+              onClick={() => void submit()}
+            >
+              {isSubmitting
+                ? t("form.buttons.saving")
+                : product
+                  ? t("form.buttons.update")
+                  : t("form.buttons.create")}
+            </Button>
           </div>
-        </form>
+        </div>
       </SheetContent>
     </Sheet>
   );
@@ -388,11 +690,13 @@ function Field({
   className?: string;
 }) {
   return (
-    <div className={cn("space-y-2", className)}>
-      <Label>{label}</Label>
+    <div className={cn("space-y-3", className)}>
+      <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
+        {label}
+      </Label>
       {children}
       {error && (
-        <p className="px-1 text-xs font-medium text-red-400 animate-in fade-in slide-in-from-top-1 duration-200">
+        <p className="px-1 text-[10px] font-black text-destructive uppercase tracking-widest mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
           {error}
         </p>
       )}

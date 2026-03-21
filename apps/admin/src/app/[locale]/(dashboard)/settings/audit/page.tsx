@@ -4,7 +4,13 @@ import { usePaginatedQuery } from "convex/react";
 import { api } from "@backend/convex/_generated/api";
 import { format } from "date-fns";
 import { Button } from "@techworld/ui";
-import { History as HistoryIcon, Terminal, Calendar, ArrowLeft, ShieldCheck } from "lucide-react";
+import {
+  History as HistoryIcon,
+  Terminal,
+  Calendar,
+  ArrowLeft,
+  ShieldCheck,
+} from "lucide-react";
 import { Link } from "@/navigation";
 import { useQuery } from "convex/react";
 import { useTranslations, useLocale } from "next-intl";
@@ -12,29 +18,44 @@ import { useTranslations, useLocale } from "next-intl";
 const LOGS_PER_PAGE = 20;
 
 export default function SettingsAuditPage() {
-  const t = useTranslations('Settings.audit');
+  const t = useTranslations("Settings.audit");
   const locale = useLocale();
   const me = useQuery(api.users.getMe);
   const canViewLogs = me?.permissions?.includes("VIEW_AUDIT_LOGS");
 
   const { results, status, loadMore } = usePaginatedQuery(
     api.audit.paginatedList,
-    canViewLogs ? { actionType: "UPDATE_SYSTEM_CONFIG" } : "skip" as any,
-    { initialNumItems: LOGS_PER_PAGE }
+    canViewLogs ? { actionType: "UPDATE_SYSTEM_CONFIG" } : ("skip" as any),
+    { initialNumItems: LOGS_PER_PAGE },
   );
 
   if (me && !canViewLogs) {
     return (
-      <main className="flex min-h-[60vh] flex-col items-center justify-center space-y-4 text-center p-8">
-        <ShieldCheck className="h-16 w-16 text-red-500/50" />
-        <h2 className="text-2xl font-semibold text-white uppercase tracking-tight">{t('denied.title')}</h2>
-        <p className="max-w-md text-zinc-500 leading-relaxed font-light">
-           {t('denied.message', { permission: "VIEW_AUDIT_LOGS" })}
-        </p>
+      <main className="flex min-h-[60vh] flex-col items-center justify-center space-y-8 text-center p-12 bg-background transition-colors">
+        <div className="relative">
+          <div className="absolute inset-0 blur-3xl bg-destructive/10 rounded-full" />
+          <div className="relative h-24 w-24 bg-card border border-border rounded-[32px] flex items-center justify-center  ">
+            <ShieldCheck size={56} className="text-destructive/50" />
+          </div>
+        </div>
+        <div className="space-y-3">
+          <h2 className="text-2xl font-black text-foreground uppercase tracking-tight italic">
+            {t("denied.title")}
+          </h2>
+          <p className="max-w-md text-muted-foreground/60 leading-relaxed font-bold uppercase tracking-widest text-[9px]">
+            {t("denied.message", { permission: "VIEW_AUDIT_LOGS" })}
+          </p>
+        </div>
         <Link href="/settings">
-          <Button variant="outline" className="mt-4 rounded-full border-white/5 bg-white/[0.02]">
-            <ArrowLeft size={16} className={locale === 'ar' ? 'ml-2 rotate-180' : 'mr-2'} />
-            {t('backButton')}
+          <Button
+            variant="outline"
+            className="mt-8 rounded-xl h-12 px-8 border-border bg-accent text-foreground hover:bg-[#ffc105] hover:text-black hover:border-[#ffc105] transition-all font-black uppercase tracking-widest text-[10px]"
+          >
+            <ArrowLeft
+              size={16}
+              className={locale === "ar" ? "ml-3 rotate-180" : "mr-3"}
+            />
+            {t("backButton")}
           </Button>
         </Link>
       </main>
@@ -42,76 +63,114 @@ export default function SettingsAuditPage() {
   }
 
   return (
-    <main className="space-y-8 pb-20">
-      <header className="rounded-[32px] border border-white/5 bg-[radial-gradient(circle_at_top_right,rgba(255,193,5,0.05),transparent_40%),#24201a] px-8 py-10 shadow-xl">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+    <main className="space-y-8 pb-20 bg-background transition-colors">
+      <header className="rounded-[32px] border border-border bg-card px-8 py-10 shadow-xl relative overflow-hidden group">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,193,5,0.05),transparent_40%)]" />
+        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-[#ffc105]/5 to-transparent dark:hidden" />
+
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between relative z-10">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <HistoryIcon className="text-[#ffc105]" size={20} />
-              <p className="text-[11px] uppercase tracking-[0.4em] text-[#ffc105]">{t('badge')}</p>
+              <p className="text-[11px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
+                {t("badge")}
+              </p>
             </div>
-            <h1 className="text-4xl font-semibold uppercase tracking-tight text-white leading-tight">
-              {t('title')}
+            <h1 className="text-4xl font-black uppercase tracking-tightest text-foreground leading-tight md:text-5xl italic">
+              {t("title")}
             </h1>
-            <p className="max-w-2xl text-sm leading-7 text-zinc-400 font-light">
-              {t('description')}
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground font-medium">
+              {t("description")}
             </p>
           </div>
           <Link href="/settings">
-            <Button variant="outline" className="rounded-full border-white/5 bg-white/[0.02]">
-              <ArrowLeft size={16} className={locale === 'ar' ? 'ml-2 rotate-180' : 'mr-2'} />
-              {t('backButton')}
+            <Button
+              variant="outline"
+              className="rounded-xl h-11 px-6 border-border bg-accent/50 text-foreground hover:bg-[#ffc105] hover:text-black hover:border-[#ffc105] transition-all font-black uppercase tracking-widest text-[10px] shadow-sm"
+            >
+              <ArrowLeft
+                size={16}
+                className={locale === "ar" ? "ml-2 rotate-180" : "mr-2"}
+              />
+              {t("backButton")}
             </Button>
           </Link>
         </div>
       </header>
 
-      <section className="space-y-6">
-        <div className="rounded-[28px] border border-white/5 bg-[#24201a] overflow-hidden shadow-2xl">
-          <div className="overflow-x-auto min-h-[400px]">
+      <section className="space-y-8 transition-all">
+        <div className="rounded-[40px] border border-border bg-card overflow-hidden   transition-all">
+          <div className="overflow-x-auto min-h-[500px] scrollbar-hide">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-white/5 bg-[#2a261f]">
-                  <th className="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold">{t('table.columns.key')}</th>
-                  <th className="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold whitespace-nowrap">{t('table.columns.updatedBy')}</th>
-                  <th className="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold">{t('table.columns.newValue')}</th>
-                  <th className="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold">{t('table.columns.timestamp')}</th>
+                <tr className="border-b border-border bg-accent/20">
+                  <th className="px-10 py-6 text-[10px] uppercase tracking-[0.4em] text-muted-foreground/40 font-black">
+                    {t("table.columns.key")}
+                  </th>
+                  <th className="px-10 py-6 text-[10px] uppercase tracking-[0.4em] text-muted-foreground/40 font-black whitespace-nowrap">
+                    {t("table.columns.updatedBy")}
+                  </th>
+                  <th className="px-10 py-6 text-[10px] uppercase tracking-[0.4em] text-muted-foreground/40 font-black">
+                    {t("table.columns.newValue")}
+                  </th>
+                  <th className="px-10 py-6 text-[10px] uppercase tracking-[0.4em] text-muted-foreground/40 font-black">
+                    {t("table.columns.timestamp")}
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-border">
                 {results.map((log) => (
-                  <tr key={log._id} className="group hover:bg-white/[0.01] transition-colors">
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-4">
-                        <div className="h-9 w-9 bg-black/40 rounded-xl flex items-center justify-center border border-white/5 group-hover:border-[#ffc105]/20 transition-colors shrink-0">
-                          <Terminal size={14} className="text-[#ffc105]" />
+                  <tr
+                    key={log._id}
+                    className="group hover:bg-accent/30 transition-all"
+                  >
+                    <td className="px-10 py-8">
+                      <div className="flex items-center gap-5">
+                        <div className="h-10 w-10 bg-accent rounded-xl flex items-center justify-center border border-border group-hover:border-[#ffc105] group-hover:bg-[#ffc105]/5 transition-all shrink-0 shadow-sm">
+                          <Terminal
+                            size={14}
+                            className="text-[#ffc105] transition-transform group-hover:scale-110"
+                          />
                         </div>
-                        <p className="text-sm font-mono text-white tracking-tight">{log.entityId}</p>
+                        <p className="text-sm font-mono text-foreground tracking-tightest font-bold uppercase transition-colors group-hover:text-[#ffc105] italic">
+                          {log.entityId}
+                        </p>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] text-zinc-400 font-bold uppercase border border-white/5 overflow-hidden">
-                           {log.userName.slice(0, 2)}
+                    <td className="px-10 py-8">
+                      <div className="flex items-center gap-4">
+                        <div className="h-9 w-9 rounded-full bg-accent flex items-center justify-center text-[10px] text-muted-foreground/60 font-black uppercase border border-border overflow-hidden transition-all group-hover:scale-110 group-hover:border-[#ffc105]/20  ">
+                          {log.userName.slice(0, 2)}
                         </div>
                         <div>
-                           <p className="text-[13px] text-white font-medium leading-none">{log.userName}</p>
-                           <p className="text-[10px] text-zinc-500 mt-1">{log.userEmail}</p>
+                          <p className="text-sm text-foreground font-black uppercase tracking-tightest leading-none">
+                            {log.userName}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground/40 mt-1 font-medium tracking-tight lowercase">
+                            {log.userEmail}
+                          </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
-                      <pre className="text-[11px] font-mono text-zinc-400 bg-black/20 p-2 rounded-lg border border-white/5 font-light leading-relaxed">
-                        {JSON.stringify((log.changes as any)?.value ?? log.changes, null, 2)}
+                    <td className="px-10 py-8">
+                      <pre className="text-[10px] font-mono text-muted-foreground bg-accent/30 p-4 rounded-xl border border-border font-medium leading-[1.8]   max-w-sm overflow-x-auto scrollbar-hide">
+                        {JSON.stringify(
+                          (log.changes as any)?.value ?? log.changes,
+                          null,
+                          2,
+                        )}
                       </pre>
                     </td>
-                    <td className="px-8 py-6">
-                       <div className="flex items-center gap-2 text-zinc-400">
-                          <Calendar size={12} className="text-zinc-600" />
-                          <span className="text-[12px] tabular-nums whitespace-nowrap font-light">
-                            {format(log.timestamp, "MMM dd, HH:mm:ss")}
-                          </span>
-                       </div>
+                    <td className="px-10 py-8">
+                      <div className="flex items-center gap-3 text-muted-foreground/40 font-black tracking-widest text-[10px] uppercase">
+                        <Calendar
+                          size={14}
+                          className="text-muted-foreground/20 group-hover:text-[#ffc105] transition-colors"
+                        />
+                        <span className="tabular-nums">
+                          {format(log.timestamp, "MMM dd, HH:mm:ss")}
+                        </span>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -119,29 +178,40 @@ export default function SettingsAuditPage() {
             </table>
 
             {status === "LoadingFirstPage" && (
-               <div className="flex flex-col items-center justify-center py-20 text-zinc-500 gap-4">
-                 <Terminal className="animate-pulse text-[#ffc105]" size={32} />
-                 <p className="text-sm animate-pulse">{t('table.loading')}</p>
-               </div>
+              <div className="flex flex-col items-center justify-center py-24 text-muted-foreground/30 gap-6">
+                <Terminal
+                  className="animate-pulse text-[#ffc105] blur-[1px]"
+                  size={48}
+                />
+                <p className="text-[10px] font-black uppercase tracking-[0.5em] animate-pulse">
+                  {t("table.loading")}
+                </p>
+              </div>
             )}
 
             {!results.length && status !== "LoadingFirstPage" && (
-                <div className="flex flex-col items-center justify-center py-20 text-zinc-700">
-                  <HistoryIcon size={48} className="mb-4 opacity-10" />
-                  <p className="text-sm italic">{t('table.empty')}</p>
-                </div>
+              <div className="flex flex-col items-center justify-center py-24 text-muted-foreground/10">
+                <HistoryIcon size={64} className="mb-6 opacity-5" />
+                <p className="text-[10px] font-black uppercase tracking-[0.5em] italic">
+                  {t("table.empty")}
+                </p>
+              </div>
             )}
           </div>
 
-          <div className="p-8 border-t border-white/5 bg-black/10">
-             <Button
-               className="w-full bg-[#1a1814] border-white/5 text-zinc-400 hover:text-white transition-all text-sm uppercase tracking-widest h-12 rounded-2xl"
-               variant="outline"
-               disabled={status !== "CanLoadMore"}
-               onClick={() => loadMore(LOGS_PER_PAGE)}
-             >
-               {status === "LoadingMore" ? t('table.loadingMore') : status === "Exhausted" ? t('table.exhausted') : t('table.loadMore')}
-             </Button>
+          <div className="p-10 border-t border-border bg-accent/5">
+            <Button
+              className="w-full h-14 bg-card border-border text-muted-foreground/40 hover:text-black hover:bg-[#ffc105] hover:border-[#ffc105] transition-all text-[11px] font-black uppercase tracking-[0.4em] rounded-[20px] shadow-sm transform active:scale-[0.99]"
+              variant="outline"
+              disabled={status !== "CanLoadMore"}
+              onClick={() => loadMore(LOGS_PER_PAGE)}
+            >
+              {status === "LoadingMore"
+                ? t("table.loadingMore")
+                : status === "Exhausted"
+                  ? t("table.exhausted")
+                  : t("table.loadMore")}
+            </Button>
           </div>
         </div>
       </section>

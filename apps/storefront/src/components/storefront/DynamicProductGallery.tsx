@@ -24,7 +24,7 @@ export function DynamicProductGallery({
 
   return (
     <div className="space-y-4">
-      <div className="relative aspect-square overflow-hidden rounded-[28px] border border-white/5 bg-zinc-950">
+      <div className="relative aspect-square overflow-hidden rounded-[28px] border border-border bg-card transition-colors">
         {activeImage ? (
           <Image
             src={activeImage}
@@ -34,14 +34,14 @@ export function DynamicProductGallery({
             className="object-contain p-4 transition-opacity duration-200"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-sm uppercase tracking-[0.3em] text-zinc-700">
+          <div className="flex h-full w-full items-center justify-center text-sm uppercase tracking-[0.3em] text-muted-foreground/30">
             No Image
           </div>
         )}
 
         {statusLabel ? (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70 backdrop-blur-md">
-            <span className="rounded-full bg-red-600 px-6 py-2 text-sm font-bold uppercase tracking-widest text-white">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-md">
+            <span className="rounded-full bg-destructive px-6 py-2 text-sm font-bold uppercase tracking-widest text-destructive-foreground">
               {statusLabel}
             </span>
           </div>
@@ -57,10 +57,10 @@ export function DynamicProductGallery({
                 key={image}
                 type="button"
                 onClick={() => onSelectImage?.(image)}
-                className={`relative aspect-square overflow-hidden rounded-2xl border transition ${
+                className={`relative aspect-square overflow-hidden rounded-2xl border transition shadow-sm ${
                   isActive
                     ? "border-[#ffc105] bg-[#ffc105]/10"
-                    : "border-white/10 bg-zinc-950 hover:border-white/30"
+                    : "border-border bg-card hover:border-foreground/20"
                 }`}
               >
                 <Image

@@ -12,20 +12,21 @@ import { useTranslations, useLocale } from "next-intl";
 import { LanguageSwitcher, ThemeToggle } from "@techworld/ui";
 
 export default function Header() {
-  const t = useTranslations('Header');
+  const t = useTranslations("Header");
   const locale = useLocale();
   const { sessionId } = useSession();
   const { toggleCart } = useCart();
   const cart = useQuery(api.cart.getCart, { sessionId });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const itemCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
+  const itemCount =
+    cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 
   const navItems = [
-    { key: 'shop', href: '/' },
-    { key: 'categories', href: '/categories' },
-    { key: 'deals', href: '/deals' },
-    { key: 'support', href: '/support' }
+    { key: "shop", href: "/" },
+    { key: "categories", href: "/categories" },
+    { key: "deals", href: "/deals" },
+    { key: "support", href: "/support" },
   ];
 
   return (
@@ -68,12 +69,15 @@ export default function Header() {
 
             <button
               onClick={toggleCart}
-              aria-label={t('cartAria')}
-              className="group relative h-12 w-12 flex items-center justify-center rounded-2xl bg-secondary border border-border text-foreground transition-all hover:bg-accent hover:border-[#ffc105]/30 shadow-xl"
+              aria-label={t("cartAria")}
+              className="group relative h-12 w-12 flex items-center justify-center rounded-2xl bg-secondary border border-border text-foreground transition-all hover:bg-accent hover:border-[#ffc105]/30 "
             >
-              <ShoppingBag size={22} className="group-hover:scale-110 transition-transform" />
+              <ShoppingBag
+                size={22}
+                className="group-hover:scale-110 transition-transform"
+              />
               {itemCount > 0 && (
-                <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-lg bg-[#ffc105] text-[10px] font-black text-black ring-4 ring-background shadow-lg">
+                <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-lg bg-[#ffc105] text-[10px] font-black text-black ring-4 ring-background  ">
                   {itemCount}
                 </span>
               )}
@@ -82,7 +86,7 @@ export default function Header() {
             {/* Mobile Menu Trigger */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden h-12 w-12 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-2xl bg-secondary border border-border transition-all shadow-xl"
+              className="lg:hidden h-12 w-12 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-2xl bg-secondary border border-border transition-all "
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -91,7 +95,7 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <nav className="lg:hidden fixed inset-x-0 top-24 bottom-0 bg-background/98 backdrop-blur-3xl border-t border-border p-8 flex flex-col space-y-4 shadow-2xl z-[60] animate-in slide-in-from-top-4 duration-300">
+          <nav className="lg:hidden fixed inset-0 top-24 bg-background/95 backdrop-blur-3xl border-t border-border p-8 flex flex-col space-y-4   z-[60] animate-in slide-in-from-top-4 duration-300">
             {navItems.map((item) => (
               <Link
                 key={item.key}
@@ -102,7 +106,10 @@ export default function Header() {
                 <span className="group-hover:translate-x-4 transition-transform ltr:group-hover:translate-x-4 rtl:group-hover:-translate-x-4">
                   {t(`nav.${item.key}`)}
                 </span>
-                <ChevronRight size={24} className={locale === 'ar' ? 'rotate-180' : ''} />
+                <ChevronRight
+                  size={24}
+                  className={locale === "ar" ? "rotate-180" : ""}
+                />
               </Link>
             ))}
 

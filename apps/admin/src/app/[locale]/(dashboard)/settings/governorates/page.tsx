@@ -1,22 +1,25 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useMemo, useState, useEffect } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { z } from "zod";
-import { toast } from "sonner";
-import { Button, Input, Label, Switch, cn } from "@techworld/ui";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
+import { useTranslations, useLocale } from "next-intl";
+import { MapPin, Truck, Plus, CheckCircle2, XCircle, Power, Info, AlertTriangle, Sparkles, Pencil } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button, Input, Label, Switch, cn } from "@techworld/ui";
+import { toast } from "sonner";
 
 const governorateFormSchema = z.object({
-  name_en: z.string().trim().min(1, "English name is required."),
-  name_ar: z.string().trim().min(1, "Arabic name is required."),
-  shippingFee: z.coerce.number().min(0, "Shipping fee must be non-negative."),
-  isActive: z.boolean(),
+  name_en: z.string().min(1, "English name is required"),
+  name_ar: z.string().min(1, "Arabic name is required"),
+  shippingFee: z.coerce.number().min(0, "Shipping fee must be a positive number"),
+  isActive: z.boolean().default(true),
 });
 
-type GovernorateFormValues = z.input<typeof governorateFormSchema>;
+type GovernorateFormValues = z.infer<typeof governorateFormSchema>;
 
 const emptyValues: GovernorateFormValues = {
   name_en: "",
@@ -26,6 +29,8 @@ const emptyValues: GovernorateFormValues = {
 };
 
 export default function GovernoratesSettingsPage() {
+  const t = useTranslations('Settings.governorates');
+  const locale = useLocale();
   const governorates = useQuery(api.governorates.listGovernoratesForAdmin);
   const createGovernorate = useMutation(api.governorates.createGovernorate);
   const updateGovernorate = useMutation(api.governorates.updateGovernorate);
@@ -39,10 +44,15 @@ export default function GovernoratesSettingsPage() {
     reset,
     setError,
     clearErrors,
+    control,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<GovernorateFormValues>({
+    resolver: zodResolver(governorateFormSchema as any),
     defaultValues: emptyValues,
   });
+
+  const isActiveValue = watch("isActive");
 
   const editingGovernorate = useMemo(
     () => governorates?.find((governorate) => governorate._id === editingId) ?? null,
@@ -90,17 +100,17 @@ export default function GovernoratesSettingsPage() {
           name_ar: parsed.data.name_ar,
           shippingFee: parsed.data.shippingFee,
         });
-        toast.success("Governorate updated.");
+        toast.success(t('messages.updated'));
       } else {
         await createGovernorate(parsed.data);
-        toast.success("Governorate created.");
+        toast.success(t('messages.created'));
       }
 
       setEditingId(null);
       reset(emptyValues);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Governorate save failed.";
-      toast.error("Governorate update failed.", { description: message });
+      const message = error instanceof Error ? error.message : t('messages.updateFailed');
+      toast.error(t('messages.updateFailed'), { description: message });
     }
   });
 
@@ -108,153 +118,251 @@ export default function GovernoratesSettingsPage() {
     setBusyId(id);
     try {
       const result = await toggleGovernorateStatus({ id });
-      toast.success(result.isActive ? "Governorate activated." : "Governorate deactivated.");
+      toast.success(result.isActive ? t('messages.activated') : t('messages.deactivated'));
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Governorate toggle failed.";
-      toast.error("Status update failed.", { description: message });
+      const message = error instanceof Error ? error.message : t('messages.statusFailed');
+      toast.error(t('messages.statusFailed'), { description: message });
     } finally {
       setBusyId(null);
     }
   };
 
   return (
-    <main className="space-y-6">
-      <section className="rounded-[28px] border border-white/5 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#24201a] px-8 py-8">
-        <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">Operations</p>
-        <h1 className="mt-3 text-4xl font-semibold uppercase tracking-tight text-white">
-          Governorate Shipping Fees
-        </h1>
-        <p className="mt-4 max-w-3xl text-sm leading-7 text-zinc-400">
-          Configure live delivery fees by governorate, toggle availability instantly, and keep the checkout pricing source under Super Admin control.
-        </p>
+    <main className="space-y-8 pb-10">
+      <section className="relative overflow-hidden rounded-[40px] border border-border bg-card px-10 py-12  ">
+        {/* Decorative background for light mode */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#ffc105]/5 to-transparent dark:hidden pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#ffc105]/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-4">
+             <MapPin className="text-[#ffc105]" size={20} />
+             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105] italic">
+               {t('badge')}
+             </p>
+          </div>
+          <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight italic">
+            {t('title')}
+          </h1>
+          <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground/60">
+            {t('description')}
+          </p>
+        </div>
       </section>
 
-      <section className="grid gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1fr,1.6fr]">
-        <form className="rounded-[24px] border border-white/5 bg-[#24201a] p-6" onSubmit={submit}>
-          <div className="mb-6 flex items-center justify-between gap-3">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">
-                {editingId ? "Edit Governorate" : "New Governorate"}
-              </p>
-              <h2 className="mt-2 text-xl font-semibold text-white">
-                {editingId ? "Update shipping profile" : "Create shipping profile"}
-              </h2>
-            </div>
-            {editingId ? (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => {
-                  setEditingId(null);
-                  reset(emptyValues);
-                }}
-              >
-                Reset
-              </Button>
-            ) : null}
-          </div>
-
-          <div className="space-y-4 text-sm text-zinc-200">
-            <FormField label="English name" error={errors.name_en?.message}>
-              <Input {...register("name_en")} placeholder="e.g. Cairo" />
-            </FormField>
-            <FormField label="Arabic name" error={errors.name_ar?.message}>
-              <Input dir="rtl" {...register("name_ar")} placeholder="e.g. القاهرة" />
-            </FormField>
-            <FormField label="Shipping fee (EGP)" error={errors.shippingFee?.message}>
-              <Input step="0.01" type="number" {...register("shippingFee")} placeholder="0.00" />
-            </FormField>
-            {!editingId ? (
-              <div className="pt-2">
-                <Switch
-                  label="Start this governorate as active"
-                  {...register("isActive")}
-                />
+      <div className="grid gap-8 grid-cols-1 xl:grid-cols-12 items-start">
+        <form className="xl:col-span-4 rounded-[40px] border border-border bg-card p-10   overflow-hidden relative group" onSubmit={submit}>
+           <div className="absolute inset-0 bg-gradient-to-b from-[#ffc105]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+           <div className="relative z-10">
+              <div className="mb-8 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
+                    {editingId ? t('form.edit') : t('form.new')}
+                  </p>
+                  <h2 className="mt-1 text-2xl font-black text-foreground uppercase tracking-tightest italic">
+                    {editingId ? t('form.updateTitle') : t('form.createTitle')}
+                  </h2>
+                </div>
+                {editingId && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="rounded-xl font-black uppercase tracking-widest text-[10px] h-8"
+                    onClick={() => {
+                      setEditingId(null);
+                      reset(emptyValues);
+                    }}
+                  >
+                    <XCircle className="ltr:mr-2 rtl:ml-2 h-3.5 w-3.5" />
+                    {t('form.reset')}
+                  </Button>
+                )}
               </div>
-            ) : null}
-          </div>
 
-          <div className="mt-6 flex gap-3">
-            <Button disabled={isSubmitting} type="submit">
-              {isSubmitting ? "Saving..." : editingId ? "Update Governorate" : "Create Governorate"}
-            </Button>
-          </div>
+              <div className="space-y-6">
+                <FormField label={t('form.nameEn')} error={errors.name_en?.message}>
+                  <div className="relative group/field">
+                    <Input {...register("name_en")} placeholder="e.g. Cairo" className="bg-accent/30 border-border/50 h-12 rounded-2xl pl-4 focus:ring-[#ffc105] transition-all" />
+                  </div>
+                </FormField>
+                <FormField label={t('form.nameAr')} error={errors.name_ar?.message}>
+                  <div className="relative group/field">
+                    <Input dir="rtl" {...register("name_ar")} placeholder="e.g. القاهرة" className="bg-accent/30 border-border/50 h-12 rounded-2xl pr-4 focus:ring-[#ffc105] transition-all" />
+                  </div>
+                </FormField>
+                <FormField label={t('form.fee')} error={errors.shippingFee?.message}>
+                  <div className="relative group/field">
+                    <div className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">EGP</div>
+                    <Input step="0.01" type="number" {...register("shippingFee")} placeholder="0.00" className="bg-accent/30 border-border/50 h-12 rounded-2xl px-4 focus:ring-[#ffc105] transition-all" />
+                  </div>
+                </FormField>
+                {!editingId && (
+                  <div className="pt-2">
+                    <div className="flex items-center justify-between p-4 rounded-2xl border border-border bg-accent/10">
+                      <Label className="text-[10px] font-black uppercase tracking-[0.2em]">{t('form.activeLabel')}</Label>
+                      <Switch
+                        checked={isActiveValue}
+                        onCheckedChange={(checked) => reset({ ...watch(), isActive: checked })}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+
+              <Button disabled={isSubmitting} type="submit" className="mt-8 w-full rounded-2xl h-14 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all shadow-xl font-black uppercase tracking-[0.2em] text-[10px]">
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent" />
+                    {t('form.saving')}
+                  </div>
+                ) : (
+                  <>
+                    <Sparkles className="ltr:mr-3 rtl:ml-3 h-4 w-4" />
+                    {editingId ? t('form.submitUpdate') : t('form.submitCreate')}
+                  </>
+                )}
+              </Button>
+           </div>
         </form>
 
-        <section className="rounded-[24px] border border-white/5 bg-[#24201a] p-6">
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Data Table</p>
-              <h2 className="mt-2 text-xl font-semibold text-white">All governorates</h2>
+        <section className="xl:col-span-8 rounded-[40px] border border-border bg-card   overflow-hidden group transition-all hover:border-[#ffc105]/10">
+          <div className="border-b border-border bg-accent/30 px-10 py-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+               <div className="h-6 w-1 bg-[#ffc105] rounded-full" />
+               <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">{t('table.badge')}</p>
+                  <h2 className="text-2xl font-black text-foreground uppercase tracking-tightest italic leading-none mt-1">{t('table.title')}</h2>
+               </div>
             </div>
-            <span className="rounded-full border border-white/5 px-3 py-1 text-xs text-zinc-300">
-              {governorates ? `${governorates.length} total` : "Loading..."}
-            </span>
+            <div className="flex items-center gap-3">
+               <span className="rounded-full border border-border bg-background px-5 py-2 text-[10px] font-black text-muted-foreground/60 font-mono tracking-widest uppercase shadow-inner">
+                 {governorates ? t('table.total', { count: governorates.length }) : t('table.loading')}
+               </span>
+            </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-sm text-zinc-300">
-              <thead className="text-xs uppercase tracking-[0.2em] text-zinc-500">
+          <div className="overflow-x-auto scrollbar-hide">
+            <table className="min-w-full text-left text-sm text-foreground">
+              <thead className="bg-accent/50 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60 border-b border-border">
                 <tr>
-                  <th className="sticky left-0 bg-[#24201a] pb-3 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Name</th>
-                  <th className="pb-3 pr-4">Fee</th>
-                  <th className="pb-3 pr-4">Status</th>
-                  <th className="pb-3">Actions</th>
+                  <th className="sticky left-0 bg-card py-6 px-10 z-10">{t('table.columns.name')}</th>
+                  <th className="py-6 px-6">{t('table.columns.fee')}</th>
+                  <th className="py-6 px-6">{t('table.columns.status')}</th>
+                  <th className="py-6 px-10 text-right">{t('table.columns.actions')}</th>
                 </tr>
               </thead>
-              <tbody>
-                {governorates?.map((governorate) => (
-                  <tr key={governorate._id} className="border-t border-white/5 align-top">
-                    <td className="sticky left-0 bg-[#24201a] py-4 max-lg:py-5 pr-4 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
-                      <p className="font-medium text-white">{governorate.name_en}</p>
-                      <p className="text-xs text-zinc-500" dir="rtl">{governorate.name_ar}</p>
+              <tbody className="divide-y divide-border/50">
+                {governorates?.map((gov) => (
+                  <tr key={gov._id} className="group/row hover:bg-accent/20 transition-all">
+                    <td className="sticky left-0 bg-card py-8 px-10 align-middle z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
+                      <div className="font-black text-foreground uppercase tracking-tightest leading-none">{gov.name_en}</div>
+                      <div className="mt-2 text-xs font-bold text-muted-foreground/40 italic" dir="rtl">{gov.name_ar}</div>
                     </td>
-                    <td className="py-4 pr-4">{governorate.shippingFee.toLocaleString()} EGP</td>
-                    <td className="py-4 pr-4">
+                    <td className="py-8 px-6 align-middle font-mono font-black text-base text-muted-foreground group-hover/row:text-foreground transition-colors">
+                      {gov.shippingFee.toLocaleString(locale)} <span className="text-[10px] uppercase tracking-widest text-muted-foreground/30">EGP</span>
+                    </td>
+                    <td className="py-8 px-6 align-middle">
                       <span
-                        className={`rounded-full border px-3 py-1 text-xs ${
-                          governorate.isActive
-                            ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-                            : "border-red-400/30 bg-red-400/10 text-red-300"
-                        }`}
+                        className={cn(
+                          "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                          gov.isActive
+                            ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                            : "bg-destructive/10 border-destructive/20 text-destructive"
+                        )}
                       >
-                        {governorate.isActive ? "Active" : "Inactive"}
+                        {gov.isActive ? (
+                          <>
+                            <CheckCircle2 size={10} />
+                            {t('table.status.active')}
+                          </>
+                        ) : (
+                          <>
+                            <XCircle size={10} />
+                            {t('table.status.inactive')}
+                          </>
+                        )}
                       </span>
                     </td>
-                    <td className="py-4">
-                      <div className="flex flex-wrap gap-2">
-                        <Button size="sm" type="button" variant="outline" onClick={() => setEditingId(governorate._id)}>
-                          Edit
+                    <td className="py-8 px-10 align-middle text-right">
+                      <div className="flex items-center justify-end gap-2  transition-opacity">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="rounded-xl h-9 px-4 border-border/50 hover:bg-[#ffc105] hover:border-[#ffc105] hover:text-black font-black uppercase tracking-widest text-[10px] transition-all"
+                          onClick={() => setEditingId(gov._id)}
+                        >
+                          <Pencil size={12} className="ltr:mr-2 rtl:ml-2" />
+                          {t('table.actions.edit')}
                         </Button>
                         <Button
                           size="sm"
-                          type="button"
                           variant="ghost"
-                          disabled={busyId === governorate._id}
-                          onClick={() => void toggleStatus(governorate._id)}
+                          disabled={busyId === gov._id}
+                          className={cn(
+                            "rounded-xl h-9 px-4 font-black uppercase tracking-widest text-[10px] transition-all",
+                            gov.isActive 
+                              ? "text-destructive hover:bg-destructive/10 hover:text-destructive" 
+                              : "text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-500"
+                          )}
+                          onClick={() => void toggleStatus(gov._id)}
                         >
-                          {busyId === governorate._id
-                            ? "Updating..."
-                            : governorate.isActive
-                              ? "Deactivate"
-                              : "Activate"}
+                          {busyId === gov._id ? (
+                            <div className="h-3 w-3 animate-spin rounded-full border-2 border-solid border-current border-r-transparent" />
+                          ) : gov.isActive ? (
+                            <>
+                              <Power size={12} className="ltr:mr-2 rtl:ml-2" />
+                              {t('table.actions.deactivate')}
+                            </>
+                          ) : (
+                            <>
+                              <Power size={12} className="ltr:mr-2 rtl:ml-2" />
+                              {t('table.actions.activate')}
+                            </>
+                          )}
                         </Button>
                       </div>
                     </td>
                   </tr>
                 ))}
-                {governorates?.length === 0 ? (
+                {!governorates && (
                   <tr>
-                    <td className="py-8 text-zinc-500" colSpan={4}>
-                      No governorates yet.
+                    <td colSpan={4} className="py-20 text-center">
+                       <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#ffc105] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+                       <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{t('table.loading')}</p>
                     </td>
                   </tr>
-                ) : null}
+                )}
+                {governorates?.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="py-32 text-center">
+                       <div className="flex flex-col items-center gap-4">
+                          <div className="h-16 w-16 rounded-full bg-[#ffc105]/10 flex items-center justify-center">
+                             <Truck size={32} className="text-[#ffc105]" />
+                          </div>
+                          <p className="text-sm font-black uppercase tracking-widest text-[#ffc105]/60">{t('table.empty')}</p>
+                       </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </section>
-      </section>
+      </div>
+
+      <div className="rounded-[32px] border border-[#ffc105]/10 bg-[#ffc105]/5 p-8 flex items-start gap-4">
+         <div className="h-10 w-10 min-w-10 rounded-2xl bg-[#ffc105]/20 flex items-center justify-center text-[#ffc105]">
+            <Info size={20} />
+         </div>
+         <div className="space-y-1">
+            <h4 className="text-sm font-black uppercase tracking-widest text-foreground">{t('messages.infoTitle')}</h4>
+            <p className="text-xs font-semibold leading-relaxed text-muted-foreground/60 max-w-4xl">
+              {t('messages.infoDescription')}
+            </p>
+         </div>
+      </div>
     </main>
   );
 }
@@ -270,14 +378,15 @@ function FormField({
 }) {
   return (
     <div className="space-y-2">
-      <Label>{label}</Label>
+      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 px-1">{label}</Label>
       {children}
       {error && (
-        <p className="px-1 text-xs font-medium text-red-400 animate-in fade-in slide-in-from-top-1 duration-200">
+        <p className="px-1 text-[10px] font-black text-destructive uppercase tracking-widest animate-in fade-in slide-in-from-top-1 duration-200">
           {error}
         </p>
       )}
     </div>
   );
 }
+
 

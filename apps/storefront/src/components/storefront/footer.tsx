@@ -20,7 +20,7 @@ export default function Footer() {
                 TECH<span className="text-[#ffc105]">WORLD</span>
               </span>
             </Link>
-            <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.3em] leading-relaxed max-w-xs shadow-sm">
+            <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.3em] leading-relaxed max-w-xs ">
               {t('tagline')}
             </p>
             <div className="flex items-center gap-4 pt-4">
@@ -38,7 +38,7 @@ export default function Footer() {
 
           {/* Explore */}
           <div>
-            <h4 className="font-space-grotesk text-foreground text-[10px] font-black uppercase tracking-[0.5em] mb-10 shadow-sm">{t('sections.explore')}</h4>
+            <h4 className="font-space-grotesk text-foreground text-[10px] font-black uppercase tracking-[0.5em] mb-10 ">{t('sections.explore')}</h4>
             <ul className="space-y-6">
               {[
                 { key: 'newReleases', href: '#' },
@@ -58,7 +58,7 @@ export default function Footer() {
 
           {/* Support */}
           <div>
-            <h4 className="font-space-grotesk text-foreground text-[10px] font-black uppercase tracking-[0.5em] mb-10 shadow-sm">{t('sections.support')}</h4>
+            <h4 className="font-space-grotesk text-foreground text-[10px] font-black uppercase tracking-[0.5em] mb-10 ">{t('sections.support')}</h4>
             <ul className="space-y-6">
               {[
                 { key: 'shippingInfo', href: '#' },
@@ -78,15 +78,15 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div className="space-y-8">
-            <h4 className="font-space-grotesk text-foreground text-[10px] font-black uppercase tracking-[0.5em] mb-10 shadow-sm">{t('sections.newsletter')}</h4>
+            <h4 className="font-space-grotesk text-foreground text-[10px] font-black uppercase tracking-[0.5em] mb-10 ">{t('sections.newsletter')}</h4>
             <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.3em] leading-relaxed max-w-xs">{t('newsletter.text')}</p>
             <div className="relative group">
               <input 
                 type="email" 
                 placeholder={t('newsletter.placeholder')} 
-                className="w-full bg-card border border-border rounded-2xl py-5 px-6 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-[#ffc105]/20 transition-all ltr:pr-14 rtl:pl-14 shadow-inner font-medium"
+                className="w-full bg-card border border-border rounded-2xl py-5 px-6 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-[#ffc105]/20 transition-all ltr:pr-14 rtl:pl-14  font-medium"
               />
-              <button className="absolute ltr:right-3 rtl:left-3 top-2.5 h-10 w-10 bg-[#ffc105] rounded-xl flex items-center justify-center text-black hover:bg-white shadow-lg transition-all active:scale-95">
+              <button className="absolute ltr:right-3 rtl:left-3 top-2.5 h-10 w-10 bg-[#ffc105] rounded-xl flex items-center justify-center text-black hover:bg-white  transition-all active:scale-95">
                 <Mail size={18} />
               </button>
             </div>
@@ -95,7 +95,7 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="pt-12 border-t border-border flex flex-col md:flex-row justify-between items-center gap-10">
-          <p className="text-muted-foreground text-[9px] font-black uppercase tracking-[0.4em] text-center md:text-left shadow-sm">
+          <p className="text-muted-foreground text-[9px] font-black uppercase tracking-[0.4em] text-center md:text-left ">
             {t('copyright', { year: 2026 })}
           </p>
           <div className="flex items-center gap-10 flex-wrap justify-center">

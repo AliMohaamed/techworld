@@ -63,8 +63,8 @@ export function Sidebar({
   );
 
   return (
-    <aside className={cn("hidden w-72 shrink-0 rounded-[24px] border border-white/5 bg-[#24201a] p-5 lg:block", className)}>
-      <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">{t('headers.navigation')}</p>
+    <aside className={cn("hidden w-72 shrink-0 rounded-[24px] border border-border bg-card p-5 lg:block shadow-xl dark:shadow-none", className)}>
+      <p className="text-[11px] uppercase tracking-[0.35em] text-muted-foreground/50">{t('headers.navigation')}</p>
       <nav className="mt-4 space-y-2">
         {visibleItems.map((item) => {
           const isActive = isActivePath(pathname, item.href);
@@ -76,33 +76,20 @@ export function Sidebar({
               href={item.href as Route}
               onClick={onItemClick}
               className={cn(
-                "flex min-h-[44px] items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition",
+                "flex min-h-[44px] items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition-all",
                 isActive
-                  ? "border-[#ffc105]/30 bg-[#ffc105]/10 text-[#ffc105]"
-                  : "border-white/5 text-zinc-300 hover:border-white/20 hover:text-white"
+                  ? "border-[#ffc105]/30 bg-[#ffc105]/10 text-[#ffc105] shadow-sm"
+                  : "border-border text-muted-foreground hover:border-[#ffc105]/20 hover:text-foreground hover:bg-accent"
               )}
             >
               <Icon size={16} />
-              {t(`nav.${item.translationKey}` as any)}
+              <span className="font-medium uppercase tracking-widest text-[10px]">
+                {t(`nav.${item.translationKey}` as any)}
+              </span>
             </Link>
           );
         })}
       </nav>
-      <p className="mt-8 text-[11px] uppercase tracking-[0.35em] text-zinc-500">{t('headers.permissions')}</p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {permissions.length ? (
-          permissions.map((permission) => (
-            <span
-              key={String(permission)}
-              className="rounded-full border border-white/5 px-3 py-1 text-xs text-zinc-300"
-            >
-              {String(permission)}
-            </span>
-          ))
-        ) : (
-          <span className="text-sm text-zinc-500">{t('empty.noPermissions')}</span>
-        )}
-      </div>
     </aside>
   );
 }

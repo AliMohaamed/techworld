@@ -31,19 +31,19 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
   if (!products || products.length === 0) return null;
 
   return (
-    <section id="featured" className="bg-black px-4 py-24 md:px-8">
+    <section id="featured" className="bg-background px-4 py-24 md:px-8">
       <div className="container mx-auto space-y-12">
-        <div className="flex flex-col justify-between gap-6 border-b border-white/5 pb-8 md:flex-row md:items-end">
+        <div className="flex flex-col justify-between gap-6 border-b border-border pb-8 md:flex-row md:items-end">
           <div className="space-y-2">
             <div className="inline-flex items-center space-x-2">
               <div className="h-1 w-8 bg-[#ffc105]" />
               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#ffc105]">{t('badge')}</span>
             </div>
-            <h2 className="font-space-grotesk text-4xl font-black uppercase tracking-tighter text-white md:text-5xl lg:text-6xl">
-              {t('title')} <span className="text-zinc-800 outline-zinc-800">{t('accentTitle')}</span>
+            <h2 className="font-space-grotesk text-4xl font-black uppercase tracking-tighter text-foreground md:text-5xl lg:text-6xl">
+              {t('title')} <span className="text-muted-foreground/20 dark:text-zinc-800">{t('accentTitle')}</span>
             </h2>
           </div>
-          <p className="max-w-xs text-sm leading-relaxed text-zinc-500">
+          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
             {t('description')}
           </p>
         </div>
