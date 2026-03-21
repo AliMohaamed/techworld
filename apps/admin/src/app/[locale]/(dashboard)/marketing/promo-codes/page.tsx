@@ -139,16 +139,16 @@ export default function PromoCodesPage() {
           <table className="min-w-full text-left text-sm text-foreground">
             <thead className="bg-accent/50 text-[10px] font-black uppercase tracking-[0.35em] text-muted-foreground/40 border-b border-border">
               <tr>
-                <th className="sticky left-0 bg-card py-6 px-10 z-10">
+                <th className="sticky left-0 bg-card py-4 px-6 z-10">
                   {t("table.columns.code")}
                 </th>
-                <th className="py-6 px-6 whitespace-nowrap">
+                <th className="py-4 px-4 whitespace-nowrap">
                   {t("table.columns.typeValue")}
                 </th>
-                <th className="py-6 px-6">{t("table.columns.usage")}</th>
-                <th className="py-6 px-6">{t("table.columns.expiration")}</th>
-                <th className="py-6 px-6">{t("table.columns.status")}</th>
-                <th className="py-6 px-10 text-right whitespace-nowrap">
+                <th className="py-4 px-4">{t("table.columns.usage")}</th>
+                <th className="py-4 px-4">{t("table.columns.expiration")}</th>
+                <th className="py-4 px-4">{t("table.columns.status")}</th>
+                <th className="py-4 px-6 text-right whitespace-nowrap">
                   {t("table.columns.actions")}
                 </th>
               </tr>
@@ -164,7 +164,7 @@ export default function PromoCodesPage() {
                     key={promo._id}
                     className="group/row hover:bg-accent/20 transition-all"
                   >
-                    <td className="sticky left-0 bg-card py-10 px-10 align-middle z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
+                    <td className="sticky left-0 bg-card py-4 px-6 align-middle z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
                       <div className="flex items-center gap-4">
                         <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
                           <Tag size={18} />
@@ -179,7 +179,7 @@ export default function PromoCodesPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="py-10 px-6 align-middle">
+                    <td className="py-6 px-4 align-middle">
                       <p className="font-black text-base text-foreground tracking-tightest italic">
                         {promo.type === "fixed"
                           ? `EGP ${promo.value.toLocaleString(locale)}`
@@ -199,7 +199,7 @@ export default function PromoCodesPage() {
                           </p>
                         )}
                     </td>
-                    <td className="py-10 px-6 align-middle">
+                    <td className="py-6 px-4 align-middle">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <UsersIcon
@@ -228,7 +228,7 @@ export default function PromoCodesPage() {
                         />
                       </div>
                     </td>
-                    <td className="py-10 px-6 align-middle">
+                    <td className="py-6 px-4 align-middle">
                       <div className="flex items-center gap-2.5">
                         <Calendar
                           size={14}
@@ -254,7 +254,7 @@ export default function PromoCodesPage() {
                         </span>
                       </div>
                     </td>
-                    <td className="py-10 px-6 align-middle">
+                    <td className="py-6 px-4 align-middle">
                       {promo.isActive && !isExpired && !isLimitReached ? (
                         <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-[9px] font-black text-emerald-500 uppercase tracking-widest shadow-sm shadow-emerald-500/5">
                           <CheckCircle2 size={12} /> {t("table.status.active")}
@@ -270,7 +270,7 @@ export default function PromoCodesPage() {
                         </span>
                       )}
                     </td>
-                    <td className="py-10 px-10 align-middle text-right">
+                    <td className="py-4 px-6 align-middle text-right">
                       <div className="flex items-center justify-end gap-3">
                         <Button
                           size="sm"

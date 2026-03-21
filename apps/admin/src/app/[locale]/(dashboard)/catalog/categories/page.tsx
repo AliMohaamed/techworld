@@ -125,19 +125,19 @@ export default function AdminCategoriesPage() {
           <table className="min-w-full text-left text-sm text-foreground">
             <thead className="bg-accent/50 text-[10px] font-black uppercase tracking-[0.35em] text-muted-foreground/40 border-b border-border">
               <tr>
-                <th className="sticky left-0 bg-card py-6 px-10 z-10">
+                <th className="sticky left-0 bg-card py-4 px-6 z-10">
                   {t("table.columns.name")}
                 </th>
-                <th className="py-6 px-6 whitespace-nowrap">
+                <th className="py-4 px-4 whitespace-nowrap">
                   {t("table.columns.slug")}
                 </th>
-                <th className="py-6 px-6 whitespace-nowrap">
+                <th className="py-4 px-4 whitespace-nowrap">
                   {t("table.columns.products")}
                 </th>
-                <th className="py-6 px-6 whitespace-nowrap">
+                <th className="py-4 px-4 whitespace-nowrap">
                   {t("table.columns.status")}
                 </th>
-                <th className="py-6 px-10 text-right whitespace-nowrap">
+                <th className="py-4 px-6 text-right whitespace-nowrap">
                   {t("table.columns.actions")}
                 </th>
               </tr>
@@ -148,7 +148,7 @@ export default function AdminCategoriesPage() {
                   key={category._id}
                   className="group/row hover:bg-accent/20 transition-all"
                 >
-                  <td className="sticky left-0 bg-card py-10 px-10 z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
+                  <td className="sticky left-0 bg-card py-4 px-6 z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
                     <div className="flex flex-col relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none opacity-0 group-hover/row:opacity-100 transition-opacity" />
                       <p className="font-black text-foreground text-lg uppercase tracking-tightest leading-none italic">
@@ -162,10 +162,10 @@ export default function AdminCategoriesPage() {
                       </p>
                     </div>
                   </td>
-                  <td className="py-10 px-6 align-middle font-black text-[10px] uppercase tracking-widest text-[#ffc105]/60 italic">
+                  <td className="py-6 px-4 align-middle font-black text-[10px] uppercase tracking-widest text-[#ffc105]/60 italic">
                     /{category.slug}
                   </td>
-                  <td className="py-10 px-6 align-middle">
+                  <td className="py-6 px-4 align-middle">
                     <div className="flex items-center gap-2.5">
                       <TagIcon size={12} className="text-muted-foreground/30" />
                       <span className="font-black text-sm text-foreground tracking-tightest">
@@ -176,7 +176,7 @@ export default function AdminCategoriesPage() {
                       </span>
                     </div>
                   </td>
-                  <td className="py-10 px-6 align-middle">
+                  <td className="py-6 px-4 align-middle">
                     <span
                       className={cn(
                         "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[9px] font-black uppercase tracking-widest transition-all shadow-sm",
@@ -196,7 +196,7 @@ export default function AdminCategoriesPage() {
                       {category.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="py-10 px-10 align-middle text-right">
+                  <td className="py-4 px-6 align-middle text-right">
                     <div className="flex items-center justify-end gap-3">
                       <Button
                         size="sm"

@@ -345,16 +345,16 @@ export default function TeamManagementPage() {
           <table className="min-w-full text-left text-sm text-foreground">
             <thead className="bg-accent/50 text-[10px] font-black uppercase tracking-[0.35em] text-muted-foreground/40 border-b border-border">
               <tr>
-                <th className="sticky left-0 bg-card py-6 px-10 z-10">
+                <th className="sticky left-0 bg-card py-4 px-6 z-10">
                   {t("list.table.columns.name")}
                 </th>
-                <th className="py-6 px-6 whitespace-nowrap">
+                <th className="py-4 px-4 whitespace-nowrap">
                   {t("list.table.columns.status")}
                 </th>
-                <th className="py-6 px-6">
+                <th className="py-4 px-4">
                   {t("list.table.columns.permissions")}
                 </th>
-                <th className="py-6 px-10 text-right whitespace-nowrap">
+                <th className="py-4 px-6 text-right whitespace-nowrap">
                   {t("list.table.columns.actions")}
                 </th>
               </tr>
@@ -365,7 +365,7 @@ export default function TeamManagementPage() {
                   key={user._id}
                   className="group/row hover:bg-accent/20 transition-all align-top"
                 >
-                  <td className="sticky left-0 bg-card py-10 px-10 z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
+                  <td className="sticky left-0 bg-card py-4 px-6 z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
                     <div className="flex flex-col relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none opacity-0 group-hover/row:opacity-100 transition-opacity" />
                       <p className="font-black text-foreground text-lg uppercase tracking-tightest leading-none italic">
@@ -381,7 +381,7 @@ export default function TeamManagementPage() {
                       )}
                     </div>
                   </td>
-                  <td className="py-10 px-6 align-middle">
+                  <td className="py-6 px-4 align-middle">
                     <span
                       className={cn(
                         "px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all shadow-sm",
@@ -395,7 +395,7 @@ export default function TeamManagementPage() {
                         : t("list.table.active")}
                     </span>
                   </td>
-                  <td className="py-10 px-6 align-middle">
+                  <td className="py-6 px-4 align-middle">
                     <div className="flex flex-wrap gap-2.5 max-w-lg">
                       {editingId === user._id ? (
                         <div className="grid gap-2.5 grid-cols-1 sm:grid-cols-2 w-full animate-in fade-in slide-in-from-top-1 duration-300">
@@ -461,7 +461,7 @@ export default function TeamManagementPage() {
                       )}
                     </div>
                   </td>
-                  <td className="py-10 px-10 align-middle text-right">
+                  <td className="py-4 px-6 align-middle text-right">
                     <div className="flex items-center justify-end gap-3">
                       {me?._id !== user._id && (
                         <>

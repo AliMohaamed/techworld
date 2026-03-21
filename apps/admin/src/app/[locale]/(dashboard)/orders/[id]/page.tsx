@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   ArrowLeft,
   CheckCircle2,
+  ShieldCheck,
   UploadCloud,
   XCircle,
 } from "lucide-react";
@@ -21,11 +22,13 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
+  cn,
 } from "@techworld/ui";
 import { useTranslations, useLocale } from "next-intl";
 
 export default function OrderDetailsPage() {
   const t = useTranslations("Orders.details");
+  const tQueue = useTranslations("Orders.queue");
   const locale = useLocale();
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -198,7 +201,7 @@ export default function OrderDetailsPage() {
               </p>
             </div>
             <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight italic">
-              {order.customerName ?? t("queue.table.walkInCustomer")}
+              {order.customerName ?? tQueue("table.walkInCustomer")}
             </h1>
             <div className="flex flex-wrap items-center gap-4 mt-4">
               <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 bg-accent/50 border border-border px-4 py-2 rounded-full">
@@ -242,10 +245,10 @@ export default function OrderDetailsPage() {
                 <div className="h-6 w-1 bg-[#ffc105] rounded-full" />
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
-                    {t("queue.table.columns.product")}
+                    {tQueue("table.columns.product")}
                   </p>
                   <h2 className="text-2xl font-black text-foreground uppercase tracking-tightest italic mt-1">
-                    {order.product?.name_en ?? t("queue.table.unknownProduct")}
+                    {order.product?.name_en ?? tQueue("table.unknownProduct")}
                   </h2>
                 </div>
               </div>

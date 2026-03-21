@@ -1,18 +1,28 @@
 {
   "Orders": {
     "queue": {
-      "badge": "User Story 1",
-      "title": "Awaiting Verification Queue",
-      "description": "Operations agents can inspect pending payment submissions, open a record, upload a manual fallback receipt, and confirm the order without leaving the admin workspace.",
+      "badge": "Order Management",
+      "title": "Orders Pipeline",
+      "description": "Operations agents can inspect all orders, handle verifications, process transitions, and track fulfillment without leaving the admin workspace.",
       "table": {
         "title": "Pending Orders",
         "total": "{count} total",
-        "loading": "Loading order queue...",
+        "loading": "Loading orders...",
         "noPermission": "Your staff account does not have permission to view orders.",
-        "empty": "No orders are currently waiting for verification.",
+        "empty": "No orders found.",
+        "filters": {
+          "ALL": "All Orders",
+          "AWAITING_VERIFICATION": "Awaiting",
+          "CONFIRMED": "Confirmed",
+          "READY_FOR_SHIPPING": "Ready to Ship",
+          "SHIPPED": "Shipped",
+          "DELIVERED": "Delivered",
+          "CANCELLED": "Cancelled"
+        },
         "columns": {
           "customer": "Customer",
           "product": "Product",
+          "status": "Status",
           "quantity": "Quantity",
           "total": "Total",
           "receipt": "Receipt",
@@ -24,7 +34,16 @@
         "noCategory": "No category",
         "viewReceipt": "View receipt",
         "pendingReceipt": "Pending manual upload",
-        "review": "Review"
+        "review": "View Details",
+        "actions": {
+          "confirm": "Confirm",
+          "cancel": "Cancel",
+          "stall": "Stall",
+          "ready": "Ready to Ship",
+          "ship": "Ship",
+          "deliver": "Deliver",
+          "rto": "RTO"
+        }
       }
     },
     "details": {
@@ -87,12 +106,16 @@
         "unknown": "Unknown"
       },
       "states": {
+        "PENDING_PAYMENT_INPUT": "Pending Payment",
         "AWAITING_VERIFICATION": "Awaiting Verification",
         "CONFIRMED": "Confirmed",
+        "READY_FOR_SHIPPING": "Ready for Shipping",
         "SHIPPED": "Shipped",
-        "CANCELLED": "Cancelled",
+        "DELIVERED": "Delivered",
+        "RTO": "Return to Origin",
         "STALLED_PAYMENT": "Stalled Payment",
-        "READY_FOR_SHIPPING": "Ready for Shipping"
+        "FLAGGED_FRAUD": "Flagged Fraud",
+        "CANCELLED": "Cancelled"
       }
     }
   }

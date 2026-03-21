@@ -247,23 +247,23 @@ export default function GovernoratesSettingsPage() {
             <table className="min-w-full text-left text-sm text-foreground">
               <thead className="bg-accent/50 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60 border-b border-border">
                 <tr>
-                  <th className="sticky left-0 bg-card py-6 px-10 z-10">{t('table.columns.name')}</th>
-                  <th className="py-6 px-6">{t('table.columns.fee')}</th>
-                  <th className="py-6 px-6">{t('table.columns.status')}</th>
-                  <th className="py-6 px-10 text-right">{t('table.columns.actions')}</th>
+                  <th className="sticky left-0 bg-card py-4 px-6 z-10">{t('table.columns.name')}</th>
+                  <th className="py-4 px-4">{t('table.columns.fee')}</th>
+                  <th className="py-4 px-4">{t('table.columns.status')}</th>
+                  <th className="py-4 px-6 text-right">{t('table.columns.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
                 {governorates?.map((gov) => (
                   <tr key={gov._id} className="group/row hover:bg-accent/20 transition-all">
-                    <td className="sticky left-0 bg-card py-8 px-10 align-middle z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
+                    <td className="sticky left-0 bg-card py-4 px-6 align-middle z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
                       <div className="font-black text-foreground uppercase tracking-tightest leading-none">{gov.name_en}</div>
                       <div className="mt-2 text-xs font-bold text-muted-foreground/40 italic" dir="rtl">{gov.name_ar}</div>
                     </td>
-                    <td className="py-8 px-6 align-middle font-mono font-black text-base text-muted-foreground group-hover/row:text-foreground transition-colors">
+                    <td className="py-4 px-4 align-middle font-mono font-black text-base text-muted-foreground group-hover/row:text-foreground transition-colors">
                       {gov.shippingFee.toLocaleString(locale)} <span className="text-[10px] uppercase tracking-widest text-muted-foreground/30">EGP</span>
                     </td>
-                    <td className="py-8 px-6 align-middle">
+                    <td className="py-4 px-4 align-middle">
                       <span
                         className={cn(
                           "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
@@ -285,7 +285,7 @@ export default function GovernoratesSettingsPage() {
                         )}
                       </span>
                     </td>
-                    <td className="py-8 px-10 align-middle text-right">
+                    <td className="py-4 px-6 align-middle text-right">
                       <div className="flex items-center justify-end gap-2  transition-opacity">
                         <Button 
                           size="sm" 

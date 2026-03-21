@@ -289,9 +289,7 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
                 </p>
                 <h1 className="text-lg font-black uppercase tracking-tight truncate max-w-[150px] sm:max-w-none text-foreground">
                   Admin Dashboard{" "}
-                  <span className="ml-1 text-[10px] font-black opacity-30">
-                    [{locale.toUpperCase()}]
-                  </span>
+                 
                 </h1>
               </div>
             </div>

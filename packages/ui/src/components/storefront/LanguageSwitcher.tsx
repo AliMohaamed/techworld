@@ -20,7 +20,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
   return (
     <button
       onClick={toggleLanguage}
-      className={`group relative flex items-center gap-3 overflow-hidden rounded-2xl border border-white/5 bg-zinc-950 px-5 py-3 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400   transition-all hover:border-[#ffc105]/30 hover:text-white active:scale-95 ${className}`}
+      className={`group relative flex items-center gap-3 overflow-hidden rounded-2xl border border-white/5  px-5 py-3 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400   transition-all hover:border-[#ffc105]/30 hover:text-white active:scale-95 ${className}`}
     >
       {/* Animated background highlight */}
       <span className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,193,5,0.1),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -29,7 +29,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
         {/* <Languages size={15} className="text-zinc-500 group-hover:text-[#ffc105] transition-colors" /> */}
 
         {/* Character indicator */}
-        <span className="flex h-5 w-5 items-center justify-center rounded-lg bg-white/5 text-[9px] group-hover:bg-[#ffc105] group-hover:text-black transition-all font-black shadow-sm ">
+        <span className="flex h-5 w-5 items-center justify-center text-[9px] group-hover:text-[#ffc105] transition-all font-black  ">
           {isArabic ? "EN" : "ع"}
         </span>
       </div>

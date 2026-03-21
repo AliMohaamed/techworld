@@ -1,47 +1,131 @@
 "use client";
 
+import { useState } from "react";
 import { Link } from "@/navigation";
-import { useQuery } from "convex/react";
-import { ArrowRight, ShieldAlert, ShoppingCart } from "lucide-react";
+import { useQuery, useMutation } from "convex/react";
+import { ArrowRight, ShieldAlert, ShoppingCart, Loader2, ChevronDown } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
+import { Id } from "@backend/convex/_generated/dataModel";
 import { Button } from "@techworld/ui/button";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@techworld/ui";
+import { toast } from "sonner";
+
+type OrderState = 
+  | "PENDING_PAYMENT_INPUT"
+  | "AWAITING_VERIFICATION"
+  | "CONFIRMED"
+  | "READY_FOR_SHIPPING"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "RTO"
+  | "STALLED_PAYMENT"
+  | "CANCELLED"
+  | "FLAGGED_FRAUD";
+
+type FilterType = "ALL" | OrderState;
 
 export default function OrdersPage() {
-  const t = useTranslations("Orders.queue");
+  const tQueue = useTranslations("Orders.queue");
+  const tStates = useTranslations("Orders.details.states");
   const locale = useLocale();
   const profile = useQuery(api.auth.getCurrentStaffProfile);
+  
   const canViewOrders =
     profile?.permissions?.some(
       (permission) => String(permission) === "VIEW_ORDERS",
     ) ?? false;
+    
+  const canManageShipping =
+    profile?.permissions?.some(
+      (permission) => String(permission) === "MANAGE_SHIPPING_STATUS",
+    ) ?? false;
+    
   const orders = useQuery(
-    api.orders.listAwaitingVerificationOrders,
+    api.orders.listAllOrders,
     profile && canViewOrders ? {} : "skip",
   );
-  const visibleOrders = orders ?? [];
+  
+  const updateGenericStatus = useMutation(api.orders.updateGenericStatus);
+  const updateOrderStatus = useMutation(api.orders.updateOrderStatus);
+  
+  const [filter, setFilter] = useState<FilterType>("ALL");
+  const [updatingId, setUpdatingId] = useState<Id<"orders"> | null>(null);
+
+  const visibleOrders = orders ? orders.filter(o => filter === "ALL" || o.state === filter) : [];
+  
+  const handleStatusChange = async (orderId: Id<"orders">, currentState: OrderState, newState: OrderState) => {
+    if (currentState === newState) return;
+    
+    setUpdatingId(orderId);
+    try {
+      if (currentState === "AWAITING_VERIFICATION" && (newState === "CONFIRMED" || newState === "CANCELLED" || newState === "STALLED_PAYMENT")) {
+        await updateOrderStatus({ orderId, newState });
+      } else {
+        await updateGenericStatus({ orderId, newState });
+      }
+      toast.success(`Order status updated to ${tStates(newState)}.`);
+    } catch (error: any) {
+      toast.error("Failed to update status", {
+        description: error.message || "Invalid state transition.",
+      });
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const getStatusColor = (state: string) => {
+    switch(state) {
+      case "AWAITING_VERIFICATION": return "bg-blue-500/10 text-blue-500 border-blue-500/20";
+      case "CONFIRMED": return "bg-[#ffc105]/10 text-[#ffc105] border-[#ffc105]/20";
+      case "READY_FOR_SHIPPING": return "bg-purple-500/10 text-purple-500 border-purple-500/20";
+      case "SHIPPED": return "bg-indigo-500/10 text-indigo-500 border-indigo-500/20";
+      case "DELIVERED": return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
+      case "CANCELLED":
+      case "RTO":
+      case "FLAGGED_FRAUD":
+        return "bg-destructive/10 text-destructive border-destructive/20";
+      default: return "bg-accent/50 text-muted-foreground/80 border-border";
+    }
+  };
+
+  const states: FilterType[] = ["ALL", "AWAITING_VERIFICATION", "CONFIRMED", "READY_FOR_SHIPPING", "SHIPPED", "DELIVERED", "CANCELLED", "RTO"];
 
   return (
     <main className="space-y-8 pb-10">
-      <section className="relative overflow-hidden rounded-[40px] border border-border bg-card px-10 py-12  ">
-        {/* Decorative background for light mode */}
+      <section className="relative overflow-hidden rounded-[40px] border border-border bg-card px-10 py-12">
         <div className="absolute inset-0 bg-gradient-to-br from-[#ffc105]/5 to-transparent dark:hidden pointer-events-none" />
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#ffc105]/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
 
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-4">
-            <ShoppingCart className="text-[#ffc105]" size={20} />
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105] italic">
-              {t("badge")}
+        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <ShoppingCart className="text-[#ffc105]" size={20} />
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105] italic">
+                {tQueue("badge")}
+              </p>
+            </div>
+            <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight italic">
+              {tQueue("title")}
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground/60">
+              {tQueue("description")}
             </p>
           </div>
-          <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight italic">
-            {t("title")}
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground/60">
-            {t("description")}
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            {states.map(s => (
+              <button 
+                key={s}
+                onClick={() => setFilter(s)}
+                className={cn(
+                  "px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-all border",
+                  filter === s ? "bg-[#ffc105] text-black border-[#ffc105]" : "bg-card text-muted-foreground/60 border-border hover:bg-accent hover:text-foreground"
+                )}
+              >
+                {s === "ALL" ? tQueue("table.filters.ALL") : tStates(s as OrderState)}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -50,7 +134,7 @@ export default function OrdersPage() {
           <div className="flex items-center gap-3">
             <div className="h-4 w-1 bg-[#ffc105] rounded-full" />
             <h2 className="text-sm font-black text-foreground uppercase tracking-widest italic">
-              {t("table.title")}
+              {tQueue("table.title")}
             </h2>
           </div>
           <div className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em]">
@@ -60,9 +144,9 @@ export default function OrdersPage() {
 
         {profile === undefined || (canViewOrders && orders === undefined) ? (
           <div className="p-20 text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#ffc105] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+            <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#ffc105]" />
             <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
-              {t("table.loading")}
+              {tQueue("table.loading")}
             </p>
           </div>
         ) : !canViewOrders ? (
@@ -71,7 +155,7 @@ export default function OrdersPage() {
               <ShieldAlert size={32} className="text-destructive" />
             </div>
             <p className="text-sm font-black uppercase tracking-widest text-destructive/60">
-              {t("table.noPermission")}
+              {tQueue("table.noPermission")}
             </p>
           </div>
         ) : visibleOrders.length === 0 ? (
@@ -80,7 +164,7 @@ export default function OrdersPage() {
               <ShieldAlert size={32} className="text-[#ffc105]" />
             </div>
             <p className="text-sm font-black uppercase tracking-widest text-[#ffc105]/60">
-              {t("table.empty")}
+              {tQueue("table.empty")}
             </p>
           </div>
         ) : (
@@ -88,52 +172,66 @@ export default function OrdersPage() {
             <table className="min-w-full text-left text-sm text-foreground">
               <thead className="bg-accent/50 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60 border-b border-border">
                 <tr>
-                  <th className="sticky left-0 bg-card py-6 px-8 z-10">
-                    {t("table.columns.customer")}
+                  <th className="sticky left-0 bg-card py-4 px-6 z-10 w-64">
+                    {tQueue("table.columns.customer")}
                   </th>
-                  <th className="py-6 px-6 whitespace-nowrap">
-                    {t("table.columns.product")}
+                  <th className="py-4 px-4 whitespace-nowrap">
+                    {tQueue("table.columns.product")}
                   </th>
-                  <th className="py-6 px-6 whitespace-nowrap text-center">
-                    {t("table.columns.quantity")}
+                  <th className="py-4 px-4 whitespace-nowrap">
+                    {tQueue("table.columns.status")}
                   </th>
-                  <th className="py-6 px-6 whitespace-nowrap">
-                    {t("table.columns.total")}
+                  <th className="py-4 px-4 whitespace-nowrap text-center">
+                    {tQueue("table.columns.quantity")}
                   </th>
-                  <th className="py-6 px-6 whitespace-nowrap">
-                    {t("table.columns.receipt")}
+                  <th className="py-4 px-4 whitespace-nowrap">
+                    {tQueue("table.columns.total")}
                   </th>
-                  <th className="py-6 px-8 text-right whitespace-nowrap">
-                    {t("table.columns.action")}
+                  <th className="py-4 px-4 whitespace-nowrap">
+                    {tQueue("table.columns.receipt")}
+                  </th>
+                  <th className="py-4 px-6 text-right whitespace-nowrap">
+                    {tQueue("table.columns.action")}
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/50">
-                {visibleOrders.map((order, idx) => (
+              <tbody className="divide-y divide-border/50 bg-card">
+                {visibleOrders.map((order) => (
                   <tr
                     key={order._id}
-                    className="group/row hover:bg-accent/20 transition-all"
+                    className={cn(
+                      "group/row hover:bg-accent/20 transition-all",
+                      updatingId === order._id ? "opacity-50 pointer-events-none" : ""
+                    )}
                   >
-                    <td className="sticky left-0 bg-card py-8 px-8 align-middle z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
-                      <div className="font-black text-foreground uppercase tracking-tightest leading-none">
-                        {order.customerName ?? t("table.walkInCustomer")}
+                    <td className="sticky left-0 bg-card py-4 px-6 align-middle z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
+                      <div className="font-black text-foreground uppercase tracking-tightest leading-none truncate">
+                        {order.customerName ?? tQueue("table.walkInCustomer")}
                       </div>
                       <div className="mt-2 text-[10px] font-bold text-muted-foreground/40 font-mono tracking-wider">
-                        {order.customerPhone ?? t("table.noPhone")}
+                        {order.customerPhone ?? tQueue("table.noPhone")}
                       </div>
                     </td>
-                    <td className="py-8 px-6 align-middle">
-                      <div className="font-bold text-foreground text-xs uppercase tracking-tightest">
-                        {order.product?.name_en ?? t("table.unknownProduct")}
+                    <td className="py-4 px-4 align-middle">
+                      <div className="font-bold text-foreground text-xs uppercase tracking-tightest max-w-[200px] truncate">
+                        {order.product?.name_en ?? tQueue("table.unknownProduct")}
                       </div>
-                      <div className="mt-1.5 text-[10px] font-black text-[#ffc105] uppercase tracking-widest italic">
-                        {order.category?.name_en ?? t("table.noCategory")}
+                      <div className="mt-1.5 text-[10px] font-black text-[#ffc105] uppercase tracking-widest italic truncate max-w-[200px]">
+                        {order.category?.name_en ?? tQueue("table.noCategory")}
                       </div>
                     </td>
-                    <td className="py-8 px-6 align-middle text-center font-mono font-black text-sm text-muted-foreground">
+                    <td className="py-4 px-4 align-middle">
+                      <span className={cn(
+                        "px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border whitespace-nowrap",
+                        getStatusColor(order.state)
+                      )}>
+                        {tStates(order.state as OrderState)}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 align-middle text-center font-mono font-black text-sm text-muted-foreground">
                       {order.quantity.toLocaleString(locale)}
                     </td>
-                    <td className="py-8 px-6 align-middle whitespace-nowrap">
+                    <td className="py-4 px-4 align-middle whitespace-nowrap">
                       <span className="font-black text-sm tracking-tightest text-foreground">
                         {order.total_price.toLocaleString(locale)}
                       </span>
@@ -141,7 +239,7 @@ export default function OrdersPage() {
                         EGP
                       </span>
                     </td>
-                    <td className="py-8 px-6 align-middle">
+                    <td className="py-4 px-4 align-middle">
                       {order.receiptUrl ? (
                         <a
                           className="inline-flex items-center gap-2 rounded-full border border-[#ffc105]/20 bg-[#ffc105]/5 px-3 py-1.5 text-[9px] font-black text-[#ffc105] uppercase tracking-widest hover:bg-[#ffc105] hover:text-black transition-all shadow-sm"
@@ -149,31 +247,60 @@ export default function OrdersPage() {
                           rel="noreferrer"
                           target="_blank"
                         >
-                          <ImageIcon size={10} /> {t("table.viewReceipt")}
+                          <ImageIcon size={10} /> {tQueue("table.viewReceipt")}
                         </a>
                       ) : (
                         <span className="text-[10px] font-black text-muted-foreground/30 uppercase tracking-widest italic">
-                          {t("table.pendingReceipt")}
+                          {tQueue("table.pendingReceipt")}
                         </span>
                       )}
                     </td>
-                    <td className="py-8 px-8 align-middle text-right">
-                      <Link href={`/orders/${order._id}`}>
-                        <Button
-                          size="sm"
-                          type="button"
-                          className="rounded-xl h-10 px-5 text-[10px] font-black uppercase tracking-widest bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   group/btn"
-                        >
-                          {t("table.review")}
-                          <ArrowRight
-                            size={14}
-                            className={cn(
-                              "transition-transform group-hover/btn:translate-x-1",
-                              locale === "ar" ? "rotate-180 mr-2" : "ml-2",
-                            )}
-                          />
-                        </Button>
-                      </Link>
+                    <td className="py-4 px-6 align-middle text-right">
+                      <div className="flex items-center justify-end gap-3 flex-nowrap">
+                        <div className="relative">
+                          <select 
+                            value={order.state} 
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleStatusChange(order._id, order.state as OrderState, e.target.value as OrderState)}
+                            className="appearance-none bg-background border border-border/50 text-foreground w-36 h-9 text-[10px] py-0 pl-3 pr-8 uppercase tracking-widest font-bold font-mono rounded-xl outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 disabled:opacity-50 transition-all hover:bg-accent/20 cursor-pointer"
+                            disabled={!canManageShipping && order.state !== "AWAITING_VERIFICATION"}
+                          >
+                            <option value={order.state} disabled>{tStates(order.state as OrderState)}</option>
+                            {order.state === "AWAITING_VERIFICATION" && <option value="CONFIRMED">{tStates("CONFIRMED")}</option>}
+                            {order.state === "AWAITING_VERIFICATION" && <option value="CANCELLED">{tStates("CANCELLED")}</option>}
+                            {order.state === "AWAITING_VERIFICATION" && <option value="STALLED_PAYMENT">{tStates("STALLED_PAYMENT")}</option>}
+                            
+                            {order.state === "CONFIRMED" && <option value="READY_FOR_SHIPPING">{tStates("READY_FOR_SHIPPING")}</option>}
+                            {order.state === "CONFIRMED" && <option value="CANCELLED">{tStates("CANCELLED")}</option>}
+                            
+                            {order.state === "READY_FOR_SHIPPING" && <option value="SHIPPED">{tStates("SHIPPED")}</option>}
+                            {order.state === "READY_FOR_SHIPPING" && <option value="CANCELLED">{tStates("CANCELLED")}</option>}
+                            
+                            {order.state === "SHIPPED" && <option value="DELIVERED">{tStates("DELIVERED")}</option>}
+                            {order.state === "SHIPPED" && <option value="RTO">{tStates("RTO")}</option>}
+                            {order.state === "SHIPPED" && <option value="CANCELLED">{tStates("CANCELLED")}</option>}
+                          </select>
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground/60">
+                            <ChevronDown size={14} />
+                          </div>
+                        </div>
+                        
+                        <Link href={`/orders/${order._id}`}>
+                          <Button
+                            size="sm"
+                            type="button"
+                            className="rounded-xl h-9 px-4 text-[10px] font-black uppercase tracking-widest bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all group/btn"
+                          >
+                            {tQueue("table.review")}
+                            <ArrowRight
+                              size={12}
+                              className={cn(
+                                "transition-transform group-hover/btn:translate-x-1",
+                                locale === "ar" ? "rotate-180 mr-2" : "ml-2",
+                              )}
+                            />
+                          </Button>
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}

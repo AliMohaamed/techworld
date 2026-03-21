@@ -114,6 +114,40 @@ export const listAwaitingVerificationOrders = query({
   },
 });
 
+export const listAllOrders = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return null;
+    }
+
+    await requirePermission(ctx, "VIEW_ORDERS");
+
+    const orders = await ctx.db
+      .query("orders")
+      .order("desc")
+      .collect();
+
+    return Promise.all(
+      orders.map(async (order) => {
+        const product = await ctx.db.get(order.productId);
+        const sku = await ctx.db.get(order.skuId);
+        const category = product ? await ctx.db.get(product.categoryId) : null;
+        const receiptUrl = await getReceiptUrl(ctx, order.paymentReceiptRef);
+
+        return {
+          ...order,
+          product,
+          sku,
+          category,
+          receiptUrl,
+        };
+      }),
+    );
+  },
+});
+
 export const getOrderDetails = query({
   args: { orderId: v.id("orders") },
   handler: async (ctx, args) => {
