@@ -1,0 +1,36 @@
+{
+  "CheckoutForm": {
+    "shipping": "Shipping Information",
+    "labels": {
+      "fullName": "Full Name",
+      "phone": "Phone Number (WhatsApp preferred)",
+      "governorate": "Select governorate",
+      "address": "Complete Delivery Address"
+    },
+    "promo": {
+      "label": "Discount Code",
+      "placeholder": "Enter code",
+      "apply": "Apply",
+      "applied": "Code Applied",
+      "remove": "Remove"
+    },
+    "summary": {
+      "subtotal": "Items subtotal",
+      "discount": "Promo Discount",
+      "shipping": "Shipping",
+      "total": "Order Total",
+      "loading": "Loading...",
+      "unavailable": "Unavailable"
+    },
+    "errors": {
+      "deliveryUnavailable": "Delivery is currently unavailable. Please try again later.",
+      "selectGovernorate": "Select your governorate to calculate delivery and continue.",
+      "placeOrderFailed": "Order placement failed.",
+      "noGovernorates": "Delivery is currently unavailable because no active governorates are configured."
+    },
+    "actions": {
+      "confirm": "CONFIRM ORDER"
+    },
+    "notice": "By confirming, you agree to receive a confirmation via WhatsApp."
+  }
+}

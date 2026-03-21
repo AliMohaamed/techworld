@@ -1,13 +1,16 @@
-"use client";
+'use client';
 
-import Link from "next/link";
+import { Link } from "@/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@backend/convex/_generated/api";
 import { ArrowUpRight, Cpu, MousePointer2, Headphones } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
 
 export default function CategorySection() {
-  const categoryResult = useQuery(api.categories.listActiveCategories);
-  const categories = categoryResult?.categories;
+  const t = useTranslations('CategorySection');
+  const locale = useLocale();
+  const categoriesResult = useQuery(api.categories.listActiveCategories);
+  const categories = categoriesResult?.categories;
 
   const getCategoryIcon = (slug: string) => {
     switch (slug?.toLowerCase()) {
@@ -26,10 +29,10 @@ export default function CategorySection() {
       <div className="container mx-auto space-y-12">
         <div className="flex items-center justify-between">
           <h2 className="font-space-grotesk text-2xl md:text-4xl lg:text-5xl font-black text-white uppercase tracking-tighter">
-            Shop by <span className="text-[#ffc105]">Category</span>
+            {t('title')} <span className="text-[#ffc105]">{t('accentTitle')}</span>
           </h2>
           <Link href="/categories" className="group flex items-center space-x-2 text-zinc-500 hover:text-white transition-colors">
-            <span className="text-[10px] font-bold uppercase tracking-widest leading-none">View All</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest leading-none">{t('viewAll')}</span>
             <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </Link>
         </div>
@@ -47,13 +50,10 @@ export default function CategorySection() {
               
               <div className="space-y-1">
                 <h3 className="font-space-grotesk text-2xl font-black text-white uppercase tracking-tighter group-hover:text-[#ffc105] transition-colors line-clamp-1">
-                  {category.name_en}
+                  {locale === 'en' ? category.name_en : category.name_ar}
                 </h3>
                 <p className="text-zinc-500 text-xs font-medium uppercase tracking-widest">
                   {category.slug.replace('-', ' ')}
-                </p>
-                <p className="font-arabic text-zinc-600 text-sm pt-1">
-                  {category.name_ar}
                 </p>
               </div>
 
@@ -68,7 +68,3 @@ export default function CategorySection() {
     </section>
   );
 }
-
-
-
-

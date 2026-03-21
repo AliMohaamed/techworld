@@ -1,0 +1,28 @@
+{
+  "Footer": {
+    "tagline": "Elevating your digital experience with premium, high-performance technology designed for the modern era.",
+    "sections": {
+      "explore": "Explore",
+      "support": "Support",
+      "newsletter": "Newsletter"
+    },
+    "links": {
+      "newReleases": "New Releases",
+      "bestSellers": "Best Sellers",
+      "giftCards": "Gift Cards",
+      "techGuide": "Tech Guide",
+      "shippingInfo": "Shipping Info",
+      "returns": "Returns & Refunds",
+      "orderTracking": "Order Tracking",
+      "helpCenter": "Help Center",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "cookieSettings": "Cookie Settings"
+    },
+    "newsletter": {
+      "text": "Stay updated with the latest tech drops.",
+      "placeholder": "Enter your email"
+    },
+    "copyright": "© 2024 TECHWORLD Inc. All rights reserved."
+  }
+}

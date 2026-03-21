@@ -1,0 +1,37 @@
+{
+  "FilterDrawer": {
+    "desktop": {
+      "badge": "تصفية الكتالوج",
+      "title": "الفلاتر"
+    },
+    "mobile": {
+      "button": "الفلاتر",
+      "badge": "نافذة المحمول",
+      "title": "تصفية المنتجات",
+      "closeAria": "إغلاق الفلاتر"
+    },
+    "labels": {
+      "search": "البحث",
+      "category": "القسم",
+      "minPrice": "أقل سعر",
+      "maxPrice": "أعلى سعر",
+      "sort": "الترتيب"
+    },
+    "placeholders": {
+      "search": "ابحث عن منتجات",
+      "maxPrice": "بدون حد"
+    },
+    "options": {
+      "allCategories": "جميع الأقسام",
+      "sort": {
+        "newest": "أحدث الإضافات",
+        "price_asc": "السعر: من الأقل إلى الأعلى",
+        "price_desc": "السعر: من الأعلى إلى الأقل"
+      }
+    },
+    "actions": {
+      "clear": "مسح",
+      "apply": "تطبيق"
+    }
+  }
+}

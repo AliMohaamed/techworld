@@ -1,0 +1,37 @@
+{
+  "FilterDrawer": {
+    "desktop": {
+      "badge": "Refine Catalog",
+      "title": "Filters"
+    },
+    "mobile": {
+      "button": "Filters",
+      "badge": "Mobile Drawer",
+      "title": "Filter Products",
+      "closeAria": "Close filters"
+    },
+    "labels": {
+      "search": "Search",
+      "category": "Category",
+      "minPrice": "Min Price",
+      "maxPrice": "Max Price",
+      "sort": "Sort"
+    },
+    "placeholders": {
+      "search": "Search products",
+      "maxPrice": "No limit"
+    },
+    "options": {
+      "allCategories": "All Categories",
+      "sort": {
+        "newest": "Newest arrivals",
+        "price_asc": "Price: low to high",
+        "price_desc": "Price: high to low"
+      }
+    },
+    "actions": {
+      "clear": "Clear",
+      "apply": "Apply"
+    }
+  }
+}

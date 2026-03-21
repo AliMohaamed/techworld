@@ -1,0 +1,189 @@
+{
+  "Catalog": {
+    "categories": {
+      "badge": "Catalog",
+      "title": "Category Management",
+      "description": "Create bilingual categories, edit operational metadata, and soft-disable categories without deleting history.",
+      "actions": {
+        "create": "Create Category",
+        "edit": "Edit",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "updating": "Updating..."
+      },
+      "table": {
+        "badge": "Data Table",
+        "title": "All categories",
+        "total": "{count} total",
+        "columns": {
+          "name": "Name",
+          "slug": "Slug",
+          "products": "Products",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "empty": "No categories yet.",
+        "loading": "Loading..."
+      },
+      "messages": {
+        "activated": "Category activated.",
+        "deactivated": "Category deactivated.",
+        "updateFailed": "Category update failed.",
+        "incomplete": "Category details are incomplete.",
+        "incompleteDescription": "English and Arabic names are required.",
+        "updated": "Category updated.",
+        "created": "Category created.",
+        "saveFailed": "Category save failed.",
+        "catalogUpdateFailed": "Catalog update failed."
+      },
+      "form": {
+        "createTitle": "New Category",
+        "editTitle": "Edit Category",
+        "badge": "Catalog Management",
+        "description": "Manage your store's taxonomy. Every category requires English and Arabic names for our bilingual storefront.",
+        "fields": {
+          "nameEn": "English name",
+          "nameAr": "Arabic name",
+          "slug": "Slug",
+          "descriptionEn": "English description",
+          "descriptionAr": "Arabic description",
+          "thumbnailImageId": "Thumbnail image ID",
+          "isActive": "Start this category as active"
+        },
+        "placeholders": {
+          "nameEn": "e.g. Mobile Phones",
+          "nameAr": "مثال: الهواتف المحمولة",
+          "slug": "mobile-accessories",
+          "descriptionEn": "Describe the category in English...",
+          "descriptionAr": "صف القسم باللغة العربية...",
+          "thumbnailImageId": "Enter image ID or upload via storage"
+        },
+        "buttons": {
+          "create": "Create Category",
+          "update": "Update Category",
+          "save": "Save Changes",
+          "saving": "Saving...",
+          "cancel": "Cancel"
+        }
+      }
+    },
+    "products": {
+      "badge": "Catalog",
+      "title": "Advanced Product Management",
+      "description": "Manage product galleries, sale pricing, and variant-level SKU inventory from an in-page product sheet.",
+      "actions": {
+        "create": "Create Product",
+        "edit": "Edit",
+        "publish": "Publish",
+        "unpublish": "Unpublish",
+        "updating": "Updating...",
+        "save": "Save"
+      },
+      "table": {
+        "badge": "Data Table",
+        "title": "All products",
+        "total": "{count} total",
+        "columns": {
+          "product": "Product",
+          "category": "Category",
+          "pricing": "Pricing",
+          "variants": "Variants",
+          "displayStock": "Display Stock",
+          "realStock": "Real Stock",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "empty": "No products created yet.",
+        "loading": "Loading...",
+        "noSlug": "no-slug",
+        "activeCategory": "Active category",
+        "inactiveCategory": "Inactive category",
+        "variantsCount": "{count} variants",
+        "defaultSkuOnly": "Default SKU only",
+        "total": "{count} total",
+        "managedViaSkus": "Managed via SKUs — use Edit"
+      },
+      "messages": {
+        "restockPrompt": "Enter restock quantity for {name}:",
+        "restockInvalid": "Invalid quantity",
+        "restockSuccess": "Restocked {quantity} items. New real stock: {total}",
+        "restockFailed": "Restock failed",
+        "saveFirst": "Please save the product first to create the SKU before restocking.",
+        "displayStockUpdated": "Display stock updated.",
+        "displayStockFailed": "Display stock update failed.",
+        "realStockUpdated": "Real stock updated.",
+        "realStockFailed": "Real stock update failed.",
+        "stockUpdateFailed": "Stock update failed.",
+        "unpublishSuccess": "Product moved back to draft.",
+        "publishSuccess": "Product published.",
+        "publicationFailed": "Publication update failed.",
+        "publicationBlocked": "Publication blocked.",
+        "updated": "Product updated.",
+        "created": "Product created."
+      },
+      "form": {
+        "createTitle": "Create advanced product",
+        "editTitle": "Edit advanced product",
+        "badge": "Product Management",
+        "description": "Configure core metadata. Localization is mandatory for TechWorld gadgets.",
+        "fields": {
+          "nameEn": "English name",
+          "nameAr": "Arabic name",
+          "slug": "Slug",
+          "descriptionEn": "English description",
+          "descriptionAr": "Arabic description",
+          "category": "Category",
+          "status": "Status",
+          "sellingPrice": "Selling price",
+          "compareAtPrice": "Compare-at price",
+          "cogs": "COGS",
+          "thumbnail": "Primary thumbnail storage ID",
+          "mediaGalleryTitle": "Media Gallery",
+          "mediaGalleryDescription": "Upload and assign storage images",
+          "variants": "Variants",
+          "skuConfig": "SKU configuration",
+          "variant": "Variant {index}",
+          "skus": {
+            "title": "SKU Matrix (Variant Control)",
+            "add": "Add Variant",
+            "name": "Variant name",
+            "color": "Color",
+            "size": "Size",
+            "type": "Type",
+            "realStock": "Real stock",
+            "displayStock": "Display stock",
+            "price": "Variant price",
+            "compareAt": "Variant compare-at",
+            "linkedImage": "Linked image",
+            "isDefault": "Default Selection"
+          }
+        },
+        "placeholders": {
+          "selectCategory": "Select category",
+          "nameEn": "e.g. Ultra HD Pro Watch",
+          "nameAr": "مثال: ساعة ألترا أتش دي برو",
+          "slug": "ultra-hd-pro-watch",
+          "descriptionEn": "Product features and overview...",
+          "descriptionAr": "مميزات المنتج ونظرة عامة...",
+          "selectThumbnail": "Select primary image",
+          "variantName": "Default",
+          "color": "e.g. Midnight Black",
+          "size": "e.g. XL or 44mm",
+          "type": "e.g. Leather or Mesh",
+          "noLinkedImage": "No linked image"
+        },
+        "statusOptions": {
+          "draft": "Draft",
+          "published": "Published"
+        },
+        "buttons": {
+          "create": "Create Product",
+          "update": "Update Product",
+          "saving": "Saving...",
+          "cancel": "Cancel",
+          "remove": "Remove"
+        }
+      }
+    }
+  }
+}

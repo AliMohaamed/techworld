@@ -2,6 +2,7 @@
 
 import type { Id } from "@backend/convex/_generated/dataModel";
 import FeaturedProductCard from "./featured-product-card";
+import { useTranslations } from "next-intl";
 
 type FeaturedProduct = {
   _id: Id<"products">;
@@ -26,6 +27,7 @@ interface FeaturedProductsProps {
 }
 
 export default function FeaturedProducts({ products }: FeaturedProductsProps) {
+  const t = useTranslations('FeaturedProducts');
   if (!products || products.length === 0) return null;
 
   return (
@@ -35,14 +37,14 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
           <div className="space-y-2">
             <div className="inline-flex items-center space-x-2">
               <div className="h-1 w-8 bg-[#ffc105]" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#ffc105]">Premium Collection</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#ffc105]">{t('badge')}</span>
             </div>
             <h2 className="font-space-grotesk text-4xl font-black uppercase tracking-tighter text-white md:text-5xl lg:text-6xl">
-              Featured <span className="text-zinc-800 outline-zinc-800">Gadgets</span>
+              {t('title')} <span className="text-zinc-800 outline-zinc-800">{t('accentTitle')}</span>
             </h2>
           </div>
           <p className="max-w-xs text-sm leading-relaxed text-zinc-500">
-            Curated selection of our highest performing hardware. Tested for perfection.
+            {t('description')}
           </p>
         </div>
 

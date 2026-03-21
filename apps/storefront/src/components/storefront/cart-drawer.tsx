@@ -6,12 +6,16 @@ import { useSession } from "@/providers/session-provider";
 import { useCart } from "@/providers/cart-provider";
 import { X, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/navigation";
 import { Id } from "@backend/convex/_generated/dataModel";
 import { useState } from "react";
 import { PromoCodeInput } from "@techworld/ui";
+import { useTranslations, useLocale } from "next-intl";
+import { toast } from "sonner";
 
 export default function CartDrawer() {
+  const t = useTranslations('CartDrawer');
+  const locale = useLocale();
   const { sessionId } = useSession();
   const { isOpen, closeCart } = useCart();
   const [appliedPromo, setAppliedPromo] = useState<string | undefined>(undefined);
@@ -26,8 +30,14 @@ export default function CartDrawer() {
     skuId: Id<"skus">,
     currentQty: number,
     delta: number,
+    displayStock: number,
   ) => {
     const newQty = Math.max(1, currentQty + delta);
+    if (delta > 0 && newQty > displayStock) {
+      toast.error(t('item.stockLimit'));
+      return;
+    }
+
     try {
       await addToCart({ sessionId, productId, skuId, quantity: newQty });
     } catch (e) {
@@ -43,105 +53,117 @@ export default function CartDrawer() {
     <>
       {/* Overlay */}
       <div 
-        className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity" 
+        className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-md transition-all duration-500 animate-in fade-in" 
         onClick={closeCart} 
       />
       
       {/* Drawer */}
-      <div className="fixed inset-y-0 right-0 z-[70] w-full max-w-md border-l border-white/5 bg-[#0a0a0a] shadow-2xl transition-transform duration-300 ease-in-out">
+      <div className={`fixed inset-y-0 ${locale === 'ar' ? 'left-0 border-r' : 'right-0 border-l'} z-[70] w-full max-w-md border-white/5 bg-[#050505] shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] animate-in ${locale === 'ar' ? 'slide-in-from-left' : 'slide-in-from-right'}`}>
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-white/5 p-6">
-            <h2 className="font-space-grotesk text-xl font-bold tracking-tight text-white uppercase flex items-center gap-2">
-              <ShoppingBag size={20} className="text-[#ffc105]" />
-              MY SHOPPING <span className="text-[#ffc105]">CART</span>
+          <div className="flex items-center justify-between border-b border-white/5 p-8">
+            <h2 className="font-space-grotesk text-2xl font-black uppercase tracking-tight text-white flex items-center gap-3">
+              <div className="h-8 w-8 rounded-xl bg-[#ffc105]/10 flex items-center justify-center text-[#ffc105]">
+                <ShoppingBag size={20} />
+              </div>
+              <span>
+                {t('title')} <span className="text-[#ffc105]">{t('accentTitle')}</span>
+              </span>
             </h2>
             <button 
               onClick={closeCart}
-              className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-white"
+              className="rounded-2xl p-3 text-zinc-500 transition-all hover:bg-white/5 hover:text-white active:scale-95"
             >
               <X size={24} />
             </button>
           </div>
 
           {/* Cart Items */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide">
             {!cart || cart.items.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center space-y-4 text-center">
-                <div className="rounded-full bg-zinc-900/50 p-6">
-                  <ShoppingBag size={48} className="text-zinc-700" />
+              <div className="flex h-full flex-col items-center justify-center space-y-6 text-center">
+                <div className="relative">
+                  <div className="absolute inset-0 animate-pulse rounded-full bg-zinc-900/40" />
+                  <div className="relative rounded-full bg-zinc-900/50 p-10 ring-1 ring-white/5 shadow-2xl">
+                    <ShoppingBag size={64} className="text-zinc-800" />
+                  </div>
                 </div>
-                <div>
-                  <p className="font-space-grotesk text-sm font-bold text-white uppercase">Your cart is empty</p>
-                  <p className="text-xs text-zinc-500 max-w-[200px] mt-1 mx-auto">Looks like you haven't added any products yet.</p>
+                <div className="space-y-2">
+                  <p className="font-space-grotesk text-lg font-black text-white uppercase tracking-tight">{t('empty.title')}</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 max-w-[220px] mx-auto leading-relaxed">{t('empty.description')}</p>
                 </div>
                 <button 
                   onClick={closeCart}
-                  className="mt-4 font-space-grotesk text-xs font-bold text-[#ffc105] hover:underline uppercase tracking-widest"
+                  className="mt-6 font-space-grotesk text-xs font-black text-[#ffc105] hover:text-white transition-all uppercase tracking-[0.3em] border border-[#ffc105]/20 px-8 py-3 rounded-full"
                 >
-                  Start Shopping
+                  {t('empty.cta')}
                 </button>
               </div>
             ) : (
               cart.items.map((item) => (
-                <div key={`${item.productId}-${item.skuId}`} className="flex gap-4">
-                  <div className="relative aspect-square h-24 w-24 overflow-hidden rounded-xl border border-white/5 bg-zinc-950">
+                <div key={`${item.productId}-${item.skuId}`} className="flex gap-6 group animate-in slide-in-from-bottom-2 duration-300">
+                  <div className="relative aspect-square h-24 w-24 flex-shrink-0 overflow-hidden rounded-[24px] border border-white/5 bg-zinc-950 shadow-inner group-hover:border-[#ffc105]/20 transition-all">
                     {item.product?.images?.[0] ? (
-                      <Image
-                        src={item.product?.images[0]}
-                        alt={item.product?.name_en || "Product"}
-                        fill
-                        className="object-cover"
-                      />
+                      <div className="relative h-full w-full">
+                         <Image 
+                           src={item.product.images[0]} 
+                           alt={locale === 'en' ? item.product.name_en : item.product.name_ar}
+                           fill
+                           className="object-cover transition-transform group-hover:scale-110"
+                         />
+                      </div>
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-zinc-800">
-                        No Image
+                      <div className="flex h-full w-full items-center justify-center text-zinc-800 text-[9px] font-black uppercase tracking-widest text-center px-2">
+                        {t('item.noImage')}
                       </div>
                     )}
                   </div>
 
-                  <div className="flex flex-1 flex-col justify-between py-1">
-                    <div className="space-y-1">
-                      <div className="flex justify-between items-start gap-2">
+                  <div className="flex flex-1 flex-col justify-between py-1 min-w-0">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-start gap-4">
                         <Link 
                           href={`/products/${item.product?.slug || item.productId}`}
                           onClick={closeCart}
-                          className="font-space-grotesk text-sm font-medium text-white hover:text-[#ffc105] transition-colors line-clamp-1 truncate"
+                          className="font-space-grotesk text-sm font-black text-white hover:text-[#ffc105] transition-colors line-clamp-1 uppercase tracking-tight"
                         >
-                          {item.product?.name_en}
+                          {locale === 'en' ? item.product?.name_en : item.product?.name_ar}
                         </Link>
                         <button 
                           onClick={() => handleRemove(item.productId, item.skuId)}
-                          className="text-zinc-600 hover:text-red-400 transition-colors"
+                          className="text-zinc-700 hover:text-red-500 transition-all active:scale-90"
                         >
                           <Trash2 size={16} />
                         </button>
                       </div>
-                      {item.sku?.variantName && item.sku.variantName !== "Default" ? (
-                        <p className="text-xs text-zinc-500">{item.sku.variantName}</p>
-                      ) : null}
+                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 bg-white/5 w-fit px-2 py-0.5 rounded shadow-sm">
+                        {item.sku?.variantName && item.sku.variantName !== "Default" 
+                          ? item.sku.variantName 
+                          : t('item.defaultVariant')}
+                      </p>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 rounded-lg border border-white/5 bg-zinc-900/50 p-1">
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="flex items-center gap-3 rounded-xl border border-white/5 bg-zinc-900/40 p-1.5 shadow-inner">
                         <button 
-                          onClick={() => handleUpdateQuantity(item.productId, item.skuId, item.quantity, -1)}
-                          className="p-1 text-zinc-400 hover:text-white"
+                          onClick={() => handleUpdateQuantity(item.productId, item.skuId, item.quantity, -1, item.sku?.display_stock ?? 0)}
+                          className="p-1.5 text-zinc-500 hover:text-white transition-colors"
                         >
                           <Minus size={14} />
                         </button>
-                        <span className="min-w-[2ch] text-center font-space-grotesk text-sm font-bold text-white">
+                        <span className="min-w-[2ch] text-center font-space-grotesk text-sm font-black text-white">
                           {item.quantity}
                         </span>
                         <button 
-                          onClick={() => handleUpdateQuantity(item.productId, item.skuId, item.quantity, 1)}
-                          className="p-1 text-zinc-400 hover:text-white"
+                          onClick={() => handleUpdateQuantity(item.productId, item.skuId, item.quantity, 1, item.sku?.display_stock ?? 0)}
+                          disabled={item.quantity >= (item.sku?.display_stock ?? 0)}
+                          className="p-1.5 text-zinc-500 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                           <Plus size={14} />
                         </button>
                       </div>
-                      <span className="font-space-grotesk text-sm font-bold text-[#ffc105]">
-                        {((item.sku?.price ?? item.product?.selling_price ?? 0) * item.quantity).toLocaleString()} EGP
+                      <span className="font-space-grotesk text-base font-black text-white tracking-tight">
+                        {((item.sku?.price ?? item.product?.selling_price ?? 0) * item.quantity).toLocaleString(locale)} <span className="text-[10px] text-[#ffc105]">EGP</span>
                       </span>
                     </div>
                   </div>
@@ -152,10 +174,10 @@ export default function CartDrawer() {
 
           {/* Footer with Checkout button */}
           {cart && cart.items.length > 0 && (
-            <div className="border-t border-white/5 bg-zinc-950 p-6 space-y-6 shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
-              <div className="space-y-3">
-                <p className="font-space-grotesk text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                  HAVE A PROMO CODE?
+            <div className="border-t border-white/10 bg-black p-8 space-y-8 shadow-[0_-15px_40px_rgba(0,0,0,0.5)] backdrop-blur-3xl">
+              <div className="space-y-4">
+                <p className="font-space-grotesk text-[10px] font-black uppercase tracking-[0.4em] text-zinc-700 ml-1">
+                  {t('promo.label')}
                 </p>
                 <PromoCodeInput
                   onApply={(code: string) => setAppliedPromo(code)}
@@ -163,28 +185,32 @@ export default function CartDrawer() {
                   appliedCode={appliedPromo}
                   error={cart.promoError}
                   discountAmount={cart.promoDiscount}
+                  placeholder={t('promo.placeholder')}
+                  applyLabel={t('promo.apply')}
+                  appliedLabel={t('promo.applied')}
+                  removeLabel={t('promo.remove')}
                 />
               </div>
 
-              <div className="space-y-2 pt-2">
-                <div className="flex justify-between text-zinc-400 text-xs font-medium uppercase tracking-widest">
-                  <span>Subtotal</span>
-                  <span className="text-white">{(cart.subtotal || 0).toLocaleString()} EGP</span>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600">
+                  <span>{t('summary.subtotal')}</span>
+                  <span className="text-zinc-400">{(cart.subtotal || 0).toLocaleString(locale)} EGP</span>
                 </div>
                 {cart.promoDiscount ? (
-                  <div className="flex justify-between text-emerald-400 text-xs font-medium uppercase tracking-widest">
-                    <span>Discount</span>
-                    <span>-{cart.promoDiscount.toLocaleString()} EGP</span>
+                  <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">
+                    <span>{t('summary.discount')}</span>
+                    <span className="font-mono">-{cart.promoDiscount.toLocaleString(locale)} EGP</span>
                   </div>
                 ) : null}
-                <div className="flex justify-between text-zinc-400 text-xs font-medium uppercase tracking-widest">
-                  <span>Shipping</span>
-                  <span className="text-zinc-500 italic">CALCULATED AT NEXT STEP</span>
+                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600">
+                  <span>{t('summary.shipping')}</span>
+                  <span className="text-zinc-700 italic lowercase tracking-wide font-medium">{t('summary.shippingNote')}</span>
                 </div>
-                <div className="flex justify-between border-t border-white/5 pt-4 text-white">
-                  <span className="font-space-grotesk text-lg font-bold uppercase tracking-widest">Total</span>
-                  <span className="font-space-grotesk text-2xl font-bold text-[#ffc105]">
-                    {(cart.total || 0).toLocaleString()} EGP
+                <div className="flex justify-between border-t border-white/10 pt-8 text-white items-end">
+                  <span className="font-space-grotesk text-sm font-black uppercase tracking-[0.5em] text-zinc-400 leading-none">{t('summary.total')}</span>
+                  <span className="font-space-grotesk text-4xl font-black text-[#ffc105] tracking-tightest leading-none">
+                    {(cart.total || 0).toLocaleString(locale)} <span className="text-lg">EGP</span>
                   </span>
                 </div>
               </div>
@@ -192,9 +218,9 @@ export default function CartDrawer() {
               <Link 
                 href="/checkout"
                 onClick={closeCart}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#ffc105] py-4 font-space-grotesk text-sm font-black uppercase tracking-[0.2em] text-black transition-all hover:scale-[1.02] active:scale-95"
+                className="group relative flex w-full items-center justify-center gap-3 rounded-2xl bg-[#ffc105] py-5 font-space-grotesk text-lg font-black uppercase tracking-[0.3em] text-black transition-all hover:bg-white active:scale-[0.98] shadow-[0_10px_30px_rgba(255,193,5,0.2)]"
               >
-                PROCEED TO CHECKOUT
+                {t('summary.checkout')}
               </Link>
             </div>
           )}

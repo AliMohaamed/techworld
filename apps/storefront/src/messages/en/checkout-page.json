@@ -1,0 +1,20 @@
+{
+  "CheckoutPage": {
+    "empty": {
+      "title": "Your Cart is Empty",
+      "back": "Back to Store"
+    },
+    "backToShopping": "Back to Shopping",
+    "title": "Checkout",
+    "accentTitle": "Review",
+    "summary": {
+      "title": "Order Summary",
+      "subtotal": "Items Subtotal",
+      "discount": "Promo Discount",
+      "total": "Total",
+      "shippingNote": "Final shipping calculated at next step",
+      "defaultVariant": "Default variant",
+      "noImage": "No Image"
+    }
+  }
+}

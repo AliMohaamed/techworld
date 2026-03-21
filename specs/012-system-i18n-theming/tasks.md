@@ -28,8 +28,8 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Core localization filesystem structures that multiple apps will use
 
-- [ ] T003 [P] Setup base `en.json` and `ar.json` translation files in `apps/storefront/src/messages/`
-- [ ] T004 [P] Setup base `en.json` and `ar.json` translation files in `apps/admin/src/messages/`
+- [x] T003 [P] Setup base `en.json` and `ar.json` translation files in `apps/storefront/src/messages/`
+- [x] T004 [P] Setup base `en.json` and `ar.json` translation files in `apps/admin/src/messages/`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -43,15 +43,15 @@ description: "Task list template for feature implementation"
 
 ### Implementation for User Story 1
 
-- [ ] T005 [P] [US1] Create Next.js i18n request configuration in `apps/storefront/src/i18n.ts`
-- [ ] T006 [P] [US1] Create Next.js i18n request configuration in `apps/admin/src/i18n.ts`
-- [ ] T007 [US1] Create global routing middleware with `Accept-Language` detection in `apps/storefront/src/middleware.ts`
-- [ ] T008 [US1] Create global routing middleware with `Accept-Language` detection in `apps/admin/src/middleware.ts`
-- [ ] T009 [US1] Refactor Storefront `apps/storefront/src/app/` structure into `[locale]` dynamic routing segment
-- [ ] T010 [US1] Refactor Admin `apps/admin/src/app/` structure into `[locale]` dynamic routing segment
-- [ ] T011 [US1] Update `apps/storefront/src/app/[locale]/layout.tsx` to inject HTML `dir` based on active locale and wrap children in `NextIntlClientProvider`
-- [ ] T012 [US1] Update `apps/admin/src/app/[locale]/layout.tsx` to inject HTML `dir` based on active locale and wrap children in `NextIntlClientProvider`
-- [ ] T013 [P] [US1] Create generic LanguageSwitcher UI component in `packages/ui/src/components/storefront/LanguageSwitcher.tsx`
+- [x] T005 [P] [US1] Create Next.js i18n request configuration in `apps/storefront/src/i18n.ts`
+- [x] T006 [P] [US1] Create Next.js i18n request configuration in `apps/admin/src/i18n.ts`
+- [x] T007 [US1] Create global routing middleware with `Accept-Language` detection in `apps/storefront/src/middleware.ts`
+- [x] T008 [US1] Create global routing middleware with `Accept-Language` detection in `apps/admin/src/middleware.ts`
+- [x] T009 [US1] Refactor Storefront `apps/storefront/src/app/` structure into `[locale]` dynamic routing segment
+- [x] T010 [US1] Refactor Admin `apps/admin/src/app/` structure into `[locale]` dynamic routing segment
+- [x] T011 [US1] Update `apps/storefront/src/app/[locale]/layout.tsx` to inject HTML `dir` based on active locale and wrap children in `NextIntlClientProvider`
+- [x] T012 [US1] Update `apps/admin/src/app/[locale]/layout.tsx` to inject HTML `dir` based on active locale and wrap children in `NextIntlClientProvider`
+- [x] T013 [P] [US1] Create generic LanguageSwitcher UI component in `packages/ui/src/components/storefront/LanguageSwitcher.tsx`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -65,11 +65,11 @@ description: "Task list template for feature implementation"
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Create generic `ThemeProvider` component wrapping `next-themes` in `packages/ui/src/components/ThemeProvider.tsx`
-- [ ] T015 [US2] Wrap Storefront root layout with `ThemeProvider` in `apps/storefront/src/app/[locale]/layout.tsx`
-- [ ] T016 [US2] Wrap Admin root layout with `ThemeProvider` in `apps/admin/src/app/[locale]/layout.tsx`
-- [ ] T017 [P] [US2] Update `tailwind.config.ts` in `packages/ui` to explicitly support `"class"` dark mode
-- [ ] T018 [P] [US2] Create Dropdown ThemeToggle UI component in `packages/ui/src/components/ThemeToggle.tsx`
+- [x] T014 [US2] Create generic `ThemeProvider` component wrapping `next-themes` in `packages/ui/src/components/ThemeProvider.tsx`
+- [x] T015 [US2] Wrap Storefront root layout with `ThemeProvider` in `apps/storefront/src/app/[locale]/layout.tsx`
+- [x] T016 [US2] Wrap Admin root layout with `ThemeProvider` in `apps/admin/src/app/[locale]/layout.tsx`
+- [x] T017 [P] [US2] Update `tailwind.config.ts` in `packages/ui` to explicitly support `"class"` dark mode
+- [x] T018 [P] [US2] Create Dropdown ThemeToggle UI component in `packages/ui/src/components/ThemeToggle.tsx`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -83,10 +83,10 @@ description: "Task list template for feature implementation"
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] Instantiate `sonner` `<Toaster richColors />` globally inside `apps/storefront/src/app/[locale]/layout.tsx`
-- [ ] T020 [US3] Instantiate `sonner` `<Toaster richColors />` globally inside `apps/admin/src/app/[locale]/layout.tsx`
-- [ ] T021 [P] [US3] Wrap async Analytics charts with `<Suspense fallback={<Skeleton />}>` in `apps/admin/src/app/[locale]/(dashboard)/page.tsx`
-- [ ] T022 [P] [US3] Wrap async product categories API calls with `<Suspense fallback={<Skeleton />}>` in `apps/storefront/src/app/[locale]/page.tsx`
+- [x] T019 [US3] Instantiate `sonner` `<Toaster richColors />` globally inside `apps/storefront/src/app/[locale]/layout.tsx`
+- [x] T020 [US3] Instantiate `sonner` `<Toaster richColors />` globally inside `apps/admin/src/app/[locale]/layout.tsx`
+- [x] T021 [P] [US3] Wrap async Analytics charts with `<Suspense fallback={<Skeleton />}>` in `apps/admin/src/app/[locale]/(dashboard)/page.tsx`
+- [x] T022 [P] [US3] Wrap async product categories API calls with `<Suspense fallback={<Skeleton />}>` in `apps/storefront/src/app/[locale]/page.tsx`
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -96,9 +96,9 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T023 Extract scattered hardcoded English strings into `apps/storefront/src/messages/en.json` and replace with `useTranslations` hooks
-- [ ] T024 Extract scattered hardcoded Admin English strings into `apps/admin/src/messages/en.json` and replace with `useTranslations` hooks
-- [ ] T025 [P] Audit all generic buttons to ensure rapid-click toast spam is debounced/throttled
+- [x] T023 Extract scattered hardcoded English strings into `apps/storefront/src/messages/en.json` and replace with `useTranslations` hooks
+- [x] T024 Extract scattered hardcoded Admin English strings into `apps/admin/src/messages/en.json` and replace with `useTranslations` hooks
+- [x] T025 [P] Audit all generic buttons to ensure rapid-click toast spam is debounced/throttled
 
 ---
 

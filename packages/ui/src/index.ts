@@ -5,6 +5,7 @@ export * from "./components/ui/select";
 export * from "./components/ui/sheet";
 export * from "./components/ui/switch";
 export * from "./components/ui/textarea";
+export * from "./components/ui/skeleton";
 
 // Keep Toaster as it was or update if shadcn/sonner is added
 export { Toaster } from "./components/toaster";
@@ -19,3 +20,8 @@ export { cn } from "./lib/utils";
 // Storefront Components
 export * from "./components/storefront/PromoCodeInput";
 export * from "./components/storefront/RelatedProducts";
+export * from "./components/storefront/LanguageSwitcher";
+
+// Core Layout components
+export * from "./components/ThemeProvider";
+export * from "./components/ThemeToggle";

@@ -1,0 +1,65 @@
+{
+  "Team": {
+    "header": {
+      "badge": "الإدارة",
+      "title": "إدارة الفريق",
+      "description": "قم بتزويد حسابات الموظفين وتفويض الأذونات الدقيقة. تفرض فحوصات الحدود بصرامة أنه لا يمكنك منح أذونات لا تملكها.",
+      "provisionButton": "إضافة موظف"
+    },
+    "provision": {
+      "title": "حساب موظف جديد",
+      "form": {
+        "name": "الاسم الكامل",
+        "namePlaceholder": "أحمد علي",
+        "email": "البريد الإلكتروني",
+        "emailPlaceholder": "ahmed@techworld.com",
+        "password": "كلمة المرور الأولية",
+        "passwordPlaceholder": "تم إنشاؤها تلقائياً",
+        "permissions": "تعيين الأذونات (ما تملكه فقط)",
+        "submit": "إتمام الإضافة",
+        "cancel": "إلغاء"
+      },
+      "messages": {
+        "required": "الاسم، البريد الإلكتروني، وكلمة المرور مطلوبة.",
+        "success": "تمت إضافة الموظف بنجاح.",
+        "failed": "فشلت عملية الإضافة"
+      }
+    },
+    "list": {
+      "badge": "قائمة الموظفين",
+      "title": "أعضاء الفريق النشطين",
+      "count": "{count} مستخدم",
+      "loading": "جار التحميل...",
+      "table": {
+        "columns": {
+          "name": "الاسم",
+          "status": "الحالة",
+          "permissions": "الأذونات النشطة",
+          "actions": "الإجراءات"
+        },
+        "me": "أنت",
+        "active": "نشط",
+        "deactivated": "معطل",
+        "done": "تم",
+        "permissions": "الأذونات"
+      },
+      "messages": {
+        "permUpdated": "تم تحديث الأذونات.",
+        "updateFailed": "فشل التحديث",
+        "statusActivated": "تم تفعيل حساب الموظف.",
+        "statusDeactivated": "تم تعطيل حساب الموظف.",
+        "statusFailed": "فشل تحديث الحالة",
+        "unknown": "خطأ غير معروف"
+      }
+    },
+    "permissions": {
+      "VIEW_DASHBOARD": "عرض لوحة التحكم",
+      "VIEW_ORDERS": "عرض الطلبات",
+      "MANAGE_CATALOG": "إدارة الكتالوج",
+      "MANAGE_MARKETING": "إدارة التسويق",
+      "MANAGE_TEAM": "إدارة الفريق",
+      "MANAGE_SETTINGS": "إدارة الإعدادات",
+      "VIEW_AUDIT_LOGS": "عرض سجلات التدقيق"
+    }
+  }
+}

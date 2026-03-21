@@ -1,4 +1,5 @@
 @import "@techworld/ui/styles.css";
+@source "../../../../packages/ui/src";
 
 @theme inline {
   --color-brand-yellow: #ffc105;

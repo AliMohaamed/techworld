@@ -1,7 +1,7 @@
 "use client";
 
 import type { MouseEvent } from "react";
-import Link from "next/link";
+import { Link } from "@/navigation";
 import Image from "next/image";
 import { useMutation } from "convex/react";
 import { api } from "@backend/convex/_generated/api";
@@ -10,6 +10,7 @@ import { useSession } from "@/providers/session-provider";
 import { useCart } from "@/providers/cart-provider";
 import { ArrowRight, ShoppingCart, Zap } from "lucide-react";
 import { Button } from "@techworld/ui";
+import { useTranslations, useLocale } from "next-intl";
 
 interface FeaturedProductCardProps {
   product: {
@@ -32,13 +33,16 @@ interface FeaturedProductCardProps {
 }
 
 export default function FeaturedProductCard({ product }: FeaturedProductCardProps) {
+  const t = useTranslations('ProductCard');
+  const locale = useLocale();
   const { sessionId } = useSession();
   const { openCart } = useCart();
   const addToCart = useMutation(api.cart.addToCart);
 
   // Resolve default SKU for stock and cart purposes
   const defaultSku = product.skus?.find((s) => s.isDefault) ?? product.skus?.[0];
-  const hasSalePrice = product.compareAtPrice !== undefined && product.compareAtPrice > product.selling_price;
+  const displayPrice = defaultSku?.price ?? product.selling_price;
+  const hasSalePrice = product.compareAtPrice !== undefined && product.compareAtPrice > displayPrice;
 
   const handleAddToCart = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -60,13 +64,13 @@ export default function FeaturedProductCard({ product }: FeaturedProductCardProp
   return (
     <Link
       href={`/products/${product.slug || product._id}`}
-      className="group relative block h-[500px] w-full overflow-hidden rounded-3xl border border-white/5 bg-zinc-900/40 transition-all hover:border-primary/20"
+      className="group relative block h-[500px] w-full overflow-hidden rounded-3xl border border-white/5 bg-zinc-900/40 transition-all hover:border-[#ffc105]/20 shadow-2xl"
     >
       <div className="absolute inset-0 z-0">
         {product.images?.[0] ? (
           <Image
             src={product.images[0]}
-            alt={product.name_en}
+            alt={locale === 'en' ? product.name_en : product.name_ar}
             fill
             className="object-cover opacity-60 transition-transform duration-700 group-hover:rotate-1 group-hover:scale-105"
           />
@@ -77,44 +81,53 @@ export default function FeaturedProductCard({ product }: FeaturedProductCardProp
       </div>
 
       <div className="absolute inset-0 z-20 flex flex-col items-start justify-end space-y-4 p-8">
-        <div className="flex items-center space-x-2 rounded-full bg-primary px-3 py-1 scale-90 origin-left">
+        <div className="flex items-center space-x-2 rounded-full bg-[#ffc105] px-3 py-1 scale-90 ltr:origin-left rtl:origin-right shadow-[0_0_15px_rgba(255,193,5,0.3)]">
           <Zap size={12} className="fill-black text-black" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-black">Featured Drop</span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-black leading-tight">{t('badges.featured')}</span>
         </div>
 
         <div className="space-y-1">
           <h3 className="font-space-grotesk text-2xl font-black uppercase tracking-tighter leading-none text-white lg:text-3xl">
-            {product.name_en}
+            {locale === 'en' ? product.name_en : product.name_ar}
           </h3>
-          <p className="font-arabic text-sm text-zinc-400">{product.name_ar}</p>
+          {locale === 'en' && (
+             <p className="font-arabic text-sm text-zinc-400 font-light">{product.name_ar}</p>
+          )}
         </div>
 
-        <p className="max-w-sm line-clamp-2 text-sm text-zinc-400">
-          {product.description_en || "Premium quality, limited edition performance gear."}
+        <p className="max-w-sm line-clamp-2 text-sm text-zinc-400 font-light leading-relaxed">
+          {locale === 'en' ? (product.description_en || t('placeholder')) : product.name_ar}
         </p>
 
         <div className="w-full border-t border-white/10 pt-4 flex items-center justify-between">
           <div>
             {hasSalePrice ? (
               <s className="mb-1 block font-space-grotesk text-sm font-bold text-zinc-500">
-                {product.compareAtPrice?.toLocaleString()} EGP
+                {product.compareAtPrice?.toLocaleString(locale)} EGP
               </s>
             ) : null}
-            <span className="font-space-grotesk text-2xl font-black text-[#ffc105]">
-              {product.selling_price.toLocaleString()} EGP
+            <span className="font-space-grotesk text-2xl font-black text-[#ffc105] tracking-tight">
+              {displayPrice.toLocaleString(locale)} EGP
             </span>
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white transition-all group-hover:bg-white/20">
-              <ArrowRight size={20} />
+          <div className="flex items-center ltr:space-x-3 rtl:space-x-reverse space-x-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white transition-all group-hover:bg-[#ffc105] group-hover:text-black shadow-inner">
+              <ArrowRight size={22} className={locale === 'ar' ? 'rotate-180' : ''} />
             </div>
             <Button
               size="sm"
               onClick={handleAddToCart}
-              className="h-12 px-6 font-space-grotesk text-xs font-black uppercase tracking-widest rounded-2xl"
+              disabled={!defaultSku || defaultSku.display_stock < 1}
+              className="h-12 px-6 font-space-grotesk text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg hover:shadow-[#ffc105]/20 group/btn"
             >
-              <ShoppingCart size={16} />
-              <span>Add</span>
+              {defaultSku && defaultSku.display_stock > 0 ? (
+                <>
+                  <ShoppingCart size={16} className="ltr:mr-2 rtl:ml-2 group-hover/btn:scale-110 transition-transform" />
+                  <span>{t('actions.addSimple')}</span>
+                </>
+              ) : (
+                <span>{t('actions.outOfStock')}</span>
+              )}
             </Button>
           </div>
         </div>

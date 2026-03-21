@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useMutation } from "convex/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,11 +14,11 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
-  cn
+  SheetDescription
 } from "@techworld/ui";
 import { api } from "@backend/convex/_generated/api";
-import type { Doc, Id } from "@backend/convex/_generated/dataModel";
+import type { Doc } from "@backend/convex/_generated/dataModel";
+import { useTranslations } from "next-intl";
 
 const promoSchema = z.object({
   code: z.string().min(3, "Code must be at least 3 characters").max(20, "Code too long").transform(v => v.toUpperCase()),
@@ -34,16 +34,13 @@ type PromoFormValues = z.infer<typeof promoSchema>;
 
 interface PromoCodeFormSheetProps {
   open: boolean;
-  onClose: () => void;
+  onOpenChange: (open: boolean) => void;
   promoCode: Doc<"promo_codes"> | null;
 }
 
-export function PromoCodeFormSheet({ open, onClose, promoCode }: PromoCodeFormSheetProps) {
+export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeFormSheetProps) {
+  const t = useTranslations('Marketing.promoCodes');
   const createPromo = useMutation(api.promoCodes.create);
-  // Manual Update logic if needed, but the current convex backend for promo only has toggle/CRUD
-  // For now we'll implement create and assume update can be added if needed, or simple CRUD cycle.
-  // Actually, toggleActive is there, but full update isn't. I'll stick to create for now as per minimal spec.
-  // For now, we will add an update mutation call if we find it in the API.
 
   const {
     register,
@@ -95,9 +92,7 @@ export function PromoCodeFormSheet({ open, onClose, promoCode }: PromoCodeFormSh
       const expiry_date_ms = data.expiry_date ? new Date(data.expiry_date).getTime() : undefined;
       
       if (promoCode) {
-        // Since we don't have an 'update' mutation yet, we'll prompt for deletion/re-creation or just skip for now.
-        // For the sake of US1 (Phase 10), we will focus on creation.
-        toast.info("Update logic not yet implemented in backend. Delete and re-create for now.");
+        toast.info(t('messages.updateNotImplemented'));
         return;
       }
 
@@ -111,35 +106,35 @@ export function PromoCodeFormSheet({ open, onClose, promoCode }: PromoCodeFormSh
         isActive: data.isActive,
       });
 
-      toast.success("Promo code created successfully");
-      onClose();
+      toast.success(t('messages.createSuccess'));
+      onOpenChange(false);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Submission failed";
-      toast.error("Operation failed", { description: message });
+      const message = error instanceof Error ? error.message : t('messages.submissionFailed');
+      toast.error(t('messages.operationFailed'), { description: message });
     }
   };
 
   return (
-    <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-
+    <Sheet modal open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full max-w-md border-l border-white/10 bg-[#1a1814] p-0 shadow-2xl">
         <div className="flex h-full flex-col">
           <SheetHeader className="border-b border-white/5 bg-[#24201a] p-8 space-y-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-primary">Marketing Config</p>
-            <SheetTitle className="text-2xl font-semibold uppercase tracking-tight text-white m-0">
-              {promoCode ? "Edit Promo Code" : "New Promo Code"}
+            <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-primary">{t('form.badge')}</p>
+            <SheetTitle className="text-2xl font-semibold uppercase tracking-tight text-white m-0 leading-tight">
+              {promoCode ? t('form.editTitle') : t('form.createTitle')}
             </SheetTitle>
             <SheetDescription className="text-sm text-zinc-500">
-              Setup discounts, limits, and expiration.
+              {t('form.description')}
             </SheetDescription>
           </SheetHeader>
 
             <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-8 space-y-6">
               <div className="space-y-4 rounded-3xl border border-white/5 bg-white/[0.02] p-6">
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-widest text-zinc-500">Promo Code String</Label>
+                  <Label htmlFor="promo-code" className="text-xs uppercase tracking-widest text-zinc-500">{t('form.fields.code')}</Label>
                   <Input 
-                    placeholder="e.g. FLASH20" 
+                    id="promo-code"
+                    placeholder={t('form.placeholders.code')} 
                     className="font-mono text-lg font-bold tracking-widest border-white/10 focus:border-primary"
                     {...register("code")} 
                   />
@@ -147,25 +142,27 @@ export function PromoCodeFormSheet({ open, onClose, promoCode }: PromoCodeFormSh
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-widest text-zinc-500">Discount Type</Label>
+                  <Label htmlFor="promo-type" className="text-xs uppercase tracking-widest text-zinc-500">{t('form.fields.type')}</Label>
                   <select 
-                    className="w-full rounded-xl border border-white/10 bg-[#2a261f] px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 transition-all outline-none hover:border-white/20 focus:border-primary"
+                    id="promo-type"
+                    className="w-full rounded-xl border border-white/10 bg-[#2a261f] px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 transition-all outline-none hover:border-white/20 focus:border-primary appearance-none"
                     {...register("type")}
                   >
-                    <option value="percentage">Percentage (%)</option>
-                    <option value="fixed">Fixed Amount (EGP)</option>
-                    <option value="free_shipping">Free Shipping</option>
+                    <option value="percentage">{t('form.types.percentage')}</option>
+                    <option value="fixed">{t('form.types.fixed')}</option>
+                    <option value="free_shipping">{t('form.types.freeShipping')}</option>
                   </select>
                 </div>
 
                 {selectedType !== "free_shipping" && (
                   <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-widest text-zinc-500">
-                       {selectedType === "percentage" ? "Percentage Value" : "Discount Amount (EGP)"}
+                    <Label htmlFor="promo-value" className="text-xs uppercase tracking-widest text-zinc-500">
+                       {selectedType === "percentage" ? t('form.fields.percentageValue') : t('form.fields.fixedValue')}
                     </Label>
                     <Input 
+                      id="promo-value"
                       type="number" 
-                      placeholder="0" 
+                      placeholder={t('form.placeholders.value')} 
                       className="border-white/10 focus:border-primary"
                       {...register("value")} 
                     />
@@ -175,10 +172,11 @@ export function PromoCodeFormSheet({ open, onClose, promoCode }: PromoCodeFormSh
 
                 {selectedType === "percentage" && (
                   <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-widest text-zinc-500">Max Discount Cap (EGP)</Label>
+                    <Label htmlFor="promo-max-discount" className="text-xs uppercase tracking-widest text-zinc-500">{t('form.fields.maxDiscount')}</Label>
                     <Input 
+                      id="promo-max-discount"
                       type="number" 
-                      placeholder="Optional limit" 
+                      placeholder={t('form.placeholders.maxDiscount')} 
                       className="border-white/10 focus:border-primary"
                       {...register("max_discount_amount")} 
                     />
@@ -188,9 +186,11 @@ export function PromoCodeFormSheet({ open, onClose, promoCode }: PromoCodeFormSh
 
               <div className="space-y-4 rounded-3xl border border-white/5 bg-white/[0.03] p-6">
                  <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-widest text-zinc-500">Max Usage Limit</Label>
+                  <Label htmlFor="promo-max-uses" className="text-xs uppercase tracking-widest text-zinc-500">{t('form.fields.maxUses')}</Label>
                   <Input 
+                    id="promo-max-uses"
                     type="number" 
+                    placeholder={t('form.placeholders.maxUses')}
                     className="border-white/10 focus:border-primary"
                     {...register("max_uses")} 
                   />
@@ -198,8 +198,9 @@ export function PromoCodeFormSheet({ open, onClose, promoCode }: PromoCodeFormSh
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-widest text-zinc-500">Expiry Date</Label>
+                  <Label htmlFor="promo-expiry-date" className="text-xs uppercase tracking-widest text-zinc-500">{t('form.fields.expiryDate')}</Label>
                   <Input 
+                    id="promo-expiry-date"
                     type="date" 
                     className="border-white/10 focus:border-primary"
                     {...register("expiry_date")} 
@@ -207,17 +208,17 @@ export function PromoCodeFormSheet({ open, onClose, promoCode }: PromoCodeFormSh
                 </div>
               </div>
 
-                <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-sm text-zinc-400">
-                <span>The system strictly prevents bundle overlap for all promo codes.</span>
+                <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-sm text-zinc-400 leading-relaxed italic">
+                <span>{t('form.fields.bundleOverlap')}</span>
               </div>
 
               <div className="border-t border-white/5 bg-[#24201a] p-8 -mx-8 -mb-8 mt-auto">
                 <div className="flex gap-3">
-                  <Button variant="outline" className="flex-1" type="button" onClick={onClose}>
-                    Cancel
+                  <Button variant="outline" className="flex-1" type="button" onClick={() => onOpenChange(false)}>
+                    {t('form.buttons.cancel')}
                   </Button>
                   <Button className="flex-1" type="submit" disabled={isSubmitting}>
-                     {isSubmitting ? "Creating..." : promoCode ? "Save Changes" : "Create Promo Code"}
+                     {isSubmitting ? t('form.buttons.saving') : promoCode ? t('form.buttons.update') : t('form.buttons.create')}
                   </Button>
                 </div>
               </div>

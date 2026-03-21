@@ -1,0 +1,37 @@
+{
+  "Dashboard": {
+    "badge": "Intelligence Panel",
+    "title": "Operations Dashboard",
+    "description": "Real-time analytics and performance metrics for TechWorld's logistics and sales cycles.",
+    "restricted": {
+      "title": "Access Restricted",
+      "description": "Your staff account does not have the permissions required to access the executive dashboard."
+    },
+    "timeWindows": {
+      "today": "Today",
+      "last7days": "Last 7 Days",
+      "last30days": "Last 30 Days"
+    },
+    "metrics": {
+      "totalOrders": "Total Orders",
+      "netProfit": "Net Profit",
+      "courierFees": "Courier Fees",
+      "rtoRate": "RTO Rate"
+    },
+    "charts": {
+      "salesVelocity": {
+        "title": "Sales Velocity",
+        "legend": "Order Count"
+      },
+      "statusBreakdown": {
+        "title": "Status Breakdown"
+      }
+    },
+    "health": {
+      "snapshot": "System Health Snapshot",
+      "grossRevenue": "Gross System Revenue",
+      "accumulatedCogs": "Accumulated COGS",
+      "compliance": "Compliance verified. Financial boundaries enforced by View Financials permission filter."
+    }
+  }
+}

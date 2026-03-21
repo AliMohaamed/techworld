@@ -12,7 +12,6 @@ import {
   Input,
   Label,
   SelectNative,
-  Switch,
   Textarea,
   cn,
   Sheet,
@@ -23,6 +22,7 @@ import {
 } from "@techworld/ui";
 import { ConvexStorageUpload } from "./ConvexStorageUpload";
 import { productSchema, type ProductFormSubmitValues, type ProductFormValues } from "./product-zod-schemas";
+import { useTranslations } from "next-intl";
 
 type CategoryOption = {
   _id: Id<"categories">;
@@ -98,6 +98,7 @@ export function ProductFormSheet({
   product: ProductRecord | null;
   onSaved: (label: string) => void;
 }) {
+  const t = useTranslations('Catalog.products');
   const createAdvancedProduct = useMutation(api.products.createAdvancedProduct);
   const updateAdvancedProduct = useMutation(api.products.updateAdvancedProduct);
   const restockItem = useMutation(api.skus.restockItem);
@@ -118,25 +119,25 @@ export function ProductFormSheet({
   const handleRestock = async (index: number) => {
     const variant = getValues(`variants.${index}`);
     if (!variant.id) {
-      toast.error("Please save the product first to create the SKU before restocking.");
+      toast.error(t('messages.saveFirst'));
       return;
     }
 
-    const amount = prompt(`Enter restock quantity for ${variant.variantName}:`, "0");
+    const amount = prompt(t('messages.restockPrompt', { name: variant.variantName }), "0");
     const quantity = parseInt(amount || "0", 10);
 
     if (isNaN(quantity) || quantity <= 0) {
-      if (amount !== null) toast.error("Invalid quantity");
+      if (amount !== null) toast.error(t('messages.restockInvalid'));
       return;
     }
 
     try {
       const result = await restockItem({ skuId: variant.id as Id<"skus">, quantity });
-      toast.success(`Restocked ${quantity} items. New real stock: ${result.real_stock}`);
+      toast.success(t('messages.restockSuccess', { quantity, total: result.real_stock }));
       // Update form state to reflect new stock
       setValue(`variants.${index}.real_stock`, result.real_stock);
     } catch (error) {
-      toast.error("Restock failed", { description: error instanceof Error ? error.message : "Restock failed" });
+      toast.error(t('messages.restockFailed'), { description: error instanceof Error ? error.message : t('messages.restockFailed') });
     }
   };
 
@@ -192,10 +193,10 @@ export function ProductFormSheet({
 
     if (product) {
       await updateAdvancedProduct({ id: product._id, ...payload });
-      onSaved("Product updated.");
+      onSaved(t('messages.updated'));
     } else {
       await createAdvancedProduct(payload);
-      onSaved("Product created.");
+      onSaved(t('messages.created'));
     }
 
     onClose();
@@ -205,60 +206,60 @@ export function ProductFormSheet({
     <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <SheetContent side="right" className="sm:max-w-4xl overflow-y-auto p-0 border-l border-white/10 dark:bg-[#0a0a0a]">
         <SheetHeader className="p-6 pb-0">
-          <SheetTitle className="text-2xl font-bold text-white">
-            {product ? "Edit advanced product" : "Create advanced product"}
+          <SheetTitle className="text-2xl font-bold text-white uppercase tracking-tight">
+            {product ? t('form.editTitle') : t('form.createTitle')}
           </SheetTitle>
           <SheetDescription className="text-zinc-500 uppercase tracking-[0.2em] text-[10px]">
-            Product Management
+            {t('form.badge')}
           </SheetDescription>
         </SheetHeader>
 
         <form className="p-6 space-y-8 pb-24" onSubmit={(event) => void submit(event)}>
           <section className="grid gap-4 md:grid-cols-2">
-            <Field label="Category" error={errors.categoryId?.message}>
+            <Field label={t('form.fields.category')} error={errors.categoryId?.message}>
               <SelectNative {...register("categoryId")}>
-                <option value="">Select category</option>
+                <option value="">{t('form.placeholders.selectCategory')}</option>
                 {categories.map((category) => (
                   <option key={category._id} value={category._id}>{category.name_en}</option>
                 ))}
               </SelectNative>
             </Field>
-            <Field label="Status" error={errors.status?.message}>
+            <Field label={t('form.fields.status')} error={errors.status?.message}>
               <SelectNative {...register("status")}>
-                <option value="DRAFT">Draft</option>
-                <option value="PUBLISHED">Published</option>
+                <option value="DRAFT">{t('form.statusOptions.draft')}</option>
+                <option value="PUBLISHED">{t('form.statusOptions.published')}</option>
               </SelectNative>
             </Field>
-            <Field label="English name" error={errors.name_en?.message}>
-              <Input {...register("name_en")} placeholder="e.g. Ultra HD Pro Watch" />
+            <Field label={t('form.fields.nameEn')} error={errors.name_en?.message}>
+              <Input {...register("name_en")} placeholder={t('form.placeholders.nameEn')} />
             </Field>
-            <Field label="Arabic name" error={errors.name_ar?.message}>
-              <Input dir="rtl" {...register("name_ar")} placeholder="e.g. ساعة ألترا أتش دي برو" />
+            <Field label={t('form.fields.nameAr')} error={errors.name_ar?.message}>
+              <Input dir="rtl" {...register("name_ar")} placeholder={t('form.placeholders.nameAr')} />
             </Field>
-            <Field label="Slug" error={errors.slug?.message}>
-              <Input {...register("slug")} placeholder="ultra-hd-pro-watch" />
+            <Field label={t('form.fields.slug')} error={errors.slug?.message}>
+              <Input {...register("slug")} placeholder={t('form.placeholders.slug')} />
             </Field>
-            <Field label="Selling price" error={errors.selling_price?.message}>
+            <Field label={t('form.fields.sellingPrice')} error={errors.selling_price?.message}>
               <Input type="number" step="0.01" {...register("selling_price")} placeholder="0.00" />
             </Field>
-            <Field label="Compare-at price" error={errors.compareAtPrice?.message?.toString()}>
+            <Field label={t('form.fields.compareAtPrice')} error={errors.compareAtPrice?.message?.toString()}>
               <Input type="number" step="0.01" {...register("compareAtPrice")} placeholder="0.00" />
             </Field>
-            <Field label="COGS" error={errors.cogs?.message?.toString()}>
+            <Field label={t('form.fields.cogs')} error={errors.cogs?.message?.toString()}>
               <Input type="number" step="0.01" {...register("cogs")} placeholder="0.00" />
             </Field>
-            <Field label="English description" error={errors.description_en?.message} className="md:col-span-2">
-              <Textarea {...register("description_en")} placeholder="Product features and overview..." />
+            <Field label={t('form.fields.descriptionEn')} error={errors.description_en?.message} className="md:col-span-2">
+              <Textarea {...register("description_en")} placeholder={t('form.placeholders.descriptionEn')} />
             </Field>
-            <Field label="Arabic description" error={errors.description_ar?.message} className="md:col-span-2">
-              <Textarea dir="rtl" {...register("description_ar")} placeholder="مميزات المنتج ونظرة عامة..." />
+            <Field label={t('form.fields.descriptionAr')} error={errors.description_ar?.message} className="md:col-span-2">
+              <Textarea dir="rtl" {...register("description_ar")} placeholder={t('form.placeholders.descriptionAr')} />
             </Field>
           </section>
 
           <section className="space-y-4">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Media Gallery</p>
-              <h3 className="mt-2 text-xl font-semibold text-white">Upload and assign storage images</h3>
+              <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">{t('form.fields.mediaGalleryTitle')}</p>
+              <h3 className="mt-2 text-xl font-semibold text-white uppercase tracking-tight">{t('form.fields.mediaGalleryDescription')}</h3>
             </div>
             <ConvexStorageUpload
               imageIds={images}
@@ -269,9 +270,9 @@ export function ProductFormSheet({
                 }
               }}
             />
-            <Field label="Primary thumbnail storage ID" error={errors.thumbnail?.message}>
+            <Field label={t('form.fields.thumbnail')} error={errors.thumbnail?.message}>
               <SelectNative {...register("thumbnail")}>
-                <option value="">Select primary image</option>
+                <option value="">{t('form.placeholders.selectThumbnail')}</option>
                 {images.map((imageId) => (
                   <option key={imageId} value={imageId}>{imageId}</option>
                 ))}
@@ -282,8 +283,8 @@ export function ProductFormSheet({
           <section className="space-y-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Variants</p>
-                <h3 className="mt-2 text-xl font-semibold text-white">SKU configuration</h3>
+                <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">{t('form.fields.variants')}</p>
+                <h3 className="mt-2 text-xl font-semibold text-white uppercase tracking-tight">{t('form.fields.skuConfig')}</h3>
               </div>
               <Button
                 type="button"
@@ -298,35 +299,35 @@ export function ProductFormSheet({
                 }
               >
                 <Plus size={16} />
-                Add Variant
+                {t('form.fields.skus.add')}
               </Button>
             </div>
             <div className="space-y-4">
               {fields.map((field, index) => (
                 <div key={field.id} className="rounded-[24px] border border-white/10 bg-[#2a261f] p-5 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50">
                   <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm font-medium text-white">Variant {index + 1}</p>
+                    <p className="text-sm font-medium text-white">{t('form.fields.variant', { index: index + 1 })}</p>
                     {fields.length > 1 ? (
                       <Button type="button" variant="ghost" onClick={() => remove(index)}>
                         <Trash2 size={16} />
-                        Remove
+                        {t('buttons.remove')}
                       </Button>
                     ) : null}
                   </div>
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    <Field label="Variant name" error={errors.variants?.[index]?.variantName?.message}>
-                      <Input {...register(`variants.${index}.variantName`)} placeholder="Default" />
+                    <Field label={t('form.fields.skus.name')} error={errors.variants?.[index]?.variantName?.message}>
+                      <Input {...register(`variants.${index}.variantName`)} placeholder={t('form.placeholders.variantName')} />
                     </Field>
-                    <Field label="Color" error={errors.variants?.[index]?.color?.message}>
-                      <Input {...register(`variants.${index}.color`)} placeholder="e.g. Midnight Black" />
+                    <Field label={t('form.fields.skus.color')} error={errors.variants?.[index]?.color?.message}>
+                      <Input {...register(`variants.${index}.color`)} placeholder={t('form.placeholders.color')} />
                     </Field>
-                    <Field label="Size" error={errors.variants?.[index]?.size?.message}>
-                      <Input {...register(`variants.${index}.size`)} placeholder="e.g. XL or 44mm" />
+                    <Field label={t('form.fields.skus.size')} error={errors.variants?.[index]?.size?.message}>
+                      <Input {...register(`variants.${index}.size`)} placeholder={t('form.placeholders.size')} />
                     </Field>
-                    <Field label="Type" error={errors.variants?.[index]?.type?.message}>
-                      <Input {...register(`variants.${index}.type`)} placeholder="e.g. Leather or Mesh" />
+                    <Field label={t('form.fields.skus.type')} error={errors.variants?.[index]?.type?.message}>
+                      <Input {...register(`variants.${index}.type`)} placeholder={t('form.placeholders.type')} />
                     </Field>
-                    <Field label="Real stock" error={errors.variants?.[index]?.real_stock?.message}>
+                    <Field label={t('form.fields.skus.realStock')} error={errors.variants?.[index]?.real_stock?.message}>
                       <div className="flex gap-2">
                         <Input type="number" {...register(`variants.${index}.real_stock`)} placeholder="0" />
                         <Button
@@ -340,18 +341,18 @@ export function ProductFormSheet({
                         </Button>
                       </div>
                     </Field>
-                    <Field label="Display stock" error={errors.variants?.[index]?.display_stock?.message}>
+                    <Field label={t('form.fields.skus.displayStock')} error={errors.variants?.[index]?.display_stock?.message}>
                       <Input type="number" {...register(`variants.${index}.display_stock`)} placeholder="0" />
                     </Field>
-                    <Field label="Variant price" error={errors.variants?.[index]?.price?.message}>
+                    <Field label={t('form.fields.skus.price')} error={errors.variants?.[index]?.price?.message}>
                       <Input type="number" step="0.01" {...register(`variants.${index}.price`)} placeholder="0.00" />
                     </Field>
-                    <Field label="Variant compare-at" error={errors.variants?.[index]?.compareAtPrice?.message?.toString()}>
+                    <Field label={t('form.fields.skus.compareAt')} error={errors.variants?.[index]?.compareAtPrice?.message?.toString()}>
                       <Input type="number" step="0.01" {...register(`variants.${index}.compareAtPrice`)} placeholder="0.00" />
                     </Field>
-                    <Field label="Linked image" error={errors.variants?.[index]?.linkedImageId?.message}>
+                    <Field label={t('form.fields.skus.linkedImage')} error={errors.variants?.[index]?.linkedImageId?.message}>
                       <SelectNative {...register(`variants.${index}.linkedImageId`)}>
-                        <option value="">No linked image</option>
+                        <option value="">{t('form.placeholders.noLinkedImage')}</option>
                         {images.map((imageId) => (
                           <option key={imageId} value={imageId}>{imageId}</option>
                         ))}
@@ -365,9 +366,9 @@ export function ProductFormSheet({
 
           <div className="sticky bottom-0 -mx-4 flex flex-col gap-3 border-t border-white/5 bg-[#24201a]/95 px-4 pb-2 pt-4 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:border-t-0 sm:bg-transparent sm:px-0 sm:pb-0">
             <Button className="w-full sm:w-auto" disabled={isSubmitting} type="submit">
-              {isSubmitting ? "Saving..." : product ? "Update Product" : "Create Product"}
+              {isSubmitting ? t('form.buttons.saving') : product ? t('form.buttons.update') : t('form.buttons.create')}
             </Button>
-            <Button className="w-full sm:w-auto" type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button className="w-full sm:w-auto" type="button" variant="ghost" onClick={onClose}>{t('form.buttons.cancel')}</Button>
           </div>
         </form>
       </SheetContent>
@@ -430,11 +431,3 @@ function buildPayload(values: ProductFormSubmitValues) {
     })),
   };
 }
-
-
-
-
-
-
-
-

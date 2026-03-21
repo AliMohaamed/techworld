@@ -7,6 +7,7 @@ import { Id } from "@backend/convex/_generated/dataModel";
 import FilterDrawer from "@/components/storefront/filter-drawer";
 import LoadMoreButton from "@/components/storefront/load-more-button";
 import ProductCard from "@/components/storefront/product-card";
+import { useTranslations, useLocale } from "next-intl";
 
 type CatalogExplorerProps = {
   lockedCategoryId?: string;
@@ -15,12 +16,15 @@ type CatalogExplorerProps = {
 export default function CatalogExplorer({
   lockedCategoryId,
 }: CatalogExplorerProps) {
+  const t = useTranslations('CatalogExplorer');
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("searchQuery") ?? undefined;
   const minPriceValue = searchParams.get("minPrice");
   const maxPriceValue = searchParams.get("maxPrice");
   const sortOrderValue = searchParams.get("sortOrder");
   const categoryId = lockedCategoryId ?? searchParams.get("categoryId") ?? undefined;
+  
   const category = useQuery(
     api.categories.getCategoryById,
     lockedCategoryId ? { id: lockedCategoryId as Id<"categories"> } : "skip",
@@ -59,70 +63,77 @@ export default function CatalogExplorer({
   );
 
   const heading = lockedCategoryId
-    ? category?.name_en ?? "Category"
-    : "Catalog Explorer";
-  const eyebrow = lockedCategoryId ? "Category Focus" : "Advanced Catalog";
+    ? (locale === 'en' ? category?.name_en : category?.name_ar) ?? t('locked.defaultHeading')
+    : t('global.heading');
+  
+  const eyebrow = lockedCategoryId ? t('locked.eyebrow') : t('global.eyebrow');
+  
   const description = lockedCategoryId
-    ? category?.description_en ?? "This category route is locked to the selected collection."
-    : "Search, filter, and page through the live storefront catalog without losing your place.";
+    ? (locale === 'en' ? category?.description_en : category?.description_en) ?? t('locked.defaultDescription')
+    : t('global.description');
 
   return (
     <div className="min-h-screen bg-black px-4 pb-20 pt-8 md:px-8">
       <div className="mx-auto max-w-7xl space-y-10">
-        <section className="overflow-hidden rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top,#2b2b2b,transparent_50%),linear-gradient(180deg,#111111,#050505)] px-6 py-10 md:px-10">
-          <div className="max-w-3xl space-y-4">
-            <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#ffc105]">
+        <section className="overflow-hidden rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top,#2b2b2b,transparent_50%),linear-gradient(180deg,#111111,#050505)] px-6 py-12 md:px-12 shadow-2xl">
+          <div className="max-w-3xl space-y-6">
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
               {eyebrow}
             </p>
-            <h1 className="font-space-grotesk text-4xl font-black uppercase tracking-tight text-white md:text-6xl">
+            <h1 className="font-space-grotesk text-4xl font-black uppercase tracking-tight text-white md:text-6xl md:leading-[1.1]">
               {heading}
             </h1>
-            <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">
+            <p className="max-w-2xl text-sm leading-8 text-zinc-400 md:text-lg font-light">
               {description}
             </p>
           </div>
         </section>
 
-        <div className="grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <div className="grid gap-8 lg:grid-cols-[340px_minmax(0,1fr)]">
           <FilterDrawer lockedCategoryId={lockedCategoryId} />
 
           <div className="space-y-8">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-white/10 bg-zinc-950/70 px-5 py-4">
-              <div>
+            <div className="flex flex-wrap items-center justify-between gap-6 rounded-[28px] border border-white/10 bg-zinc-950/70 ltr:px-8 rtl:px-8 py-5 shadow-inner">
+              <div className="space-y-1">
                 <p className="text-[10px] font-black uppercase tracking-[0.35em] text-zinc-500">
-                  Current Results
+                  {t('results.eyebrow')}
                 </p>
-                <p className="font-space-grotesk text-lg font-black uppercase tracking-tight text-white">
-                  {results.length} products loaded
+                <p className="font-space-grotesk text-xl font-black uppercase tracking-tight text-white">
+                  {t('results.count', { count: results.length })}
                 </p>
               </div>
               {searchQuery && (
-                <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
-                  Search: <span className="text-white">{searchQuery}</span>
-                </p>
+                <div className="px-5 py-2 rounded-full bg-white/5 border border-white/5">
+                   <p className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+                     {t('results.search', { query: searchQuery })}
+                   </p>
+                </div>
               )}
             </div>
 
             {results.length === 0 && status === "Exhausted" ? (
-              <div className="space-y-8">
-                <div className="rounded-[28px] border border-dashed border-white/10 bg-zinc-950/60 px-6 py-10 text-center">
+              <div className="space-y-12">
+                <div className="rounded-[32px] border border-dashed border-white/10 bg-zinc-950/60 px-8 py-16 text-center shadow-2xl">
                   <p className="text-[10px] font-black uppercase tracking-[0.35em] text-zinc-500">
-                    Empty State
+                    {t('empty.eyebrow')}
                   </p>
-                  <h2 className="mt-3 font-space-grotesk text-3xl font-black uppercase tracking-tight text-white">
-                    No products found
+                  <h2 className="mt-4 font-space-grotesk text-4xl font-black uppercase tracking-tight text-white">
+                    {t('empty.title')}
                   </h2>
-                  <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-zinc-400">
-                    Adjust the active filters or clear them to widen the catalog. Recommended products stay visible below so the page never dead-ends.
+                  <p className="mx-auto mt-4 max-w-xl text-sm leading-8 text-zinc-400 font-light italic">
+                    {t('empty.description')}
                   </p>
                 </div>
 
                 {recommendationResult?.products?.length ? (
-                  <section className="space-y-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#ffc105]">
-                      Recommended Products
-                    </p>
-                    <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+                  <section className="space-y-8">
+                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                       <div className="h-0.5 w-12 bg-[#ffc105]" />
+                       <p className="text-[11px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
+                         {t('recommended.eyebrow')}
+                       </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-6 xl:grid-cols-4">
                       {recommendationResult.products.map((product) => (
                         <ProductCard key={product._id} product={product} />
                       ))}
@@ -132,13 +143,13 @@ export default function CatalogExplorer({
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-2 gap-4 xl:grid-cols-3">
+                <div className="grid grid-cols-2 gap-6 xl:grid-cols-3">
                   {results.map((product) => (
                     <ProductCard key={product._id} product={product} />
                   ))}
                 </div>
 
-                <div className="flex justify-center">
+                <div className="flex justify-center pt-8">
                   {status === "LoadingMore" || status === "CanLoadMore" ? (
                     <LoadMoreButton
                       disabled={status === "LoadingMore"}
@@ -156,7 +167,3 @@ export default function CatalogExplorer({
     </div>
   );
 }
-
-
-
-

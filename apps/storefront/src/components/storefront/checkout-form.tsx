@@ -1,225 +1,223 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useMutation } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "@backend/convex/_generated/api";
-import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
-import { useRouter } from "next/navigation";
-import { User, Phone, MapPin, Loader2, ArrowRight, MapPinned } from "lucide-react";
+import { useCart } from "@/providers/cart-provider";
+import { ChevronRight, ShieldCheck, Loader2 } from "lucide-react";
+import { useRouter } from "@/navigation";
+import { useTranslations, useLocale } from "next-intl";
 import { PromoCodeInput } from "@techworld/ui";
+import type { Id } from "@backend/convex/_generated/dataModel";
 
-type GovernorateOption = {
-  _id: Id<"governorates">;
-  name_ar: string;
-  name_en: string;
-  shippingFee: number;
-  isActive: boolean;
-};
-
-interface CheckoutFormProps {
-  cartTotal: number;
-  promoDiscount?: number;
-  promoError?: string | null;
-  appliedPromo?: string;
-  onApplyPromo?: (code: string) => void;
-  onRemovePromo?: () => void;
-  governorates: GovernorateOption[];
-  governoratesLoading?: boolean;
-}
-
-export default function CheckoutForm({
-  cartTotal,
-  promoDiscount = 0,
-  promoError,
-  appliedPromo,
-  onApplyPromo,
-  onRemovePromo,
-  governorates,
-  governoratesLoading,
-}: CheckoutFormProps) {
-  const { sessionId } = useSession();
+export default function CheckoutForm() {
+  const t = useTranslations('CheckoutForm');
+  const locale = useLocale();
   const router = useRouter();
-  const placeOrder = useMutation(api.cart.placeOrderFromSession);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { sessionId } = useSession();
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     phone: "",
+    governorateId: "" as Id<"governorates"> | "",
     address: "",
-    governorateId: "",
+    promoCode: ""
   });
 
-  const selectedGovernorate = useMemo(
-    () => governorates.find((governorate) => governorate._id === formData.governorateId),
-    [formData.governorateId, governorates],
+  const governorates = useQuery(api.governorates.listActiveGovernorates);
+  const cart = useQuery(api.cart.getCart, { 
+    sessionId, 
+    promoCode: formData.promoCode || undefined
+  });
+  const placeOrder = useMutation(api.cart.placeOrderFromSession);
+
+  const selectedGov = useMemo(() => 
+    governorates?.find(g => g._id === formData.governorateId),
+    [governorates, formData.governorateId]
   );
-  const shippingFee = selectedGovernorate?.shippingFee ?? 0;
-  const grandTotal = Math.max(0, cartTotal + shippingFee - promoDiscount);
-  const deliveryUnavailable = !governoratesLoading && governorates.length === 0;
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (deliveryUnavailable) {
-      setErrorMessage("Delivery is currently unavailable. Please try again later.");
-      return;
-    }
-    if (!formData.governorateId) {
-      setErrorMessage("Select your governorate to calculate delivery and continue.");
-      return;
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cart || isSubmitting || !formData.governorateId) return;
 
-    setErrorMessage(null);
-    setIsLoading(true);
+    setIsSubmitting(true);
     try {
       const shortCode = await placeOrder({
         sessionId,
-        customerName: formData.name,
+        customerName: formData.fullName,
         customerPhone: formData.phone,
-        customerAddress: formData.address,
         governorateId: formData.governorateId as Id<"governorates">,
-        promoCode: appliedPromo,
+        customerAddress: formData.address,
+        promoCode: formData.promoCode || undefined
       });
 
       router.push(`/success?code=${shortCode}`);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Order placement failed.";
-      console.error("Order placement failed", err);
-      setErrorMessage(message);
-      setIsLoading(false);
+    } catch (error) {
+      console.error("Order failed:", error);
+      alert(t('errors.placeOrderFailed'));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  if (governorates && governorates.length === 0) {
+    return (
+      <div className="rounded-[32px] border border-red-500/20 bg-red-500/5 p-10 text-center shadow-inner">
+        <p className="text-red-400 font-black uppercase tracking-widest text-xs leading-relaxed">{t('errors.noGovernorates')}</p>
+      </div>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <h3 className="font-space-grotesk text-sm font-bold uppercase tracking-widest text-[#ffc105]">
-          Shipping Information
-        </h3>
-
-        <div className="space-y-4">
-          <div className="relative">
-            <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
-            <input
-              required
-              type="text"
-              placeholder="Full Name"
-              className="w-full rounded-xl border border-white/5 bg-zinc-900/50 py-4 pl-12 pr-4 text-sm text-white placeholder:text-zinc-600 focus:border-[#ffc105]/50 focus:outline-none focus:ring-1 focus:ring-[#ffc105]/50"
-              value={formData.name}
-              onChange={(event) => setFormData({ ...formData, name: event.target.value })}
-            />
+    <div className="space-y-12">
+      <form onSubmit={handleSubmit} className="space-y-12">
+        {/* Shipping Section */}
+        <div className="space-y-8">
+          <div className="flex items-center gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#ffc105] text-sm font-black text-black shadow-[0_4px_15px_rgba(255,193,5,0.3)]">1</div>
+            <h2 className="font-space-grotesk text-2xl font-black tracking-tight text-white uppercase">{t('shipping')}</h2>
           </div>
 
-          <div className="relative">
-            <Phone className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
-            <input
-              required
-              type="tel"
-              placeholder="Phone Number (WhatsApp preferred)"
-              className="w-full rounded-xl border border-white/5 bg-zinc-900/50 py-4 pl-12 pr-4 text-sm text-white placeholder:text-zinc-600 focus:border-[#ffc105]/50 focus:outline-none focus:ring-1 focus:ring-[#ffc105]/50"
-              value={formData.phone}
-              onChange={(event) => setFormData({ ...formData, phone: event.target.value })}
-            />
-          </div>
-
-          <div className="relative">
-            <MapPinned className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
-            <select
-              required
-              className="w-full appearance-none rounded-xl border border-white/5 bg-zinc-900/50 py-4 pl-12 pr-4 text-sm text-white focus:border-[#ffc105]/50 focus:outline-none focus:ring-1 focus:ring-[#ffc105]/50 disabled:cursor-not-allowed disabled:opacity-60"
-              disabled={deliveryUnavailable}
-              value={formData.governorateId}
-              onChange={(event) => setFormData({ ...formData, governorateId: event.target.value })}
-            >
-              <option value="">Select governorate</option>
-              {governorates.map((governorate) => (
-                <option key={governorate._id} value={governorate._id}>
-                  {governorate.name_en} - {governorate.shippingFee.toLocaleString()} EGP
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="relative">
-            <MapPin className="absolute left-4 top-4 h-4 w-4 text-zinc-500" />
-            <textarea
-              required
-              placeholder="Complete Delivery Address"
-              rows={3}
-              className="w-full rounded-xl border border-white/5 bg-zinc-900/50 py-4 pl-12 pr-4 text-sm text-white placeholder:text-zinc-600 focus:border-[#ffc105]/50 focus:outline-none focus:ring-1 focus:ring-[#ffc105]/50"
-              value={formData.address}
-              onChange={(event) => setFormData({ ...formData, address: event.target.value })}
-            />
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-600 block px-1">{t('labels.fullName')}</label>
+              <div className="relative">
+                <input
+                  required
+                  type="text"
+                  placeholder={t('labels.fullName')}
+                  className="w-full rounded-2xl border border-white/5 bg-zinc-900/50 p-5 text-white placeholder:text-zinc-700 focus:border-[#ffc105]/30 focus:outline-none transition-all shadow-inner font-medium"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-600 block px-1">{t('labels.phone')}</label>
+              <div className="relative">
+                <input
+                  required
+                  type="tel"
+                  placeholder="01xxxxxxxxx"
+                  className="w-full rounded-2xl border border-white/5 bg-zinc-900/50 p-5 text-white placeholder:text-zinc-700 focus:border-[#ffc105]/30 focus:outline-none transition-all shadow-inner font-mono"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-600 block px-1">{t('labels.governorate')}</label>
+              <div className="relative">
+                <select
+                  required
+                  className="w-full rounded-2xl border border-white/5 bg-zinc-900/50 p-5 text-white focus:border-[#ffc105]/30 focus:outline-none appearance-none transition-all shadow-inner font-medium"
+                  value={formData.governorateId}
+                  onChange={(e) => setFormData({ ...formData, governorateId: e.target.value as Id<"governorates"> })}
+                >
+                  <option value="" disabled className="text-zinc-800">{t('labels.governorate')}</option>
+                  {governorates?.map((gov) => (
+                    <option key={gov._id} value={gov._id} className="bg-zinc-900">
+                      {locale === 'en' ? gov.name_en : gov.name_ar} ({gov.shippingFee.toLocaleString(locale)} <span className="text-[10px]">EGP</span>)
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute ltr:right-6 rtl:left-6 top-1/2 -translate-y-1/2 text-zinc-600">
+                   <ChevronRight size={18} className="rotate-90" />
+                </div>
+              </div>
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-600 block px-1">{t('labels.address')}</label>
+              <textarea
+                required
+                placeholder={t('labels.address')}
+                className="min-h-[150px] w-full rounded-3xl border border-white/5 bg-zinc-900/50 p-6 text-white placeholder:text-zinc-700 focus:border-[#ffc105]/30 focus:outline-none transition-all shadow-inner resize-none font-medium leading-relaxed"
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="space-y-4 rounded-2xl border border-white/5 bg-zinc-950 p-6 shadow-sm">
-        <h3 className="font-space-grotesk text-sm font-bold uppercase tracking-widest text-zinc-500">
-          Discount Code
-        </h3>
-        <PromoCodeInput
-          onApply={onApplyPromo || (() => {})}
-          onRemove={onRemovePromo || (() => {})}
-          appliedCode={appliedPromo}
-          error={promoError}
-          discountAmount={promoDiscount}
-        />
-      </div>
-
-      <div className="space-y-4 rounded-2xl border border-white/5 bg-zinc-950 p-6 shadow-sm">
-        <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-zinc-400">
-          <span>Items subtotal</span>
-          <span className="text-zinc-200">{cartTotal.toLocaleString()} EGP</span>
-        </div>
-        {promoDiscount > 0 ? (
-          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-emerald-400">
-            <span>Promo Discount</span>
-            <span>-{promoDiscount.toLocaleString()} EGP</span>
+        {/* Promo Code Section */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-900 text-sm font-black text-white border border-white/5">2</div>
+            <h2 className="font-space-grotesk text-2xl font-black tracking-tight text-white uppercase">{t('promo.label')}</h2>
           </div>
-        ) : null}
-        <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-zinc-400">
-          <span>Shipping</span>
-          <span className="text-zinc-200">
-            {selectedGovernorate ? `${shippingFee.toLocaleString()} EGP` : governoratesLoading ? "Loading..." : deliveryUnavailable ? "Unavailable" : "Select governorate"}
-          </span>
+          <PromoCodeInput
+             onApply={(code) => setFormData({ ...formData, promoCode: code })}
+             onRemove={() => setFormData({ ...formData, promoCode: "" })}
+             appliedCode={formData.promoCode}
+             error={cart?.promoError}
+             discountAmount={cart?.promoDiscount}
+             placeholder={t('promo.placeholder')}
+             applyLabel={t('promo.apply')}
+             appliedLabel={t('promo.applied')}
+             removeLabel={t('promo.remove')}
+          />
         </div>
-        <div className="flex items-center justify-between border-t border-white/5 pt-4">
-          <span className="text-zinc-400 text-xs font-bold uppercase tracking-widest">Order Total</span>
-          <span className="font-space-grotesk text-2xl font-black text-[#ffc105]">
-            {grandTotal.toLocaleString()} EGP
-          </span>
+
+        {/* Summary Recap Desktop */}
+        <div className="rounded-[40px] border border-white/5 bg-white/[0.02] p-10 space-y-6 shadow-inner backdrop-blur-sm">
+          <div className="flex justify-between items-center pb-6 border-b border-white/5">
+            <span className="text-zinc-600 text-[10px] font-black uppercase tracking-[0.3em]">{t('summary.subtotal')}</span>
+            <span className="text-white font-space-grotesk font-black tracking-tight">{(cart?.subtotal || 0).toLocaleString(locale)} <span className="text-xs text-[#ffc105]">EGP</span></span>
+          </div>
+          
+          {cart?.promoDiscount ? (
+            <div className="flex justify-between items-center text-emerald-500">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em]">{t('summary.discount')}</span>
+              <span className="font-space-grotesk font-black tracking-tight">-{cart.promoDiscount.toLocaleString(locale)} <span className="text-xs">EGP</span></span>
+            </div>
+          ) : null}
+
+          <div className="flex justify-between items-center">
+            <span className="text-zinc-600 text-[10px] font-black uppercase tracking-[0.3em]">{t('summary.shipping')}</span>
+            <span className="text-white font-space-grotesk font-black tracking-tight">
+              {!formData.governorateId ? (
+                <span className="text-zinc-700 italic text-[10px] lowercase tracking-wide font-medium">{t('errors.selectGovernorate')}</span>
+              ) : selectedGov ? (
+                <>{selectedGov.shippingFee.toLocaleString(locale)} <span className="text-xs text-[#ffc105]">EGP</span></>
+              ) : (
+                <span className="text-zinc-700 text-[10px] uppercase font-black tracking-widest">{t('summary.loading')}</span>
+              )}
+            </span>
+          </div>
+
+          <div className="flex justify-between items-center pt-8 border-t border-white/10">
+            <span className="text-white text-sm font-black uppercase tracking-[0.4em]">{t('summary.total')}</span>
+            <span className="text-[#ffc105] font-space-grotesk text-4xl font-black tracking-tightest">
+              {((cart?.total || 0) + (selectedGov?.shippingFee || 0)).toLocaleString(locale)} <span className="text-lg">EGP</span>
+            </span>
+          </div>
         </div>
 
-        {governoratesLoading ? (
-          <p className="text-sm text-zinc-500">Loading available delivery governorates...</p>
-        ) : deliveryUnavailable ? (
-          <p className="text-sm text-red-400">
-            Delivery is currently unavailable because no active governorates are configured.
-          </p>
-        ) : null}
-        {errorMessage ? <p className="text-sm text-red-400">{errorMessage}</p> : null}
-
-        <button
-          disabled={isLoading || governoratesLoading || deliveryUnavailable}
-          type="submit"
-          className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#ffc105] py-5 font-space-grotesk text-sm font-black uppercase tracking-[0.2em] text-black transition-all hover:scale-[1.02] active:scale-95 disabled:grayscale disabled:opacity-50"
-        >
-          {isLoading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <>
-              CONFIRM ORDER
-              <ArrowRight size={18} />
-            </>
-          )}
-        </button>
-
-        <p className="text-center text-[10px] uppercase tracking-wider text-zinc-600">
-          By confirming, you agree to receive a confirmation via WhatsApp.
-        </p>
-      </div>
-    </form>
+        <div className="space-y-6">
+          <button
+            disabled={isSubmitting || !cart}
+            type="submit"
+            className="group relative flex w-full items-center justify-center gap-4 rounded-2xl bg-[#ffc105] py-6 font-space-grotesk text-xl font-black uppercase tracking-[0.3em] text-black transition-all hover:bg-white active:scale-[0.98] disabled:opacity-30 disabled:grayscale shadow-[0_10px_30px_rgba(255,193,5,0.2)]"
+          >
+            {isSubmitting ? (
+              <Loader2 className="animate-spin" size={28} />
+            ) : (
+              <>
+                {t('actions.confirm')}
+                <ChevronRight size={24} className={`transition-transform group-hover:translate-x-1 ${locale === 'ar' ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
+              </>
+            )}
+          </button>
+          <div className="flex items-center justify-center gap-3 text-zinc-600 px-4 py-3 bg-zinc-900/20 rounded-xl border border-white/5">
+            <ShieldCheck size={18} className="text-emerald-500" />
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] leading-relaxed text-center">
+              {t('notice')}
+            </p>
+          </div>
+        </div>
+      </form>
+    </div>
   );
 }

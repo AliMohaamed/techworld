@@ -2,7 +2,8 @@
 
 import * as React from "react";
 
-import { usePathname } from "next/navigation";
+import { useLocale } from "next-intl";
+import { usePathname } from "@/navigation";
 import { Authenticated, AuthLoading, Unauthenticated, useQuery } from "convex/react";
 import { useForm } from "react-hook-form";
 import { ShieldCheck, ShieldX, LogOut, Menu } from "lucide-react";
@@ -12,7 +13,7 @@ import { Button } from "@techworld/ui/button";
 import { api } from "@backend/convex/_generated/api";
 import { authClient } from "@/lib/auth-client";
 import { Sidebar } from "@/components/Sidebar";
-import { Sheet, SheetTrigger, SheetContent, cn } from "@techworld/ui";
+import { Sheet, SheetTrigger, SheetContent, cn, ThemeToggle } from "@techworld/ui";
 
 const signInSchema = z.object({
   email: z.string().trim().email("Enter a valid admin email address."),
@@ -123,9 +124,9 @@ function LoginScreen() {
               <p className="text-sm text-red-400">{errors.password.message}</p>
             ) : null}
           </div>
-          <Button className="w-full py-2 text-sm cursor-pointer font-bold" disabled={isSubmitting} type="submit">
+          <button className="w-full flex h-11 items-center justify-center rounded-xl bg-[#ffc105] text-sm font-bold text-black transition-all hover:bg-[#ffc105]/90 disabled:opacity-50 cursor-pointer" disabled={isSubmitting} type="submit">
             {isSubmitting ? "Signing in..." : "Sign In"}
-          </Button>
+          </button>
         </form>
       </div>
     </main>
@@ -135,6 +136,7 @@ function LoginScreen() {
 function AuthenticatedShell({ children }: { children: React.ReactNode }) {
   const profile = useQuery(api.auth.getCurrentStaffProfile);
   const pathname = usePathname();
+  const locale = useLocale();
 
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
@@ -244,12 +246,13 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
                   TechWorld Ops
                 </p>
                 <h1 className="text-lg font-semibold uppercase tracking-tight truncate max-w-[150px] sm:max-w-none">
-                  Admin Dashboard
+                  Admin Dashboard <span className="ml-1 text-[10px] opacity-40">[{locale.toUpperCase()}]</span>
                 </h1>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-zinc-400">
+            <ThemeToggle />
             <span className="hidden md:inline">{profile.authUser?.email}</span>
             <Button
               onClick={() => void authClient.signOut()}

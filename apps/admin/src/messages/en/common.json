@@ -1,0 +1,30 @@
+{
+  "Common": {
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "create": "Create",
+      "search": "Search...",
+      "filter": "Filter",
+      "apply": "Apply",
+      "clear": "Clear",
+      "view": "View",
+      "confirm": "Confirm"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "completed": "Completed",
+      "failed": "Failed",
+      "loading": "Loading..."
+    },
+    "feedback": {
+      "success": "Action completed successfully",
+      "error": "An error occurred",
+      "noResults": "No results found"
+    }
+  }
+}

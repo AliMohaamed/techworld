@@ -1,0 +1,10 @@
+{
+  "CategoriesPage": {
+    "badge": "Active Collections",
+    "title": "Explore Categories",
+    "description": "Every active category routes into a filtered storefront view so customers can browse broad themes before narrowing into exact products.",
+    "card": {
+      "defaultDescription": "Browse every live product mapped to this category."
+    }
+  }
+}

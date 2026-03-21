@@ -1,7 +1,7 @@
 "use client";
 
 import type { MouseEvent } from "react";
-import Link from "next/link";
+import { Link } from "@/navigation";
 import Image from "next/image";
 import { useMutation } from "convex/react";
 import { api } from "@backend/convex/_generated/api";
@@ -9,6 +9,7 @@ import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
 import { useCart } from "@/providers/cart-provider";
 import { ShoppingCart } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
 
 interface ProductCardProps {
   product: {
@@ -33,6 +34,8 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const t = useTranslations('ProductCard');
+  const locale = useLocale();
   const { sessionId } = useSession();
   const { openCart } = useCart();
   const addToCart = useMutation(api.cart.addToCart);
@@ -64,67 +67,69 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
       href={`/products/${product.slug || product._id}`}
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-[#1c1c1e] transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/50"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-card transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/20 dark:hover:shadow-black/50 border border-border active:scale-[0.99]"
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-2xl border-b border-white/5 bg-zinc-900">
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-2xl border-b border-border bg-secondary">
         {product.images?.[0] ? (
           <Image
             src={product.images[0]}
-            alt={product.name_en}
+            alt={locale === 'en' ? product.name_en : product.name_ar}
             fill
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-zinc-900 text-zinc-700">No Image</div>
+          <div className="flex h-full w-full items-center justify-center bg-secondary text-muted-foreground font-bold uppercase tracking-widest text-[10px]">
+            {t('noImage')}
+          </div>
         )}
 
-        {hasSalePrice ? (
-          <div className="absolute left-4 top-4 rounded-full bg-[#ffc105] px-3 py-1 text-[10px] font-black uppercase tracking-[0.3em] text-black">
-            Sale
+        {hasSalePrice && !isOutOfStock ? (
+          <div className="absolute ltr:left-4 rtl:right-4 top-4 rounded-full bg-[#ffc105] px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.3em] text-black shadow-lg">
+            {t('badges.sale')}
           </div>
         ) : null}
 
         {isOutOfStock ? (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
-            <span className="rounded bg-red-600 px-3 py-1 text-xs font-bold uppercase tracking-widest text-white">
-              Sold Out
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70 backdrop-blur-[4px] animate-in fade-in duration-500">
+            <span className="rounded-xl bg-red-600/20 border border-red-600/50 px-5 py-2.5 text-xs font-black uppercase tracking-[0.2em] text-red-500 shadow-[0_0_20px_rgba(220,38,38,0.2)]">
+              {t('badges.soldOut')}
             </span>
           </div>
         ) : null}
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <span className="mb-2 text-xs font-bold uppercase tracking-widest text-[#ffc105]">
-          {product.categoryName || "PROJECTORS"}
+      <div className="flex flex-1 flex-col p-6">
+        <span className="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#ffc105]/80">
+          {product.categoryName || t('placeholderCategory')}
         </span>
 
-        <h3 className="mb-2 line-clamp-2 font-space-grotesk text-[1.35rem] font-bold leading-tight text-white">
-          {product.name_en} <span className="font-arabic font-normal text-zinc-400">| {product.name_ar}</span>
+        <h3 className="mb-2 line-clamp-1 font-space-grotesk text-[1.4rem] font-black leading-tight text-foreground uppercase tracking-tighter group-hover:text-[#ffc105] transition-colors">
+          {locale === 'en' ? product.name_en : product.name_ar}
         </h3>
 
-        <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-zinc-300">
-          {product.description_en || "Experience premium quality with this top-of-the-line product, designed to provide exceptional performance."}
+        <p className="mb-6 line-clamp-2 text-sm leading-relaxed text-muted-foreground font-light">
+          {locale === 'en' ? (product.description_en || t('placeholder')) : product.name_ar}
         </p>
 
-        <div className="mt-1 flex items-center gap-4">
+        <div className="mt-auto flex items-center gap-4">
           <div className="flex shrink-0 flex-col">
             {hasSalePrice ? (
-              <s className="mb-1 font-space-grotesk text-sm font-bold tracking-tight text-zinc-500">
-                {product.compareAtPrice?.toLocaleString()} EGP
+              <s className="mb-0.5 font-space-grotesk text-sm font-bold tracking-tight text-muted-foreground decoration-red-900/50">
+                {product.compareAtPrice?.toLocaleString(locale)} <span className="text-[10px]">EGP</span>
               </s>
             ) : null}
-            <span className="font-space-grotesk text-[1.5rem] font-bold tracking-tight text-[#ffc105]">
-              {product.selling_price.toLocaleString()} <span className="text-lg">EGP</span>
+            <span className="font-space-grotesk text-[1.6rem] font-black tracking-tightest text-foreground">
+              {displayPrice.toLocaleString(locale)} <span className="text-lg text-[#ffc105]">EGP</span>
             </span>
           </div>
 
           <button
             disabled={isOutOfStock}
             onClick={handleAddToCart}
-            className="flex h-[3.25rem] flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#ffc105] px-4 font-bold text-black transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-14 flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#ffc105] px-4 font-black text-black transition-all hover:bg-white active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-30 shadow-lg hover:shadow-[#ffc105]/20"
           >
-            <ShoppingCart size={20} className="shrink-0 fill-black/10" />
-            <span className="whitespace-nowrap">Add to Cart</span>
+            <ShoppingCart size={20} className="shrink-0 fill-black/5" />
+            <span className="whitespace-nowrap uppercase tracking-widest text-xs">{t('actions.add')}</span>
           </button>
         </div>
       </div>

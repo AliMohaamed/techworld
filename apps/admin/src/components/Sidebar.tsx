@@ -1,32 +1,33 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/navigation";
 import type { Route } from "next";
 import { Boxes, ClipboardList, FolderTree, History as HistoryIcon, Home, MapPinned, Settings, ShieldCheck, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@techworld/ui";
 import type { Permission } from "@backend/convex/lib/permissions";
+import { useTranslations } from "next-intl";
 
 type StaffPermissionValue = string | number | bigint | boolean;
 type SidebarRoute = "/" | "/orders" | "/catalog/categories" | "/catalog/products" | "/marketing/promo-codes" | "/settings/governorates" | "/settings/audit" | "/settings" | "/audit" | "/team";
 
 type NavItem = {
   href: SidebarRoute;
-  label: string;
+  translationKey: string;
   icon: LucideIcon;
   requiredPermissions?: Permission[];
 };
 
 const navItems: NavItem[] = [
-  { href: "/", label: "Overview", icon: Home },
-  { href: "/orders", label: "Orders", icon: ClipboardList, requiredPermissions: ["VIEW_ORDERS"] },
-  { href: "/catalog/categories", label: "Categories", icon: FolderTree, requiredPermissions: ["MANAGE_CATEGORIES"] },
-  { href: "/catalog/products", label: "Products", icon: Boxes, requiredPermissions: ["MANAGE_PRODUCTS"] },
-  { href: "/marketing/promo-codes", label: "Promo Codes", icon: ClipboardList, requiredPermissions: ["MANAGE_SYSTEM_CONFIG"] },
-  { href: "/settings/governorates", label: "Operations", icon: MapPinned, requiredPermissions: ["MANAGE_SYSTEM_CONFIG"] },
-  { href: "/settings/audit", label: "Audit Ledger", icon: ShieldCheck, requiredPermissions: ["VIEW_AUDIT_LOGS"] },
-  { href: "/settings", label: "Settings", icon: Settings, requiredPermissions: ["MANAGE_SYSTEM_CONFIG"] },
-  { href: "/audit", label: "All Logs", icon: HistoryIcon, requiredPermissions: ["VIEW_AUDIT_LOGS"] },
-  { href: "/team", label: "Team", icon: Users, requiredPermissions: ["MANAGE_USERS"] },
+  { href: "/", translationKey: "overview", icon: Home },
+  { href: "/orders", translationKey: "orders", icon: ClipboardList, requiredPermissions: ["VIEW_ORDERS"] },
+  { href: "/catalog/categories", translationKey: "categories", icon: FolderTree, requiredPermissions: ["MANAGE_CATEGORIES"] },
+  { href: "/catalog/products", translationKey: "products", icon: Boxes, requiredPermissions: ["MANAGE_PRODUCTS"] },
+  { href: "/marketing/promo-codes", translationKey: "promoCodes", icon: ClipboardList, requiredPermissions: ["MANAGE_SYSTEM_CONFIG"] },
+  { href: "/settings/governorates", translationKey: "operations", icon: MapPinned, requiredPermissions: ["MANAGE_SYSTEM_CONFIG"] },
+  { href: "/settings/audit", translationKey: "auditLedger", icon: ShieldCheck, requiredPermissions: ["VIEW_AUDIT_LOGS"] },
+  { href: "/settings", translationKey: "settings", icon: Settings, requiredPermissions: ["MANAGE_SYSTEM_CONFIG"] },
+  { href: "/audit", translationKey: "allLogs", icon: HistoryIcon, requiredPermissions: ["VIEW_AUDIT_LOGS"] },
+  { href: "/team", translationKey: "team", icon: Users, requiredPermissions: ["MANAGE_USERS"] },
 ];
 
 function hasRequiredPermission(
@@ -56,13 +57,14 @@ export function Sidebar({
   className?: string;
   onItemClick?: () => void;
 }) {
+  const t = useTranslations('Sidebar');
   const visibleItems = navItems.filter((item) =>
     hasRequiredPermission(permissions, item.requiredPermissions),
   );
 
   return (
     <aside className={cn("hidden w-72 shrink-0 rounded-[24px] border border-white/5 bg-[#24201a] p-5 lg:block", className)}>
-      <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Navigation</p>
+      <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">{t('headers.navigation')}</p>
       <nav className="mt-4 space-y-2">
         {visibleItems.map((item) => {
           const isActive = isActivePath(pathname, item.href);
@@ -81,12 +83,12 @@ export function Sidebar({
               )}
             >
               <Icon size={16} />
-              {item.label}
+              {t(`nav.${item.translationKey}` as any)}
             </Link>
           );
         })}
       </nav>
-      <p className="mt-8 text-[11px] uppercase tracking-[0.35em] text-zinc-500">Permissions</p>
+      <p className="mt-8 text-[11px] uppercase tracking-[0.35em] text-zinc-500">{t('headers.permissions')}</p>
       <div className="mt-4 flex flex-wrap gap-2">
         {permissions.length ? (
           permissions.map((permission) => (
@@ -98,11 +100,9 @@ export function Sidebar({
             </span>
           ))
         ) : (
-          <span className="text-sm text-zinc-500">No staff permissions mapped yet.</span>
+          <span className="text-sm text-zinc-500">{t('empty.noPermissions')}</span>
         )}
       </div>
     </aside>
   );
 }
-
-

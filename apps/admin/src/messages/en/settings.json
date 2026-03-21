@@ -1,0 +1,74 @@
+{
+  "Settings": {
+    "system": {
+      "badge": "System Control",
+      "title": "System Settings",
+      "description": "Manage global application states, toggle payment methods, and enforce security policies across the commerce engine.",
+      "auditLogButton": "View Audit Log",
+      "toggles": {
+        "title": "Global Toggles",
+        "maintenance": {
+          "title": "Maintenance Mode",
+          "description": "Take the storefront offline for all users. Admin dashboard remains accessible."
+        },
+        "cod": {
+          "title": "Guest COD (Cash on Delivery)",
+          "description": "Allow unverified users to place orders using COD as a payment method."
+        }
+      },
+      "blacklist": {
+        "title": "Security Blacklist",
+        "addNumber": "Add Number",
+        "close": "Close",
+        "form": {
+          "phoneLabel": "Phone Number (E.164)",
+          "phonePlaceholder": "+201234567890",
+          "reasonLabel": "Reason for blocking",
+          "reasonPlaceholder": "Fraudulent behavior",
+          "submit": "Enforce Block",
+          "errors": {
+            "invalidPhone": "Invalid phone number format",
+            "reasonRequired": "Reason is required"
+          }
+        },
+        "empty": "No phone numbers are currently blacklisted.",
+        "messages": {
+          "maintenanceActive": "Maintenance mode activated",
+          "maintenanceInactive": "Maintenance mode deactivated",
+          "maintenanceFailed": "Failed to update maintenance mode",
+          "codEnabled": "COD payments enabled",
+          "codDisabled": "COD payments disabled",
+          "codFailed": "Failed to update COD settings",
+          "blacklistSuccess": "Number blacklisted",
+          "blacklistFailed": "Failed to blacklist number",
+          "removeSuccess": "Number removed from blacklist",
+          "removeFailed": "Failed to remove number",
+          "error": "An error occurred"
+        }
+      }
+    },
+    "audit": {
+      "badge": "Traceability",
+      "title": "Settings Audit Trail",
+      "description": "History of all global configuration changes. This ledger tracks who changed what system toggle and when.",
+      "backButton": "Back to Settings",
+      "table": {
+        "columns": {
+          "key": "Setting Key",
+          "updatedBy": "Updated By",
+          "newValue": "New Value",
+          "timestamp": "Timestamp"
+        },
+        "loading": "Fetching system history...",
+        "empty": "No configuration changes recorded yet.",
+        "loadMore": "Load more entries",
+        "loadingMore": "Fetching older entries...",
+        "exhausted": "Total History Loaded"
+      },
+      "denied": {
+        "title": "Access Denied",
+        "message": "Your account requires the {permission} permission to access the audit trail. Please contact a Super Admin for authorization."
+      }
+    }
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "Marketing": {
+    "promoCodes": {
+      "badge": "Marketing",
+      "title": "Promo Codes Engine",
+      "description": "Create and manage discount codes, usage limits, and expiration dates. Mutually exclusive from bundles per Phase 10 rules.",
+      "actions": {
+        "create": "Create New discount",
+        "edit": "Edit",
+        "delete": "Delete",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "confirmDelete": "Are you sure you want to delete this promo code?"
+      },
+      "table": {
+        "badge": "Active Discounts",
+        "title": "All Promo Codes",
+        "total": "{count} total",
+        "columns": {
+          "code": "Code",
+          "typeValue": "Type & Value",
+          "usage": "Usage",
+          "expiration": "Expiration",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "empty": "No promo codes found. Create your first one to drive sales!",
+        "loading": "Loading promo codes...",
+        "types": {
+          "fixed": "Fixed Amount",
+          "percentage": "Percentage",
+          "freeShipping": "Free Shipping"
+        },
+        "cappedAt": "Capped at EGP {amount}",
+        "neverExpires": "Never",
+        "status": {
+          "active": "Active",
+          "expired": "Expired",
+          "full": "Full",
+          "inactive": "Inactive"
+        }
+      },
+      "messages": {
+        "activated": "Promo code activated",
+        "deactivated": "Promo code deactivated",
+        "deleteSuccess": "Promo code deleted",
+        "updateFailed": "Failed to update status",
+        "deleteFailed": "Failed to delete promo code",
+        "updateNotImplemented": "Update logic not yet implemented in backend. Delete and re-create for now.",
+        "createSuccess": "Promo code created successfully",
+        "operationFailed": "Operation failed",
+        "submissionFailed": "Submission failed",
+        "invalidOrExpiredPromoCode": "Invalid or expired promo code"  
+      },
+      "form": {
+        "createTitle": "New Promo Code",
+        "editTitle": "Edit Promo Code",
+        "badge": "Marketing Config",
+        "description": "Setup discounts, limits, and expiration.",
+        "fields": {
+          "code": "Promo Code String",
+          "type": "Discount Type",
+          "value": "Discount Magnitude",
+          "percentageValue": "Percentage Value",
+          "fixedValue": "Discount Amount (EGP)",
+          "maxDiscount": "Max Discount Cap (EGP)",
+          "maxUses": "Max Usage Limit",
+          "expiryDate": "Expiry Date",
+          "description": "Campaign Notes",
+          "isActive": "Ready for Public Consumption",
+          "bundleOverlap": "The system strictly prevents bundle overlap for all promo codes."
+        },
+        "placeholders": {
+          "code": "e.g. FLASH20",
+          "value": "100.00",
+          "maxDiscount": "Optional limit",
+          "maxUses": "100",
+          "description": "Short internal description..."
+        },
+        "types": {
+          "fixed": "Fixed Amount (EGP)",
+          "percentage": "Percentage (%)",
+          "freeShipping": "Free Shipping"
+        },
+        "buttons": {
+          "create": "Create Promo Code",
+          "update": "Save Changes",
+          "saving": "Creating...",
+          "cancel": "Cancel"
+        }
+      }
+    }
+  }
+}
