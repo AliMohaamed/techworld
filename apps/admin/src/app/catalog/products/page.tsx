@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
-import { Button } from "@techworld/ui/button";
+import { Button, Input, cn } from "@techworld/ui";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { ProductFormSheet } from "@/components/catalog/products/ProductFormSheet";
@@ -122,10 +122,10 @@ export default function AdminProductsPage() {
 
   return (
     <main className="space-y-6">
-      <section className="rounded-[28px] border border-white/5 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#24201a] px-8 py-8">
+      <section className="rounded-3xl border border-white/5 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#24201a] px-8 py-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">Catalog</p>
+            <p className="text-[11px] uppercase tracking-[0.35em] text-primary">Catalog</p>
             <h1 className="mt-3 text-4xl font-semibold uppercase tracking-tight text-white">
               Advanced Product Management
             </h1>
@@ -139,7 +139,7 @@ export default function AdminProductsPage() {
         </div>
       </section>
 
-      <section className="rounded-[24px] border border-white/5 bg-[#24201a] p-6">
+      <section className="rounded-3xl border border-white/5 bg-[#24201a] p-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Data Table</p>
@@ -205,8 +205,8 @@ export default function AdminProductsPage() {
                     ) : (
                       // Simple product: legacy inline edit
                       <div className="flex items-center gap-2">
-                        <input
-                          className="w-24 rounded-xl border border-white/10 bg-[#2a261f] px-3 py-2 text-zinc-100 placeholder:text-zinc-500 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50"
+                        <Input
+                          className="w-24"
                           type="number"
                           value={displayDrafts[product._id] ?? String(product.display_stock ?? 0)}
                           onChange={(event) =>
@@ -237,8 +237,8 @@ export default function AdminProductsPage() {
                     ) : (
                       // Simple product: legacy inline edit
                       <div className="flex items-center gap-2">
-                        <input
-                          className="w-24 rounded-xl border border-white/10 bg-[#2a261f] px-3 py-2 text-zinc-100 placeholder:text-zinc-500 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50"
+                        <Input
+                          className="w-24"
                           type="number"
                           value={realDrafts[product._id] ?? String(product.real_stock ?? 0)}
                           onChange={(event) =>

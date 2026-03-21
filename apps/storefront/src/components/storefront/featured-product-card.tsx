@@ -9,6 +9,7 @@ import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
 import { useCart } from "@/providers/cart-provider";
 import { ArrowRight, ShoppingCart, Zap } from "lucide-react";
+import { Button } from "@techworld/ui";
 
 interface FeaturedProductCardProps {
   product: {
@@ -59,7 +60,7 @@ export default function FeaturedProductCard({ product }: FeaturedProductCardProp
   return (
     <Link
       href={`/products/${product.slug || product._id}`}
-      className="group relative block h-[500px] w-full overflow-hidden rounded-[32px] border border-white/5 bg-zinc-900/40 transition-all hover:border-[#ffc105]/20"
+      className="group relative block h-[500px] w-full overflow-hidden rounded-3xl border border-white/5 bg-zinc-900/40 transition-all hover:border-primary/20"
     >
       <div className="absolute inset-0 z-0">
         {product.images?.[0] ? (
@@ -76,7 +77,7 @@ export default function FeaturedProductCard({ product }: FeaturedProductCardProp
       </div>
 
       <div className="absolute inset-0 z-20 flex flex-col items-start justify-end space-y-4 p-8">
-        <div className="flex items-center space-x-2 rounded-full bg-[#ffc105] px-3 py-1 scale-90 origin-left">
+        <div className="flex items-center space-x-2 rounded-full bg-primary px-3 py-1 scale-90 origin-left">
           <Zap size={12} className="fill-black text-black" />
           <span className="text-[10px] font-black uppercase tracking-widest text-black">Featured Drop</span>
         </div>
@@ -107,13 +108,14 @@ export default function FeaturedProductCard({ product }: FeaturedProductCardProp
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white transition-all group-hover:bg-white/20">
               <ArrowRight size={20} />
             </div>
-            <button
+            <Button
+              size="sm"
               onClick={handleAddToCart}
-              className="flex h-12 items-center justify-center space-x-2 rounded-2xl bg-[#ffc105] px-6 font-space-grotesk text-xs font-black uppercase tracking-widest text-black transition-colors hover:bg-[#e6ae00]"
+              className="h-12 px-6 font-space-grotesk text-xs font-black uppercase tracking-widest rounded-2xl"
             >
               <ShoppingCart size={16} />
               <span>Add</span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>

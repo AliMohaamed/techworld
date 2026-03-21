@@ -64,6 +64,7 @@ export default defineSchema({
     name: v.optional(v.string()),
     price: v.optional(v.number()),
     slug: v.optional(v.string()),
+    related_product_ids: v.optional(v.array(v.id("products"))),
   })
     .index("by_category", ["categoryId"])
     .index("by_status", ["status"])
@@ -138,6 +139,9 @@ export default defineSchema({
     shortCode: v.optional(v.string()),
     paymentReceiptRef: v.optional(storageRef),
     unit_cogs: v.optional(v.number()),
+    promo_code_id: v.optional(v.id("promo_codes")),
+    promo_code_snapshot: v.optional(v.string()),
+    discount_applied: v.optional(v.number()),
   })
     .index("by_shortCode", ["shortCode"])
     .index("by_session", ["sessionId"])
@@ -150,7 +154,10 @@ export default defineSchema({
     actionType: v.string(),
     timestamp: v.number(),
     changes: v.any(),
-  }).index("by_timestamp", ["timestamp"]),
+  })
+    .index("by_timestamp", ["timestamp"])
+    .index("by_actionType_timestamp", ["actionType", "timestamp"])
+    .index("by_entityId_timestamp", ["entityId", "timestamp"]),
 
   system_configs: defineTable({
     key: v.string(),
@@ -165,4 +172,17 @@ export default defineSchema({
     addedBy: v.id("users"),
     addedAt: v.number(),
   }).index("by_phone", ["phoneNumber"]),
+
+  promo_codes: defineTable({
+    code: v.string(),
+    type: v.union(v.literal("fixed"), v.literal("percentage"), v.literal("free_shipping")),
+    value: v.number(),
+    max_discount_amount: v.optional(v.number()),
+    max_uses: v.number(),
+    current_uses: v.number(),
+    expiry_date: v.optional(v.number()),
+    isActive: v.boolean(),
+  })
+    .index("by_code", ["code"])
+    .index("by_active", ["isActive"]),
 });

@@ -8,11 +8,14 @@ import { X, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Id } from "@backend/convex/_generated/dataModel";
+import { useState } from "react";
+import { PromoCodeInput } from "@techworld/ui";
 
 export default function CartDrawer() {
   const { sessionId } = useSession();
   const { isOpen, closeCart } = useCart();
-  const cart = useQuery(api.cart.getCart, { sessionId });
+  const [appliedPromo, setAppliedPromo] = useState<string | undefined>(undefined);
+  const cart = useQuery(api.cart.getCart, { sessionId, promoCode: appliedPromo });
   const addToCart = useMutation(api.cart.addToCart);
   const removeFromCart = useMutation(api.cart.removeFromCart);
 
@@ -149,12 +152,31 @@ export default function CartDrawer() {
 
           {/* Footer with Checkout button */}
           {cart && cart.items.length > 0 && (
-            <div className="border-t border-white/5 bg-zinc-950 p-6 space-y-4 shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
-              <div className="space-y-2">
+            <div className="border-t border-white/5 bg-zinc-950 p-6 space-y-6 shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
+              <div className="space-y-3">
+                <p className="font-space-grotesk text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                  HAVE A PROMO CODE?
+                </p>
+                <PromoCodeInput
+                  onApply={(code: string) => setAppliedPromo(code)}
+                  onRemove={() => setAppliedPromo(undefined)}
+                  appliedCode={appliedPromo}
+                  error={cart.promoError}
+                  discountAmount={cart.promoDiscount}
+                />
+              </div>
+
+              <div className="space-y-2 pt-2">
                 <div className="flex justify-between text-zinc-400 text-xs font-medium uppercase tracking-widest">
                   <span>Subtotal</span>
-                  <span className="text-white">{(cart.total || 0).toLocaleString()} EGP</span>
+                  <span className="text-white">{(cart.subtotal || 0).toLocaleString()} EGP</span>
                 </div>
+                {cart.promoDiscount ? (
+                  <div className="flex justify-between text-emerald-400 text-xs font-medium uppercase tracking-widest">
+                    <span>Discount</span>
+                    <span>-{cart.promoDiscount.toLocaleString()} EGP</span>
+                  </div>
+                ) : null}
                 <div className="flex justify-between text-zinc-400 text-xs font-medium uppercase tracking-widest">
                   <span>Shipping</span>
                   <span className="text-zinc-500 italic">CALCULATED AT NEXT STEP</span>
@@ -181,7 +203,3 @@ export default function CartDrawer() {
     </>
   );
 }
-
-
-
-

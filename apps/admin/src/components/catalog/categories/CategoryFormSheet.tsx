@@ -5,7 +5,18 @@ import { useMutation } from "convex/react";
 import { toast } from "sonner";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
-import { Button, Input, Label, Switch, Textarea } from "@techworld/ui";
+import {
+  Button,
+  Input,
+  Label,
+  Switch,
+  Textarea,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@techworld/ui";
 
 type CategoryFormState = {
   name_en: string;
@@ -108,22 +119,19 @@ export function CategoryFormSheet({
     }
   };
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-[2px]">
-      <div className="absolute inset-x-0 bottom-0 top-6 w-full overflow-y-auto rounded-t-[32px] border border-white/5 bg-[#24201a] p-4 shadow-2xl shadow-black/40 sm:inset-y-0 sm:left-auto sm:right-0 sm:max-w-xl sm:rounded-none sm:border-l sm:border-t-0 sm:p-6">
-        <div className="sticky top-0 z-10 -mx-4 mb-6 flex items-start justify-between gap-4 border-b border-white/5 bg-[#24201a]/95 px-4 pb-4 pt-1 backdrop-blur sm:static sm:mx-0 sm:border-b-0 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-0">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Category Sheet</p>
-            <h2 className="mt-2 text-xl font-semibold text-white sm:text-2xl">
-              {category ? "Edit Category" : "New Category"}
-            </h2>
-          </div>
-          <Button type="button" variant="ghost" onClick={onClose}>Close</Button>
-        </div>
+    <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <SheetContent side="right" className="sm:max-w-xl overflow-y-auto p-0 border-l border-white/10 dark:bg-[#0a0a0a]">
+        <SheetHeader className="p-6 pb-0">
+          <SheetTitle className="text-2xl font-bold text-white">
+            {category ? "Edit Category" : "New Category"}
+          </SheetTitle>
+          <SheetDescription className="text-zinc-500 uppercase tracking-[0.2em] text-[10px]">
+            Catalog Management
+          </SheetDescription>
+        </SheetHeader>
 
-        <form className="space-y-6 pb-24 sm:pb-8" onSubmit={submit}>
+        <form className="p-6 space-y-6 pb-24" onSubmit={submit}>
           <div className="space-y-4 text-sm text-zinc-200">
             <div className="space-y-2">
               <Label htmlFor="name_en">English name</Label>
@@ -209,7 +217,7 @@ export function CategoryFormSheet({
             <Button className="w-full sm:w-auto" type="button" variant="ghost" onClick={onClose}>Cancel</Button>
           </div>
         </form>
-      </div>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }

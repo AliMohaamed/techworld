@@ -7,7 +7,20 @@ import { toast } from "sonner";
 import { Plus, Trash2, TrendingUp } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
-import { Button, Input, Label, Select, Switch, Textarea, cn } from "@techworld/ui";
+import {
+  Button,
+  Input,
+  Label,
+  SelectNative,
+  Switch,
+  Textarea,
+  cn,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@techworld/ui";
 import { ConvexStorageUpload } from "./ConvexStorageUpload";
 import { productSchema, type ProductFormSubmitValues, type ProductFormValues } from "./product-zod-schemas";
 
@@ -188,38 +201,33 @@ export function ProductFormSheet({
     onClose();
   });
 
-  if (!open) {
-    return null;
-  }
-
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-[2px]">
-      <div className="absolute inset-x-0 bottom-0 top-6 w-full overflow-y-auto rounded-t-[32px] border border-white/5 bg-[#24201a] p-4 shadow-2xl shadow-black/40 sm:inset-y-0 sm:left-auto sm:right-0 sm:max-w-4xl sm:rounded-none sm:border-l sm:border-t-0 sm:p-6">
-        <div className="sticky top-0 z-10 -mx-4 mb-6 flex items-start justify-between gap-4 border-b border-white/5 bg-[#24201a]/95 px-4 pb-4 pt-1 backdrop-blur sm:static sm:mx-0 sm:border-b-0 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-0">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Product Sheet</p>
-            <h2 className="mt-2 text-xl font-semibold text-white sm:text-2xl">
-              {product ? "Edit advanced product" : "Create advanced product"}
-            </h2>
-          </div>
-          <Button type="button" variant="ghost" onClick={onClose}>Close</Button>
-        </div>
+    <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <SheetContent side="right" className="sm:max-w-4xl overflow-y-auto p-0 border-l border-white/10 dark:bg-[#0a0a0a]">
+        <SheetHeader className="p-6 pb-0">
+          <SheetTitle className="text-2xl font-bold text-white">
+            {product ? "Edit advanced product" : "Create advanced product"}
+          </SheetTitle>
+          <SheetDescription className="text-zinc-500 uppercase tracking-[0.2em] text-[10px]">
+            Product Management
+          </SheetDescription>
+        </SheetHeader>
 
-        <form className="space-y-8 pb-24 sm:pb-8" onSubmit={(event) => void submit(event)}>
+        <form className="p-6 space-y-8 pb-24" onSubmit={(event) => void submit(event)}>
           <section className="grid gap-4 md:grid-cols-2">
             <Field label="Category" error={errors.categoryId?.message}>
-              <Select {...register("categoryId")}>
+              <SelectNative {...register("categoryId")}>
                 <option value="">Select category</option>
                 {categories.map((category) => (
                   <option key={category._id} value={category._id}>{category.name_en}</option>
                 ))}
-              </Select>
+              </SelectNative>
             </Field>
             <Field label="Status" error={errors.status?.message}>
-              <Select {...register("status")}>
+              <SelectNative {...register("status")}>
                 <option value="DRAFT">Draft</option>
                 <option value="PUBLISHED">Published</option>
-              </Select>
+              </SelectNative>
             </Field>
             <Field label="English name" error={errors.name_en?.message}>
               <Input {...register("name_en")} placeholder="e.g. Ultra HD Pro Watch" />
@@ -262,12 +270,12 @@ export function ProductFormSheet({
               }}
             />
             <Field label="Primary thumbnail storage ID" error={errors.thumbnail?.message}>
-              <Select {...register("thumbnail")}>
+              <SelectNative {...register("thumbnail")}>
                 <option value="">Select primary image</option>
                 {images.map((imageId) => (
                   <option key={imageId} value={imageId}>{imageId}</option>
                 ))}
-              </Select>
+              </SelectNative>
             </Field>
           </section>
 
@@ -342,12 +350,12 @@ export function ProductFormSheet({
                       <Input type="number" step="0.01" {...register(`variants.${index}.compareAtPrice`)} placeholder="0.00" />
                     </Field>
                     <Field label="Linked image" error={errors.variants?.[index]?.linkedImageId?.message}>
-                      <Select {...register(`variants.${index}.linkedImageId`)}>
+                      <SelectNative {...register(`variants.${index}.linkedImageId`)}>
                         <option value="">No linked image</option>
                         {images.map((imageId) => (
                           <option key={imageId} value={imageId}>{imageId}</option>
                         ))}
-                      </Select>
+                      </SelectNative>
                     </Field>
                   </div>
                 </div>
@@ -362,8 +370,8 @@ export function ProductFormSheet({
             <Button className="w-full sm:w-auto" type="button" variant="ghost" onClick={onClose}>Cancel</Button>
           </div>
         </form>
-      </div>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }
 

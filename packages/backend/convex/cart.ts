@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
+import { internal } from "./_generated/api";
 import { resolveProductImages, resolveStorageRef } from "./products";
 import { writeAuditLog } from "./lib/audit";
 
@@ -111,14 +112,14 @@ export const removeFromCart = mutation({
 });
 
 export const getCart = query({
-  args: { sessionId: v.string() },
+  args: { sessionId: v.string(), promoCode: v.optional(v.string()) },
   handler: async (ctx, args) => {
     const session = await ctx.db
       .query("cart_sessions")
-      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId as string))
       .unique();
 
-    if (!session) return { items: [], total: 0 };
+    if (!session) return { items: [], subtotal: 0, total: 0 };
 
     const items = await Promise.all(
       session.items.map(async (item) => {
@@ -141,12 +142,56 @@ export const getCart = query({
       }),
     );
 
-    const total = items.reduce((sum, item) => {
+    const subtotal = items.reduce((sum, item) => {
       const unitPrice = item.sku?.price ?? item.product?.selling_price ?? 0;
       return sum + unitPrice * item.quantity;
     }, 0);
 
-    return { items, total };
+    let promoDiscount = 0;
+    let promoError = null;
+    let promoId = undefined;
+
+    if (args.promoCode) {
+      // Internal-ish check using the same logic as validatePromoCode query
+      // (Avoiding cross-file query call if possible, or using a library function)
+      // For simplicity here, we'll re-calculate or assume a bridge. 
+      // In Convex, it's best to helper-ize logic used in both queries and mutations.
+      // But for the sake of the task, I will implement a bridge fetch.
+      const promo = await ctx.db
+        .query("promo_codes")
+        .withIndex("by_code", (q) => q.eq("code", args.promoCode as string))
+        .unique();
+
+      if (!promo || !promo.isActive || (promo.expiry_date && Date.now() > promo.expiry_date) || promo.current_uses >= promo.max_uses) {
+        promoError = "Invalid or expired promo code";
+      } else {
+        const products = await Promise.all(session.items.map(item => ctx.db.get(item.productId)));
+        const hasBundle = products.some(p => (p as any)?.isBundle === true);
+        
+        if (hasBundle) {
+          promoError = "Promo code cannot be combined with bundles";
+        } else {
+          promoId = promo._id;
+          if (promo.type === "fixed") {
+            promoDiscount = promo.value;
+          } else if (promo.type === "percentage") {
+            promoDiscount = (subtotal * promo.value) / 100;
+            if (promo.max_discount_amount) {
+              promoDiscount = Math.min(promoDiscount, promo.max_discount_amount);
+            }
+          }
+        }
+      }
+    }
+
+    return { 
+      items, 
+      subtotal, 
+      promoDiscount: Math.floor(promoDiscount), 
+      promoError,
+      promoId,
+      total: Math.max(0, subtotal - Math.floor(promoDiscount)) 
+    };
   },
 });
 
@@ -208,11 +253,12 @@ export const placeOrderFromSession = mutation({
     customerPhone: v.string(),
     customerAddress: v.string(),
     governorateId: v.id("governorates"),
+    promoCode: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const session = await ctx.db
       .query("cart_sessions")
-      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId as string))
       .unique();
 
     if (!session || session.items.length === 0) {
@@ -226,7 +272,62 @@ export const placeOrderFromSession = mutation({
       .withIndex("by_phone", (q) => q.eq("phoneNumber", args.customerPhone))
       .unique();
 
-    for (const item of session.items) {
+    let promoDoc = null;
+    let promoDiscountAmount = 0;
+
+    if (args.promoCode) {
+      const promo = await ctx.db
+        .query("promo_codes")
+        .withIndex("by_code", (q) => q.eq("code", args.promoCode as string))
+        .unique();
+
+      if (promo && promo.isActive && (!promo.expiry_date || Date.now() <= promo.expiry_date) && promo.current_uses < promo.max_uses) {
+        // Double check bundle exclusivity
+        const products = await Promise.all(session.items.map(item => ctx.db.get(item.productId)));
+        const hasBundle = products.some(p => (p as any)?.isBundle === true);
+        
+        if (!hasBundle) {
+          promoDoc = promo;
+          // Calculate global discount for the whole order to be split or assigned to one line
+          // The schema has promo_code_id on 'orders' table (which is per-item here)
+          // Since it's per-item, we calculate the subtotal first
+          const subtotal = session.items.reduce((sum, item) => sum + (0), 0); // Need prices
+          // Better approach: calculate per-line or store at order level if orders was a header.
+          // Since TechWorld orders is per-item/SKU, we apply the discount logically.
+          // Spec says "Applied mutually exclusive... one code per order".
+          // We'll apply the whole discount amount to the first item for calculation record, or split it.
+          // Given TW architecture, we'll store the discount applied on the line.
+        }
+      }
+    }
+
+    // Refetching prices for discount calculation
+    const sessionItemsWithPrices = await Promise.all(session.items.map(async (item) => {
+        const sku = await ctx.db.get(item.skuId);
+        return { ...item, price: sku?.price ?? 0 };
+    }));
+    const totalSubtotal = sessionItemsWithPrices.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+
+    if (promoDoc) {
+        if (promoDoc.type === "fixed") {
+          promoDiscountAmount = promoDoc.value;
+        } else if (promoDoc.type === "percentage") {
+          promoDiscountAmount = (totalSubtotal * promoDoc.value) / 100;
+          if (promoDoc.max_discount_amount) {
+            promoDiscountAmount = Math.min(promoDiscountAmount, promoDoc.max_discount_amount);
+          }
+        }
+        
+        // Increment usage
+        await ctx.db.patch(promoDoc._id, { current_uses: promoDoc.current_uses + 1 });
+    }
+
+    let totalDiscountAppliedSoFar = 0;
+    let aggregatedTotalPrice = 0;
+    let firstOrderId = null;
+
+    for (let i = 0; i < session.items.length; i++) {
+      const item = session.items[i];
       const product = await ctx.db.get(item.productId);
       if (!product) continue;
 
@@ -244,20 +345,36 @@ export const placeOrderFromSession = mutation({
       });
 
       const lineSubtotal = sku.price * item.quantity;
+      
+      let discountForLine = 0;
+      if (totalSubtotal > 0 && promoDiscountAmount > 0) {
+        if (i === session.items.length - 1) {
+          discountForLine = Math.floor(promoDiscountAmount) - totalDiscountAppliedSoFar;
+        } else {
+          discountForLine = Math.floor((lineSubtotal / totalSubtotal) * promoDiscountAmount);
+          totalDiscountAppliedSoFar += discountForLine;
+        }
+        // Ensure we never subtract more than the line subtotal 
+        discountForLine = Math.min(discountForLine, lineSubtotal);
+      }
+
       const orderId = await ctx.db.insert("orders", {
         sessionId: args.sessionId,
         customerName: args.customerName,
         customerPhone: args.customerPhone,
         customerAddress: args.customerAddress,
         governorateId: args.governorateId,
-        appliedShippingFee: governorate.shippingFee,
+        appliedShippingFee: promoDoc?.type === "free_shipping" ? 0 : governorate.shippingFee,
         productId: item.productId,
         skuId: item.skuId,
         quantity: item.quantity,
-        total_price: lineSubtotal,
+        total_price: lineSubtotal - discountForLine,
         state: isBlacklisted ? "FLAGGED_FRAUD" : "PENDING_PAYMENT_INPUT",
         shortCode,
         unit_cogs: product.cogs,
+        promo_code_id: promoDoc?._id,
+        promo_code_snapshot: promoDoc?.code,
+        discount_applied: discountForLine,
       });
 
       await writeAuditLog(ctx, {
@@ -271,9 +388,27 @@ export const placeOrderFromSession = mutation({
           shortCode,
           customerName: args.customerName,
           governorateId: args.governorateId,
-          appliedShippingFee: governorate.shippingFee,
+          appliedShippingFee: promoDoc?.type === "free_shipping" ? 0 : governorate.shippingFee,
           lineSubtotal,
+          promoCode: args.promoCode,
+          discountApplied: discountForLine,
         },
+      });
+
+      if (!firstOrderId) {
+        firstOrderId = orderId;
+      }
+      aggregatedTotalPrice += (lineSubtotal - discountForLine);
+    }
+
+    if (!isBlacklisted && args.customerPhone && firstOrderId) {
+      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppWebhook, {
+        orderId: firstOrderId,
+        shortCode: shortCode,
+        customerPhone: args.customerPhone,
+        customerName: args.customerName || "Customer",
+        newState: "PENDING_PAYMENT_INPUT",
+        totalPrice: aggregatedTotalPrice + (promoDoc?.type === "free_shipping" ? 0 : governorate.shippingFee),
       });
     }
 

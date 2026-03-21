@@ -225,6 +225,36 @@ export async function resolveProductImages(
   return resolvedImages.filter((image): image is string => Boolean(image));
 }
 
+export const getSitemapData = query({
+  args: {},
+  handler: async (ctx) => {
+    const activeCategories = await ctx.db
+      .query("categories")
+      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .collect();
+    
+    const activeCategoryIds = new Set(activeCategories.map(c => c._id));
+
+    const products = await ctx.db
+      .query("products")
+      .withIndex("by_status", (q) => q.eq("status", "PUBLISHED"))
+      .collect();
+
+    return {
+      categories: activeCategories.map(c => ({ 
+        slug: c.slug, 
+        lastModified: new Date(c._creationTime).toISOString() 
+      })),
+      products: products
+        .filter(p => activeCategoryIds.has(p.categoryId))
+        .map(p => ({ 
+          slug: p.slug, 
+          lastModified: new Date(p._creationTime).toISOString() 
+        })),
+    };
+  },
+});
+
 async function resolveSkuMedia(
   ctx: Pick<QueryCtx, "db" | "storage">,
   productId: Id<"products">,
@@ -256,6 +286,18 @@ export const getProduct = query({
       categorySlug: category?.slug,
       isCategoryActive: category?.isActive ?? false,
       skus,
+      related_products: product.related_product_ids 
+        ? (await Promise.all(product.related_product_ids.map(async (id) => {
+            const p = await ctx.db.get(id);
+            if (!p || p.status !== "PUBLISHED") return null;
+            return {
+              ...p,
+              thumbnail: await resolveStorageRef(ctx, p.thumbnail),
+              images: await resolveProductImages(ctx, p.images),
+              skus: await resolveSkuMedia(ctx, p._id),
+            };
+          }))).filter((p): p is NonNullable<typeof p> => p !== null)
+        : [],
     };
 
     if (!(await canViewFinancials(ctx))) {
@@ -286,6 +328,18 @@ export const getBySlug = query({
       categorySlug: category?.slug,
       isCategoryActive: category?.isActive ?? false,
       skus,
+      related_products: product.related_product_ids 
+        ? (await Promise.all(product.related_product_ids.map(async (id) => {
+            const p = await ctx.db.get(id);
+            if (!p || p.status !== "PUBLISHED") return null;
+            return {
+              ...p,
+              thumbnail: await resolveStorageRef(ctx, p.thumbnail),
+              images: await resolveProductImages(ctx, p.images),
+              skus: await resolveSkuMedia(ctx, p._id),
+            };
+          }))).filter((p): p is NonNullable<typeof p> => p !== null)
+        : [],
     };
 
     if (!(await canViewFinancials(ctx))) {

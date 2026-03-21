@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useQuery } from "convex/react";
 import { useSession } from "@/providers/session-provider";
 import Image from "next/image";
@@ -10,7 +11,8 @@ import CheckoutForm from "@/components/storefront/checkout-form";
 
 export default function CheckoutPage() {
   const { sessionId } = useSession();
-  const cart = useQuery(api.cart.getCart, { sessionId });
+  const [appliedPromo, setAppliedPromo] = useState<string | undefined>(undefined);
+  const cart = useQuery(api.cart.getCart, { sessionId, promoCode: appliedPromo });
   const governorates = useQuery(api.governorates.listActiveGovernorates);
   const governoratesLoading = governorates === undefined;
 
@@ -28,7 +30,9 @@ export default function CheckoutPage() {
     );
   }
 
-  const itemsSubtotal = cart.total || 0;
+  const itemsSubtotal = cart.subtotal || 0;
+  const promoDiscount = cart.promoDiscount || 0;
+  const grandTotal = cart.total || 0;
   const hasGovernorates = Boolean(governorates && governorates.length > 0);
 
   return (
@@ -85,6 +89,12 @@ export default function CheckoutPage() {
                 <span>Items Subtotal</span>
                 <span className="text-zinc-300">{itemsSubtotal.toLocaleString()} EGP</span>
               </div>
+              {promoDiscount > 0 && (
+                <div className="flex justify-between text-xs uppercase tracking-widest text-emerald-400">
+                  <span>Promo Discount</span>
+                  <span>-{promoDiscount.toLocaleString()} EGP</span>
+                </div>
+              )}
               <div className="flex justify-between text-xs uppercase tracking-widest text-zinc-500">
                 <span>Shipping</span>
                 <span className="text-zinc-300">
@@ -95,7 +105,16 @@ export default function CheckoutPage() {
           </div>
 
           <div className="order-1 lg:order-2">
-            <CheckoutForm cartTotal={itemsSubtotal} governorates={governorates ?? []} governoratesLoading={governoratesLoading} />
+            <CheckoutForm 
+              cartTotal={itemsSubtotal} 
+              promoDiscount={promoDiscount}
+              promoError={cart.promoError}
+              appliedPromo={appliedPromo}
+              onApplyPromo={(code) => setAppliedPromo(code)}
+              onRemovePromo={() => setAppliedPromo(undefined)}
+              governorates={governorates ?? []} 
+              governoratesLoading={governoratesLoading} 
+            />
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@techworld/ui";
 import { ArrowRight, Play } from "lucide-react";
 
 export default function Hero() {
@@ -24,13 +25,16 @@ export default function Hero() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-6">
-            <Link 
-              href="/products" 
-              className="group h-16 px-10 bg-[#ffc105] text-black font-space-grotesk font-black text-lg uppercase tracking-widest rounded-2xl flex items-center justify-center hover:bg-[#e6ae00] hover:scale-105 active:scale-95 transition-all w-full sm:w-auto"
+            <Button
+              asChild
+              size="lg"
+              className="h-16 px-10 font-space-grotesk font-black text-lg uppercase tracking-widest rounded-2xl w-full sm:w-auto"
             >
-              Shop Now
-              <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
-            </Link>
+              <Link href="/products">
+                Shop Now
+                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+              </Link>
+            </Button>
           </div>
 
         </div>

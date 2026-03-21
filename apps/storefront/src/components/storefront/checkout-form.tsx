@@ -7,6 +7,7 @@ import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
 import { useRouter } from "next/navigation";
 import { User, Phone, MapPin, Loader2, ArrowRight, MapPinned } from "lucide-react";
+import { PromoCodeInput } from "@techworld/ui";
 
 type GovernorateOption = {
   _id: Id<"governorates">;
@@ -16,15 +17,27 @@ type GovernorateOption = {
   isActive: boolean;
 };
 
-export default function CheckoutForm({
-  cartTotal,
-  governorates,
-  governoratesLoading,
-}: {
+interface CheckoutFormProps {
   cartTotal: number;
+  promoDiscount?: number;
+  promoError?: string | null;
+  appliedPromo?: string;
+  onApplyPromo?: (code: string) => void;
+  onRemovePromo?: () => void;
   governorates: GovernorateOption[];
   governoratesLoading?: boolean;
-}) {
+}
+
+export default function CheckoutForm({
+  cartTotal,
+  promoDiscount = 0,
+  promoError,
+  appliedPromo,
+  onApplyPromo,
+  onRemovePromo,
+  governorates,
+  governoratesLoading,
+}: CheckoutFormProps) {
   const { sessionId } = useSession();
   const router = useRouter();
   const placeOrder = useMutation(api.cart.placeOrderFromSession);
@@ -43,7 +56,7 @@ export default function CheckoutForm({
     [formData.governorateId, governorates],
   );
   const shippingFee = selectedGovernorate?.shippingFee ?? 0;
-  const grandTotal = cartTotal + shippingFee;
+  const grandTotal = Math.max(0, cartTotal + shippingFee - promoDiscount);
   const deliveryUnavailable = !governoratesLoading && governorates.length === 0;
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -66,6 +79,7 @@ export default function CheckoutForm({
         customerPhone: formData.phone,
         customerAddress: formData.address,
         governorateId: formData.governorateId as Id<"governorates">,
+        promoCode: appliedPromo,
       });
 
       router.push(`/success?code=${shortCode}`);
@@ -142,10 +156,29 @@ export default function CheckoutForm({
       </div>
 
       <div className="space-y-4 rounded-2xl border border-white/5 bg-zinc-950 p-6 shadow-sm">
+        <h3 className="font-space-grotesk text-sm font-bold uppercase tracking-widest text-zinc-500">
+          Discount Code
+        </h3>
+        <PromoCodeInput
+          onApply={onApplyPromo || (() => {})}
+          onRemove={onRemovePromo || (() => {})}
+          appliedCode={appliedPromo}
+          error={promoError}
+          discountAmount={promoDiscount}
+        />
+      </div>
+
+      <div className="space-y-4 rounded-2xl border border-white/5 bg-zinc-950 p-6 shadow-sm">
         <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-zinc-400">
           <span>Items subtotal</span>
           <span className="text-zinc-200">{cartTotal.toLocaleString()} EGP</span>
         </div>
+        {promoDiscount > 0 ? (
+          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-emerald-400">
+            <span>Promo Discount</span>
+            <span>-{promoDiscount.toLocaleString()} EGP</span>
+          </div>
+        ) : null}
         <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-zinc-400">
           <span>Shipping</span>
           <span className="text-zinc-200">
@@ -190,4 +223,3 @@ export default function CheckoutForm({
     </form>
   );
 }
-

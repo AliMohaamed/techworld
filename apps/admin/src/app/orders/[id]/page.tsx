@@ -8,7 +8,14 @@ import { toast } from "sonner";
 import { AlertTriangle, ArrowLeft, CheckCircle2, UploadCloud, XCircle } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import { Id } from "@backend/convex/_generated/dataModel";
-import { Button } from "@techworld/ui/button";
+import {
+  Button,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@techworld/ui";
 
 export default function OrderDetailsPage() {
   const params = useParams<{ id: string }>();
@@ -212,18 +219,19 @@ export default function OrderDetailsPage() {
         </div>
       </section>
 
-      {isModalOpen ? (
-        <div className="fixed inset-0 z-50 bg-black/70 px-6 py-10">
-          <div className="mx-auto max-w-xl rounded-[28px] border border-white/5 bg-[#24201a] p-8 shadow-2xl shadow-black/40">
-            <div className="space-y-3">
-              <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">Manual Fallback</p>
-              <h2 className="text-2xl font-semibold uppercase tracking-tight text-white">Upload receipt and confirm</h2>
-              <p className="text-sm leading-7 text-zinc-400">
-                Attach a manual WhatsApp receipt if the customer proof needs to be uploaded directly from the admin workstation.
-              </p>
-            </div>
+      <Sheet open={isModalOpen} onOpenChange={(isOpen) => !isOpen && setIsModalOpen(false)}>
+        <SheetContent side="right" className="sm:max-w-xl overflow-y-auto p-0 border-l border-white/10 dark:bg-[#0a0a0a]">
+          <SheetHeader className="p-8 pb-0">
+            <SheetTitle className="text-2xl font-semibold uppercase tracking-tight text-white">
+              Manual Fallback
+            </SheetTitle>
+            <SheetDescription className="mt-3 text-sm leading-7 text-zinc-400">
+              Attach a manual WhatsApp receipt if the customer proof needs to be uploaded directly from the admin workstation.
+            </SheetDescription>
+          </SheetHeader>
 
-            <label className="mt-6 block rounded-[24px] border border-dashed border-white/10 bg-[#2a261f] px-5 py-8 text-center text-sm text-zinc-400 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50">
+          <div className="p-8 space-y-6">
+            <label className="block rounded-[24px] border border-dashed border-white/10 bg-[#2a261f] px-5 py-8 text-center text-sm text-zinc-400 transition-all outline-none hover:border-white/20 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50 cursor-pointer">
               <input
                 accept="image/*"
                 className="hidden"
@@ -235,7 +243,7 @@ export default function OrderDetailsPage() {
               <span className="mt-4 block text-xs text-[#ffc105]">{uploadLabel}</span>
             </label>
 
-            <div className="mt-6 flex gap-3">
+            <div className="flex gap-3">
               <Button className="flex-1" onClick={() => setIsModalOpen(false)} type="button" variant="ghost">
                 Close
               </Button>
@@ -245,8 +253,8 @@ export default function OrderDetailsPage() {
               </Button>
             </div>
           </div>
-        </div>
-      ) : null}
+        </SheetContent>
+      </Sheet>
     </main>
   );
 }

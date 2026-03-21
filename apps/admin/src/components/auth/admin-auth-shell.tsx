@@ -12,7 +12,7 @@ import { Button } from "@techworld/ui/button";
 import { api } from "@backend/convex/_generated/api";
 import { authClient } from "@/lib/auth-client";
 import { Sidebar } from "@/components/Sidebar";
-import { Sheet, SheetTrigger, SheetPortal, SheetBackdrop, SheetPopup, cn } from "@techworld/ui";
+import { Sheet, SheetTrigger, SheetContent, cn } from "@techworld/ui";
 
 const signInSchema = z.object({
   email: z.string().trim().email("Enter a valid admin email address."),
@@ -211,32 +211,29 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
               >
                 <Menu size={20} />
               </button>
-              <SheetPortal>
-                <SheetBackdrop />
-                <SheetPopup side="left" className="p-0 border-r border-white/5">
-                  <div className="flex flex-col h-full bg-[#1a1814] p-6">
-                    <div className="flex items-center gap-3 mb-8">
-                      <div className="rounded-xl bg-[#ffc105] p-2 text-black">
-                        <ShieldCheck size={18} />
-                      </div>
-                      <div className="min-w-0 text-left">
-                        <p className="text-[10px] uppercase tracking-[0.35em] text-[#ffc105] truncate">
-                          TechWorld Ops
-                        </p>
-                        <h1 className="text-base font-semibold uppercase tracking-tight truncate">
-                          Admin Dashboard
-                        </h1>
-                      </div>
+              <SheetContent side="left" className="p-0 border-r border-white/5 w-72">
+                <div className="flex flex-col h-full bg-[#1a1814] p-6">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="rounded-xl bg-primary p-2 text-primary-foreground">
+                      <ShieldCheck size={18} />
                     </div>
-                    <Sidebar 
-                      pathname={pathname} 
-                      permissions={profile.permissions} 
-                      className="block w-full border-none bg-transparent p-0" 
-                      onItemClick={() => setIsMenuOpen(false)}
-                    />
+                    <div className="min-w-0 text-left">
+                      <p className="text-[10px] uppercase tracking-[0.35em] text-primary truncate">
+                        TechWorld Ops
+                      </p>
+                      <h1 className="text-base font-semibold uppercase tracking-tight truncate">
+                        Admin Dashboard
+                      </h1>
+                    </div>
                   </div>
-                </SheetPopup>
-              </SheetPortal>
+                  <Sidebar 
+                    pathname={pathname} 
+                    permissions={profile.permissions} 
+                    className="block w-full border-none bg-transparent p-0" 
+                    onItemClick={() => setIsMenuOpen(false)}
+                  />
+                </div>
+              </SheetContent>
             </Sheet>
             <div className="flex items-center gap-3">
               <div className="rounded-xl bg-[#ffc105] p-2 text-black hidden sm:block">

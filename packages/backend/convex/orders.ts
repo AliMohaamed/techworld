@@ -204,6 +204,17 @@ export const updateOrderStatus = mutation({
 
     await ctx.db.patch(args.orderId, patch);
 
+    if (order.customerPhone && order.shortCode) {
+      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppWebhook, {
+        orderId: args.orderId,
+        shortCode: order.shortCode,
+        customerPhone: order.customerPhone,
+        customerName: order.customerName || "Customer",
+        newState: args.newState,
+        totalPrice: order.total_price,
+      });
+    }
+
     await scheduleAuditLog(ctx, {
       userId: actor._id,
       entityId: args.orderId,
@@ -302,6 +313,17 @@ export const payOrder = mutation({
 
     await ctx.db.patch(args.orderId, { state: "AWAITING_VERIFICATION" });
 
+    if (order.customerPhone && order.shortCode) {
+      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppWebhook, {
+        orderId: args.orderId,
+        shortCode: order.shortCode,
+        customerPhone: order.customerPhone,
+        customerName: order.customerName || "Customer",
+        newState: "AWAITING_VERIFICATION",
+        totalPrice: order.total_price,
+      });
+    }
+
     await scheduleAuditLog(ctx, {
       userId: await getActorUserId(ctx),
       entityId: args.orderId,
@@ -344,6 +366,17 @@ export const updateRto = mutation({
     });
 
     await ctx.db.patch(args.orderId, { state: "RTO" });
+
+    if (order.customerPhone && order.shortCode) {
+      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppWebhook, {
+        orderId: args.orderId,
+        shortCode: order.shortCode,
+        customerPhone: order.customerPhone,
+        customerName: order.customerName || "Customer",
+        newState: "RTO",
+        totalPrice: order.total_price,
+      });
+    }
 
     await scheduleAuditLog(ctx, {
       userId: actor._id,
@@ -396,6 +429,17 @@ export const updateGenericStatus = mutation({
     }
 
     await ctx.db.patch(args.orderId, { state: args.newState });
+
+    if (order.customerPhone && order.shortCode) {
+      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppWebhook, {
+        orderId: args.orderId,
+        shortCode: order.shortCode,
+        customerPhone: order.customerPhone,
+        customerName: order.customerName || "Customer",
+        newState: args.newState,
+        totalPrice: order.total_price,
+      });
+    }
 
     await scheduleAuditLog(ctx, {
       userId: actor._id,

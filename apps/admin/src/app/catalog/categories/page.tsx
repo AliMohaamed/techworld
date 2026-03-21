@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
-import { Button } from "@techworld/ui/button";
+import { Button } from "@techworld/ui";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { CategoryFormSheet } from "@/components/catalog/categories/CategoryFormSheet";
@@ -51,10 +51,10 @@ export default function AdminCategoriesPage() {
 
   return (
     <main className="space-y-6">
-      <section className="rounded-[28px] border border-white/5 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#24201a] px-8 py-8">
+      <section className="rounded-3xl border border-white/5 bg-[radial-gradient(circle_at_top,#222,transparent_45%),#24201a] px-8 py-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105]">Catalog</p>
+            <p className="text-[11px] uppercase tracking-[0.35em] text-primary">Catalog</p>
             <h1 className="mt-3 text-4xl font-semibold uppercase tracking-tight text-white">
               Category Management
             </h1>
@@ -68,7 +68,7 @@ export default function AdminCategoriesPage() {
         </div>
       </section>
 
-      <section className="rounded-[24px] border border-white/5 bg-[#24201a] p-6">
+      <section className="rounded-3xl border border-white/5 bg-[#24201a] p-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <p className="text-[11px] uppercase tracking-[0.35em] text-zinc-500">Data Table</p>

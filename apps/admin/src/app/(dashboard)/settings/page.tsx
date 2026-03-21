@@ -5,7 +5,8 @@ import { api } from "@backend/convex/_generated/api";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button, Input, Label, Switch } from "@techworld/ui";
-import { ShieldAlert, Settings2, Ban, Plus, Trash2, Loader2 } from "lucide-react";
+import { ShieldAlert, Settings2, Ban, Plus, Trash2, Loader2, History as HistoryIcon } from "lucide-react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -83,16 +84,26 @@ export default function SystemSettingsPage() {
   return (
     <main className="space-y-8 pb-20">
       <header className="rounded-[32px] border border-white/5 bg-[radial-gradient(circle_at_top_left,rgba(255,193,5,0.05),transparent_40%),#24201a] px-8 py-10 shadow-xl">
-        <div className="flex items-center gap-3">
-          <Settings2 className="text-[#ffc105]" size={20} />
-          <p className="text-[11px] uppercase tracking-[0.4em] text-[#ffc105]">System Control</p>
+        <div className="flex items-center justify-between">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Settings2 className="text-[#ffc105]" size={20} />
+              <p className="text-[11px] uppercase tracking-[0.4em] text-[#ffc105]">System Control</p>
+            </div>
+            <h1 className="text-4xl font-semibold uppercase tracking-tight text-white leading-tight">
+              System Settings
+            </h1>
+            <p className="max-w-2xl text-sm leading-7 text-zinc-400 font-light">
+              Manage global application states, toggle payment methods, and enforce security policies across the commerce engine.
+            </p>
+          </div>
+          <Link href={"/settings/audit" as any}>
+            <Button variant="outline" className="rounded-full border-white/5 bg-white/[0.02]">
+              <HistoryIcon size={16} className="mr-2" />
+              View Audit Log
+            </Button>
+          </Link>
         </div>
-        <h1 className="mt-4 text-4xl font-semibold uppercase tracking-tight text-white leading-tight">
-          System Settings
-        </h1>
-        <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400 font-light">
-          Manage global application states, toggle payment methods, and enforce security policies across the commerce engine.
-        </p>
       </header>
 
       <div className="grid gap-8 grid-cols-1 lg:grid-cols-2">

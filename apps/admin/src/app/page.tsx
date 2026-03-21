@@ -7,6 +7,7 @@ import { useState } from "react";
 import { SalesVelocityChart } from "@/components/charts/SalesVelocityChart";
 import { StatusBreakdownChart } from "@/components/charts/StatusBreakdownChart";
 import { TrendingUp, ShoppingCart, DollarSign, Truck, AlertCircle, ShieldX } from "lucide-react";
+import { Button, cn } from "@techworld/ui";
 import { hasPermission } from "@backend/convex/lib/permissions";
 
 export default function AdminDashboardPage() {
@@ -49,9 +50,9 @@ export default function AdminDashboardPage() {
   return (
     <main className="space-y-8 animate-in fade-in duration-500 pb-12">
       {/* Header with Time Window Selector */}
-      <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 rounded-[32px] border border-white/5 bg-[radial-gradient(circle_at_top_right,rgba(255,193,5,0.08),transparent_40%),#24201a] px-8 py-10 shadow-xl">
+      <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 rounded-3xl border border-white/5 bg-[radial-gradient(circle_at_top_right,rgba(255,193,5,0.08),transparent_40%),#24201a] px-8 py-10 shadow-xl">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.4em] text-[#ffc105]">Executive Dashboard</p>
+          <p className="text-[11px] uppercase tracking-[0.4em] text-primary">Executive Dashboard</p>
           <h1 className="mt-3 text-4xl font-semibold uppercase tracking-tight text-white leading-tight">
             Performance Overview
           </h1>
@@ -62,17 +63,18 @@ export default function AdminDashboardPage() {
         
         <div className="flex shrink-0 items-center gap-1 rounded-2xl border border-white/5 bg-black/20 p-1.5 backdrop-blur">
           {(["today", "last7days", "last30days"] as const).map((window) => (
-            <button
+            <Button
               key={window}
+              size="sm"
+              variant={timeWindow === window ? "default" : "ghost"}
               onClick={() => setTimeWindow(window)}
-              className={`rounded-xl px-4 py-2 text-[10px] uppercase tracking-[0.1em] transition-all duration-300 font-semibold ${
-                timeWindow === window 
-                  ? "bg-[#ffc105] text-black shadow-lg shadow-[#ffc105]/20 scale-[1.02]" 
-                  : "text-zinc-500 hover:text-white"
-              }`}
+              className={cn(
+                "h-9 px-4 text-[10px] uppercase tracking-[0.1em]",
+                timeWindow !== window && "text-zinc-500 hover:text-white"
+              )}
             >
               {window.replace("last", "Last ")}
-            </button>
+            </Button>
           ))}
         </div>
       </section>

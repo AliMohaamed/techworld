@@ -11,6 +11,10 @@ Auto-generated from all feature plans. Last updated: 2026-03-21
 - Convex Database and Convex File Storage (for images) (007-advanced-catalog)
 - TypeScript 5.x, React 18 + Next.js 14+, Tailwind CSS v3.x, Radix UI (or shadcn/ui) (009-responsive-dashboard)
 - N/A (Frontend UX only, existing Convex models preserved) (009-responsive-dashboard)
+- TypeScript (Next.js 14+, Convex) (011-marketing-seo)
+- Convex Database (adding `promo_codes` table, updating `products` and `orders` schema) (011-marketing-seo)
+- TypeScript, React 18, Next.js 14+ (App Router) + `next-intl` (routing & translations), `next-themes` (theme management), `sonner` (toast notifications), `lucide-react`, standard React Suspense. (012-system-i18n-theming)
+- Client-side Cookies (for locale and theme persistence to avoid hydration mismatches). (012-system-i18n-theming)
 
 - [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION] (005-catalog-explorer)
 
@@ -31,9 +35,9 @@ cd src; pytest; ruff check .
 [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]: Follow standard conventions
 
 ## Recent Changes
-- 009-responsive-dashboard: Added TypeScript 5.x, React 18 + Next.js 14+, Tailwind CSS v3.x, Radix UI (or shadcn/ui)
-- 007-advanced-catalog: Added TypeScript (Next.js 14+, Convex Backend) + React, TailwindCSS v4, shadcn/ui (`Dialog`, `Sheet`, `Form`), Zod, React Hook Form, Convex (`storage`)
-- 006-admin-dashboard-arch: Added TypeScript / Node 20 + Next.js 16.1.6, React 19, Convex ^1.33.1, Tailwind CSS v4, shadcn/ui, Turborepo
+- 012-system-i18n-theming: Added TypeScript, React 18, Next.js 14+ (App Router) + `next-intl` (routing & translations), `next-themes` (theme management), `sonner` (toast notifications), `lucide-react`, standard React Suspense.
+- 011-marketing-seo: Added TypeScript (Next.js 14+, Convex)
+- 011-marketing-seo: Added TypeScript (Next.js 14+, Convex)
 
 
 <!-- MANUAL ADDITIONS START -->

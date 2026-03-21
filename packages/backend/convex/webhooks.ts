@@ -1,4 +1,4 @@
-import { internalMutation, mutation } from "./_generated/server";
+import { internalAction, internalMutation, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { requirePermission } from "./lib/rbac";
 import { internal } from "./_generated/api";
@@ -135,4 +135,46 @@ export const attachReceiptManually = mutation({
   },
 });
 
+/**
+ * Internal action to dispatch WhatsApp notification webhooks.
+ * This is triggered asynchronously via runAfter from order state transitions.
+ */
+export const dispatchWhatsAppWebhook = internalAction({
+  args: {
+    orderId: v.id("orders"),
+    shortCode: v.string(),
+    customerPhone: v.string(),
+    customerName: v.string(),
+    newState: v.string(),
+    totalPrice: v.number(),
+  },
+  handler: async (ctx, args) => {
+    try {
+      const WEBHOOK_URL = process.env.WHATSAPP_WEBHOOK_URL || "https://webhook.site/techworld-whatsapp-endpoint";
+      
+      const payload = {
+        phone: args.customerPhone,
+        template: "order_status_update",
+        parameters: {
+          customerName: args.customerName,
+          orderCode: args.shortCode,
+          status: args.newState,
+          totalAmount: args.totalPrice,
+        }
+      };
+
+      const res = await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        console.error(`WhatsApp webhook failed with status ${res.status}`);
+      }
+    } catch (e) {
+      console.error("Error dispatching WhatsApp webhook:", e);
+    }
+  }
+});
 

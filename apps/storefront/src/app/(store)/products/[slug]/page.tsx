@@ -10,6 +10,7 @@ import { useCart } from "@/providers/cart-provider";
 import { ChevronRight, ShoppingBag, Truck, ShieldCheck, Zap } from "lucide-react";
 import Link from "next/link";
 import { DynamicProductGallery } from "@/components/storefront/DynamicProductGallery";
+import { RelatedProducts } from "@techworld/ui";
 
 type ProductSku = {
   _id: Id<"skus">;
@@ -287,6 +288,10 @@ export default function ProductDetailPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="container mx-auto px-4 md:px-8 mt-12">
+        <RelatedProducts products={product.related_products || []} />
       </div>
     </div>
   );

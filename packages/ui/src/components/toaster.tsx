@@ -9,7 +9,7 @@ export function Toaster() {
       richColors
       theme="dark"
       toastOptions={{
-        className: "border border-white/10 bg-[#111111] text-white",
+        className: "border border-border bg-background text-foreground",
       }}
     />
   );
