@@ -10,7 +10,16 @@ const authConfig = process.env.NEXT_PUBLIC_CONVEX_URL && process.env.NEXT_PUBLIC
       convexSiteUrl: "",
     };
 
-const auth = (authConfig.convexUrl ? convexBetterAuthNextJs(authConfig) : {}) as any;
+const noop = () => {};
+const auth = (authConfig.convexUrl ? convexBetterAuthNextJs(authConfig) : {
+  handler: { GET: noop, POST: noop },
+  preloadAuthQuery: noop,
+  isAuthenticated: noop,
+  getToken: noop,
+  fetchAuthQuery: noop,
+  fetchAuthMutation: noop,
+  fetchAuthAction: noop,
+}) as any;
 
 export const {
   handler,
