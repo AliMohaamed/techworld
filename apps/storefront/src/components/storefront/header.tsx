@@ -31,7 +31,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-xl transition-all h-24">
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-secondary/30 backdrop-blur-xl transition-all h-20">
         <div className="container mx-auto flex h-full items-center justify-between px-6 md:px-12">
           {/* Logo */}
           <div className="flex">
@@ -40,19 +40,19 @@ export default function Header() {
               className="group flex items-center gap-3 min-h-[44px] outline-none"
             >
               <div className="h-6 w-6 rounded-md bg-[#ffc105] shadow-[0_0_15px_rgba(255,193,5,0.4)] transition-all group-hover:rotate-12 group-hover:scale-110" />
-              <span className="font-space-grotesk text-2xl font-black tracking-tightest text-foreground uppercase sm:text-3xl">
+              <span className="font-space-grotesk text-2xl font-bold tracking-tight text-foreground uppercase sm:text-3xl">
                 TECH<span className="text-[#ffc105]">WORLD</span>
               </span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden items-center ltr:space-x-12 rtl:space-x-reverse space-x-12 lg:flex">
+          <nav className="hidden items-center ltr:space-x-8 rtl:space-x-reverse space-x-8 lg:flex">
             {navItems.map((item) => (
               <Link
                 key={item.key}
                 href={item.href}
-                className="group relative text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-foreground transition-all min-h-[44px] flex items-center"
+                className="group relative text-base font-medium text-muted-foreground hover:text-foreground transition-all min-h-[44px] flex items-center"
               >
                 {t(`nav.${item.key}`)}
                 <span className="absolute bottom-2 left-0 w-0 h-[2px] bg-[#ffc105] transition-all group-hover:w-full" />
@@ -102,13 +102,13 @@ export default function Header() {
                   key={item.key}
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-2xl font-black uppercase tracking-[0.3em] text-white/70 hover:text-[#ffc105] transition-all py-6 border-b border-white/5 flex items-center justify-between group"
+                  className="text-lg font-medium text-white/80 hover:text-[#ffc105] transition-all py-5 border-b border-white/5 flex items-center justify-between group"
                 >
-                  <span className="group-hover:translate-x-4 transition-transform ltr:group-hover:translate-x-4 rtl:group-hover:-translate-x-4 font-space-grotesk">
+                  <span className="group-hover:translate-x-2 transition-transform ltr:group-hover:translate-x-2 rtl:group-hover:-translate-x-2">
                     {t(`nav.${item.key}`)}
                   </span>
                   <ChevronRight
-                    size={24}
+                    size={20}
                     className={locale === "ar" ? "rotate-180 text-[#ffc105]" : "text-[#ffc105]"}
                   />
                 </Link>
@@ -132,7 +132,7 @@ export default function Header() {
               <Link
                 href="/"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-center w-full py-6 rounded-3xl bg-[#ffc105] text-black text-xl font-black uppercase tracking-[0.3em] shadow-[0_0_50px_rgba(255,193,5,0.15)] active:scale-95 transition-all"
+                className="flex items-center justify-center w-full py-4 rounded-2xl bg-[#ffc105] text-black text-lg font-semibold shadow-[0_0_30px_rgba(255,193,5,0.15)] active:scale-95 transition-all"
               >
                 {t("nav.shopNow")}
               </Link>
