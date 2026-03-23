@@ -28,5 +28,12 @@
     "title_part3": "Lifestyle",
     "description": "Discover the latest smartwatches, premium audio, and smart gadgets.",
     "cta": "Shop Now"
+  },
+  "SuccessPage": {
+    "nextSteps": {
+      "step1": "Click the <span class=\"text-white font-bold\">VERIFY ON WHATSAPP</span> button below.",
+      "step2": "Send the pre-filled message without modifying the <span class=\"text-white font-bold\">Order ID</span>.",
+      "step3": "Attach a screenshot of your <span class=\"text-white font-bold\">Instapay / Wallet</span> transfer as proof."
+    }
   }
 }

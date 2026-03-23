@@ -45,7 +45,7 @@ export default function FeaturedProductCard({
   // Resolve default SKU for stock and cart purposes
   const defaultSku =
     product.skus?.find((s) => s.isDefault) ?? product.skus?.[0];
-  const displayPrice = defaultSku?.price ?? product.selling_price;
+  const displayPrice = defaultSku?.price || product.selling_price;
   const hasSalePrice =
     product.compareAtPrice !== undefined &&
     product.compareAtPrice > displayPrice;

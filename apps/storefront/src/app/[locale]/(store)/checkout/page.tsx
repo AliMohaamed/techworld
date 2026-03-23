@@ -119,8 +119,8 @@ export default function CheckoutPage() {
                       </p>
                       <p className="font-space-grotesk text-lg font-black text-foreground mt-3 uppercase tracking-tighter">
                         {(
-                          (item.sku?.price ??
-                            item.product?.selling_price ??
+                          (item.sku?.price ||
+                            item.product?.selling_price ||
                             0) * item.quantity
                         ).toLocaleString(locale)}{" "}
                         <span className="text-xs text-[#ffc105]">EGP</span>

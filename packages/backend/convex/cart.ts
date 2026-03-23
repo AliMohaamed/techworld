@@ -143,7 +143,7 @@ export const getCart = query({
     );
 
     const subtotal = items.reduce((sum, item) => {
-      const unitPrice = item.sku?.price ?? item.product?.selling_price ?? 0;
+      const unitPrice = item.sku?.price || item.product?.selling_price || 0;
       return sum + unitPrice * item.quantity;
     }, 0);
 
@@ -303,8 +303,10 @@ export const placeOrderFromSession = mutation({
 
     // Refetching prices for discount calculation
     const sessionItemsWithPrices = await Promise.all(session.items.map(async (item) => {
+        const product = await ctx.db.get(item.productId);
         const sku = await ctx.db.get(item.skuId);
-        return { ...item, price: sku?.price ?? 0 };
+        const effectivePrice = sku?.price || product?.selling_price || 0;
+        return { ...item, price: effectivePrice };
     }));
     const totalSubtotal = sessionItemsWithPrices.reduce((sum, i) => sum + (i.price * i.quantity), 0);
 
@@ -344,7 +346,8 @@ export const placeOrderFromSession = mutation({
         display_stock: sku.display_stock - item.quantity,
       });
 
-      const lineSubtotal = sku.price * item.quantity;
+      const effectivePrice = sku.price || product.selling_price || 0;
+      const lineSubtotal = effectivePrice * item.quantity;
       
       let discountForLine = 0;
       if (totalSubtotal > 0 && promoDiscountAmount > 0) {

@@ -28,5 +28,12 @@
     "title_part3": "في حياتك",
     "description": "اكتشف أحدث الساعات الذكية، وأنظمة الصوت المتطورة، والأدوات الذكية.",
     "cta": "تسوق الآن"
+  },
+  "SuccessPage": {
+    "nextSteps": {
+      "step1": "اضغط علي زر <span class=\"text-white font-bold\">تأكيد الطلب عبر واتساب</span> بالأسفل.",
+      "step2": "أرسل الرسالة المجهزة مسبقاً بدون تعديل <span class=\"text-white font-bold\">رقم الطلب</span>.",
+      "step3": "أرفق لقطة شاشة لعملية التحويل سواء <span class=\"text-white font-bold\">إنستاباي / محفظة إلكترونية</span> كإثبات للدفع."
+    }
   }
 }

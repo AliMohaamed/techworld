@@ -45,7 +45,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const defaultSku =
     product.skus?.find((s) => s.isDefault) ?? product.skus?.[0];
   const displayStock = defaultSku?.display_stock ?? product.display_stock ?? 0;
-  const displayPrice = defaultSku?.price ?? product.selling_price;
+  const displayPrice = defaultSku?.price || product.selling_price;
   const isOutOfStock = displayStock <= 0;
   const hasSalePrice =
     product.compareAtPrice !== undefined &&
