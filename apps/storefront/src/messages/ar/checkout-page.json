@@ -1,0 +1,20 @@
+{
+  "CheckoutPage": {
+    "empty": {
+      "title": "سلتك فارغة",
+      "back": "العودة للمتجر"
+    },
+    "backToShopping": "العودة للتسوق",
+    "title": "إتمام",
+    "accentTitle": "الطلب",
+    "summary": {
+      "title": "ملخص الطلب",
+      "subtotal": "المجموع الفرعي",
+      "discount": "خصم الكود",
+      "total": "الإجمالي",
+      "shippingNote": "سيتم حساب الشحن النهائي في الخطوة التالية",
+      "defaultVariant": "الخيار الافتراضي",
+      "noImage": "لا توجد صورة"
+    }
+  }
+}

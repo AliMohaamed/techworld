@@ -1,0 +1,94 @@
+{
+  "Marketing": {
+    "promoCodes": {
+      "badge": "التسويق",
+      "title": "محرك أكواد الخصم",
+      "description": "أنشئ وأدر أكواد الخصم، حدود الاستخدام، وتواريخ الانتهاء. استبعاد متبادل من العروض والحزم حسب قواعد المرحلة 10.",
+      "actions": {
+        "create": "إنشاء خصم جديد",
+        "edit": "تعديل",
+        "delete": "حذف",
+        "activate": "تفعيل",
+        "deactivate": "تعطيل",
+        "confirmDelete": "هل أنت متأكد من رغبتك في حذف كود الخصم هذا؟"
+      },
+      "table": {
+        "badge": "الخصومات النشطة",
+        "title": "كافة أكواد الخصم",
+        "total": "الإجمالي {count}",
+        "columns": {
+          "code": "الكود",
+          "typeValue": "النوع والقيمة",
+          "usage": "الاستخدام",
+          "expiration": "الانتهاء",
+          "status": "الحالة",
+          "actions": "الإجراءات"
+        },
+        "empty": "لم يتم العثور على أكواد خصم. أنشئ أول كود لزيادة المبيعات!",
+        "loading": "جار تحميل أكواد الخصم...",
+        "types": {
+          "fixed": "مبلغ ثابت",
+          "percentage": "نسبة مئوية",
+          "freeShipping": "شحن مجاني"
+        },
+        "cappedAt": "بحد أقصى {amount} جنيه",
+        "neverExpires": "لا ينتهي",
+        "status": {
+          "active": "نشط",
+          "expired": "منتهي",
+          "full": "مكتمل",
+          "inactive": "غير نشط"
+        }
+      },
+      "messages": {
+        "activated": "تم تفعيل كود الخصم",
+        "deactivated": "تم تعطيل كود الخصم",
+        "deleteSuccess": "تم حذف كود الخصم",
+        "updateFailed": "فشل تحديث الحالة",
+        "deleteFailed": "فشل حذف كود الخصم",
+        "updateNotImplemented": "منطق التحديث لم يتم تنفيذه في الخلفية بعد. قم بالحذف وإعادة الإنشاء حالياً.",
+        "createSuccess": "تم إنشاء كود الخصم بنجاح",
+        "operationFailed": "فشلت العملية",
+        "submissionFailed": "فشل الإرسال",
+        "invalidOrExpiredPromoCode": "كود الخصم غير صالح أو منتهي الصلاحية"
+      },
+      "form": {
+        "createTitle": "كود خصم جديد",
+        "editTitle": "تعديل كود الخصم",
+        "badge": "تكوين التسويق",
+        "description": "قم بإعداد الخصومات، الحدود، وتواريخ الانتهاء.",
+        "fields": {
+          "code": "نص كود الخصم",
+          "type": "نوع الخصم",
+          "value": "قيمة الخصم",
+          "percentageValue": "قيمة النسبة المئوية",
+          "fixedValue": "مبلغ الخصم (جنيه مصري)",
+          "maxDiscount": "الحد الأقصى للخصم (جنيه مصري)",
+          "maxUses": "حد الاستخدام الأقصى",
+          "expiryDate": "تاريخ الانتهاء",
+          "description": "ملاحظات الحملة",
+          "isActive": "جاهز للاستخدام العام",
+          "bundleOverlap": "يمنع النظام بصرامة تداخل الحزم لجميع أكواد الخصم."
+        },
+        "placeholders": {
+          "code": "مثال: FLASH20",
+          "value": "100.00",
+          "maxDiscount": "حد اختياري",
+          "maxUses": "100",
+          "description": "وصف داخلي قصير..."
+        },
+        "types": {
+          "fixed": "مبلغ ثابت (جنيه مصري)",
+          "percentage": "نسبة مئوية (%)",
+          "freeShipping": "شحن مجاني"
+        },
+        "buttons": {
+          "create": "إنشاء كود الخصم",
+          "update": "حفظ التغييرات",
+          "saving": "جار الإنشاء...",
+          "cancel": "إلغاء"
+        }
+      }
+    }
+  }
+}

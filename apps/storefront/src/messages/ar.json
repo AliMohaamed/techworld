@@ -1,0 +1,32 @@
+{
+  "Common": {
+    "actions": {
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "delete": "حذف"
+    },
+    "feedback": {
+      "successTitle": "نجاح",
+      "errorTitle": "خطأ"
+    }
+  },
+  "Navigation": {
+    "storefront": {
+      "home": "الرئيسية",
+      "catalog": "كتالوج"
+    }
+  },
+  "CategorySection": {
+    "title": "تسوق حسب",
+    "accentTitle": "الفئة",
+    "viewAll": "عرض الكل"
+  },
+  "Hero": {
+    "badge": "أجهزة الصوت عصرية متوفرة الآن",
+    "title_part1": "اعرف أحدث",
+    "title_part2": "تكنولوجيا",
+    "title_part3": "في حياتك",
+    "description": "اكتشف أحدث الساعات الذكية، وأنظمة الصوت المتطورة، والأدوات الذكية.",
+    "cta": "تسوق الآن"
+  }
+}

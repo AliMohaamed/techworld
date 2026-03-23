@@ -1,0 +1,28 @@
+{
+  "Footer": {
+    "tagline": "ارتقِ بتجربتك الرقمية مع تكنولوجيا متميزة وعالية الأداء مصممة للعصر الحديث.",
+    "sections": {
+      "explore": "استكشف",
+      "support": "الدعم",
+      "newsletter": "النشرة الإخبارية"
+    },
+    "links": {
+      "newReleases": "إصدارات جديدة",
+      "bestSellers": "الأكثر مبيعاً",
+      "giftCards": "بطاقات الهدايا",
+      "techGuide": "دليل التقنية",
+      "shippingInfo": "معلومات الشحن",
+      "returns": "الاسترجاع والاسترداد",
+      "orderTracking": "تتبع الطلب",
+      "helpCenter": "مركز المساعدة",
+      "privacy": "سياسة الخصوصية",
+      "terms": "شروط الخدمة",
+      "cookieSettings": "إعدادات الكوكيز"
+    },
+    "newsletter": {
+      "text": "ابقَ على اطلاع بأحدث إصدارات التقنية.",
+      "placeholder": "أدخل بريدك الإلكتروني"
+    },
+    "copyright": "© 2024 TECHWORLD Inc. جميع الحقوق محفوظة."
+  }
+}

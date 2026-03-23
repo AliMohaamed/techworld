@@ -1,0 +1,27 @@
+{
+  "Audit": {
+    "header": {
+      "badge": "System Transparency",
+      "title": "Audit Logs",
+      "description": "A comprehensive ledger of all critical system actions. This is a read-only immutable record for operational security and forensic auditing."
+    },
+    "filter": {
+      "placeholder": "Search by action, user, or entity...",
+      "syncing": "Syncing...",
+      "count": "{count} events logged"
+    },
+    "table": {
+      "columns": {
+        "action": "Action",
+        "subject": "Subject",
+        "entity": "Entity",
+        "timestamp": "Timestamp"
+      },
+      "loading": "Establishing secure connection to ledger...",
+      "empty": "No recorded events found in the current buffer.",
+      "loadMore": "Load more entries",
+      "loadingMore": "Fetching older entries...",
+      "exhausted": "End of Ledger - Integrity Verified"
+    }
+  }
+}

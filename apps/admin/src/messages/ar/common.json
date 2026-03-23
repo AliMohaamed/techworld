@@ -1,0 +1,30 @@
+{
+  "Common": {
+    "actions": {
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "delete": "حذف",
+      "edit": "تعديل",
+      "create": "إنشاء",
+      "search": "بحث...",
+      "filter": "تصفية",
+      "apply": "تطبيق",
+      "clear": "مسح",
+      "view": "عرض",
+      "confirm": "تأكيد"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "pending": "معلق",
+      "completed": "مكتمل",
+      "failed": "فشل",
+      "loading": "جار التحميل..."
+    },
+    "feedback": {
+      "success": "تمت العملية بنجاح",
+      "error": "حدث خطأ ما",
+      "noResults": "لم يتم العثور علي نتائج"
+    }
+  }
+}

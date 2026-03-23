@@ -1,0 +1,17 @@
+{
+  "ProductCard": {
+    "badges": {
+      "sale": "عرض",
+      "featured": "مميز",
+      "soldOut": "نفذت الكمية"
+    },
+    "placeholderCategory": "تكنولوجيا",
+    "placeholder": "تمتع بجودة متميزة مع هذا المنتج المتطور.",
+    "actions": {
+      "add": "إضافة للسلة",
+      "addSimple": "إضافة",
+      "outOfStock": "نفدت الكمية"
+    },
+    "noImage": "لا توجد صورة"
+  }
+}

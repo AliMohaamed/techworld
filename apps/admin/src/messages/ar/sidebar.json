@@ -1,0 +1,23 @@
+{
+  "Sidebar": {
+    "headers": {
+      "navigation": "التنقل",
+      "permissions": "الصلاحيات"
+    },
+    "nav": {
+      "overview": "نظرة عامة",
+      "orders": "الطلبات",
+      "categories": "الأقسام",
+      "products": "المنتجات",
+      "promoCodes": "أكواد الخصم",
+      "operations": "العمليات",
+      "auditLedger": "سجل المراجعة",
+      "allLogs": "كافة السجلات",
+      "settings": "الإعدادات",
+      "team": "الفريق"
+    },
+    "empty": {
+      "noPermissions": "لا توجد صلاحيات للموظف محددة بعد."
+    }
+  }
+}

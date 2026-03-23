@@ -1,0 +1,11 @@
+{
+  "Header": {
+    "nav": {
+      "shop": "Shop",
+      "categories": "Categories",
+      "deals": "Deals",
+      "support": "Support"
+    },
+    "cartAria": "Open shopping cart"
+  }
+}

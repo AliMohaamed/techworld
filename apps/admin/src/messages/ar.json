@@ -1,0 +1,31 @@
+{
+  "Common": {
+    "actions": {
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "delete": "حذف"
+    },
+    "feedback": {
+      "successTitle": "نجاح",
+      "errorTitle": "خطأ"
+    }
+  },
+  "Navigation": {
+    "admin": {
+      "dashboard": "لوحة القيادة",
+      "catalog": "كتالوج",
+      "orders": "الطلبات"
+    }
+  },
+  "Dashboard": {
+    "title": "نظرة عامة على الأداء",
+    "badge": "لوحة القيادة التنفيذية",
+    "description": "معلومات ذكية في الوقت الحقيقي عبر تدفق طلباتك. مراقبة سرعة المبيعات، وربحية النظام، والنجاح التشغيلي.",
+    "metrics": {
+      "totalOrders": "إجمالي الطلبات",
+      "netProfit": "صافي الربح",
+      "courierFees": "رسوم الشحن",
+      "rtoRate": "معدل المرتجعات"
+    }
+  }
+}

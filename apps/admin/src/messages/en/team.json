@@ -1,0 +1,65 @@
+{
+  "Team": {
+    "header": {
+      "badge": "Administration",
+      "title": "Team Management",
+      "description": "Provision staff accounts and delegate granular permissions. Bound checks strictly enforce that you cannot grant permissions you do not own.",
+      "provisionButton": "Provision Staff"
+    },
+    "provision": {
+      "title": "New Staff Account",
+      "form": {
+        "name": "Full Name",
+        "namePlaceholder": "John Doe",
+        "email": "Email Address",
+        "emailPlaceholder": "john@techworld.com",
+        "password": "Initial Password",
+        "passwordPlaceholder": "Auto-generated",
+        "permissions": "Assign Permissions (Only what you own)",
+        "submit": "Complete Provisioning",
+        "cancel": "Cancel"
+      },
+      "messages": {
+        "required": "Name, Email, and Password are required.",
+        "success": "Staff provisioned successfully.",
+        "failed": "Provisioning failed"
+      }
+    },
+    "list": {
+      "badge": "Staff List",
+      "title": "Active Team Members",
+      "count": "{count} users",
+      "loading": "Loading...",
+      "table": {
+        "columns": {
+          "name": "Name",
+          "status": "Status",
+          "permissions": "Active Permissions",
+          "actions": "Actions"
+        },
+        "me": "You",
+        "active": "Active",
+        "deactivated": "Deactivated",
+        "done": "Done",
+        "permissions": "Permissions"
+      },
+      "messages": {
+        "permUpdated": "Permissions updated.",
+        "updateFailed": "Update failed",
+        "statusActivated": "Staff account activated.",
+        "statusDeactivated": "Staff account deactivated.",
+        "statusFailed": "Status update failed",
+        "unknown": "Unknown error"
+      }
+    },
+    "permissions": {
+      "VIEW_DASHBOARD": "View Dashboard",
+      "VIEW_ORDERS": "View Orders",
+      "MANAGE_CATALOG": "Manage Catalog",
+      "MANAGE_MARKETING": "Manage Marketing",
+      "MANAGE_TEAM": "Manage Team",
+      "MANAGE_SETTINGS": "Manage Settings",
+      "VIEW_AUDIT_LOGS": "View Audit Logs"
+    }
+  }
+}

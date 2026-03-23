@@ -1,0 +1,17 @@
+{
+  "ProductCard": {
+    "badges": {
+      "sale": "Sale",
+      "featured": "Featured",
+      "soldOut": "Sold Out"
+    },
+    "placeholderCategory": "TECH",
+    "placeholder": "Experience premium quality with this top-of-the-line product.",
+    "actions": {
+      "add": "Add to Cart",
+      "addSimple": "Add",
+      "outOfStock": "Out of Stock"
+    },
+    "noImage": "No Image"
+  }
+}

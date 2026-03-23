@@ -1,0 +1,23 @@
+{
+  "Sidebar": {
+    "headers": {
+      "navigation": "Navigation",
+      "permissions": "Permissions"
+    },
+    "nav": {
+      "overview": "Overview",
+      "orders": "Orders",
+      "categories": "Categories",
+      "products": "Products",
+      "promoCodes": "Promo Codes",
+      "operations": "Operations",
+      "auditLedger": "Audit Ledger",
+      "allLogs": "All Logs",
+      "settings": "Settings",
+      "team": "Team"
+    },
+    "empty": {
+      "noPermissions": "No staff permissions mapped yet."
+    }
+  }
+}

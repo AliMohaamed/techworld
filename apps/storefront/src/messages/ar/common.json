@@ -1,0 +1,13 @@
+{
+  "Common": {
+    "actions": {
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "delete": "حذف"
+    },
+    "feedback": {
+      "successTitle": "نجاح",
+      "errorTitle": "خطأ"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "CartDrawer": {
+    "title": "MY SHOPPING",
+    "accentTitle": "CART",
+    "empty": {
+      "title": "Your cart is empty",
+      "description": "Looks like you haven't added any products yet.",
+      "cta": "Start Shopping"
+    },
+    "promo": {
+      "label": "HAVE A PROMO CODE?",
+      "placeholder": "Enter code",
+      "apply": "Apply",
+      "applied": "Code Applied",
+      "remove": "Remove"
+    },
+    "summary": {
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "shipping": "Shipping",
+      "shippingNote": "CALCULATED AT NEXT STEP",
+      "total": "Total",
+      "checkout": "PROCEED TO CHECKOUT"
+    },
+    "item": {
+      "noImage": "No Image",
+      "defaultVariant": "Default variant",
+      "stockLimit": "Cannot add more. No more stock available."
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "ProductDetail": {
+    "loading": "جار التحميل...",
+    "notFound": {
+      "title": "المنتج غير موجود",
+      "description": "المنتج الذي تبحث عنه غير موجود أو تم حذفه.",
+      "backToStore": "العودة للمتجر"
+    },
+    "breadcrumb": {
+      "store": "المتجر",
+      "category": "القسم"
+    },
+    "pricing": {
+      "currency": "جنيه",
+      "unitsLeft": "متبقي {count} قطع"
+    },
+    "variants": {
+      "colorways": "الألوان المتاحة",
+      "variants": "الأنواع المتاحة",
+      "selected": "الخيار المختار",
+      "size": "المقاس: {size}",
+      "type": "النوع: {type}"
+    },
+    "actions": {
+      "addToCart": "إضافة للسلة"
+    },
+    "features": {
+      "shipping": "شحن سريع لجميع أنحاء مصر",
+      "cod": "تحقق آمن من الدفع عند الاستلام",
+      "authentic": "مخزون تقني أصلي"
+    },
+    "status": {
+      "unavailable": "غير متوفر حالياً",
+      "soldOut": "نفذت الكمية"
+    }
+  }
+}

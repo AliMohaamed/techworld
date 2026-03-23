@@ -1,0 +1,29 @@
+{
+  "SuccessPage": {
+    "title": "Order",
+    "accentTitle": "Placed!",
+    "description": "Your session has been converted to a pending order. Please follow the instructions below to verify your purchase.",
+    "orderRef": "Your Order ID",
+    "nextSteps": {
+      "title": "Next Steps:",
+      "step1": "Click the <span class=\"text-white font-bold\">VERIFY ON WHATSAPP</span> button below.",
+      "step2": "Send the pre-filled message without modifying the <span class=\"text-white font-bold\">Order ID</span>.",
+      "step3": "Attach a screenshot of your <span class=\"text-white font-bold\">Instapay / Wallet</span> transfer as proof."
+    },
+    "actions": {
+      "verify": "VERIFY ON WHATSAPP",
+      "back": "Return to Homepage"
+    },
+    "badges": {
+      "stock": "Virtual Stock Reserved",
+      "secure": "Secure Verification",
+      "delivery": "Delivery Post-Approval"
+    },
+    "errors": {
+      "notFound": "Order Not Found",
+      "backToStore": "Back to Store"
+    },
+    "loading": "Loading order data...",
+    "whatsappMessage": "Hello TechWorld! My Order ID is {code}. I'm attaching my payment receipt for verification."
+  }
+}

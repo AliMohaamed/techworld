@@ -1,0 +1,27 @@
+{
+  "CatalogExplorer": {
+    "locked": {
+      "eyebrow": "Category Focus",
+      "defaultHeading": "Category",
+      "defaultDescription": "This category route is locked to the selected collection."
+    },
+    "global": {
+      "eyebrow": "Advanced Catalog",
+      "heading": "Catalog Explorer",
+      "description": "Search, filter, and page through the live storefront catalog without losing your place."
+    },
+    "results": {
+      "eyebrow": "Current Results",
+      "count": "{count} products loaded",
+      "search": "Search: {query}"
+    },
+    "empty": {
+      "eyebrow": "Empty State",
+      "title": "No products found",
+      "description": "Adjust the active filters or clear them to widen the catalog. Recommended products stay visible below so the page never dead-ends."
+    },
+    "recommended": {
+      "eyebrow": "Recommended Products"
+    }
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "Catalog": {
+    "categories": {
+      "badge": "الكتالوج",
+      "title": "إدارة الأقسام",
+      "description": "أنشئ أقساماً ثنائية اللغة، عدل البيانات الوصفية التشغيلية، وعطل الأقسام مؤقتاً بدون حذف تاريخها.",
+      "actions": {
+        "create": "إنشاء قسم",
+        "edit": "تعديل",
+        "activate": "تفعيل",
+        "deactivate": "تعطيل",
+        "updating": "جار التحديث..."
+      },
+      "table": {
+        "badge": "جدول البيانات",
+        "title": "كافة الأقسام",
+        "total": "الإجمالي {count}",
+        "columns": {
+          "name": "الاسم",
+          "slug": "الاسم اللطيف (Slug)",
+          "products": "المنتجات",
+          "status": "الحالة",
+          "actions": "الإجراءات"
+        },
+        "empty": "لا توجد أقسام بعد.",
+        "loading": "جار التحميل..."
+      },
+      "messages": {
+        "activated": "تم تفعيل القسم.",
+        "deactivated": "تم تعطيل القسم.",
+        "updateFailed": "فشل تحديث القسم.",
+        "incomplete": "بيانات القسم غير مكتملة.",
+        "incompleteDescription": "يفضل إدخال الأسماء باللغة الإنجليزية والعربية.",
+        "updated": "تم تحديث القسم.",
+        "created": "تم إنشاء القسم.",
+        "saveFailed": "فشل حفظ القسم.",
+        "catalogUpdateFailed": "فشل تحديث الكتالوج."
+      },
+      "form": {
+        "createTitle": "قسم جديد",
+        "editTitle": "تعديل القسم",
+        "badge": "إدارة الكتالوج",
+        "description": "أدر تصنيفات متجرك. يتطلب كل قسم اسماً بالإنجليزية وآخر بالعربية لمتجرنا ثنائي اللغة.",
+        "fields": {
+          "nameEn": "الاسم (الإنجليزية)",
+          "nameAr": "الاسم (العربية)",
+          "slug": "الاسم اللطيف (Slug)",
+          "descriptionEn": "الوصف (الإنجليزية)",
+          "descriptionAr": "الوصف (العربية)",
+          "thumbnailImageId": "معرف الصورة المصغرة",
+          "isActive": "تفعيل هذا القسم عند الإنشاء"
+        },
+        "placeholders": {
+          "nameEn": "مثال: Mobile Phones",
+          "nameAr": "مثال: الهواتف المحمولة",
+          "slug": "mobile-accessories",
+          "descriptionEn": "صف القسم باللغة الإنجليزية...",
+          "descriptionAr": "صف القسم باللغة العربية...",
+          "thumbnailImageId": "أدخل معرف الصورة أو ارفعها عبر التخزين"
+        },
+        "buttons": {
+          "create": "إنشاء القسم",
+          "update": "تحديث القسم",
+          "save": "حفظ التغييرات",
+          "saving": "جار الحفظ...",
+          "cancel": "إلغاء"
+        }
+      }
+    },
+    "products": {
+      "badge": "الكتالوج",
+      "title": "إدارة المنتجات المتقدمة",
+      "description": "أدر معارض المنتجات، أسعار التخفيض، ومخزون الـ (SKU) علي مستوي المتغيرات.",
+      "actions": {
+        "create": "إنشاء منتج",
+        "edit": "تعديل",
+        "publish": "نشر",
+        "unpublish": "إلغاء النشر",
+        "updating": "جار التحديث...",
+        "save": "حفظ"
+      },
+      "table": {
+        "badge": "جدول البيانات",
+        "title": "كافة المنتجات",
+        "total": "الإجمالي {count}",
+        "columns": {
+          "product": "المنتج",
+          "category": "القسم",
+          "pricing": "التسعير",
+          "variants": "المتغيرات",
+          "displayStock": "المخزون المعروض",
+          "realStock": "المخزون الفعلي",
+          "status": "الحالة",
+          "actions": "الإجراءات"
+        },
+        "empty": "لم يتم إنشاء منتجات بعد.",
+        "loading": "جار التحميل...",
+        "noSlug": "بدون-اسم-لطيف",
+        "activeCategory": "قسم نشط",
+        "inactiveCategory": "قسم غير نشط",
+        "variantsCount": "{count} متغيرات",
+        "defaultSkuOnly": "وحدة SKU الافتراضية فقط",
+        "total": "الإجمالي {count}",
+        "managedViaSkus": "تتم الإدارة عبر SKUs - استخدم التعديل"
+      },
+      "messages": {
+        "restockPrompt": "أدخل كمية إعادة التعبئة لـ {name}:",
+        "restockInvalid": "كمية غير صالحة",
+        "restockSuccess": "تمت إعادة تعبئة {quantity} قطع. المخزون الفعلي الجديد: {total}",
+        "restockFailed": "فشلت إعادة التعبئة",
+        "saveFirst": "يرجى حفظ المنتج أولاً لإنشاء الـ SKU قبل إعادة التعبئة.",
+        "displayStockUpdated": "تم تحديث المخزون المعروض.",
+        "displayStockFailed": "فشل تحديث المخزون المعروض.",
+        "realStockUpdated": "تم تحديث المخزون الفعلي.",
+        "realStockFailed": "فشل تحديث المخزون الفعلي.",
+        "stockUpdateFailed": "فشل تحديث المخزون.",
+        "unpublishSuccess": "تمت إعادة المنتج للمسودة.",
+        "publishSuccess": "تم نشر المنتج بنجاح.",
+        "publicationFailed": "فشل تحديث حالة النشر.",
+        "publicationBlocked": "تم حظر النشر.",
+        "updated": "تم تحديث المنتج.",
+        "created": "تم إنشاء المنتج."
+      },
+      "form": {
+        "createTitle": "إنشاء منتج متقدم",
+        "editTitle": "تعديل المنتج المتقدم",
+        "badge": "إدارة المنتجات",
+        "description": "قم بتكوين البيانات الوصفية الأساسية. الترجمة إلزامية لأجهزة تيك وورلد.",
+        "fields": {
+          "nameEn": "الاسم (الإنجليزية)",
+          "nameAr": "الاسم (العربية)",
+          "slug": "الاسم اللطيف (Slug)",
+          "descriptionEn": "الوصف (الإنجليزي)",
+          "descriptionAr": "الوصف (العربي)",
+          "category": "القسم",
+          "status": "الحالة",
+          "sellingPrice": "سعر البيع",
+          "compareAtPrice": "السعر المرجعي",
+          "cogs": "التكلفة (COGS)",
+          "thumbnail": "معرف الصورة المصغرة الأساسي",
+          "mediaGalleryTitle": "معرض الوسائط",
+          "mediaGalleryDescription": "ارفع وخصص صور التخزين",
+          "variants": "المتغيرات",
+          "skuConfig": "تكوين SKU",
+          "variant": "المتغير {index}",
+          "skus": {
+            "title": "مصفوفة SKU (التحكم بالمتغيرات)",
+            "add": "إضافة متغير",
+            "name": "اسم المتغير",
+            "color": "اللون",
+            "size": "المقاس",
+            "type": "النوع",
+            "realStock": "المخزون الفعلي",
+            "displayStock": "المخزون المعروض",
+            "price": "سعر المتغير",
+            "compareAt": "السعر المرجعي للمتغير",
+            "linkedImage": "الصورة المرتبطة",
+            "isDefault": "الاختيار الافتراضي"
+          }
+        },
+        "placeholders": {
+          "selectCategory": "اختر قسماً",
+          "nameEn": "مثال: Ultra HD Pro Watch",
+          "nameAr": "مثال: ساعة ألترا أتش دي برو",
+          "slug": "ultra-hd-pro-watch",
+          "descriptionEn": "مميزات المنتج ونظرة عامة...",
+          "descriptionAr": "مميزات المنتج ونظرة عامة...",
+          "selectThumbnail": "اختر الصورة الأساسية",
+          "variantName": "افتراضي",
+          "color": "مثال: Midnight Black",
+          "size": "مثال: XL أو 44mm",
+          "type": "مثال: Leather أو Mesh",
+          "noLinkedImage": "لا توجد صورة مرتبطة"
+        },
+        "statusOptions": {
+          "draft": "مسودة",
+          "published": "منشور"
+        },
+        "buttons": {
+          "create": "إنشاء منتج",
+          "update": "تحديث المنتج",
+          "saving": "جار الحفظ...",
+          "cancel": "إلغاء",
+          "remove": "حذف"
+        }
+      }
+    }
+  }
+}

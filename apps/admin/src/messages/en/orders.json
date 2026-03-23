@@ -1,0 +1,122 @@
+{
+  "Orders": {
+    "queue": {
+      "badge": "Order Management",
+      "title": "Orders Pipeline",
+      "description": "Operations agents can inspect all orders, handle verifications, process transitions, and track fulfillment without leaving the admin workspace.",
+      "table": {
+        "title": "Pending Orders",
+        "total": "{count} total",
+        "loading": "Loading orders...",
+        "noPermission": "Your staff account does not have permission to view orders.",
+        "empty": "No orders found.",
+        "filters": {
+          "ALL": "All Orders",
+          "AWAITING_VERIFICATION": "Awaiting",
+          "CONFIRMED": "Confirmed",
+          "READY_FOR_SHIPPING": "Ready to Ship",
+          "SHIPPED": "Shipped",
+          "DELIVERED": "Delivered",
+          "CANCELLED": "Cancelled"
+        },
+        "columns": {
+          "customer": "Customer",
+          "product": "Product",
+          "status": "Status",
+          "quantity": "Quantity",
+          "total": "Total",
+          "receipt": "Receipt",
+          "action": "Action"
+        },
+        "walkInCustomer": "Walk-in customer",
+        "noPhone": "No phone",
+        "unknownProduct": "Unknown product",
+        "noCategory": "No category",
+        "viewReceipt": "View receipt",
+        "pendingReceipt": "Pending manual upload",
+        "review": "View Details",
+        "actions": {
+          "confirm": "Confirm",
+          "cancel": "Cancel",
+          "stall": "Stall",
+          "ready": "Ready to Ship",
+          "ship": "Ship",
+          "deliver": "Deliver",
+          "rto": "RTO"
+        }
+      }
+    },
+    "details": {
+      "back": "Back to queue",
+      "badge": "Order Review",
+      "description": "Review the uploaded proof, optionally attach a manual fallback receipt, and transition the order when stock is still available.",
+      "loading": "Loading order details...",
+      "notFound": "Order not found.",
+      "cards": {
+        "phone": "Phone",
+        "address": "Address",
+        "state": "Order State",
+        "revenue": "Total Revenue",
+        "category": "Category",
+        "quantity": "Quantity",
+        "realStock": "Real stock",
+        "unitCogs": "Unit COGS",
+        "totalCogs": "Total COGS",
+        "netMargin": "Net Margin"
+      },
+      "unknown": "Unknown",
+      "notProvided": "Not provided",
+      "financials": {
+        "badge": "Financial Visibility",
+        "title": "Profitability Snapshot",
+        "visible": "Visible",
+        "masked": "Masked",
+        "redacted": "This staff account can process the order, but financial metrics are redacted server-side."
+      },
+      "receipt": {
+        "badge": "Receipt Proof",
+        "open": "Open current receipt",
+        "missing": "No receipt is attached yet. Use the manual fallback flow."
+      },
+      "actions": {
+        "manualFallback": "Manual Fallback",
+        "cancel": "Cancel Order",
+        "markStalled": "Mark Stalled",
+        "rto": "Return to Origin (RTO)",
+        "logisticsNote": "Shipping and logistical transitions beyond verification take place here. Full FSM extension for Courier tracking pending."
+      },
+      "modal": {
+        "title": "Manual Fallback",
+        "description": "Attach a manual WhatsApp receipt if the customer proof needs to be uploaded directly from the admin workstation.",
+        "select": "Select receipt image",
+        "types": "PNG, JPG, or WEBP",
+        "noFile": "No fallback receipt selected",
+        "fileInfo": "{name} ({size} KB)",
+        "close": "Close",
+        "confirm": "Confirm Order"
+      },
+      "messages": {
+        "rtoConfirm": "Are you sure you want to mark this order as Return to Origin? This will automatically restock the SKU.",
+        "rtoSuccess": "Order marked as RTO. Inventory restocked.",
+        "rtoFailed": "RTO failed",
+        "statusUpdated": "Order moved to {state}.",
+        "updateFailed": "Order update failed.",
+        "outOfStock": "Out of stock",
+        "outOfStockDescription": "Another agent depleted the remaining stock before confirmation. The order was not confirmed.",
+        "unknown": "Unknown"
+      },
+      "states": {
+        "PENDING_PAYMENT_INPUT": "Pending Payment",
+        "AWAITING_VERIFICATION": "Awaiting Verification",
+        "CONFIRMED": "Confirmed",
+        "READY_FOR_SHIPPING": "Ready for Shipping",
+        "SHIPPED": "Shipped",
+        "DELIVERED": "Delivered",
+        "RTO": "Return to Origin",
+        "STALLED_PAYMENT": "Stalled Payment",
+        "FLAGGED_FRAUD": "Flagged Fraud",
+        "CANCELLED": "Cancelled"
+      }
+    }
+  }
+}

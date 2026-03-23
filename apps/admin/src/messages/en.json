@@ -1,0 +1,31 @@
+{
+  "Common": {
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "feedback": {
+      "successTitle": "Success",
+      "errorTitle": "Error"
+    }
+  },
+  "Navigation": {
+    "admin": {
+      "dashboard": "Dashboard",
+      "catalog": "Catalog",
+      "orders": "Orders"
+    }
+  },
+  "Dashboard": {
+    "title": "Performance Overview",
+    "badge": "Executive Dashboard",
+    "description": "Real-time bounded intelligence across your order stream. Monitoring sales velocity, system profitability, and operational success.",
+    "metrics": {
+      "totalOrders": "Total Orders",
+      "netProfit": "Net Profit",
+      "courierFees": "Courier Fees",
+      "rtoRate": "RTO Rate"
+    }
+  }
+}
