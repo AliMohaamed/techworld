@@ -455,7 +455,7 @@ export default function TeamManagementPage() {
                             className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 shadow-sm transition-all hover:border-[#ffc105]/30 hover:text-foreground"
                           >
                             <div className="h-1 w-1 rounded-full bg-emerald-500/40" />{" "}
-                            {formatPermissionName(perm)}
+                            {formatPermissionName(String(perm))}
                           </span>
                         ))
                       )}
