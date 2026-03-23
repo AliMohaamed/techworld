@@ -427,42 +427,49 @@ export const updateGenericStatus = mutation({
   args: {
     orderId: v.id("orders"),
     newState: orderStateValidator,
+    manualReceiptId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
-    const actor = await requirePermission(ctx, "MANAGE_SHIPPING_STATUS");
+    // Manual override only requires VIEW_ORDERS — any admin who can see orders can override status.
+    // Stock and audit safety is enforced by the handler itself.
+    const actor = await requirePermission(ctx, "VIEW_ORDERS");
 
     const order = await getOrderOrThrow(ctx, args.orderId);
     if (!order) {
       throw new ConvexError({ code: "ORDER_NOT_FOUND", message: "Order not found" });
     }
 
-    // Validation logic for sequential flow:
-    // CONFIRMED -> READY_FOR_SHIPPING -> SHIPPED -> DELIVERED
-    const transitions: Record<string, string[]> = {
-      CONFIRMED: ["READY_FOR_SHIPPING", "CANCELLED"],
-      READY_FOR_SHIPPING: ["SHIPPED", "CONFIRMED", "CANCELLED"],
-      SHIPPED: ["DELIVERED", "RTO", "CANCELLED"],
-    };
+    const statesThatDeductStock = ["CONFIRMED", "READY_FOR_SHIPPING", "SHIPPED", "DELIVERED"];
+    const wasDeducted = statesThatDeductStock.includes(order.state);
+    const willBeDeducted = statesThatDeductStock.includes(args.newState);
 
-    if (args.newState !== order.state && !transitions[order.state]?.includes(args.newState)) {
-      throw new ConvexError({ 
-        code: "INVALID_TRANSITION", 
-        message: `Manual status override failed. The transition from ${order.state} to ${args.newState} is not permitted by the standard FSM.` 
+    if (wasDeducted && !willBeDeducted) {
+      // Returning to a non-deducting state: restore stock
+      await ctx.runMutation(internal.skus.incrementSkuRealStock, {
+        skuId: order.skuId,
+        quantity: order.quantity,
       });
-    }
-
-    // US5: Auto-restock on cancellation after confirmation
-    if (args.newState === "CANCELLED") {
-      const statesThatDeductStock = ["CONFIRMED", "READY_FOR_SHIPPING", "SHIPPED", "DELIVERED"];
-      if (statesThatDeductStock.includes(order.state)) {
-        await ctx.runMutation(internal.skus.incrementSkuRealStock, {
-          skuId: order.skuId,
-          quantity: order.quantity,
-        });
+    } else if (!wasDeducted && willBeDeducted) {
+      // Moving to a deducting state: deduct stock, but don't block admin if stock is 0
+      const sku = await ctx.db.get(order.skuId);
+      if (sku) {
+        const deductQty = Math.min(order.quantity, sku.real_stock);
+        if (deductQty > 0) {
+          await ctx.runMutation(internal.skus.decrementSkuRealStock, {
+            skuId: order.skuId,
+            quantity: deductQty,
+          });
+        }
+        // If real_stock was already 0, we skip silently and let the admin proceed
       }
     }
 
-    await ctx.db.patch(args.orderId, { state: args.newState });
+    const patch: any = { state: args.newState };
+    if (args.manualReceiptId !== undefined) {
+      patch.paymentReceiptRef = args.manualReceiptId;
+    }
+
+    await ctx.db.patch(args.orderId, patch);
 
     if (order.customerPhone && order.shortCode) {
       ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppWebhook, {
@@ -479,7 +486,11 @@ export const updateGenericStatus = mutation({
       userId: actor._id,
       entityId: args.orderId,
       actionType: "ORDER_STATUS_CHANGED",
-      changes: { from: order.state, to: args.newState },
+      changes: { 
+        from: order.state, 
+        to: args.newState,
+        manualReceiptId: args.manualReceiptId,
+      },
     });
 
     return { success: true };

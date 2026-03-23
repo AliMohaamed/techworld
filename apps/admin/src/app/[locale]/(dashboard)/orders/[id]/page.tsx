@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   UploadCloud,
   XCircle,
+  Settings2,
 } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import { Id } from "@backend/convex/_generated/dataModel";
@@ -22,6 +23,11 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   cn,
 } from "@techworld/ui";
 import { useTranslations, useLocale } from "next-intl";
@@ -34,12 +40,15 @@ export default function OrderDetailsPage() {
   const router = useRouter();
   const orderId = params.id as Id<"orders">;
   const order = useQuery(api.orders.getOrderDetails, { orderId });
-  const updateOrderStatus = useMutation(api.orders.updateOrderStatus);
+  const updateOrderStatus = useMutation(api.orders.updateGenericStatus);
+  const updateGenericStatus = useMutation(api.orders.updateGenericStatus);
   const updateRto = useMutation(api.orders.updateRto);
   const generateReceiptUploadUrl = useMutation(
     api.files.generateReceiptUploadUrl,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isManualOverrideOpen, setIsManualOverrideOpen] = useState(false);
+  const [manualState, setManualState] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -135,6 +144,43 @@ export default function OrderDetailsPage() {
     }
   };
 
+  const handleManualOverride = async () => {
+    if (!manualState) return;
+    setIsSubmitting(true);
+    try {
+      const storageId = await uploadReceipt();
+      await updateGenericStatus({
+        orderId,
+        newState: manualState as any,
+        manualReceiptId: storageId,
+      });
+      toast.success(
+        t("messages.statusUpdated", { state: t(`states.${manualState}`) }),
+      );
+      setIsManualOverrideOpen(false);
+      setSelectedFile(null);
+      setManualState("");
+      router.push("/orders");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : t("messages.updateFailed");
+      if (
+        message.includes("OUT_OF_STOCK") ||
+        message.includes("out of stock")
+      ) {
+        toast.error(t("messages.outOfStock"), {
+          description: t("messages.outOfStockDescription"),
+        });
+      } else {
+        toast.error(t("messages.updateFailed"), {
+          description: message,
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const formatFinancialValue = (value: number | string | null) => {
     if (typeof value === "number") {
       return `${value.toLocaleString(locale)} EGP`;
@@ -164,7 +210,7 @@ export default function OrderDetailsPage() {
           {t("back")}
         </Link>
 
-        {order.state === "AWAITING_VERIFICATION" && (
+        {order.state === "AWAITING_VERIFICATION" ? (
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
@@ -177,6 +223,14 @@ export default function OrderDetailsPage() {
               {t("actions.cancel")}
             </Button>
             <Button
+              variant="outline"
+              className="rounded-xl h-10 px-6 border-border font-black uppercase tracking-widest text-[10px] hover:bg-foreground hover:text-background transition-all"
+              onClick={() => setIsManualOverrideOpen(true)}
+            >
+              <Settings2 size={14} className="ltr:mr-2 rtl:ml-2" />
+              {t("actions.manualOverride", { defaultValue: "Manual Update" })}
+            </Button>
+            <Button
               className="rounded-xl h-10 px-8 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all shadow-lg font-black uppercase tracking-widest text-[10px]"
               onClick={() => setIsModalOpen(true)}
             >
@@ -184,6 +238,15 @@ export default function OrderDetailsPage() {
               {t("actions.verifyNow", { defaultValue: "Verify Order" })}
             </Button>
           </div>
+        ) : (
+          <Button
+            variant="outline"
+            className="rounded-xl h-10 px-6 border-border font-black uppercase tracking-widest text-[10px] hover:bg-foreground hover:text-background transition-all"
+            onClick={() => setIsManualOverrideOpen(true)}
+          >
+            <Settings2 size={14} className="ltr:mr-2 rtl:ml-2" />
+            {t("actions.manualOverride", { defaultValue: "Manual Update" })}
+          </Button>
         )}
       </div>
 
@@ -545,6 +608,135 @@ export default function OrderDetailsPage() {
               <Button
                 className="w-full rounded-2xl h-12 text-muted-foreground/40 hover:text-foreground font-black uppercase tracking-widest text-[10px] transition-all"
                 onClick={() => setIsModalOpen(false)}
+                type="button"
+                variant="ghost"
+              >
+                {t("modal.close")}
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <Sheet
+        open={isManualOverrideOpen}
+        onOpenChange={(isOpen) =>
+          !isOpen && setIsManualOverrideOpen(false)
+        }
+      >
+        <SheetContent
+          side="right"
+          className="sm:max-w-xl p-0 border-l border-border bg-card"
+        >
+          <div className="h-full flex flex-col">
+            <SheetHeader className="p-10 border-b border-border bg-accent/20">
+              <div className="flex items-center gap-3 mb-4">
+                <Settings2 className="text-[#ffc105]" size={20} />
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105] italic">
+                  Admin Action
+                </p>
+              </div>
+              <SheetTitle className="text-3xl font-black uppercase tracking-tightest text-foreground leading-tight italic">
+                {t("overrideModal.title", { defaultValue: "Manual Override" })}
+              </SheetTitle>
+              <SheetDescription className="mt-4 text-sm font-medium leading-relaxed text-muted-foreground/60">
+                {t("overrideModal.description", {
+                  defaultValue:
+                    "Change the order status arbitrarily. You may optionally attach a receipt.",
+                })}
+              </SheetDescription>
+            </SheetHeader>
+
+            <div className="flex-1 p-10 space-y-8 overflow-y-auto">
+              <div className="space-y-4">
+                <label className="text-xs font-black uppercase tracking-widest text-foreground">
+                  New Status
+                </label>
+                <Select value={manualState} onValueChange={setManualState}>
+                  <SelectTrigger className="h-14 rounded-2xl border-border bg-accent/20 px-4 font-space-grotesk text-sm font-bold">
+                    <SelectValue placeholder="Select target status..." />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl border border-border bg-card">
+                    {[
+                      "PENDING_PAYMENT_INPUT",
+                      "AWAITING_VERIFICATION",
+                      "CONFIRMED",
+                      "READY_FOR_SHIPPING",
+                      "SHIPPED",
+                      "DELIVERED",
+                      "RTO",
+                      "STALLED_PAYMENT",
+                      "FLAGGED_FRAUD",
+                      "CANCELLED",
+                    ].map((state) => (
+                      <SelectItem
+                        key={state}
+                        value={state}
+                        className="font-space-grotesk font-medium text-xs"
+                      >
+                        {t(`states.${state}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="group/drop">
+                <label className="block rounded-[40px] border-2 border-dashed border-border/50 bg-accent/20 px-8 py-12 text-center transition-all cursor-pointer hover:border-[#ffc105]/50 hover:bg-[#ffc105]/5">
+                  <input
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(event) =>
+                      setSelectedFile(event.target.files?.[0] ?? null)
+                    }
+                    type="file"
+                  />
+                  <div className="h-12 w-12 rounded-full bg-background border border-border flex items-center justify-center mx-auto mb-4 group-hover/drop:scale-110 transition-transform">
+                    <ImageIcon className="text-muted-foreground/40" size={20} />
+                  </div>
+                  <span className="block text-sm font-black uppercase tracking-widest text-foreground mb-1">
+                    {t("overrideModal.attach", {
+                      defaultValue: "Attach Receipt (Optional)",
+                    })}
+                  </span>
+
+                  {selectedFile && (
+                    <div className="mt-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 animate-in zoom-in-95 duration-300">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 truncate">
+                        {selectedFile.name}
+                      </p>
+                    </div>
+                  )}
+                </label>
+              </div>
+            </div>
+
+            <div className="p-10 border-t border-border bg-accent/20 gap-4 flex flex-col">
+              <Button
+                className="w-full rounded-2xl h-14 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all shadow-xl font-black uppercase tracking-[0.2em] text-[10px]"
+                disabled={isSubmitting || !manualState}
+                onClick={handleManualOverride}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent" />
+                    Updating...
+                  </div>
+                ) : (
+                  <>
+                    <Settings2
+                      size={16}
+                      className="ltr:mr-3 rtl:ml-3 h-4 w-4"
+                    />
+                    {t("overrideModal.confirm", {
+                      defaultValue: "Apply Override",
+                    })}
+                  </>
+                )}
+              </Button>
+              <Button
+                className="w-full rounded-2xl h-12 text-muted-foreground/40 hover:text-foreground font-black uppercase tracking-widest text-[10px] transition-all"
+                onClick={() => setIsManualOverrideOpen(false)}
                 type="button"
                 variant="ghost"
               >
