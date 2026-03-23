@@ -1,16 +1,41 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalPassThroughEnv": [
+    "CONVEX_DEPLOYMENT",
+    "CONVEX_URL",
+    "CONVEX_SITE_URL",
+    "NEXT_PUBLIC_CONVEX_URL",
+    "NEXT_PUBLIC_CONVEX_SITE_URL"
+  ],
   "tasks": {
+    "codegen": {
+      "cache": false
+    },
     "build": {
-      "dependsOn": ["^build" ],
-      "outputs": [".next/**", "dist/**"]
+      "dependsOn": [
+        "^build",
+        "^codegen"
+      ],
+      "outputs": [
+        ".next/**",
+        "dist/**"
+      ],
+      "env": [
+        "CONVEX_DEPLOYMENT",
+        "CONVEX_URL",
+        "CONVEX_SITE_URL",
+        "CONVEX_DEPLOY_KEY",
+        "NEXT_PUBLIC_CONVEX_URL"
+      ]
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint"
+      ]
     }
   }
 }
