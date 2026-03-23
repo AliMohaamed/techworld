@@ -107,37 +107,37 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.categoryName || t("placeholderCategory")}
         </span>
 
-        <h3 className="mb-1.5 sm:mb-2 line-clamp-1 font-space-grotesk text-sm sm:text-xl md:text-[1.4rem] font-black leading-tight text-foreground uppercase tracking-tighter group-hover:text-[#ffc105] transition-colors">
+        <h3 className="mb-1.5 sm:mb-2 line-clamp-2 sm:line-clamp-1 font-space-grotesk text-sm sm:text-xl md:text-[1.4rem] font-black leading-tight text-foreground uppercase tracking-tighter group-hover:text-[#ffc105] transition-colors">
           {locale === "en" ? product.name_en : product.name_ar}
         </h3>
 
-        <p className="mb-4 sm:mb-6 line-clamp-2 text-[10px] sm:text-sm leading-relaxed text-muted-foreground font-light h-[2.2rem] sm:h-[2.8rem] overflow-hidden overflow-ellipsis">
+        <p className="hidden sm:block mb-4 sm:mb-6 animate-in fade-in line-clamp-2 text-sm leading-relaxed text-muted-foreground font-light h-[2.8rem] overflow-hidden overflow-ellipsis">
           {locale === "en"
             ? product.description_en || t("placeholder")
             : product.description_ar || t("placeholder")}
         </p>
 
-        <div className="mt-auto flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full">
+        <div className="mt-auto flex flex-row items-end justify-between sm:items-center gap-2 sm:gap-4 w-full">
           <div className="flex shrink-0 flex-col">
             {hasSalePrice ? (
-              <s className="mb-0.5 font-space-grotesk text-xs sm:text-sm font-bold tracking-tight text-muted-foreground decoration-red-900/50">
+              <s className="mb-0.5 font-space-grotesk text-[10px] sm:text-sm font-bold tracking-tight text-muted-foreground decoration-red-900/50">
                 {product.compareAtPrice?.toLocaleString(locale)}{" "}
                 <span className="text-[9px] sm:text-[10px]">EGP</span>
               </s>
             ) : null}
-            <span className="font-space-grotesk text-base sm:text-2xl md:text-[1.6rem] font-black tracking-tightest text-foreground leading-none">
+            <span className="font-space-grotesk text-lg sm:text-2xl md:text-[1.6rem] font-black tracking-tightest text-foreground leading-none">
               {displayPrice.toLocaleString(locale)}{" "}
-              <span className="text-sm sm:text-lg text-[#ffc105]">EGP</span>
+              <span className="text-xs sm:text-lg text-[#ffc105]">EGP</span>
             </span>
           </div>
 
           <button
             disabled={isOutOfStock}
             onClick={handleAddToCart}
-            className="flex h-10 sm:h-12 md:h-14 w-full sm:w-auto flex-1 cursor-pointer items-center justify-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl bg-[#ffc105] px-2 sm:px-4 font-black text-black transition-all hover:bg-white active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-30 hover:shadow-[#ffc105]/20"
+            className="flex h-10 w-10 sm:h-12 md:h-14 sm:w-auto sm:flex-1 shrink-0 cursor-pointer items-center justify-center gap-1.5 sm:gap-2 rounded-[14px] sm:rounded-2xl bg-[#ffc105] sm:px-4 font-black text-black transition-all hover:bg-white active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-30 hover:shadow-[#ffc105]/20"
           >
-            <ShoppingCart size={16} className="md:h-5 md:w-5 shrink-0 fill-black/5" />
-            <span className="whitespace-nowrap uppercase tracking-widest text-[9px] sm:text-xs">
+            <ShoppingCart size={18} className="md:h-5 md:w-5 shrink-0 sm:fill-black/5" />
+            <span className="hidden sm:inline-block whitespace-nowrap uppercase tracking-widest text-[9px] sm:text-xs">
               {t("actions.add")}
             </span>
           </button>
