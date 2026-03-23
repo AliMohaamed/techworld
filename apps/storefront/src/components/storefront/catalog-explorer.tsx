@@ -127,7 +127,7 @@ export default function CatalogExplorer({
                   <h2 className="mt-4 font-space-grotesk text-4xl font-black uppercase tracking-tight text-foreground">
                     {t("empty.title")}
                   </h2>
-                  <p className="mx-auto mt-4 max-w-xl text-sm leading-8 text-muted-foreground font-light italic">
+                  <p className="mx-auto mt-4 max-w-xl text-sm leading-8 text-muted-foreground font-light">
                     {t("empty.description")}
                   </p>
                 </div>

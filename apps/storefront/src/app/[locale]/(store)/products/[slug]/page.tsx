@@ -263,7 +263,7 @@ export default function ProductDetailPage() {
             <div className="mb-12 space-y-6">
               <p className="text-sm md:text-base leading-8 text-muted-foreground font-medium">{product.description_en}</p>
               <div className="border-t border-border pt-8 ltr:text-right rtl:text-right">
-                <p className="font-arabic text-xl md:text-2xl leading-relaxed text-muted-foreground/60 font-medium italic">
+                <p className="font-arabic text-xl md:text-2xl leading-relaxed text-muted-foreground/60 font-medium">
                   {product.description_ar}
                 </p>
               </div>

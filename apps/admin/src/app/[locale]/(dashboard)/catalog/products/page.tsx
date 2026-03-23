@@ -165,11 +165,11 @@ export default function AdminProductsPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Package className="text-[#ffc105]" size={20} />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105] italic">
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
                 {t("badge")}
               </p>
             </div>
-            <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight italic">
+            <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight">
               {t("title")}
             </h1>
             <p className="max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground/60">
@@ -195,7 +195,7 @@ export default function AdminProductsPage() {
               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
                 {t("table.badge")}
               </p>
-              <h2 className="text-2xl font-black text-foreground uppercase tracking-tightest italic leading-none mt-1">
+              <h2 className="text-2xl font-black text-foreground uppercase tracking-tightest leading-none mt-1">
                 {t("table.title")}
               </h2>
             </div>
@@ -248,16 +248,16 @@ export default function AdminProductsPage() {
                   <td className="sticky left-0 bg-card py-4 px-6 z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
                     <div className="flex flex-col relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none opacity-0 group-hover/row:opacity-100 transition-opacity" />
-                      <p className="font-black text-foreground text-lg uppercase tracking-tightest leading-none italic">
+                      <p className="font-black text-foreground text-lg uppercase tracking-tightest leading-none">
                         {product.name_en}
                       </p>
                       <p
-                        className="text-[10px] text-muted-foreground/40 font-mono tracking-widest mt-2 uppercase italic"
+                        className="text-[10px] text-muted-foreground/40 font-mono tracking-widest mt-2 uppercase"
                         dir="rtl"
                       >
                         {product.name_ar}
                       </p>
-                      <p className="mt-3 text-[9px] font-black text-[#ffc105] uppercase tracking-widest italic flex items-center gap-1.5 opacity-60">
+                      <p className="mt-3 text-[9px] font-black text-[#ffc105] uppercase tracking-widest flex items-center gap-1.5 opacity-60">
                         <Plus size={10} className="rotate-45" />{" "}
                         {product.slug ?? t("table.noSlug")}
                       </p>
@@ -336,7 +336,7 @@ export default function AdminProductsPage() {
                             .reduce((s, sku) => s + sku.display_stock, 0)
                             .toLocaleString(locale)}
                         </p>
-                        <p className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[.2em] italic leading-none">
+                        <p className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[.2em] leading-none">
                           {t("table.managedViaSkus")}
                         </p>
                       </div>
@@ -382,7 +382,7 @@ export default function AdminProductsPage() {
                             .reduce((s, sku) => s + sku.real_stock, 0)
                             .toLocaleString(locale)}
                         </p>
-                        <p className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[.2em] italic leading-none">
+                        <p className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[.2em] leading-none">
                           {t("table.managedViaSkus")}
                         </p>
                       </div>
@@ -442,7 +442,7 @@ export default function AdminProductsPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="rounded-xl h-10 px-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-foreground hover:bg-accent transition-all   italic"
+                        className="rounded-xl h-10 px-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-foreground hover:bg-accent transition-all"
                         onClick={() => openEditSheet(product._id)}
                       >
                         {t("actions.edit")}
@@ -491,7 +491,7 @@ export default function AdminProductsPage() {
                     <div className="h-16 w-16 rounded-full bg-accent/20 flex items-center justify-center">
                       <Package size={32} className="text-muted-foreground/20" />
                     </div>
-                    <p className="text-sm font-black uppercase tracking-widest text-muted-foreground/20 italic">
+                    <p className="text-sm font-black uppercase tracking-widest text-muted-foreground/20">
                       {t("table.empty")}
                     </p>
                   </td>

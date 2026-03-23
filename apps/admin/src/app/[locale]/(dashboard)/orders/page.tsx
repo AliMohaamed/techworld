@@ -101,11 +101,11 @@ export default function OrdersPage() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <ShoppingCart className="text-[#ffc105]" size={20} />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105] italic">
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
                 {tQueue("badge")}
               </p>
             </div>
-            <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight italic">
+            <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight">
               {tQueue("title")}
             </h1>
             <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground/60">
@@ -133,7 +133,7 @@ export default function OrdersPage() {
         <div className="border-b border-border bg-accent/30 px-8 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-4 w-1 bg-[#ffc105] rounded-full" />
-            <h2 className="text-sm font-black text-foreground uppercase tracking-widest italic">
+            <h2 className="text-sm font-black text-foreground uppercase tracking-widest">
               {tQueue("table.title")}
             </h2>
           </div>
@@ -216,7 +216,7 @@ export default function OrdersPage() {
                       <div className="font-bold text-foreground text-xs uppercase tracking-tightest max-w-[200px] truncate">
                         {order.product?.name_en ?? tQueue("table.unknownProduct")}
                       </div>
-                      <div className="mt-1.5 text-[10px] font-black text-[#ffc105] uppercase tracking-widest italic truncate max-w-[200px]">
+                      <div className="mt-1.5 text-[10px] font-black text-[#ffc105] uppercase tracking-widest truncate max-w-[200px]">
                         {order.category?.name_en ?? tQueue("table.noCategory")}
                       </div>
                     </td>
@@ -250,7 +250,7 @@ export default function OrdersPage() {
                           <ImageIcon size={10} /> {tQueue("table.viewReceipt")}
                         </a>
                       ) : (
-                        <span className="text-[10px] font-black text-muted-foreground/30 uppercase tracking-widest italic">
+                        <span className="text-[10px] font-black text-muted-foreground/30 uppercase tracking-widest">
                           {tQueue("table.pendingReceipt")}
                         </span>
                       )}

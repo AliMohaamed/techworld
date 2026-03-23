@@ -86,4 +86,9 @@
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
   }
+
+  /* Force all text to be normal, removing all italics from the site */
+  *, ::before, ::after {
+    font-style: normal !important;
+  }
 }

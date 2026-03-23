@@ -136,11 +136,11 @@ export function CategoryFormSheet({
           <SheetHeader className="p-10 pb-10 border-b border-border bg-card relative z-10">
             <div className="flex items-center gap-3 mb-4">
               <Layers className="text-[#ffc105]" size={24} />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105] italic">
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
                 {t("form.badge")}
               </p>
             </div>
-            <SheetTitle className="text-3xl font-black uppercase tracking-tightest text-foreground m-0 leading-tight italic">
+            <SheetTitle className="text-3xl font-black uppercase tracking-tightest text-foreground m-0 leading-tight">
               {category ? t("form.editTitle") : t("form.createTitle")}
             </SheetTitle>
             <SheetDescription className="text-sm font-medium text-muted-foreground/60 max-w-sm mt-2">
@@ -171,7 +171,7 @@ export function CategoryFormSheet({
                     }))
                   }
                   placeholder={t("form.placeholders.nameEn")}
-                  className="rounded-xl border-border bg-background h-12 font-black uppercase tracking-tightest placeholder:italic"
+                  className="rounded-xl border-border bg-background h-12 font-black uppercase tracking-tightest placeholder:not-italic"
                 />
               </div>
 
@@ -193,7 +193,7 @@ export function CategoryFormSheet({
                     }))
                   }
                   placeholder={t("form.placeholders.nameAr")}
-                  className="rounded-xl border-border bg-background h-12 font-black tracking-tightest placeholder:italic"
+                  className="rounded-xl border-border bg-background h-12 font-black tracking-tightest placeholder:not-italic"
                 />
               </div>
 

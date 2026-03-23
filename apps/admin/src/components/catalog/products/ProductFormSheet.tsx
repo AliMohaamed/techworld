@@ -249,11 +249,11 @@ export function ProductFormSheet({
           <SheetHeader className="p-10 pb-10 border-b border-border bg-card relative z-10">
             <div className="flex items-center gap-3 mb-4">
               <Box className="text-[#ffc105]" size={24} />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105] italic">
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
                 {t("form.badge")}
               </p>
             </div>
-            <SheetTitle className="text-4xl font-black text-foreground uppercase tracking-tightest leading-tight italic">
+            <SheetTitle className="text-4xl font-black text-foreground uppercase tracking-tightest leading-tight">
               {product ? t("form.editTitle") : t("form.createTitle")}
             </SheetTitle>
             <SheetDescription className="text-sm font-medium text-muted-foreground/60 max-w-2xl mt-2">
@@ -329,7 +329,7 @@ export function ProductFormSheet({
                   <Input
                     {...register("name_en")}
                     placeholder={t("form.placeholders.nameEn")}
-                    className="rounded-xl border-border bg-background h-12 font-black uppercase tracking-tightest placeholder:italic"
+                    className="rounded-xl border-border bg-background h-12 font-black uppercase tracking-tightest placeholder:not-italic"
                   />
                 </Field>
                 <Field
@@ -340,7 +340,7 @@ export function ProductFormSheet({
                     dir="rtl"
                     {...register("name_ar")}
                     placeholder={t("form.placeholders.nameAr")}
-                    className="rounded-xl border-border bg-background h-12 font-black tracking-tightest placeholder:italic"
+                    className="rounded-xl border-border bg-background h-12 font-black tracking-tightest placeholder:not-italic"
                   />
                 </Field>
                 <Field
@@ -513,7 +513,7 @@ export function ProductFormSheet({
                     <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between relative z-10">
                       <div className="flex items-center gap-3">
                         <div className="h-2 w-2 rounded-full bg-[#ffc105]" />
-                        <p className="text-[11px] font-black text-foreground uppercase tracking-widest italic">
+                        <p className="text-[11px] font-black text-foreground uppercase tracking-widest">
                           {t("form.fields.variant", { index: index + 1 })}
                         </p>
                       </div>
