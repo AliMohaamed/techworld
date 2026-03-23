@@ -95,7 +95,7 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <nav className="lg:hidden fixed inset-0 top-24 bg-background/95 backdrop-blur-3xl border-t border-border p-8 flex flex-col space-y-4   z-[60] animate-in slide-in-from-top-4 duration-300">
+          <nav className="lg:hidden fixed inset-0 top-24 bg-background/95 backdrop-blur-3xl border-t border-border p-8 flex flex-col space-y-4 z-[60] animate-in slide-in-from-top-4 duration-300">
             {navItems.map((item) => (
               <Link
                 key={item.key}

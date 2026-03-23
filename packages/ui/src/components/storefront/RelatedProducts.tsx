@@ -44,7 +44,7 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
           return (
             <Link
               key={product._id}
-              href={`/products/${product.slug}`}
+              href={`/products/${product.slug}` as any}
               className="group flex flex-col space-y-3"
             >
               <div className="relative aspect-square overflow-hidden rounded-3xl border border-white/5 bg-zinc-900 shadow-xl transition-all group-hover:border-primary/30">
