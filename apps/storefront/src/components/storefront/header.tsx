@@ -31,7 +31,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-secondary/30 backdrop-blur-xl transition-all h-20">
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-secondary transition-all h-20">
         <div className="container mx-auto flex h-full items-center justify-between px-6 md:px-12">
           {/* Logo */}
           <div className="flex">
@@ -47,7 +47,7 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden items-center ltr:space-x-8 rtl:space-x-reverse space-x-8 lg:flex">
+          <nav className="hidden items-center gap-8 lg:flex">
             {navItems.map((item) => (
               <Link
                 key={item.key}
