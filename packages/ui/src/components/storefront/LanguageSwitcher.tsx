@@ -12,7 +12,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
   const toggleLanguage = () => {
     const nextLocale = locale === "en" ? "ar" : "en";
     const newPathname = pathname.replace(`/${locale}`, `/${nextLocale}`);
-    router.push(newPathname);
+    router.push(newPathname as any);
   };
 
   const isArabic = locale === "ar";
