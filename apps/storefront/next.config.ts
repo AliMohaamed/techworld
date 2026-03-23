@@ -35,7 +35,7 @@ const remotePatterns: any[] = [
 ];
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@techworld/ui"],
+  transpilePackages: ["@techworld/ui", "@techworld/backend"],
   images: {
     remotePatterns,
   },
