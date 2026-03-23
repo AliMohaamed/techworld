@@ -73,6 +73,15 @@
         "masked": "Masked",
         "redacted": "This staff account can process the order, but financial metrics are redacted server-side."
       },
+      "summary": {
+        "title": "Payment Summary",
+        "subtotal": "Subtotal",
+        "shipping": "Shipping Fee",
+        "discount": "Discount applied: {code}",
+        "total": "Final Total",
+        "egp": "EGP",
+        "freeShipping": "Free Shipping"
+      },
       "receipt": {
         "badge": "Receipt Proof",
         "open": "Open current receipt",
@@ -83,7 +92,15 @@
         "cancel": "Cancel Order",
         "markStalled": "Mark Stalled",
         "rto": "Return to Origin (RTO)",
-        "logisticsNote": "Shipping and logistical transitions beyond verification take place here. Full FSM extension for Courier tracking pending."
+        "logisticsNote": "Shipping and logistical transitions beyond verification take place here. Full FSM extension for Courier tracking pending.",
+        "manualOverride": "Manual Update",
+        "verifyNow": "Verify Order"
+      },
+      "overrideModal": {
+        "title": "Manual Override",
+        "description": "Change the order status arbitrarily. You may optionally attach  a receipt.",
+        "attach": "Attach Receipt (Optional)",
+        "confirm": "Apply Override"
       },
       "modal": {
         "title": "Manual Fallback",

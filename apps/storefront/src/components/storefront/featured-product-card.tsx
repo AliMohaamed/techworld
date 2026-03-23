@@ -45,7 +45,7 @@ export default function FeaturedProductCard({
   // Resolve default SKU for stock and cart purposes
   const defaultSku =
     product.skus?.find((s) => s.isDefault) ?? product.skus?.[0];
-  const displayPrice = defaultSku?.price ?? product.selling_price;
+  const displayPrice = defaultSku?.price || product.selling_price;
   const hasSalePrice =
     product.compareAtPrice !== undefined &&
     product.compareAtPrice > displayPrice;
@@ -70,7 +70,7 @@ export default function FeaturedProductCard({
   return (
     <Link
       href={`/products/${product.slug || product._id}`}
-      className="group relative block h-[500px] w-full overflow-hidden rounded-3xl border border-border bg-card/40 transition-all hover:border-[#ffc105]/20  "
+      className="group relative block h-[400px] sm:h-[500px] w-full overflow-hidden rounded-3xl border border-border bg-card/40 transition-all hover:border-[#ffc105]/20  "
     >
       <div className="absolute inset-0 z-0">
         {product.images?.[0] ? (
@@ -86,8 +86,8 @@ export default function FeaturedProductCard({
         <div className="absolute inset-0 z-10 bg-gradient-to-t from-background via-background/40 to-transparent" />
       </div>
 
-      <div className="absolute inset-0 z-20 flex flex-col items-start justify-end space-y-4 p-8">
-        <div className="flex items-center space-x-2 rounded-full bg-[#ffc105] px-3 py-1 scale-90 ltr:origin-left rtl:origin-right shadow-[0_0_15px_rgba(255,193,5,0.3)]">
+      <div className="absolute inset-0 z-20 flex flex-col items-start justify-end space-y-3 sm:space-y-4 p-5 sm:p-8">
+        <div className="flex items-center space-x-2 rounded-full bg-[#ffc105] px-3 py-1 scale-90 sm:scale-100 ltr:origin-left rtl:origin-right shadow-[0_0_15px_rgba(255,193,5,0.3)]">
           <Zap size={12} className="fill-black text-black" />
           <span className="text-[10px] font-black uppercase tracking-widest text-black leading-tight">
             {t("badges.featured")}
@@ -122,8 +122,8 @@ export default function FeaturedProductCard({
               {displayPrice.toLocaleString(locale)} EGP
             </span>
           </div>
-          <div className="flex items-center ltr:space-x-3 rtl:space-x-reverse space-x-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/50 text-foreground transition-all group-hover:bg-[#ffc105] group-hover:text-black  ">
+          <div className="flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse">
+            <div className="hidden sm:flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/50 text-foreground transition-all group-hover:bg-[#ffc105] group-hover:text-black">
               <ArrowRight
                 size={22}
                 className={locale === "ar" ? "rotate-180" : ""}

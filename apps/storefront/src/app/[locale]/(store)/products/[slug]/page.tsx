@@ -76,7 +76,7 @@ export default function ProductDetailPage() {
   const galleryImages = product
     ? uniqueImages([selectedVariant?.linkedImageId, product.thumbnail, ...(product.images ?? [])])
     : [];
-  const displayPrice = selectedVariant?.price ?? product?.selling_price ?? 0;
+  const displayPrice = selectedVariant?.price || product?.selling_price || 0;
   const compareAtPrice = selectedVariant?.compareAtPrice ?? product?.compareAtPrice;
   const hasSalePrice = compareAtPrice !== undefined && compareAtPrice > displayPrice;
   const availableUnits = selectedVariant?.display_stock ?? 0;
@@ -169,7 +169,7 @@ export default function ProductDetailPage() {
               <h1 className="font-space-grotesk text-4xl font-black leading-[1.1] text-foreground md:text-6xl lg:text-7xl uppercase tracking-tightest">
                 {product.name_en}
               </h1>
-              <p className="ltr:text-right rtl:text-right font-arabic text-2xl leading-relaxed text-[#ffc105] font-light shadow-sm">{product.name_ar}</p>
+              <p className="ltr:text-right rtl:text-right font-arabic text-2xl leading-relaxed text-[#ffc105] font-light">{product.name_ar}</p>
             </header>
 
             <div className="mb-10 flex flex-wrap items-center gap-8 border-b border-border pb-10">

@@ -14,7 +14,8 @@
       "total": "Total",
       "shippingNote": "Final shipping calculated at next step",
       "defaultVariant": "Default variant",
-      "noImage": "No Image"
+      "noImage": "No Image",
+      "freeShipping": "Free Shipping"
     }
   }
 }

@@ -30,7 +30,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
 
         {/* Character indicator */}
         <span className="flex h-5 w-5 items-center justify-center text-[9px] group-hover:text-[#ffc105] transition-all font-black  ">
-          {isArabic ? "EN" : "ع"}
+          {isArabic ? "EN" : "AR"}
         </span>
       </div>
 

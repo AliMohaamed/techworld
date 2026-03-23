@@ -153,10 +153,12 @@ export default function CheckoutForm() {
             appliedCode={formData.promoCode}
             error={cart?.promoError}
             discountAmount={cart?.promoDiscount}
+            promoType={cart?.promoType}
             placeholder={t('promo.placeholder')}
             applyLabel={t('promo.apply')}
             appliedLabel={t('promo.applied')}
             removeLabel={t('promo.remove')}
+            freeShippingLabel={t('summary.freeShipping')}
           />
         </div>
 
@@ -167,7 +169,12 @@ export default function CheckoutForm() {
             <span className="text-foreground font-space-grotesk font-black tracking-tight">{(cart?.subtotal || 0).toLocaleString(locale)} <span className="text-xs text-[#ffc105]">EGP</span></span>
           </div>
 
-          {cart?.promoDiscount ? (
+          {cart?.promoType === "free_shipping" ? (
+            <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-500">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em]">{t('summary.discount')}</span>
+              <span className="font-space-grotesk font-black tracking-tight uppercase tracking-widest text-[10px] bg-emerald-500/10 px-2 py-1 rounded">{t('summary.freeShipping')}</span>
+            </div>
+          ) : cart?.promoDiscount ? (
             <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-500">
               <span className="text-[10px] font-black uppercase tracking-[0.3em]">{t('summary.discount')}</span>
               <span className="font-space-grotesk font-black tracking-tight">-{cart.promoDiscount.toLocaleString(locale)} <span className="text-xs">EGP</span></span>
@@ -180,7 +187,14 @@ export default function CheckoutForm() {
               {!formData.governorateId ? (
                 <span className="text-muted-foreground italic text-[10px] lowercase tracking-wide font-medium">{t('errors.selectGovernorate')}</span>
               ) : selectedGov ? (
-                <>{selectedGov.shippingFee.toLocaleString(locale)} <span className="text-xs text-[#ffc105]">EGP</span></>
+                cart?.promoType === "free_shipping" ? (
+                  <span className="text-emerald-500 flex items-center gap-2">
+                    <span className="line-through text-muted-foreground opacity-50">{selectedGov.shippingFee.toLocaleString(locale)}</span>
+                    <span className="text-[10px] uppercase font-black tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded">{t('summary.freeShipping')}</span>
+                  </span>
+                ) : (
+                  <>{selectedGov.shippingFee.toLocaleString(locale)} <span className="text-xs text-[#ffc105]">EGP</span></>
+                )
               ) : (
                 <span className="text-muted-foreground text-[10px] uppercase font-black tracking-widest">{t('summary.loading')}</span>
               )}
@@ -190,7 +204,7 @@ export default function CheckoutForm() {
           <div className="flex justify-between items-center pt-8 border-t border-border">
             <span className="text-foreground text-sm font-black uppercase tracking-[0.4em]">{t('summary.total')}</span>
             <span className="text-[#ffc105] font-space-grotesk text-4xl font-black tracking-tightest">
-              {((cart?.total || 0) + (selectedGov?.shippingFee || 0)).toLocaleString(locale)} <span className="text-lg">EGP</span>
+              {((cart?.total || 0) + (cart?.promoType === "free_shipping" ? 0 : (selectedGov?.shippingFee || 0))).toLocaleString(locale)} <span className="text-lg">EGP</span>
             </span>
           </div>
         </div>

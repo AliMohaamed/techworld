@@ -47,7 +47,7 @@ export default function OrdersPage() {
   );
   
   const updateGenericStatus = useMutation(api.orders.updateGenericStatus);
-  const updateOrderStatus = useMutation(api.orders.updateOrderStatus);
+  const updateOrderStatus = useMutation(api.orders.updateGenericStatus);
   
   const [filter, setFilter] = useState<FilterType>("ALL");
   const [updatingId, setUpdatingId] = useState<Id<"orders"> | null>(null);
@@ -59,15 +59,11 @@ export default function OrdersPage() {
     
     setUpdatingId(orderId);
     try {
-      if (currentState === "AWAITING_VERIFICATION" && (newState === "CONFIRMED" || newState === "CANCELLED" || newState === "STALLED_PAYMENT")) {
-        await updateOrderStatus({ orderId, newState });
-      } else {
-        await updateGenericStatus({ orderId, newState });
-      }
+      await updateGenericStatus({ orderId, newState });
       toast.success(`Order status updated to ${tStates(newState)}.`);
     } catch (error: any) {
       toast.error("Failed to update status", {
-        description: error.message || "Invalid state transition.",
+        description: error.message || "Could not update the order.",
       });
     } finally {
       setUpdatingId(null);
@@ -233,7 +229,7 @@ export default function OrdersPage() {
                     </td>
                     <td className="py-4 px-4 align-middle whitespace-nowrap">
                       <span className="font-black text-sm tracking-tightest text-foreground">
-                        {order.total_price.toLocaleString(locale)}
+                        {(order.total_price + (order.appliedShippingFee || 0)).toLocaleString(locale)}
                       </span>
                       <span className="ml-1 text-[9px] font-black text-muted-foreground/30 uppercase tracking-widest">
                         EGP
@@ -260,44 +256,37 @@ export default function OrdersPage() {
                         <Select
                           value={order.state}
                           onValueChange={(value) => value && handleStatusChange(order._id, order.state as OrderState, value as OrderState)}
-                          disabled={!canManageShipping && order.state !== "AWAITING_VERIFICATION"}
                         >
                           <SelectTrigger className="w-36 h-9 text-[10px] uppercase tracking-widest font-bold font-mono rounded-xl bg-background border-border/50 hover:bg-accent/20 focus:ring-primary/50 text-foreground">
                             <SelectValue placeholder={tStates(order.state as OrderState)} />
                           </SelectTrigger>
                           <SelectContent className="rounded-xl border-border bg-card">
-                            <SelectItem value={order.state} disabled className="text-[10px] uppercase tracking-widest font-bold cursor-not-allowed opacity-50 transition-colors">
-                              {tStates(order.state as OrderState)}
-                            </SelectItem>
-                            {order.state === "AWAITING_VERIFICATION" && (
-                              <>
-                                <SelectItem value="CONFIRMED" className="text-[10px] uppercase tracking-widest cursor-pointer hover:bg-accent hover:text-accent-foreground">{tStates("CONFIRMED")}</SelectItem>
-                                <SelectItem value="CANCELLED" className="text-[10px] uppercase tracking-widest cursor-pointer hover:bg-accent hover:text-accent-foreground text-destructive focus:text-destructive">{tStates("CANCELLED")}</SelectItem>
-                                <SelectItem value="STALLED_PAYMENT" className="text-[10px] uppercase tracking-widest cursor-pointer hover:bg-accent hover:text-accent-foreground">{tStates("STALLED_PAYMENT")}</SelectItem>
-                              </>
-                            )}
-                            
-                            {order.state === "CONFIRMED" && (
-                              <>
-                                <SelectItem value="READY_FOR_SHIPPING" className="text-[10px] uppercase tracking-widest cursor-pointer hover:bg-accent hover:text-accent-foreground">{tStates("READY_FOR_SHIPPING")}</SelectItem>
-                                <SelectItem value="CANCELLED" className="text-[10px] uppercase tracking-widest cursor-pointer text-destructive focus:text-destructive hover:bg-accent">{tStates("CANCELLED")}</SelectItem>
-                              </>
-                            )}
-                            
-                            {order.state === "READY_FOR_SHIPPING" && (
-                              <>
-                                <SelectItem value="SHIPPED" className="text-[10px] uppercase tracking-widest cursor-pointer hover:bg-accent hover:text-accent-foreground">{tStates("SHIPPED")}</SelectItem>
-                                <SelectItem value="CANCELLED" className="text-[10px] uppercase tracking-widest cursor-pointer text-destructive focus:text-destructive hover:bg-accent">{tStates("CANCELLED")}</SelectItem>
-                              </>
-                            )}
-                            
-                            {order.state === "SHIPPED" && (
-                              <>
-                                <SelectItem value="DELIVERED" className="text-[10px] uppercase tracking-widest cursor-pointer hover:bg-accent hover:text-accent-foreground">{tStates("DELIVERED")}</SelectItem>
-                                <SelectItem value="RTO" className="text-[10px] uppercase tracking-widest cursor-pointer text-destructive focus:text-destructive hover:bg-accent">{tStates("RTO")}</SelectItem>
-                                <SelectItem value="CANCELLED" className="text-[10px] uppercase tracking-widest cursor-pointer text-destructive focus:text-destructive hover:bg-accent">{tStates("CANCELLED")}</SelectItem>
-                              </>
-                            )}
+                            {([
+                              "PENDING_PAYMENT_INPUT",
+                              "AWAITING_VERIFICATION",
+                              "CONFIRMED",
+                              "READY_FOR_SHIPPING",
+                              "SHIPPED",
+                              "DELIVERED",
+                              "RTO",
+                              "STALLED_PAYMENT",
+                              "FLAGGED_FRAUD",
+                              "CANCELLED",
+                            ] as OrderState[]).map((state) => (
+                              <SelectItem
+                                key={state}
+                                value={state}
+                                className={`text-[10px] uppercase tracking-widest font-bold cursor-pointer hover:bg-accent hover:text-accent-foreground ${
+                                  state === order.state ? "opacity-50 cursor-not-allowed" : ""
+                                } ${
+                                  state === "CANCELLED" || state === "RTO" || state === "FLAGGED_FRAUD"
+                                    ? "text-destructive focus:text-destructive"
+                                    : ""
+                                }`}
+                              >
+                                {tStates(state)}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         

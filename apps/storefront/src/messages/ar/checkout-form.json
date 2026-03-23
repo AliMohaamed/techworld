@@ -20,7 +20,8 @@
       "shipping": "الشحن",
       "total": "إجمالي الطلب",
       "loading": "جاري التحميل...",
-      "unavailable": "غير متاح"
+      "unavailable": "غير متاح",
+      "freeShipping": "شحن مجاني"
     },
     "errors": {
       "deliveryUnavailable": "التوصيل غير متاح حالياً. يرجى المحاولة لاحقاً.",

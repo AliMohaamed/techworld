@@ -5,6 +5,10 @@ import { useQuery } from "convex/react";
 import { api } from "@backend/convex/_generated/api";
 import { ArrowUpRight, Cpu, MousePointer2, Headphones } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { FreeMode } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/free-mode';
 
 export default function CategorySection() {
   const t = useTranslations('CategorySection');
@@ -37,7 +41,44 @@ export default function CategorySection() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:hidden">
+          <Swiper
+            modules={[FreeMode]}
+            spaceBetween={16}
+            slidesPerView={1.15}
+            freeMode={true}
+            className="w-full !overflow-visible"
+          >
+            {categories.map((category) => (
+              <SwiperSlide key={category._id}>
+                <Link 
+                  href={`/categories/${category.slug || category._id}`}
+                  className="group relative h-[320px] overflow-hidden rounded-[24px] bg-card border border-border p-8 flex flex-col justify-between hover:border-[#ffc105]/40 transition-all shadow-xl hover:shadow-[#ffc105]/5"
+                >
+                  <div className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center text-[#ffc105] group-hover:scale-110 transition-transform">
+                    {getCategoryIcon(category.slug)}
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <h3 className="font-space-grotesk text-2xl font-black text-foreground uppercase tracking-tighter group-hover:text-[#ffc105] transition-colors line-clamp-1">
+                      {locale === 'en' ? category.name_en : category.name_ar}
+                    </h3>
+                    <p className="text-muted-foreground/60 text-xs font-medium uppercase tracking-widest leading-relaxed">
+                      {category.slug.replace('-', ' ')}
+                    </p>
+                  </div>
+
+                  {/* Decorative Arrow */}
+                  <div className="absolute top-8 right-8 h-10 w-10 rounded-full border border-border flex items-center justify-center text-foreground opacity-100 transition-all bg-accent">
+                    <ArrowUpRight size={18} />
+                  </div>
+                </Link>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+
+        <div className="hidden md:grid md:grid-cols-3 gap-6">
           {categories.slice(0, 3).map((category) => (
             <Link 
               key={category._id} 

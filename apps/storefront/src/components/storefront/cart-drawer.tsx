@@ -209,8 +209,8 @@ export default function CartDrawer() {
                       </div>
                       <span className="font-space-grotesk text-base font-black text-foreground tracking-tight">
                         {(
-                          (item.sku?.price ??
-                            item.product?.selling_price ??
+                          (item.sku?.price ||
+                            item.product?.selling_price ||
                             0) * item.quantity
                         ).toLocaleString(locale)}{" "}
                         <span className="text-[10px] text-[#ffc105]">EGP</span>
