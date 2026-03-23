@@ -7,6 +7,9 @@
     "codegen": "convex codegen",
     "lint": "eslint convex --ext .ts"
   },
+  "exports": {
+    "./convex/*": "./convex/*"
+  },
   "dependencies": {
     "@convex-dev/better-auth": "^0.10.2",
     "better-auth": "1.4.9",

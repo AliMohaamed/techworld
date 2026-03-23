@@ -13,7 +13,8 @@
     "dev:admin": "npx turbo run dev --filter=@techworld/admin",
     "dev:backend": "npm run dev --workspace @techworld/backend",
     "build": "npx turbo run build",
-    "lint": "npx turbo run lint"
+    "lint": "npx turbo run lint",
+    "generate": "convex dev --once"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
