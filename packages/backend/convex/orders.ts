@@ -171,7 +171,6 @@ export const getOrderDetails = query({
 
     return {
       ...order,
-      total_price: viewFinancials ? order.total_price : null,
       sku,
       product: product
         ? {

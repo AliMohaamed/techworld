@@ -12,10 +12,12 @@ interface PromoCodeInputProps {
   isLoading?: boolean;
   error?: string | null;
   discountAmount?: number;
+  promoType?: string | null;
   placeholder?: string;
   applyLabel?: string;
   removeLabel?: string;
   appliedLabel?: string;
+  freeShippingLabel?: string;
 }
 
 export function PromoCodeInput({
@@ -25,10 +27,12 @@ export function PromoCodeInput({
   isLoading,
   error,
   discountAmount,
+  promoType,
   placeholder = "PROMO CODE",
   applyLabel = "Apply",
   removeLabel = "Remove",
   appliedLabel = "Code Applied",
+  freeShippingLabel = "Free Shipping",
 }: PromoCodeInputProps) {
   const [inputValue, setInputValue] = useState("");
 
@@ -56,7 +60,13 @@ export function PromoCodeInput({
         </div>
         <div className="text-right">
           <p className="font-space-grotesk text-base font-black text-emerald-400 tracking-tight">
-            -{discountAmount?.toLocaleString()} <span className="text-[10px]">EGP</span>
+            {promoType === "free_shipping" ? (
+               <span className="text-[10px] uppercase tracking-widest bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded">{freeShippingLabel}</span>
+            ) : (
+               <>
+                 -{discountAmount?.toLocaleString()} <span className="text-[10px]">EGP</span>
+               </>
+            )}
           </p>
           <button
             onClick={onRemove}

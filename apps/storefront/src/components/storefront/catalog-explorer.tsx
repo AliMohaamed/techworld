@@ -140,7 +140,7 @@ export default function CatalogExplorer({
                         {t("recommended.eyebrow")}
                       </p>
                     </div>
-                    <div className="grid grid-cols-2 gap-6 xl:grid-cols-4">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-6 xl:grid-cols-4">
                       {recommendationResult.products.map((product) => (
                         <ProductCard
                           key={product._id}
@@ -153,7 +153,7 @@ export default function CatalogExplorer({
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-2 gap-6 xl:grid-cols-3">
+                <div className="grid grid-cols-2 gap-3 sm:gap-6 xl:grid-cols-3">
                   {results.map((product) => (
                     <ProductCard key={product._id} product={product as any} />
                   ))}

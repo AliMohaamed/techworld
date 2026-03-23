@@ -229,7 +229,7 @@ export default function OrdersPage() {
                     </td>
                     <td className="py-4 px-4 align-middle whitespace-nowrap">
                       <span className="font-black text-sm tracking-tightest text-foreground">
-                        {order.total_price.toLocaleString(locale)}
+                        {(order.total_price + (order.appliedShippingFee || 0)).toLocaleString(locale)}
                       </span>
                       <span className="ml-1 text-[9px] font-black text-muted-foreground/30 uppercase tracking-widest">
                         EGP

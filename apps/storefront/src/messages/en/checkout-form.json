@@ -20,7 +20,8 @@
       "shipping": "Shipping",
       "total": "Order Total",
       "loading": "Loading...",
-      "unavailable": "Unavailable"
+      "unavailable": "Unavailable",
+      "freeShipping": "Free Shipping"
     },
     "errors": {
       "deliveryUnavailable": "Delivery is currently unavailable. Please try again later.",

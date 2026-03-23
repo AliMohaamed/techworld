@@ -13,6 +13,9 @@ import {
   UploadCloud,
   XCircle,
   Settings2,
+  CreditCard,
+  LayoutDashboard,
+  Info
 } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import { Id } from "@backend/convex/_generated/dataModel";
@@ -404,6 +407,47 @@ export default function OrderDetailsPage() {
                     </p>
                   </div>
                 )}
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-[40px] border border-border bg-card overflow-hidden group transition-all hover:border-[#ffc105]/10">
+            <div className="border-b border-border bg-accent/30 px-10 py-8">
+              <div className="flex items-center gap-4">
+                <div className="h-6 w-1 bg-[#ffc105] rounded-full" />
+                <div className="flex items-center gap-3">
+                  <CreditCard className="text-[#ffc105]" size={20} />
+                  <h2 className="text-xl font-black text-foreground uppercase tracking-tightest italic mt-1">
+                    {t("summary.title")}
+                  </h2>
+                </div>
+              </div>
+            </div>
+            <div className="p-10 space-y-6">
+              <div className="flex justify-between items-center text-sm font-black uppercase tracking-widest text-muted-foreground">
+                <span>{t("summary.subtotal")}</span>
+                <span className="text-foreground">{(order.total_price + (order.discount_applied || 0)).toLocaleString(locale)} {t("summary.egp")}</span>
+              </div>
+              <div className="flex justify-between items-center text-sm font-black uppercase tracking-widest text-muted-foreground">
+                <span>{t("summary.shipping")}</span>
+                <span className="text-foreground">{(order.appliedShippingFee || 0).toLocaleString(locale)} {t("summary.egp")}</span>
+              </div>
+              {((order.discount_applied ?? 0) > 0 || order.promo_code_snapshot) ? (
+                <div className="flex justify-between items-center text-sm font-black uppercase tracking-widest text-emerald-500">
+                  <span>{t("summary.discount", { code: order.promo_code_snapshot || "" })}</span>
+                  <span className="font-mono">
+                    {(order.discount_applied ?? 0) > 0 
+                      ? `-${order.discount_applied?.toLocaleString(locale)} ${t("summary.egp")}`
+                      : <span className="text-[10px] uppercase font-black bg-emerald-500/10 px-2 py-1 rounded">{t("summary.freeShipping")}</span>
+                    }
+                  </span>
+                </div>
+              ) : null}
+              <div className="flex justify-between items-center pt-6 border-t border-border/50 text-xl font-black uppercase tracking-tightest text-foreground">
+                <span>{t("summary.total")}</span>
+                <span className="text-[#ffc105]">
+                  {(order.total_price + (order.appliedShippingFee || 0)).toLocaleString(locale)} {t("summary.egp")}
+                </span>
               </div>
             </div>
           </section>

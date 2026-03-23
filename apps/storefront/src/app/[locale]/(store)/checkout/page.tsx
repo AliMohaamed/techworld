@@ -137,7 +137,14 @@ export default function CheckoutPage() {
                     {(cart.subtotal || 0).toLocaleString(locale)} EGP
                   </span>
                 </div>
-                {cart.promoDiscount ? (
+                {cart.promoType === "free_shipping" ? (
+                  <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">
+                    <span>{t("summary.discount")}</span>
+                    <span className="bg-emerald-500/10 px-2 py-1 rounded">
+                      {t("summary.freeShipping")}
+                    </span>
+                  </div>
+                ) : cart.promoDiscount ? (
                   <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">
                     <span>{t("summary.discount")}</span>
                     <span className="font-mono">

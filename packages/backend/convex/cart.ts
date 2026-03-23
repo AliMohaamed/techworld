@@ -150,6 +150,7 @@ export const getCart = query({
     let promoDiscount = 0;
     let promoError = null;
     let promoId = undefined;
+    let promoType = null;
 
     if (args.promoCode) {
       // Internal-ish check using the same logic as validatePromoCode query
@@ -172,6 +173,7 @@ export const getCart = query({
           promoError = "Promo code cannot be combined with bundles";
         } else {
           promoId = promo._id;
+          promoType = promo.type;
           if (promo.type === "fixed") {
             promoDiscount = promo.value;
           } else if (promo.type === "percentage") {
@@ -188,6 +190,7 @@ export const getCart = query({
       items, 
       subtotal, 
       promoDiscount: Math.floor(promoDiscount), 
+      promoType,
       promoError,
       promoId,
       total: Math.max(0, subtotal - Math.floor(promoDiscount)) 
