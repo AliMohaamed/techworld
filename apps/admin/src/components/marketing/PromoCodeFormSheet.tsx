@@ -64,7 +64,7 @@ export function PromoCodeFormSheet({
     control,
     formState: { errors, isSubmitting },
   } = useForm<PromoFormValues>({
-    resolver: zodResolver(promoSchema),
+    resolver: zodResolver(promoSchema as any),
     defaultValues: {
       code: "",
       type: "percentage",
