@@ -323,7 +323,10 @@ export default function OrderDetailsPage() {
                   <InfoCard
                     label={t("cards.netMargin")}
                     value={formatFinancialValue(order.financials.net_margin)}
-                    positive={order.financials.net_margin > 0}
+                    positive={
+                      typeof order.financials.net_margin === "number" &&
+                      order.financials.net_margin > 0
+                    }
                   />
                 </div>
 
