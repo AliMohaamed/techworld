@@ -65,6 +65,7 @@ export default defineSchema({
     price: v.optional(v.number()),
     slug: v.optional(v.string()),
     related_product_ids: v.optional(v.array(v.id("products"))),
+    isFeatured: v.optional(v.boolean()),
   })
     .index("by_category", ["categoryId"])
     .index("by_status", ["status"])

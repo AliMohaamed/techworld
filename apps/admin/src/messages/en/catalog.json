@@ -22,6 +22,7 @@
           "status": "Status",
           "actions": "Actions"
         },
+        "products": "Products",
         "empty": "No categories yet.",
         "loading": "Loading..."
       },
@@ -47,7 +48,7 @@
           "slug": "Slug",
           "descriptionEn": "English description",
           "descriptionAr": "Arabic description",
-          "thumbnailImageId": "Thumbnail image ID",
+          "thumbnailImageId": "Category Thumbnail",
           "isActive": "Start this category as active"
         },
         "placeholders": {
@@ -100,7 +101,6 @@
         "inactiveCategory": "Inactive category",
         "variantsCount": "{count} variants",
         "defaultSkuOnly": "Default SKU only",
-        "total": "{count} total",
         "managedViaSkus": "Managed via SKUs — use Edit"
       },
       "messages": {
@@ -141,6 +141,8 @@
           "mediaGalleryTitle": "Media Gallery",
           "mediaGalleryDescription": "Upload and assign storage images",
           "variants": "Variants",
+          "isFeatured": "Featured Product",
+          "isFeaturedDescription": "Highlight this product on the home page's featured section.",
           "skuConfig": "SKU configuration",
           "variant": "Variant {index}",
           "skus": {

@@ -570,165 +570,6 @@ export const listAdminProducts = query({
   },
 });
 
-export const createProduct = mutation({
-  args: {
-    categoryId: v.id("categories"),
-    name_ar: v.string(),
-    name_en: v.string(),
-    description_ar: v.optional(v.string()),
-    description_en: v.optional(v.string()),
-    images: v.array(v.string()),
-    selling_price: v.number(),
-    cogs: v.optional(v.number()),
-    display_stock: v.number(),
-    real_stock: v.number(),
-    status: v.optional(v.union(v.literal("DRAFT"), v.literal("PUBLISHED"))),
-    slug: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const user = await requirePermission(ctx, "MANAGE_PRODUCTS");
-
-    if (args.status === "PUBLISHED") {
-      await ensureActiveCategory(ctx, args.categoryId);
-    } else {
-      await ensureCategoryExists(ctx, args.categoryId);
-    }
-
-    const name_en = args.name_en.trim();
-    const name_ar = args.name_ar.trim();
-    const slug = slugify(args.slug?.trim() || name_en);
-
-    if (!name_en || !name_ar || !slug) {
-      throw new ConvexError({
-        code: "INVALID_PRODUCT",
-        message: "Product names and slug are required.",
-      });
-    }
-
-    const payload = {
-      categoryId: args.categoryId,
-      name_ar,
-      name_en,
-      description_ar: normalizeOptionalString(args.description_ar),
-      description_en: normalizeOptionalString(args.description_en),
-      images: args.images,
-      selling_price: sanitizeNumber(args.selling_price, "Selling price"),
-      cogs:
-        args.cogs !== undefined ? sanitizeNumber(args.cogs, "COGS") : undefined,
-      display_stock: sanitizeNumber(args.display_stock, "Display stock"),
-      real_stock: sanitizeNumber(args.real_stock, "Real stock"),
-      status: args.status ?? "DRAFT",
-      name: name_en,
-      price: args.selling_price,
-      slug,
-    };
-
-    await ensureUniqueProductSlug(ctx, slug);
-
-    const productId = await ctx.db.insert("products", payload);
-
-    await ctx.runMutation(internal.audit.logAudit, {
-      userId: user._id,
-      entityId: productId,
-      actionType: "CREATE_PRODUCT",
-      changes: payload,
-    });
-
-    return productId;
-  },
-});
-
-export const updateProduct = mutation({
-  args: {
-    id: v.id("products"),
-    categoryId: v.optional(v.id("categories")),
-    name_ar: v.optional(v.string()),
-    name_en: v.optional(v.string()),
-    description_ar: v.optional(v.string()),
-    description_en: v.optional(v.string()),
-    images: v.optional(v.array(v.string())),
-    selling_price: v.optional(v.number()),
-    cogs: v.optional(v.number()),
-    display_stock: v.optional(v.number()),
-    real_stock: v.optional(v.number()),
-    status: v.optional(v.union(v.literal("DRAFT"), v.literal("PUBLISHED"))),
-    slug: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const user = await requirePermission(ctx, "MANAGE_PRODUCTS");
-
-    if (args.real_stock !== undefined) {
-      await requirePermission(ctx, "ADJUST_REAL_STOCK");
-      sanitizeNumber(args.real_stock, "Real stock");
-    }
-
-    if (args.display_stock !== undefined) {
-      await requirePermission(ctx, "MANAGE_DISPLAY_STOCK");
-      sanitizeNumber(args.display_stock, "Display stock");
-    }
-
-    const existing = await ctx.db.get(args.id);
-    if (!existing) {
-      throw new ConvexError({ code: "PRODUCT_NOT_FOUND", message: "Product not found." });
-    }
-
-    const nextCategoryId = args.categoryId ?? existing.categoryId;
-    const nextNameEn = args.name_en?.trim() || existing.name_en;
-    const nextSlug = args.slug !== undefined ? slugify(args.slug) : existing.slug || slugify(nextNameEn);
-    const nextStatus = args.status ?? existing.status;
-
-    if (!nextNameEn || !nextSlug) {
-      throw new ConvexError({
-        code: "INVALID_PRODUCT",
-        message: "Product must keep a valid English name and slug.",
-      });
-    }
-
-    if (nextStatus === "PUBLISHED") {
-      await ensureActiveCategory(ctx, nextCategoryId);
-    } else {
-      await ensureCategoryExists(ctx, nextCategoryId);
-    }
-
-    await ensureUniqueProductSlug(ctx, nextSlug, args.id);
-
-    const patch = {
-      ...(args.categoryId !== undefined ? { categoryId: nextCategoryId } : {}),
-      ...(args.name_ar !== undefined ? { name_ar: args.name_ar.trim() } : {}),
-      ...(args.name_en !== undefined ? { name_en: nextNameEn, name: nextNameEn } : {}),
-      ...(args.description_ar !== undefined
-        ? { description_ar: normalizeOptionalString(args.description_ar) }
-        : {}),
-      ...(args.description_en !== undefined
-        ? { description_en: normalizeOptionalString(args.description_en) }
-        : {}),
-      ...(args.images !== undefined ? { images: args.images } : {}),
-      ...(args.selling_price !== undefined
-        ? {
-            selling_price: sanitizeNumber(args.selling_price, "Selling price"),
-            price: sanitizeNumber(args.selling_price, "Selling price"),
-          }
-        : {}),
-      ...(args.cogs !== undefined ? { cogs: sanitizeNumber(args.cogs, "COGS") } : {}),
-      ...(args.display_stock !== undefined ? { display_stock: args.display_stock } : {}),
-      ...(args.real_stock !== undefined ? { real_stock: args.real_stock } : {}),
-      ...(args.status !== undefined ? { status: nextStatus } : {}),
-      slug: nextSlug,
-    };
-
-    await ctx.db.patch(args.id, patch);
-
-    await ctx.runMutation(internal.audit.logAudit, {
-      userId: user._id,
-      entityId: args.id,
-      actionType: "UPDATE_PRODUCT",
-      changes: { previous: existing, updated: patch },
-    });
-
-    return { success: true };
-  },
-});
-
 export const publishProduct = mutation({
   args: { id: v.id("products") },
   handler: async (ctx, args) => {
@@ -797,6 +638,7 @@ export const getForStorefront = query({
             _id: p._id,
             name_ar: p.name_ar,
             name_en: p.name_en,
+            description_ar: p.description_ar,
             description_en: p.description_en,
             selling_price: p.selling_price,
             compareAtPrice: p.compareAtPrice,
@@ -804,6 +646,7 @@ export const getForStorefront = query({
             images: await resolveProductImages(ctx, p.images),
             categoryId: p.categoryId,
             slug: p.slug,
+            isFeatured: p.isFeatured,
             categoryName: category?.name_en || "UNKNOWN",
             skus: await resolveSkuMedia(ctx, p._id),
           };
@@ -965,6 +808,202 @@ async function replaceAdvancedProductSkus(
   }
 }
 
+export const createProduct = mutation({
+  args: {
+    categoryId: v.id("categories"),
+    name_ar: v.string(),
+    name_en: v.string(),
+    description_ar: v.optional(v.string()),
+    description_en: v.optional(v.string()),
+    images: v.array(v.string()),
+    selling_price: v.number(),
+    cogs: v.optional(v.number()),
+    display_stock: v.number(),
+    real_stock: v.number(),
+    status: v.optional(v.union(v.literal("DRAFT"), v.literal("PUBLISHED"))),
+    slug: v.optional(v.string()),
+    isFeatured: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requirePermission(ctx, "MANAGE_PRODUCTS");
+
+    if (args.status === "PUBLISHED") {
+      await ensureActiveCategory(ctx, args.categoryId);
+    } else {
+      await ensureCategoryExists(ctx, args.categoryId);
+    }
+
+    const name_en = args.name_en.trim();
+    const name_ar = args.name_ar.trim();
+    const slug = slugify(args.slug?.trim() || name_en);
+
+    if (!name_en || !name_ar || !slug) {
+      throw new ConvexError({
+        code: "INVALID_PRODUCT",
+        message: "Product names and slug are required.",
+      });
+    }
+
+    const payload = {
+      categoryId: args.categoryId,
+      name_ar,
+      name_en,
+      description_ar: normalizeOptionalString(args.description_ar),
+      description_en: normalizeOptionalString(args.description_en),
+      images: args.images,
+      selling_price: sanitizeNumber(args.selling_price, "Selling price"),
+      cogs:
+        args.cogs !== undefined ? sanitizeNumber(args.cogs, "COGS") : undefined,
+      display_stock: sanitizeNumber(args.display_stock, "Display stock"),
+      real_stock: sanitizeNumber(args.real_stock, "Real stock"),
+      status: args.status ?? "DRAFT",
+      name: name_en,
+      price: args.selling_price,
+      slug,
+      isFeatured: args.isFeatured,
+    };
+
+    await ensureUniqueProductSlug(ctx, slug);
+
+    const productId = await ctx.db.insert("products", payload);
+
+    await ctx.runMutation(internal.audit.logAudit, {
+      userId: user._id,
+      entityId: productId,
+      actionType: "CREATE_PRODUCT",
+      changes: payload,
+    });
+
+    return productId;
+  },
+});
+
+export const updateProduct = mutation({
+  args: {
+    id: v.id("products"),
+    categoryId: v.optional(v.id("categories")),
+    name_ar: v.optional(v.string()),
+    name_en: v.optional(v.string()),
+    description_ar: v.optional(v.string()),
+    description_en: v.optional(v.string()),
+    images: v.optional(v.array(v.string())),
+    selling_price: v.optional(v.number()),
+    cogs: v.optional(v.number()),
+    display_stock: v.optional(v.number()),
+    real_stock: v.optional(v.number()),
+    status: v.optional(v.union(v.literal("DRAFT"), v.literal("PUBLISHED"))),
+    slug: v.optional(v.string()),
+    isFeatured: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requirePermission(ctx, "MANAGE_PRODUCTS");
+
+    if (args.real_stock !== undefined) {
+      await requirePermission(ctx, "ADJUST_REAL_STOCK");
+      sanitizeNumber(args.real_stock, "Real stock");
+    }
+
+    if (args.display_stock !== undefined) {
+      await requirePermission(ctx, "MANAGE_DISPLAY_STOCK");
+      sanitizeNumber(args.display_stock, "Display stock");
+    }
+
+    const existing = await ctx.db.get(args.id);
+    if (!existing) {
+      throw new ConvexError({ code: "PRODUCT_NOT_FOUND", message: "Product not found." });
+    }
+
+    const nextCategoryId = args.categoryId ?? existing.categoryId;
+    const nextNameEn = args.name_en?.trim() || existing.name_en;
+    const nextSlug = args.slug !== undefined ? slugify(args.slug) : existing.slug || slugify(nextNameEn);
+    const nextStatus = args.status ?? existing.status;
+
+    if (!nextNameEn || !nextSlug) {
+      throw new ConvexError({
+        code: "INVALID_PRODUCT",
+        message: "Product must keep a valid English name and slug.",
+      });
+    }
+
+    if (nextStatus === "PUBLISHED") {
+      await ensureActiveCategory(ctx, nextCategoryId);
+    } else {
+      await ensureCategoryExists(ctx, nextCategoryId);
+    }
+
+    await ensureUniqueProductSlug(ctx, nextSlug, args.id);
+
+    const patch = {
+      ...(args.categoryId !== undefined ? { categoryId: nextCategoryId } : {}),
+      ...(args.name_ar !== undefined ? { name_ar: args.name_ar.trim() } : {}),
+      ...(args.name_en !== undefined ? { name_en: nextNameEn, name: nextNameEn } : {}),
+      ...(args.description_ar !== undefined
+        ? { description_ar: normalizeOptionalString(args.description_ar) }
+        : {}),
+      ...(args.description_en !== undefined
+        ? { description_en: normalizeOptionalString(args.description_en) }
+        : {}),
+      ...(args.images !== undefined ? { images: args.images } : {}),
+      ...(args.selling_price !== undefined
+        ? {
+            selling_price: sanitizeNumber(args.selling_price, "Selling price"),
+            price: sanitizeNumber(args.selling_price, "Selling price"),
+          }
+        : {}),
+      ...(args.cogs !== undefined ? { cogs: sanitizeNumber(args.cogs, "COGS") } : {}),
+      ...(args.display_stock !== undefined ? { display_stock: args.display_stock } : {}),
+      ...(args.real_stock !== undefined ? { real_stock: args.real_stock } : {}),
+      ...(args.status !== undefined ? { status: nextStatus } : {}),
+      ...(args.isFeatured !== undefined ? { isFeatured: args.isFeatured } : {}),
+      slug: nextSlug,
+    };
+
+    // Collect all existing storage IDs before update
+    const oldStorageIds = new Set<string>();
+    if (existing.thumbnail) oldStorageIds.add(existing.thumbnail as string);
+    existing.images?.forEach((id) => oldStorageIds.add(id as string));
+    const skus = await ctx.db
+      .query("skus")
+      .withIndex("by_product", (q) => q.eq("productId", args.id))
+      .collect();
+    skus.forEach((sku) => {
+      if (sku.linkedImageId) oldStorageIds.add(sku.linkedImageId as string);
+    });
+
+    await ctx.db.patch(args.id, patch);
+
+    // Collect all new storage IDs after update
+    const newStorageIds = new Set<string>();
+    const currentProduct = await ctx.db.get(args.id); // Refresh after patch
+    if (currentProduct?.thumbnail) newStorageIds.add(currentProduct.thumbnail as string);
+    currentProduct?.images?.forEach((id: string) => newStorageIds.add(id));
+    // Re-check SKUs (they haven't changed in this mutation but we must ensure we don't delete their images)
+    skus.forEach((sku) => {
+      if (sku.linkedImageId) newStorageIds.add(sku.linkedImageId as string);
+    });
+
+    // Delete orphaned storage IDs
+    for (const id of oldStorageIds) {
+      if (!newStorageIds.has(id)) {
+        try {
+          await ctx.storage.delete(id as Id<"_storage">);
+        } catch (error) {
+          console.error(`Failed to delete orphaned product image ${id}:`, error);
+        }
+      }
+    }
+
+    await ctx.runMutation(internal.audit.logAudit, {
+      userId: user._id,
+      entityId: args.id,
+      actionType: "UPDATE_PRODUCT",
+      changes: { previous: existing, updated: patch },
+    });
+
+    return { success: true };
+  },
+});
+
 export const createAdvancedProduct = mutation({
   args: {
     categoryId: v.id("categories"),
@@ -979,6 +1018,7 @@ export const createAdvancedProduct = mutation({
     cogs: v.optional(v.number()),
     status: v.optional(v.union(v.literal("DRAFT"), v.literal("PUBLISHED"))),
     slug: v.optional(v.string()),
+    isFeatured: v.optional(v.boolean()),
     variants: v.array(advancedVariantInputValidator),
   },
   handler: async (ctx, args) => {
@@ -1025,6 +1065,7 @@ export const createAdvancedProduct = mutation({
       name: name_en,
       price: args.selling_price,
       slug,
+      isFeatured: args.isFeatured,
       isActive: args.status === "PUBLISHED",
     };
 
@@ -1061,6 +1102,7 @@ export const updateAdvancedProduct = mutation({
     cogs: v.optional(v.number()),
     status: v.optional(v.union(v.literal("DRAFT"), v.literal("PUBLISHED"))),
     slug: v.optional(v.string()),
+    isFeatured: v.optional(v.boolean()),
     variants: v.array(advancedVariantInputValidator),
   },
   handler: async (ctx, args) => {
@@ -1113,11 +1155,43 @@ export const updateAdvancedProduct = mutation({
       name: name_en,
       price: args.selling_price,
       slug,
+      isFeatured: args.isFeatured,
       isActive: args.status === "PUBLISHED",
     };
 
+    // Collect all existing storage IDs before update
+    const oldStorageIds = new Set<string>();
+    if (existing.thumbnail) oldStorageIds.add(existing.thumbnail as string);
+    existing.images.forEach((id) => oldStorageIds.add(id as string));
+    const existingSkus = await ctx.db
+      .query("skus")
+      .withIndex("by_product", (q) => q.eq("productId", args.id))
+      .collect();
+    existingSkus.forEach((sku) => {
+      if (sku.linkedImageId) oldStorageIds.add(sku.linkedImageId as string);
+    });
+
     await ctx.db.patch(args.id, patch);
     await replaceAdvancedProductSkus(ctx, args.id, normalizedVariants, user._id);
+
+    // Collect all current storage IDs after update
+    const newStorageIds = new Set<string>();
+    if (patch.thumbnail) newStorageIds.add(patch.thumbnail as string);
+    patch.images.forEach((id) => newStorageIds.add(id as string));
+    normalizedVariants.forEach((v) => {
+      if (v.linkedImageId) newStorageIds.add(v.linkedImageId as string);
+    });
+
+    // Delete orphaned storage IDs
+    for (const id of oldStorageIds) {
+      if (!newStorageIds.has(id)) {
+        try {
+          await ctx.storage.delete(id as Id<"_storage">);
+        } catch (error) {
+          console.error(`Failed to delete orphaned product image ${id}:`, error);
+        }
+      }
+    }
 
     await ctx.runMutation(internal.audit.logAudit, {
       userId: user._id,
@@ -1129,21 +1203,5 @@ export const updateAdvancedProduct = mutation({
         variants: normalizedVariants,
       },
     });
-
-    return { success: true };
   },
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-

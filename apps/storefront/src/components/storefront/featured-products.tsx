@@ -20,6 +20,7 @@ type FeaturedProduct = {
     display_stock: number;
     isDefault?: boolean;
   }>;
+  isFeatured?: boolean;
 };
 
 interface FeaturedProductsProps {
@@ -49,7 +50,7 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {products.slice(0, 4).map((product) => (
+          {products.map((product) => (
             <FeaturedProductCard key={product._id} product={product} />
           ))}
         </div>

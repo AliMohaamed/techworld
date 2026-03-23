@@ -21,6 +21,7 @@ interface FeaturedProductCardProps {
     compareAtPrice?: number;
     display_stock?: number;
     images: string[];
+    description_ar?: string;
     description_en?: string;
     slug?: string;
     skus?: Array<{
@@ -104,10 +105,10 @@ export default function FeaturedProductCard({
           )}
         </div>
 
-        <p className="max-w-sm line-clamp-2 text-sm text-muted-foreground font-light leading-relaxed">
+        <p className="max-w-sm line-clamp-2 text-sm text-muted-foreground font-light leading-relaxed h-[2.8rem] overflow-hidden overflow-ellipsis">
           {locale === "en"
             ? product.description_en || t("placeholder")
-            : product.name_ar}
+            : product.description_ar || t("placeholder")}
         </p>
 
         <div className="w-full border-t border-border pt-4 flex items-center justify-between">

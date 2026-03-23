@@ -20,6 +20,7 @@ import {
   Shield,
   Lock,
   CheckCircle2,
+  Pencil,
 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 
@@ -29,10 +30,14 @@ export default function TeamManagementPage() {
   const staff = useQuery(api.users.listStaff);
   const me = useQuery(api.users.getMe);
   const provisionStaff = useMutation(api.users.provisionStaff);
+  const updateStaff = useMutation(api.users.updateStaff);
   const updateStaffPermissions = useMutation(api.users.updateStaffPermissions);
   const toggleStaffStatus = useMutation(api.users.toggleStaffStatus);
 
   const [isProvisioning, setIsProvisioning] = useState(false);
+  const [editingStaffId, setEditingStaffId] = useState<Id<"users"> | null>(
+    null,
+  );
   const [editingId, setEditingId] = useState<Id<"users"> | null>(null);
   const [busyId, setBusyId] = useState<Id<"users"> | null>(null);
 
@@ -57,29 +62,54 @@ export default function TeamManagementPage() {
       prev.includes(perm) ? prev.filter((p) => p !== perm) : [...prev, perm],
     );
   };
+  
+  const handleEdit = (user: any) => {
+    setFormName(user.name);
+    setFormEmail(user.email);
+    setFormPassword(""); // Don't show old password
+    setEditingStaffId(user._id);
+    setFormPermissions(user.permissions);
+    setIsProvisioning(true);
+  };
 
   const handleProvision = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formName || !formEmail || !formPassword) {
+    if (!formName || !formEmail || (!editingStaffId && !formPassword)) {
       toast.error(t("provision.messages.required"));
       return;
     }
 
     try {
-      await provisionStaff({
-        name: formName,
-        email: formEmail,
-        password: formPassword,
-        permissions: formPermissions,
-      });
-      toast.success(t("provision.messages.success"));
+      if (editingStaffId) {
+        await updateStaff({
+          userId: editingStaffId,
+          name: formName,
+          email: formEmail,
+          password: formPassword || undefined,
+        });
+        toast.success(t("edit.messages.success"));
+      } else {
+        await provisionStaff({
+          name: formName,
+          email: formEmail,
+          password: formPassword,
+          permissions: formPermissions,
+        });
+        toast.success(t("provision.messages.success"));
+      }
       setIsProvisioning(false);
+      setEditingStaffId(null);
       resetForm();
     } catch (error) {
-      toast.error(t("provision.messages.failed"), {
-        description:
-          error instanceof Error ? error.message : t("list.messages.unknown"),
-      });
+      toast.error(
+        editingStaffId
+          ? t("edit.messages.failed")
+          : t("provision.messages.failed"),
+        {
+          description:
+            error instanceof Error ? error.message : t("list.messages.unknown"),
+        },
+      );
     }
   };
 
@@ -177,13 +207,17 @@ export default function TeamManagementPage() {
             <div className="flex items-center gap-3">
               <ShieldCheck className="text-primary" size={20} />
               <h2 className="text-2xl font-black text-foreground uppercase tracking-tightest italic">
-                {t("provision.title")}
+                {editingStaffId ? t("edit.title") : t("provision.title")}
               </h2>
             </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsProvisioning(false)}
+              onClick={() => {
+                setIsProvisioning(false);
+                setEditingStaffId(null);
+                resetForm();
+              }}
               className="rounded-full h-10 w-10 p-0 hover:bg-accent hover:text-foreground"
             >
               <X className="h-5 w-5" />
@@ -223,19 +257,19 @@ export default function TeamManagementPage() {
                 />
               </div>
               <div className="space-y-3">
-                <Label
+                  <Label
                   htmlFor="staff-password"
                   className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40"
                 >
-                  {t("provision.form.password")}
+                  {editingStaffId ? t("edit.form.password") : t("provision.form.password")}
                 </Label>
                 <div className="flex gap-2">
                   <Input
                     id="staff-password"
                     className="rounded-xl bg-background border-border h-12 font-mono text-xs tracking-widest uppercase focus:border-primary/40 focus:ring-primary/10"
                     value={formPassword}
-                    readOnly
-                    placeholder={t("provision.form.passwordPlaceholder")}
+                    onChange={(e) => setFormPassword(e.target.value)}
+                    placeholder={editingStaffId ? t("edit.form.password") : t("provision.form.passwordPlaceholder")}
                     icon={
                       <Lock size={14} className="text-muted-foreground/30" />
                     }
@@ -304,12 +338,16 @@ export default function TeamManagementPage() {
                 type="submit"
                 className="h-14 px-10 rounded-2xl bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all shadow-xl font-black uppercase tracking-[0.2em] text-[10px]"
               >
-                {t("provision.form.submit")}
+                {editingStaffId ? t("edit.form.submit") : t("provision.form.submit")}
               </Button>
               <Button
                 type="button"
                 variant="ghost"
-                onClick={() => setIsProvisioning(false)}
+                onClick={() => {
+                  setIsProvisioning(false);
+                  setEditingStaffId(null);
+                  resetForm();
+                }}
                 className="h-14 px-10 rounded-2xl text-muted-foreground/40 hover:text-foreground hover:bg-accent transition-all font-black uppercase tracking-widest text-[10px]"
               >
                 {t("provision.form.cancel")}
@@ -484,6 +522,16 @@ export default function TeamManagementPage() {
                             {editingId === user._id
                               ? t("list.table.done")
                               : t("list.table.permissions")}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="rounded-xl h-10 px-6 text-[10px] font-black uppercase tracking-[0.2em] italic shadow-sm transition-all text-muted-foreground/40 hover:text-foreground hover:bg-accent"
+                            disabled={busyId === user._id || isProvisioning}
+                            onClick={() => handleEdit(user)}
+                          >
+                            <Pencil size={14} className="ltr:mr-2 rtl:ml-2" />
+                            {t("list.table.edit")}
                           </Button>
                           <Button
                             size="sm"
