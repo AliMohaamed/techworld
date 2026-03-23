@@ -1,6 +1,8 @@
 {
   "FeaturedProducts": {
+    "badge": "Special Collection",
     "title": "Selected",
-    "accentTitle": "For You"
+    "accentTitle": "For You",
+    "description": "Our handpicked selection of premium devices and smart gear."
   }
 }

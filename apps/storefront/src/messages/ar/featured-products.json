@@ -1,6 +1,8 @@
 {
   "FeaturedProducts": {
+    "badge": "مجموعة خاصة",
     "title": "مختارات",
-    "accentTitle": "لك"
+    "accentTitle": "لك",
+    "description": "تشكيلتنا المختارة بعناية من الأجهزة المتميزة والأدوات الذكية."
   }
 }
