@@ -14,7 +14,7 @@
     "dev:backend": "npm run dev --workspace @techworld/backend",
     "build": "npx turbo run build",
     "lint": "npx turbo run lint",
-    "generate": "convex dev --once"
+    "generate": "npx turbo run codegen"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

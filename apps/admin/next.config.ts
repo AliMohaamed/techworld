@@ -5,7 +5,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 const nextConfig: NextConfig = {
   typedRoutes: true,
-  transpilePackages: ["@techworld/ui"],
+  transpilePackages: ["@techworld/ui", "@techworld/backend"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "clean-heron-293.convex.cloud", pathname: "/**" },
