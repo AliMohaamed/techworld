@@ -117,7 +117,9 @@
         "activated": "Governorate activated.",
         "deactivated": "Governorate deactivated.",
         "updateFailed": "Governorate update failed.",
-        "statusFailed": "Status update failed."
+        "statusFailed": "Status update failed.",
+        "infoTitle": "Regional Operations",
+        "infoDescription": "Governorate-based logistics are central to the commerce engine. Ensure all pricing and activation states are verified before going live."
       }
     }
   }

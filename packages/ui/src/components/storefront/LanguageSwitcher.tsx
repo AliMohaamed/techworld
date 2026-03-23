@@ -88,7 +88,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
     <div className={`relative ${className}`} ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="group flex items-center gap-2 rounded-2xl border border-white/5 px-4 py-2 text-sm font-medium text-zinc-400 transition-all hover:border-[#ffc105]/30 hover:text-white focus:outline-none"
+        className="group flex items-center gap-2 rounded-2xl border border-white/5 px-4 py-2 text-sm font-medium text-zinc-400 transition-all hover:border-[#ffc105]/30 hover:text-black dark:hover:text-white focus:outline-none"
       >
         <span className="text-base leading-none">{currentLang.flag}</span>
         <span className="tracking-wider">{currentLang.shortLabel}</span>
@@ -104,7 +104,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
               className={`flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all ${
                 locale === lang.code
                   ? "bg-[#ffc105]/10 text-[#ffc105]"
-                  : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                  : "text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white"
               }`}
             >
               <span className="text-base leading-none">{lang.flag}</span>
