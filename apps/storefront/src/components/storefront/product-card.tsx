@@ -16,6 +16,7 @@ interface ProductCardProps {
     _id: Id<"products">;
     name_ar: string;
     name_en: string;
+    description_ar?: string;
     description_en?: string;
     selling_price: number;
     compareAtPrice?: number;
@@ -110,10 +111,10 @@ export default function ProductCard({ product }: ProductCardProps) {
           {locale === "en" ? product.name_en : product.name_ar}
         </h3>
 
-        <p className="mb-6 line-clamp-2 text-sm leading-relaxed text-muted-foreground font-light">
+        <p className="mb-6 line-clamp-2 text-sm leading-relaxed text-muted-foreground font-light h-[2.8rem] overflow-hidden overflow-ellipsis">
           {locale === "en"
             ? product.description_en || t("placeholder")
-            : product.name_ar}
+            : product.description_ar || t("placeholder")}
         </p>
 
         <div className="mt-auto flex items-center gap-4">

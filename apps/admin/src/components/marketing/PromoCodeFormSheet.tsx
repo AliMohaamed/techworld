@@ -159,7 +159,7 @@ export function PromoCodeFormSheet({
 
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex-1 overflow-y-auto p-10 space-y-8 relative z-10 scrollbar-hide"
+            className="flex-1 overflow-y-auto p-10 space-y-8 relative z-10"
           >
             <div className="space-y-6 rounded-[32px] border border-border bg-card p-8   group transition-all hover:border-[#ffc105]/20">
               <div className="space-y-3">

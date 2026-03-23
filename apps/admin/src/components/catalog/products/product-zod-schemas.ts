@@ -44,6 +44,7 @@ export const productSchema = z.object({
   thumbnail: z.string().optional(),
   images: z.array(z.string()).default([]),
   status: z.union([z.literal("DRAFT"), z.literal("PUBLISHED")]),
+  isFeatured: z.boolean().default(false),
   variants: z.array(variantSchema).min(1, "At least one variant is required."),
 }).superRefine((value, ctx) => {
   if (

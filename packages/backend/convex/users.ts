@@ -5,6 +5,102 @@ import { internal } from "./_generated/api";
 import { createAuth } from "./auth";
 import { permissionValidators, permissionValues } from "./lib/permissions";
 
+export const updateStaff = mutation({
+  args: {
+    userId: v.id("users"),
+    name: v.optional(v.string()),
+    email: v.optional(v.string()),
+    password: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const actor = await requirePermission(ctx, "MANAGE_USERS");
+
+    const user = await ctx.db.get(args.userId);
+    if (!user) {
+      throw new ConvexError({
+        code: "USER_NOT_FOUND",
+        message: "Staff record not found",
+      });
+    }
+
+    const auth = createAuth(ctx);
+    const authContext = await auth.$context;
+
+    const updates: any = {};
+    const authUpdates: any = {};
+
+    if (args.name !== undefined) {
+      const normalizedName = args.name.trim();
+      updates.name = normalizedName;
+      authUpdates.name = normalizedName;
+    }
+
+    if (args.email !== undefined) {
+      const normalizedEmail = args.email.trim().toLowerCase();
+      // Check if email is already taken by another user
+      const existingUser = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", normalizedEmail))
+        .unique();
+
+      if (existingUser && existingUser._id !== args.userId) {
+        throw new ConvexError({
+          code: "EMAIL_TAKEN",
+          message: "Email is already in use by another staff member.",
+        });
+      }
+
+      updates.email = normalizedEmail;
+      authUpdates.email = normalizedEmail;
+    }
+
+    // Update Convex record
+    if (Object.keys(updates).length > 0) {
+      await ctx.db.patch(args.userId, updates);
+    }
+
+    // Update Auth system if identifier exists
+    if (user.identifier) {
+      if (Object.keys(authUpdates).length > 0) {
+        await authContext.internalAdapter.updateUser(
+          user.identifier,
+          authUpdates,
+        );
+      }
+
+      if (args.password) {
+        const passwordHash = await authContext.password.hash(args.password);
+        // Find the credential account for this user
+        const accounts = await authContext.internalAdapter.findAccounts(
+          user.identifier,
+        );
+        const credentialAccount = accounts.find(
+          (a) => a.providerId === "credential",
+        );
+
+        if (credentialAccount) {
+          await authContext.internalAdapter.updateAccount(
+            credentialAccount.id,
+            {
+              password: passwordHash,
+              accountId: updates.email ?? user.email, // Keep accountId in sync with email
+            },
+          );
+        }
+      }
+    }
+
+    await ctx.scheduler.runAfter(0, internal.audit.logAudit, {
+      userId: actor._id,
+      entityId: args.userId,
+      actionType: "STAFF_UPDATED",
+      changes: { updates, passwordChanged: !!args.password },
+    });
+
+    return { success: true };
+  },
+});
+
 export const createInitialAdmin = mutation({
   args: {
     name: v.string(),
@@ -68,6 +164,109 @@ export const createInitialAdmin = mutation({
       email: normalizedEmail,
       permissions: permissionValues,
       userId: staffUserId,
+    };
+  },
+});
+
+/**
+ * Robust Bootstrap Mutation
+ * Creates or updates the admin account with full permissions, regardless of existing users.
+ * This is used for initial setup or recovery in production.
+ */
+export const bootstrapAdmin = mutation({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    password: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const auth = createAuth(ctx);
+    const authContext = await auth.$context;
+    const normalizedEmail = args.email.trim().toLowerCase();
+    const normalizedName = args.name.trim();
+
+    // 1. Check if ANY user record already exists in the 'users' table
+    let staffUser = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", normalizedEmail))
+      .unique();
+
+    // 2. Auth System Registration / Lookup
+    let authUserResult = await authContext.internalAdapter.findUserByEmail(
+      normalizedEmail,
+      { includeAccounts: true }
+    );
+
+    const passwordHash = await authContext.password.hash(args.password);
+    let authUserId: string;
+
+    if (!authUserResult) {
+      // Create new auth user
+      const newAuthUser = await authContext.internalAdapter.createUser({
+        email: normalizedEmail,
+        emailVerified: true,
+        name: normalizedName,
+      });
+      authUserId = newAuthUser.id;
+
+      await authContext.internalAdapter.createAccount({
+        accountId: normalizedEmail,
+        password: passwordHash,
+        providerId: "credential",
+        userId: authUserId,
+      });
+    } else {
+      authUserId = authUserResult.user.id;
+      // Update existing auth user's password
+      const accounts = authUserResult.accounts;
+      const credentialAccount = accounts.find((a) => a.providerId === "credential");
+
+      if (credentialAccount) {
+        await authContext.internalAdapter.updateAccount(credentialAccount.id, {
+          password: passwordHash,
+          accountId: normalizedEmail,
+        });
+      } else {
+        await authContext.internalAdapter.createAccount({
+          accountId: normalizedEmail,
+          password: passwordHash,
+          providerId: "credential",
+          userId: authUserId,
+        });
+      }
+    }
+
+    // 3. Convex User Record (Syncing ID if needed)
+    if (staffUser) {
+      await ctx.db.patch(staffUser._id, {
+        name: normalizedName,
+        identifier: authUserId,
+        permissions: [...permissionValues],
+        isActive: true,
+      });
+    } else {
+      const newId = await ctx.db.insert("users", {
+        name: normalizedName,
+        email: normalizedEmail,
+        identifier: authUserId,
+        permissions: [...permissionValues],
+        isActive: true,
+      });
+      staffUser = (await ctx.db.get(newId))!;
+    }
+
+    // 4. Audit Log
+    await ctx.scheduler.runAfter(0, internal.audit.logAudit, {
+      userId: staffUser._id,
+      entityId: String(staffUser._id),
+      actionType: "ADMIN_BOOTSTRAP_FORCE",
+      changes: { email: normalizedEmail, permissions: permissionValues },
+    });
+
+    return {
+      success: true,
+      userId: staffUser._id,
+      email: normalizedEmail,
     };
   },
 });
@@ -186,6 +385,8 @@ export const updateStaffPermissions = mutation({
     return { success: true };
   },
 });
+
+
 
 export const toggleStaffStatus = mutation({
   args: { userId: v.id("users") },

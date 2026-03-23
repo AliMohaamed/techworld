@@ -166,6 +166,16 @@ export const updateCategory = mutation({
 
     await ensureUniqueCategorySlug(ctx, nextSlug, id);
 
+    const nextThumbnail = normalizeOptionalString(changes.thumbnailImageId);
+
+    if (nextThumbnail !== undefined && previous.thumbnailImageId && previous.thumbnailImageId !== nextThumbnail) {
+      try {
+        await ctx.storage.delete(previous.thumbnailImageId as Id<"_storage">);
+      } catch (error) {
+        console.error("Failed to delete orphaned category image:", error);
+      }
+    }
+
     const patch = {
       ...(changes.name_ar !== undefined ? { name_ar: changes.name_ar.trim() } : {}),
       ...(changes.name_en !== undefined ? { name_en: nextNameEn } : {}),
@@ -176,7 +186,7 @@ export const updateCategory = mutation({
         ? { description_en: normalizeOptionalString(changes.description_en) }
         : {}),
       ...(changes.thumbnailImageId !== undefined
-        ? { thumbnailImageId: normalizeOptionalString(changes.thumbnailImageId) }
+        ? { thumbnailImageId: nextThumbnail }
         : {}),
       slug: nextSlug,
     };

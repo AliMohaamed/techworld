@@ -25,6 +25,17 @@
         "failed": "فشلت عملية الإضافة"
       }
     },
+    "edit": {
+      "title": "تعديل حساب موظف",
+      "form": {
+        "password": "كلمة مرور جديدة (اتركها فارغة للإبقاء على الحالية)",
+        "submit": "حفظ التغييرات"
+      },
+      "messages": {
+        "success": "تم تحديث بيانات الموظف بنجاح.",
+        "failed": "فشل التحديث"
+      }
+    },
     "list": {
       "badge": "قائمة الموظفين",
       "title": "أعضاء الفريق النشطين",
@@ -41,7 +52,8 @@
         "active": "نشط",
         "deactivated": "معطل",
         "done": "تم",
-        "permissions": "الأذونات"
+        "permissions": "الأذونات",
+        "edit": "تعديل"
       },
       "messages": {
         "permUpdated": "تم تحديث الأذونات.",
@@ -53,13 +65,20 @@
       }
     },
     "permissions": {
-      "VIEW_DASHBOARD": "عرض لوحة التحكم",
       "VIEW_ORDERS": "عرض الطلبات",
-      "MANAGE_CATALOG": "إدارة الكتالوج",
-      "MANAGE_MARKETING": "إدارة التسويق",
-      "MANAGE_TEAM": "إدارة الفريق",
-      "MANAGE_SETTINGS": "إدارة الإعدادات",
-      "VIEW_AUDIT_LOGS": "عرض سجلات التدقيق"
+      "VERIFY_PAYMENTS": "التحقق من المدفوعات",
+      "MANAGE_SHIPPING_STATUS": "إدارة حالة الشحن",
+      "PROCESS_RETURNS": "معالجة المرتجعات",
+      "MANAGE_PRODUCTS": "إدارة المنتجات",
+      "ADJUST_REAL_STOCK": "تعديل المخزون الحقيقي",
+      "MANAGE_DISPLAY_STOCK": "إدارة مخزون العرض",
+      "MANAGE_CATEGORIES": "إدارة الفئات",
+      "VIEW_FINANCIALS": "عرض البيانات المالية",
+      "MANAGE_SYSTEM_CONFIG": "إدارة إعدادات النظام",
+      "RESOLVE_FRAUD": "حل مشاكل الاحتيال",
+      "VIEW_ANALYTICS": "عرض التحليلات",
+      "VIEW_AUDIT_LOGS": "عرض سجلات التدقيق",
+      "MANAGE_USERS": "إدارة المستخدمين"
     }
   }
 }

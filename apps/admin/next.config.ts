@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "clean-heron-293.convex.cloud", pathname: "/**" },
+      { protocol: "https", hostname: "usable-wren-18.convex.cloud", pathname: "/**" },
     ],
   },
 };

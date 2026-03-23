@@ -24,7 +24,7 @@ export default function StorefrontHomePage() {
       
       <Suspense fallback={<div className="container mx-auto py-24 px-8"><Skeleton className="h-[600px] w-full rounded-[32px] bg-muted/20" /></div>}>
         {products && (
-          <FeaturedProducts products={products as any} />
+          <FeaturedProducts products={(products as any).filter((p: any) => p.isFeatured).slice(0, 4)} />
         )}
       </Suspense>
     </div>

@@ -32,6 +32,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
+  Switch,
 } from "@techworld/ui";
 import { ConvexStorageUpload } from "./ConvexStorageUpload";
 import {
@@ -60,6 +61,7 @@ type ProductRecord = {
   status: "DRAFT" | "PUBLISHED";
   thumbnail?: string;
   images: string[];
+  isFeatured?: boolean;
   skus?: Array<{
     _id: Id<"skus">;
     variantName: string;
@@ -99,6 +101,7 @@ const emptyValues: ProductFormValues = {
   thumbnail: "",
   images: [],
   status: "DRAFT",
+  isFeatured: false,
   variants: [emptyVariant],
 };
 
@@ -196,6 +199,7 @@ export function ProductFormSheet({
       thumbnail: product.thumbnail ?? product.images[0] ?? "",
       images: product.images,
       status: product.status,
+      isFeatured: product.isFeatured ?? false,
       variants:
         product.skus && product.skus.length > 0
           ? product.skus.map((sku, index) => ({
@@ -240,9 +244,9 @@ export function ProductFormSheet({
     <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <SheetContent
         side="right"
-        className="sm:max-w-5xl overflow-y-auto p-0 border-l border-border bg-background transition-all"
+        className="sm:max-w-5xl p-0 border-l border-border bg-background transition-all"
       >
-        <div className="flex h-full flex-col relative">
+        <div className="flex h-full flex-col relative overflow-hidden">
           {/* Decorative background for light mode */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#ffc105]/5 to-transparent dark:hidden pointer-events-none" />
 
@@ -263,7 +267,7 @@ export function ProductFormSheet({
           </SheetHeader>
 
           <form
-            className="p-10 space-y-12 pb-32 relative z-10 scrollbar-hide"
+            className="flex-1 overflow-y-auto p-10 space-y-12 pb-32 relative z-10"
             onSubmit={(event) => void submit(event)}
           >
             {/* Core Info Section */}
@@ -322,6 +326,26 @@ export function ProductFormSheet({
                     <input type="hidden" {...register("status")} />
                   </div>
                 </Field>
+                <div className="flex items-center justify-between p-6 rounded-2xl border border-[#ffc105]/20 bg-[#ffc105]/5 md:col-span-2">
+                  <div className="space-y-1">
+                    <Label className="text-[11px] font-black uppercase tracking-widest text-foreground">
+                      {t("form.fields.isFeatured")}
+                    </Label>
+                    <p className="text-[10px] text-muted-foreground/60 font-medium leading-relaxed">
+                      {t("form.fields.isFeaturedDescription")}
+                    </p>
+                  </div>
+                  <Controller
+                    control={control}
+                    name="isFeatured"
+                    render={({ field }) => (
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
+                  />
+                </div>
                 <Field
                   label={t("form.fields.nameEn")}
                   error={errors.name_en?.message}
@@ -737,6 +761,7 @@ function buildPayload(values: ProductFormSubmitValues) {
     thumbnail: values.thumbnail || values.images[0],
     images: values.images,
     status: values.status,
+    isFeatured: values.isFeatured,
     variants: values.variants.map((variant, index) => ({
       id: variant.id as Id<"skus"> | undefined,
       variantName: variant.variantName,

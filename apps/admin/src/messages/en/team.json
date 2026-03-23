@@ -25,6 +25,17 @@
         "failed": "Provisioning failed"
       }
     },
+    "edit": {
+      "title": "Edit Staff Account",
+      "form": {
+        "password": "New Password (Leave blank to keep current)",
+        "submit": "Save Changes"
+      },
+      "messages": {
+        "success": "Staff updated successfully.",
+        "failed": "Update failed"
+      }
+    },
     "list": {
       "badge": "Staff List",
       "title": "Active Team Members",
@@ -41,7 +52,8 @@
         "active": "Active",
         "deactivated": "Deactivated",
         "done": "Done",
-        "permissions": "Permissions"
+        "permissions": "Permissions",
+        "edit": "Edit"
       },
       "messages": {
         "permUpdated": "Permissions updated.",
@@ -53,13 +65,20 @@
       }
     },
     "permissions": {
-      "VIEW_DASHBOARD": "View Dashboard",
       "VIEW_ORDERS": "View Orders",
-      "MANAGE_CATALOG": "Manage Catalog",
-      "MANAGE_MARKETING": "Manage Marketing",
-      "MANAGE_TEAM": "Manage Team",
-      "MANAGE_SETTINGS": "Manage Settings",
-      "VIEW_AUDIT_LOGS": "View Audit Logs"
+      "VERIFY_PAYMENTS": "Verify Payments",
+      "MANAGE_SHIPPING_STATUS": "Manage Shipping Status",
+      "PROCESS_RETURNS": "Process Returns",
+      "MANAGE_PRODUCTS": "Manage Products",
+      "ADJUST_REAL_STOCK": "Adjust Real Stock",
+      "MANAGE_DISPLAY_STOCK": "Manage Display Stock",
+      "MANAGE_CATEGORIES": "Manage Categories",
+      "VIEW_FINANCIALS": "View Financials",
+      "MANAGE_SYSTEM_CONFIG": "Manage System Config",
+      "RESOLVE_FRAUD": "Resolve Fraud",
+      "VIEW_ANALYTICS": "View Analytics",
+      "VIEW_AUDIT_LOGS": "View Audit Logs",
+      "MANAGE_USERS": "Manage Users"
     }
   }
 }

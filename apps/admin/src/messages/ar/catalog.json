@@ -22,6 +22,7 @@
           "status": "الحالة",
           "actions": "الإجراءات"
         },
+        "products": "منتجات",
         "empty": "لا توجد أقسام بعد.",
         "loading": "جار التحميل..."
       },
@@ -47,7 +48,7 @@
           "slug": "الاسم اللطيف (Slug)",
           "descriptionEn": "الوصف (الإنجليزية)",
           "descriptionAr": "الوصف (العربية)",
-          "thumbnailImageId": "معرف الصورة المصغرة",
+          "thumbnailImageId": "صورة القسم",
           "isActive": "تفعيل هذا القسم عند الإنشاء"
         },
         "placeholders": {
@@ -56,7 +57,7 @@
           "slug": "mobile-accessories",
           "descriptionEn": "صف القسم باللغة الإنجليزية...",
           "descriptionAr": "صف القسم باللغة العربية...",
-          "thumbnailImageId": "أدخل معرف الصورة أو ارفعها عبر التخزين"
+          "thumbnailImageId": "ارفع صورة القسم أو اخترها من التخزين"
         },
         "buttons": {
           "create": "إنشاء القسم",
@@ -100,7 +101,6 @@
         "inactiveCategory": "قسم غير نشط",
         "variantsCount": "{count} متغيرات",
         "defaultSkuOnly": "وحدة SKU الافتراضية فقط",
-        "total": "الإجمالي {count}",
         "managedViaSkus": "تتم الإدارة عبر SKUs - استخدم التعديل"
       },
       "messages": {
@@ -141,6 +141,8 @@
           "mediaGalleryTitle": "معرض الوسائط",
           "mediaGalleryDescription": "ارفع وخصص صور التخزين",
           "variants": "المتغيرات",
+          "isFeatured": "منتج مميز",
+          "isFeaturedDescription": "تمييز هذا المنتج في قسم العروض المميزة على الصفحة الرئيسية.",
           "skuConfig": "تكوين SKU",
           "variant": "المتغير {index}",
           "skus": {

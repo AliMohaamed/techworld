@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import { useMutation } from "convex/react";
 import { toast } from "sonner";
-import { Sparkles, Layers, Info, CheckCircle2 } from "lucide-react";
+import {
+  Sparkles,
+  Layers,
+  Info,
+  CheckCircle2,
+  Image as ImageIcon,
+} from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import {
   Button,
@@ -19,6 +25,7 @@ import {
   cn,
 } from "@techworld/ui";
 import { useTranslations } from "next-intl";
+import { ConvexStorageUpload } from "../products/ConvexStorageUpload";
 
 type CategoryFormState = {
   name_en: string;
@@ -127,7 +134,7 @@ export function CategoryFormSheet({
     <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <SheetContent
         side="right"
-        className="sm:max-w-xl overflow-y-auto p-0 border-l border-border bg-background transition-all"
+        className="sm:max-w-xl p-0 border-l border-border bg-background transition-all"
       >
         <div className="flex h-full flex-col relative overflow-hidden">
           {/* Decorative background for light mode */}
@@ -150,7 +157,7 @@ export function CategoryFormSheet({
           </SheetHeader>
 
           <form
-            className="p-10 space-y-10 pb-32 relative z-10 scrollbar-hide"
+            className="flex-1 overflow-y-auto p-10 space-y-10 pb-32 relative z-10"
             onSubmit={submit}
           >
             <div className="space-y-8 rounded-[40px] border border-border bg-card p-8   group transition-all hover:border-[#ffc105]/10">
@@ -261,24 +268,21 @@ export function CategoryFormSheet({
                 />
               </div>
 
-              <div className="space-y-3">
-                <Label
-                  htmlFor="thumbnailImageId"
-                  className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40"
-                >
-                  {t("form.fields.thumbnailImageId")}
-                </Label>
-                <Input
-                  id="thumbnailImageId"
-                  value={form.thumbnailImageId}
-                  onChange={(event) =>
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <ImageIcon size={18} className="text-[#ffc105]/60" />
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
+                    {t("form.fields.thumbnailImageId")}
+                  </h3>
+                </div>
+                <ConvexStorageUpload
+                  imageIds={form.thumbnailImageId ? [form.thumbnailImageId] : []}
+                  onChange={(nextImages) => {
                     setForm((current) => ({
                       ...current,
-                      thumbnailImageId: event.target.value,
-                    }))
-                  }
-                  placeholder={t("form.placeholders.thumbnailImageId")}
-                  className="rounded-xl border-border bg-background h-11 font-mono text-[10px] tracking-tightest uppercase"
+                      thumbnailImageId: nextImages[0] || "",
+                    }));
+                  }}
                 />
               </div>
 

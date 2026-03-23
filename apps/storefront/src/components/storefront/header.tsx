@@ -23,7 +23,7 @@ export default function Header() {
     cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 
   const navItems = [
-    { key: "shop", href: "/" },
+    { key: "shop", href: "/products" },
     { key: "categories", href: "/categories" },
     { key: "deals", href: "/deals" },
     { key: "support", href: "/support" },
@@ -95,31 +95,49 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <nav className="lg:hidden fixed inset-0 top-24 bg-background/95 backdrop-blur-3xl border-t border-border p-8 flex flex-col space-y-4 z-[60] animate-in slide-in-from-top-4 duration-300">
-            {navItems.map((item) => (
-              <Link
-                key={item.key}
-                href={item.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className=" text-2xl font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-[#ffc105] transition-all py-6 border-b border-border flex items-center justify-between group"
-              >
-                <span className="group-hover:translate-x-4 transition-transform ltr:group-hover:translate-x-4 rtl:group-hover:-translate-x-4">
-                  {t(`nav.${item.key}`)}
-                </span>
-                <ChevronRight
-                  size={24}
-                  className={locale === "ar" ? "rotate-180" : ""}
-                />
-              </Link>
-            ))}
-
-            {/* Theme & Language switchers at the bottom of mobile menu */}
-            <div className="pt-8 mt-auto flex flex-col gap-4">
-              <div className="flex justify-center">
-                <ThemeToggle />
-              </div>
-              <LanguageSwitcher className="w-full justify-center py-5 text-base" />
+          <nav className="lg:hidden absolute left-0 top-24 w-full min-h-[calc(100vh-96px)] bg-black/95 backdrop-blur-xl border-t border-white/5 p-8 flex flex-col shadow-2xl z-[60] animate-in slide-in-from-top-4 duration-300">
+            <div className="flex flex-col space-y-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.key}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-2xl font-black uppercase tracking-[0.3em] text-white/70 hover:text-[#ffc105] transition-all py-6 border-b border-white/5 flex items-center justify-between group"
+                >
+                  <span className="group-hover:translate-x-4 transition-transform ltr:group-hover:translate-x-4 rtl:group-hover:-translate-x-4 font-space-grotesk">
+                    {t(`nav.${item.key}`)}
+                  </span>
+                  <ChevronRight
+                    size={24}
+                    className={locale === "ar" ? "rotate-180 text-[#ffc105]" : "text-[#ffc105]"}
+                  />
+                </Link>
+              ))}
             </div>
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex-1">                <div className="flex items-center gap-3 text-white">
+                <ThemeToggle />
+                {/* <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t("theme") || "Mode"}</span> */}
+              </div>
+              </div>
+              <div className="flex-1 flex flex-col items-end">                 
+                <div className="flex items-center gap-3 ">
+                {/* <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t("language") || "Language"}</span> */}
+                <LanguageSwitcher />
+              </div>
+              </div>
+            </div>
+
+            <div className="pt-8 mt-auto">
+              <Link
+                href="/"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-center w-full py-6 rounded-3xl bg-[#ffc105] text-black text-xl font-black uppercase tracking-[0.3em] shadow-[0_0_50px_rgba(255,193,5,0.15)] active:scale-95 transition-all"
+              >
+                {t("nav.shopNow")}
+              </Link>
+            </div>
+
           </nav>
         )}
       </header>
