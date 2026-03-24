@@ -4,6 +4,31 @@
       "badge": "Order Management",
       "title": "Orders Pipeline",
       "description": "Operations agents can inspect all orders, handle verifications, process transitions, and track fulfillment without leaving the admin workspace.",
+      "stats": {
+        "totalOrders": "Total Orders",
+        "totalRevenue": "Total Revenue",
+        "totalProducts": "Products Sold",
+        "deliveryRate": "Delivery Rate",
+        "egp": "EGP"
+      },
+      "filters": {
+        "ALL": "All Orders",
+        "advanced": {
+          "title": "Advanced Filters",
+          "search": "Search name, phone, or code...",
+          "date": {
+            "label": "Time Period",
+            "TODAY": "Today",
+            "LAST_7_DAYS": "Last 7 Days",
+            "LAST_30_DAYS": "Last 30 Days",
+            "LAST_90_DAYS": "Last 90 Days",
+            "ALL_TIME": "All Time"
+          },
+          "product": "Product",
+          "category": "Category",
+          "clear": "Clear All"
+        }
+      },
       "table": {
         "title": "Pending Orders",
         "total": "{count} total",

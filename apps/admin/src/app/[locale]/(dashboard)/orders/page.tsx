@@ -3,12 +3,16 @@
 import { useState } from "react";
 import { Link } from "@/navigation";
 import { useQuery, useMutation } from "convex/react";
-import { ArrowRight, ShieldAlert, ShoppingCart, Loader2, ChevronDown } from "lucide-react";
+import { 
+  ArrowRight, ShieldAlert, ShoppingCart, Loader2, 
+  Search, Calendar, Filter, X, Package, Layers, 
+  TrendingUp, DollarSign, Box, CheckCircle2 
+} from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import { Id } from "@backend/convex/_generated/dataModel";
 import { Button } from "@techworld/ui/button";
 import { useTranslations, useLocale } from "next-intl";
-import { cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@techworld/ui";
+import { cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input } from "@techworld/ui";
 import { toast } from "sonner";
 
 type OrderState = 
@@ -24,6 +28,8 @@ type OrderState =
   | "FLAGGED_FRAUD";
 
 type FilterType = "ALL" | OrderState;
+
+type DateRangePreset = "TODAY" | "LAST_7_DAYS" | "LAST_30_DAYS" | "LAST_90_DAYS" | "ALL_TIME";
 
 export default function OrdersPage() {
   const tQueue = useTranslations("Orders.queue");
@@ -45,15 +51,70 @@ export default function OrdersPage() {
     api.orders.listAllOrders,
     profile && canViewOrders ? {} : "skip",
   );
+
+  const products = useQuery(api.products.listAdminProducts, profile && canViewOrders ? {} : "skip");
+  const categories = useQuery(api.categories.listAll, profile && canViewOrders ? {} : "skip");
   
   const updateGenericStatus = useMutation(api.orders.updateGenericStatus);
-  const updateOrderStatus = useMutation(api.orders.updateGenericStatus);
   
   const [filter, setFilter] = useState<FilterType>("ALL");
   const [updatingId, setUpdatingId] = useState<Id<"orders"> | null>(null);
 
-  const visibleOrders = orders ? orders.filter(o => filter === "ALL" || o.state === filter) : [];
-  
+  // Advanced filters state
+  const [search, setSearch] = useState("");
+  const [dateRange, setDateRange] = useState<DateRangePreset>("ALL_TIME");
+  const [selectedProductId, setSelectedProductId] = useState<string>("ALL");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("ALL");
+  const [isFilterBarOpen, setIsFilterBarOpen] = useState(false);
+
+  const filterByDate = (orderTime: number, preset: DateRangePreset) => {
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
+    switch (preset) {
+      case "TODAY":
+        return new Date(orderTime).toDateString() === new Date(now).toDateString();
+      case "LAST_7_DAYS":
+        return orderTime >= now - 7 * dayMs;
+      case "LAST_30_DAYS":
+        return orderTime >= now - 30 * dayMs;
+      case "LAST_90_DAYS":
+        return orderTime >= now - 90 * dayMs;
+      default:
+        return true;
+    }
+  };
+
+  const visibleOrders = orders ? orders.filter(o => {
+    const matchesStatus = filter === "ALL" || o.state === filter;
+    const matchesSearch = !search || 
+      o.customerName?.toLowerCase().includes(search.toLowerCase()) || 
+      o.customerPhone?.includes(search) || 
+      o.shortCode?.toLowerCase().includes(search.toLowerCase());
+    const matchesDate = filterByDate(o._creationTime, dateRange);
+    const matchesProduct = selectedProductId === "ALL" || o.productId === selectedProductId;
+    const matchesCategory = selectedCategoryId === "ALL" || o.product?.categoryId === selectedCategoryId;
+
+    return matchesStatus && matchesSearch && matchesDate && matchesProduct && matchesCategory;
+  }) : [];
+
+  // Stats calculation
+  const stats = {
+    totalOrders: visibleOrders.length,
+    totalRevenue: visibleOrders.reduce((acc, o) => acc + o.total_price + (o.appliedShippingFee || 0), 0),
+    totalProducts: visibleOrders.reduce((acc, o) => acc + o.quantity, 0),
+    deliveryRate: visibleOrders.length > 0 
+      ? Math.round((visibleOrders.filter(o => o.state === "DELIVERED").length / visibleOrders.length) * 100) 
+      : 0
+  };
+
+  const handleClearFilters = () => {
+    setSearch("");
+    setDateRange("ALL_TIME");
+    setSelectedProductId("ALL");
+    setSelectedCategoryId("ALL");
+    setFilter("ALL");
+  };
+
   const handleStatusChange = async (orderId: Id<"orders">, currentState: OrderState, newState: OrderState) => {
     if (currentState === newState) return;
     
@@ -89,26 +150,168 @@ export default function OrdersPage() {
 
   return (
     <main className="space-y-8 pb-10">
-      <section className="relative overflow-hidden rounded-[40px] border border-border bg-card px-10 py-12">
+      {/* Stats Overview */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: tQueue("stats.totalOrders"), value: stats.totalOrders.toLocaleString(locale), icon: Box, color: "text-blue-500", bg: "bg-blue-500/10" },
+          { label: tQueue("stats.totalRevenue"), value: `${stats.totalRevenue.toLocaleString(locale)} ${tQueue("stats.egp")}`, icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+          { label: tQueue("stats.totalProducts"), value: stats.totalProducts.toLocaleString(locale), icon: Package, color: "text-[#ffc105]", bg: "bg-[#ffc105]/10" },
+          { label: tQueue("stats.deliveryRate"), value: `${stats.deliveryRate}%`, icon: CheckCircle2, color: "text-purple-500", bg: "bg-purple-500/10" },
+        ].map((stat, i) => (
+          <div key={i} className="bg-card border border-border rounded-[32px] p-6 flex items-center gap-4 transition-all hover:border-[#ffc105]/20 hover:shadow-lg group">
+            <div className={cn("p-4 rounded-2xl transition-transform group-hover:scale-110", stat.bg)}>
+              <stat.icon className={stat.color} size={24} />
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 mb-1">{stat.label}</p>
+              <p className="text-2xl font-black tracking-tightest text-foreground">{stat.value}</p>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section className="relative overflow-hidden rounded-[40px] border border-border bg-card px-10 py-12 transition-all hover:shadow-2xl">
         <div className="absolute inset-0 bg-gradient-to-br from-[#ffc105]/5 to-transparent dark:hidden pointer-events-none" />
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#ffc105]/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <ShoppingCart className="text-[#ffc105]" size={20} />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
-                {tQueue("badge")}
+        <div className="relative z-10 flex flex-col gap-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <ShoppingCart className="text-[#ffc105]" size={20} />
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
+                  {tQueue("badge")}
+                </p>
+              </div>
+              <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight">
+                {tQueue("title")}
+              </h1>
+              <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground/60">
+                {tQueue("description")}
               </p>
             </div>
-            <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight">
-              {tQueue("title")}
-            </h1>
-            <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground/60">
-              {tQueue("description")}
-            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setIsFilterBarOpen(!isFilterBarOpen)}
+                className={cn(
+                  "rounded-2xl h-12 px-6 text-[10px] font-black uppercase tracking-widest transition-all",
+                  isFilterBarOpen || search || dateRange !== "ALL_TIME" || selectedProductId !== "ALL" || selectedCategoryId !== "ALL"
+                    ? "border-[#ffc105] text-[#ffc105] bg-[#ffc105]/5"
+                    : "border-border text-muted-foreground"
+                )}
+              >
+                <Filter size={14} className={cn("mr-2", locale === "ar" ? "ml-2 mr-0" : "mr-2 ml-0")} />
+                {tQueue("filters.advanced.title")}
+                {(search || dateRange !== "ALL_TIME" || selectedProductId !== "ALL" || selectedCategoryId !== "ALL") && (
+                  <span className="ml-2 w-5 h-5 flex items-center justify-center bg-[#ffc105] text-black rounded-full text-[8px]">
+                    {[search, dateRange !== "ALL_TIME", selectedProductId !== "ALL", selectedCategoryId !== "ALL"].filter(Boolean).length}
+                  </span>
+                )}
+              </Button>
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+
+          {/* Advanced Filter Bar */}
+          <div className={cn(
+            "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-hidden transition-all duration-300",
+            isFilterBarOpen ? "max-h-[500px] opacity-100 mt-2" : "max-h-0 opacity-0"
+          )}>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2">
+                {tQueue("filters.advanced.search")}
+              </label>
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40" size={14} />
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={tQueue("filters.advanced.search")}
+                  className="pl-10 h-12 rounded-2xl bg-accent/20 border-border/50 focus:border-[#ffc105]/50 transition-all text-xs font-bold"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2">
+                {tQueue("filters.advanced.date.label")}
+              </label>
+              <Select value={dateRange} onValueChange={(v) => setDateRange(v as DateRangePreset)}>
+                <SelectTrigger className="h-12 rounded-2xl bg-accent/20 border-border/50 focus:border-[#ffc105]/50 text-xs font-bold px-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar size={14} className="text-muted-foreground/40" />
+                    <SelectValue />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="rounded-2xl border-border bg-card">
+                  {(["TODAY", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_90_DAYS", "ALL_TIME"] as DateRangePreset[]).map(p => (
+                    <SelectItem key={p} value={p} className="text-xs font-bold uppercase tracking-widest">
+                      {tQueue(`filters.advanced.date.${p}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2">
+                {tQueue("filters.advanced.product")}
+              </label>
+              <Select value={selectedProductId} onValueChange={setSelectedProductId}>
+                <SelectTrigger className="h-12 rounded-2xl bg-accent/20 border-border/50 focus:border-[#ffc105]/50 text-xs font-bold px-4">
+                  <div className="flex items-center gap-2 text-left truncate">
+                    <Package size={14} className="text-muted-foreground/40 flex-shrink-0" />
+                    <SelectValue />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="rounded-2xl border-border bg-card max-h-60">
+                  <SelectItem value="ALL" className="text-xs font-bold uppercase tracking-widest">
+                    {tQueue("filters.ALL")}
+                  </SelectItem>
+                  {products?.map(p => (
+                    <SelectItem key={p._id} value={p._id} className="text-xs font-bold">
+                      {locale === "ar" ? p.name_ar : p.name_en}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2">
+                {tQueue("filters.advanced.category")}
+              </label>
+              <div className="flex gap-2">
+                <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId}>
+                  <SelectTrigger className="h-12 rounded-2xl bg-accent/20 border-border/50 focus:border-[#ffc105]/50 text-xs font-bold px-4 grow">
+                    <div className="flex items-center gap-2 text-left truncate">
+                      <Layers size={14} className="text-muted-foreground/40 flex-shrink-0" />
+                      <SelectValue />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl border-border bg-card">
+                    <SelectItem value="ALL" className="text-xs font-bold uppercase tracking-widest">
+                      {tQueue("filters.ALL")}
+                    </SelectItem>
+                    {categories?.map(c => (
+                      <SelectItem key={c._id} value={c._id} className="text-xs font-bold">
+                        {locale === "ar" ? c.name_ar : c.name_en}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="ghost"
+                  onClick={handleClearFilters}
+                  className="h-12 w-12 rounded-2xl border border-border/50 text-destructive hover:bg-destructive/10 shrink-0"
+                >
+                  <X size={18} />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-border/50">
             {states.map(s => (
               <button 
                 key={s}
