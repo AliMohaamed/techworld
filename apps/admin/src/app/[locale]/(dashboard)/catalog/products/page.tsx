@@ -11,6 +11,7 @@ import { useTranslations, useLocale } from "next-intl";
 import {
   Package,
   Plus,
+  Minus,
   Search,
   Filter,
   ArrowUpRight,
@@ -63,14 +64,37 @@ export default function AdminProductsPage() {
   const updateProduct = useMutation(api.products.updateProduct);
   const publishProduct = useMutation(api.products.publishProduct);
   const unpublishProduct = useMutation(api.products.unpublishProduct);
+  const updateSkuRealStock = useMutation(api.skus.updateSkuRealStock);
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingId, setEditingId] = useState<Id<"products"> | null>(null);
   const [busyId, setBusyId] = useState<Id<"products"> | null>(null);
+  const [updatingSkuId, setUpdatingSkuId] = useState<Id<"skus"> | null>(null);
   const [displayDrafts, setDisplayDrafts] = useState<Record<string, string>>(
     {},
   );
   const [realDrafts, setRealDrafts] = useState<Record<string, string>>({});
+
+  const adjustRealStock = async (
+    skuId: Id<"skus">,
+    currentStock: number,
+    delta: number,
+  ) => {
+    const nextStock = Math.max(0, currentStock + delta);
+    if (nextStock === currentStock) return;
+
+    setUpdatingSkuId(skuId);
+    try {
+      await updateSkuRealStock({ skuId, real_stock: nextStock });
+      toast.success(t("messages.realStockUpdated"));
+    } catch (error: any) {
+      toast.error(t("messages.stockUpdateFailed"), {
+        description: error.message || t("messages.realStockFailed"),
+      });
+    } finally {
+      setUpdatingSkuId(null);
+    }
+  };
 
   const editingProduct = useMemo(
     () => products?.find((product) => product._id === editingId) ?? null,
@@ -376,15 +400,37 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="py-6 px-4 align-middle">
                     {product.skus && product.skus.length > 0 ? (
-                      <div className="flex flex-col gap-1">
-                        <p className="text-xs font-black text-foreground tracking-tightest">
-                          {product.skus
-                            .reduce((s, sku) => s + sku.real_stock, 0)
-                            .toLocaleString(locale)}
-                        </p>
-                        <p className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[.2em] leading-none">
-                          {t("table.managedViaSkus")}
-                        </p>
+                      <div className="flex flex-col gap-2">
+                        {product.skus.map((sku) => (
+                          <div key={sku._id} className="flex items-center justify-between gap-3 min-w-[120px]">
+                            <span className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest truncate max-w-[60px]">
+                              {sku.variantName}
+                            </span>
+                            <div className="flex items-center bg-accent/30 rounded-lg p-0.5 border border-border/50">
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-6 w-6 rounded-md hover:bg-destructive/10 hover:text-destructive transition-all"
+                                disabled={updatingSkuId === sku._id || sku.real_stock <= 0}
+                                onClick={() => void adjustRealStock(sku._id, sku.real_stock, -1)}
+                              >
+                                <Minus size={10} />
+                              </Button>
+                              <span className="text-[10px] font-black min-w-[24px] text-center font-mono">
+                                {updatingSkuId === sku._id ? "..." : sku.real_stock}
+                              </span>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-6 w-6 rounded-md hover:bg-emerald-500/10 hover:text-emerald-500 transition-all"
+                                disabled={updatingSkuId === sku._id}
+                                onClick={() => void adjustRealStock(sku._id, sku.real_stock, 1)}
+                              >
+                                <Plus size={10} />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 group/input">
