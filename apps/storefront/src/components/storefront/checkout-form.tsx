@@ -119,7 +119,7 @@ export default function CheckoutForm() {
                   <option value="" disabled className="text-muted-foreground">{t('labels.governorate')}</option>
                   {governorates?.map((gov) => (
                     <option key={gov._id} value={gov._id} className="bg-card text-foreground">
-                      {locale === 'en' ? gov.name_en : gov.name_ar} ({gov.shippingFee.toLocaleString(locale)} <span className="text-[10px]">EGP</span>)
+                      {locale === 'en' ? gov.name_en : gov.name_ar} ({gov.shippingFee.toLocaleString(locale)} EGP)
                     </option>
                   ))}
                 </select>

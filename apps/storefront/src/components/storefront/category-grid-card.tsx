@@ -1,8 +1,6 @@
-"use client";
-
 import { Link } from "@/navigation";
 import { ArrowUpRight } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
+import { getTranslations, getLocale } from "next-intl/server";
 
 type CategoryGridCardProps = {
   category: {
@@ -15,9 +13,9 @@ type CategoryGridCardProps = {
   };
 };
 
-export default function CategoryGridCard({ category }: CategoryGridCardProps) {
-  const t = useTranslations("CategoriesPage");
-  const locale = useLocale();
+export default async function CategoryGridCard({ category }: CategoryGridCardProps) {
+  const t = await getTranslations("CategoriesPage");
+  const locale = await getLocale();
 
   return (
     <Link

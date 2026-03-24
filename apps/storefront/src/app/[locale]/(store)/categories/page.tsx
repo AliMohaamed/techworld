@@ -1,32 +1,12 @@
-"use client";
-
-import { useQuery } from "convex/react";
+import { getTranslations } from "next-intl/server";
+import { fetchQuery } from "convex/nextjs";
 import { api } from "@backend/convex/_generated/api";
 import CategoryGridCard from "@/components/storefront/category-grid-card";
-import { useTranslations } from "next-intl";
 
-export default function CategoriesPage() {
-  const t = useTranslations("CategoriesPage");
-  const categoryResult = useQuery(api.categories.listActiveCategories);
-  const categories = categoryResult?.categories;
-
-  if (!categories) {
-    return (
-      <div className="min-h-screen bg-background px-4 pb-24 pt-12 md:px-8">
-        <div className="mx-auto max-w-7xl animate-pulse space-y-8">
-          <div className="h-48 rounded-[40px] bg-accent  " />
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={index}
-                className="aspect-[4/5] rounded-[32px] bg-accent  "
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+export default async function CategoriesPage() {
+  const t = await getTranslations("CategoriesPage");
+  const categoriesResult = await fetchQuery(api.categories.listActiveCategories);
+  const categories = categoriesResult?.categories || [];
 
   return (
     <div className="min-h-screen bg-background px-4 pb-24 pt-12 md:px-8 transition-colors">
@@ -53,7 +33,7 @@ export default function CategoriesPage() {
         </section>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category) => (
+          {categories.map((category: any) => (
             <CategoryGridCard key={category._id} category={category} />
           ))}
         </div>

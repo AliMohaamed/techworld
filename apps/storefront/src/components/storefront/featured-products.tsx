@@ -1,12 +1,6 @@
-"use client";
-
 import type { Id } from "@backend/convex/_generated/dataModel";
-import FeaturedProductCard from "./featured-product-card";
-import { useTranslations } from "next-intl";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { FreeMode } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/free-mode';
+import { getTranslations } from "next-intl/server";
+import { FeaturedProductsCarousel } from "./FeaturedProductsCarousel";
 
 type FeaturedProduct = {
   _id: Id<"products">;
@@ -31,8 +25,8 @@ interface FeaturedProductsProps {
   products: FeaturedProduct[];
 }
 
-export default function FeaturedProducts({ products }: FeaturedProductsProps) {
-  const t = useTranslations('FeaturedProducts');
+export default async function FeaturedProducts({ products }: FeaturedProductsProps) {
+  const t = await getTranslations('FeaturedProducts');
   if (!products || products.length === 0) return null;
 
   return (
@@ -53,27 +47,7 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
           </p>
         </div>
 
-        <div className="md:hidden">
-          <Swiper
-            modules={[FreeMode]}
-            spaceBetween={16}
-            slidesPerView={1.2}
-            freeMode={true}
-            className="w-full !overflow-visible"
-          >
-            {products.map((product) => (
-              <SwiperSlide key={product._id} className="h-auto">
-                <FeaturedProductCard product={product} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-
-        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <FeaturedProductCard key={product._id} product={product} />
-          ))}
-        </div>
+        <FeaturedProductsCarousel products={products} />
       </div>
     </section>
   );

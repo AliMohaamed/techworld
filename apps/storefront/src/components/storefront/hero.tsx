@@ -1,14 +1,12 @@
-'use client';
-
 import { Link } from "@/navigation";
 import { Button } from "@techworld/ui";
 import { ArrowRight, ShoppingBag } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
+import { getTranslations, getLocale } from "next-intl/server";
 import Image from "next/image";
 
-export default function Hero() {
-  const t = useTranslations('Hero');
-  const locale = useLocale();
+export default async function Hero() {
+  const t = await getTranslations('Hero');
+  const locale = await getLocale();
 
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-visible bg-background px-4 md:px-8 pt-24 md:pt-16 pb-16">
