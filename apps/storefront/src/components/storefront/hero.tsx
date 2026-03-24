@@ -76,7 +76,7 @@ export default function Hero() {
                 alt="Premium Gadgets" 
                 fill 
                 className="object-cover object-center hover:scale-[1.03] transition-transform duration-[1.5s] ease-out"
-                priority
+                priority = {true}
                 quality={100}
               />
               <div className="absolute bottom-8 ltr:left-8 rtl:right-8 ltr:right-8 rtl:left-8 z-20 flex justify-between items-end">
