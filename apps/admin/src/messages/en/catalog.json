@@ -184,8 +184,15 @@
           "saving": "Saving...",
           "cancel": "Cancel",
           "remove": "Remove"
+        },
+        "validation": {
+          "required": "This field is required.",
+          "nonNegative": "Value must be zero or more.",
+          "atLeastOneVariant": "At least one variant is required.",
+          "compareAtPriceError": "Compare-at price must be higher than selling price."
         }
       }
     }
   }
 }
+
