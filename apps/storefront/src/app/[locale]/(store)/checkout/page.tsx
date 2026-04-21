@@ -94,6 +94,7 @@ export default function CheckoutPage() {
                           }
                           fill
                           className="object-cover group-hover:scale-110 transition-transform duration-500"
+                          priority={true}
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-muted-foreground/20 text-[10px] font-black uppercase tracking-widest">

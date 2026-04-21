@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -53,6 +51,7 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
                     src={product.thumbnail}
                     alt={product.name_en}
                     fill
+                    priority={true}
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                 ) : (

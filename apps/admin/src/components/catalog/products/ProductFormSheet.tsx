@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 import { useFieldArray, useForm, useWatch, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { useMutation } from "convex/react";
 import { toast } from "sonner";
 import {
@@ -133,7 +135,9 @@ export function ProductFormSheet({
     formState: { errors, isSubmitting },
   } = useForm<ProductFormValues>({
     defaultValues: emptyValues,
+    resolver: zodResolver(productSchema),
   });
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "variants",
@@ -220,14 +224,8 @@ export function ProductFormSheet({
   }, [open, product, reset]);
 
   const submit = handleSubmit(async (values) => {
-    const parsed = productSchema.safeParse(values);
-    if (!parsed.success) {
-      throw new Error(
-        parsed.error.issues[0]?.message ?? "Product form is invalid.",
-      );
-    }
+    const payload = buildPayload(values);
 
-    const payload = buildPayload(parsed.data);
 
     if (product) {
       await updateAdvancedProduct({ id: product._id, ...payload });
@@ -732,20 +730,25 @@ function Field({
   children: React.ReactNode;
   className?: string;
 }) {
+  const t = useTranslations("Catalog.products.form.validation");
+  const errorMessage = error && t.has(error as any) ? t(error as any) : error;
+
   return (
     <div className={cn("space-y-3", className)}>
       <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
         {label}
       </Label>
       {children}
-      {error && (
+      {errorMessage && (
         <p className="px-1 text-[10px] font-black text-destructive uppercase tracking-widest mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
-          {error}
+          {errorMessage}
         </p>
       )}
     </div>
   );
 }
+
+
 
 function buildPayload(values: ProductFormSubmitValues) {
   return {

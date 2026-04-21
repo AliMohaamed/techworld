@@ -1,14 +1,12 @@
-'use client';
-
 import { Link } from "@/navigation";
 import { Button } from "@techworld/ui";
 import { ArrowRight, ShoppingBag } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
+import { getTranslations, getLocale } from "next-intl/server";
 import Image from "next/image";
 
-export default function Hero() {
-  const t = useTranslations('Hero');
-  const locale = useLocale();
+export default async function Hero() {
+  const t = await getTranslations('Hero');
+  const locale = await getLocale();
 
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-visible bg-background px-4 md:px-8 pt-24 md:pt-16 pb-16">
@@ -76,7 +74,7 @@ export default function Hero() {
                 alt="Premium Gadgets" 
                 fill 
                 className="object-cover object-center hover:scale-[1.03] transition-transform duration-[1.5s] ease-out"
-                priority
+                priority = {true}
                 quality={100}
               />
               <div className="absolute bottom-8 ltr:left-8 rtl:right-8 ltr:right-8 rtl:left-8 z-20 flex justify-between items-end">

@@ -1,12 +1,11 @@
-"use client";
-
 import { Link } from "@/navigation";
-import { Mail, Github, Twitter, Instagram } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
+import { Github, Twitter, Instagram } from "lucide-react";
+import { getTranslations, getLocale } from "next-intl/server";
+import { NewsletterForm } from "./NewsletterForm";
 
-export default function Footer() {
-  const t = useTranslations('Footer');
-  const locale = useLocale();
+export default async function Footer() {
+  const t = await getTranslations('Footer');
+  const locale = await getLocale();
 
   return (
     <footer className="border-t border-border bg-background pt-24 pb-12 px-6 md:px-12">
@@ -80,16 +79,7 @@ export default function Footer() {
           <div className="space-y-8">
             <h4 className="font-space-grotesk text-foreground text-[10px] font-black uppercase tracking-[0.5em] mb-10 ">{t('sections.newsletter')}</h4>
             <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.3em] leading-relaxed max-w-xs">{t('newsletter.text')}</p>
-            <div className="relative group">
-              <input 
-                type="email" 
-                placeholder={t('newsletter.placeholder')} 
-                className="w-full bg-card border border-border rounded-2xl py-5 px-6 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-[#ffc105]/20 transition-all ltr:pr-14 rtl:pl-14  font-medium"
-              />
-              <button className="absolute ltr:right-3 rtl:left-3 top-2.5 h-10 w-10 bg-[#ffc105] rounded-xl flex items-center justify-center text-black hover:bg-white  transition-all active:scale-95">
-                <Mail size={18} />
-              </button>
-            </div>
+            <NewsletterForm />
           </div>
         </div>
 

@@ -496,3 +496,36 @@ export const updateGenericStatus = mutation({
   },
 });
 
+export const getOrderStats = query({
+  args: {
+    fromTimestamp: v.optional(v.number()),
+    toTimestamp: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    await requirePermission(ctx, "VIEW_ORDERS");
+
+    const orders = await ctx.db.query("orders").collect();
+
+    let filteredOrders = orders;
+    if (args.fromTimestamp !== undefined) {
+      filteredOrders = filteredOrders.filter(o => o._creationTime >= (args.fromTimestamp as number));
+    }
+    if (args.toTimestamp !== undefined) {
+      filteredOrders = filteredOrders.filter(o => o._creationTime <= (args.toTimestamp as number));
+    }
+
+    const totalOrders = filteredOrders.length;
+    const totalRevenue = filteredOrders.reduce((acc, o) => acc + o.total_price + (o.appliedShippingFee || 0), 0);
+    const totalProductsSold = filteredOrders.reduce((acc, o) => acc + o.quantity, 0);
+    const deliveredOrders = filteredOrders.filter(o => o.state === "DELIVERED").length;
+    const deliveryRate = totalOrders > 0 ? (deliveredOrders / totalOrders) * 100 : 0;
+
+    return {
+      totalOrders,
+      totalRevenue,
+      totalProductsSold,
+      deliveryRate,
+    };
+  },
+});
+

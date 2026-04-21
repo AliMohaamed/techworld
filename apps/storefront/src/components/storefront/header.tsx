@@ -6,10 +6,12 @@ import { useSession } from "@/providers/session-provider";
 import { useCart } from "@/providers/cart-provider";
 import { ShoppingBag, Menu, X, ChevronRight } from "lucide-react";
 import { Link } from "@/navigation";
-import CartDrawer from "./cart-drawer";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { LanguageSwitcher, ThemeToggle } from "@techworld/ui";
+
+const CartDrawer = dynamic(() => import("./cart-drawer"), { ssr: false });
 
 export default function Header() {
   const t = useTranslations("Header");

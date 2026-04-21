@@ -69,6 +69,7 @@ export function DynamicProductGallery({
                   fill
                   className="object-cover"
                   sizes="120px"
+                  priority={true}
                 />
               </button>
             );
