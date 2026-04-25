@@ -63,7 +63,7 @@ export default function AdminDashboardPage() {
   return (
     <main className="space-y-8 animate-in fade-in duration-500 pb-12 bg-background transition-colors">
       {/* Header with Time Window Selector */}
-      <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 rounded-[32px] border border-border bg-card px-8 py-10 shadow-xl relative overflow-hidden group">
+      <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 rounded-[32px] border border-border bg-card px-8 py-10   relative overflow-hidden group">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,193,5,0.08),transparent_40%)]" />
         {/* Light mode decorative gradient */}
         <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-[#ffc105]/5 to-transparent dark:hidden" />

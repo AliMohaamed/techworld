@@ -91,7 +91,7 @@ export default function AdminCategoriesPage() {
           <Button
             type="button"
             onClick={openCreateSheet}
-            className="rounded-2xl h-14 px-10 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all shadow-xl font-black uppercase tracking-[0.2em] text-[10px]"
+            className="rounded-2xl h-14 px-10 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-black uppercase tracking-[0.2em] text-[10px]"
           >
             <Plus className="ltr:mr-3 rtl:ml-3 h-4 w-4" />
             {t("actions.create")}

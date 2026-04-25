@@ -436,7 +436,7 @@ export default function OrderDetailsPage() {
                 <div className="flex justify-between items-center text-sm font-black uppercase tracking-widest text-emerald-500">
                   <span>{t("summary.discount", { code: order.promo_code_snapshot || "" })}</span>
                   <span className="font-mono">
-                    {(order.discount_applied ?? 0) > 0 
+                    {(order.discount_applied ?? 0) > 0
                       ? `-${order.discount_applied?.toLocaleString(locale)} ${t("summary.egp")}`
                       : <span className="text-[10px] uppercase font-black bg-emerald-500/10 px-2 py-1 rounded">{t("summary.freeShipping")}</span>
                     }
@@ -542,12 +542,12 @@ export default function OrderDetailsPage() {
               {["CONFIRMED", "READY_FOR_SHIPPING", "SHIPPED"].includes(
                 order.state,
               ) && (
-                <div className="rounded-2xl bg-accent/30 p-4 border border-border/50">
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40 leading-relaxed italic text-center">
-                    {t("actions.logisticsNote")}
-                  </p>
-                </div>
-              )}
+                  <div className="rounded-2xl bg-accent/30 p-4 border border-border/50">
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40 leading-relaxed italic text-center">
+                      {t("actions.logisticsNote")}
+                    </p>
+                  </div>
+                )}
             </div>
           </section>
         </div>
@@ -630,7 +630,7 @@ export default function OrderDetailsPage() {
 
             <div className="p-10 border-t border-border bg-accent/20 gap-4 flex flex-col">
               <Button
-                className="w-full rounded-2xl h-14 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all shadow-xl font-black uppercase tracking-[0.2em] text-[10px]"
+                className="w-full rounded-2xl h-14 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-black uppercase tracking-[0.2em] text-[10px]"
                 disabled={isSubmitting || !selectedFile}
                 onClick={() => void handleStatusChange("CONFIRMED")}
               >
@@ -757,7 +757,7 @@ export default function OrderDetailsPage() {
 
             <div className="p-10 border-t border-border bg-accent/20 gap-4 flex flex-col">
               <Button
-                className="w-full rounded-2xl h-14 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all shadow-xl font-black uppercase tracking-[0.2em] text-[10px]"
+                className="w-full rounded-2xl h-14 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-black uppercase tracking-[0.2em] text-[10px]"
                 disabled={isSubmitting || !manualState}
                 onClick={handleManualOverride}
               >

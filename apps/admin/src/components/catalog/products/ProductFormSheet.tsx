@@ -3,8 +3,10 @@
 import { useEffect } from "react";
 import { useFieldArray, useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 
-import { useMutation } from "convex/react";
+
+import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
 import {
   Plus,
@@ -143,6 +145,12 @@ export function ProductFormSheet({
     name: "variants",
   });
   const images = useWatch({ control, name: "images" }) ?? [];
+  const thumbnail = useWatch({ control, name: "thumbnail" });
+
+  const storageUrls = useQuery(
+    api.storage.getStorageUrls,
+    images.length > 0 ? { storageIds: images } : "skip",
+  );
 
   const handleRestock = async (index: number) => {
     const variant = getValues(`variants.${index}`);
@@ -465,10 +473,13 @@ export function ProductFormSheet({
               <div className="p-8 rounded-[40px] border border-border bg-card   space-y-6">
                 <ConvexStorageUpload
                   imageIds={images}
+                  storageUrls={storageUrls}
                   onChange={(nextImages) => {
                     setValue("images", nextImages, { shouldValidate: true });
                     if (!getValues("thumbnail") && nextImages[0]) {
                       setValue("thumbnail", nextImages[0]);
+                    } else if (getValues("thumbnail") && !nextImages.includes(getValues("thumbnail")!)) {
+                      setValue("thumbnail", nextImages[0] || "");
                     }
                   }}
                 />
@@ -480,14 +491,59 @@ export function ProductFormSheet({
                     control={control}
                     name="thumbnail"
                     render={({ field }) => (
-                      <Select value={field.value || undefined} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full rounded-xl border border-border bg-background px-4 h-12 font-mono text-[10px] tracking-widest uppercase text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
-                          <SelectValue placeholder={t("form.placeholders.selectThumbnail")} />
+                      <Select
+                        value={field.value || undefined}
+                        onValueChange={(val) => {
+                          field.onChange(val);
+                          // Reorder images to make selected thumbnail the first one
+                          const nextImages = [
+                            val,
+                            ...images.filter((id) => id !== val),
+                          ];
+                          setValue("images", nextImages);
+                        }}
+                      >
+                        <SelectTrigger className="w-full rounded-xl border border-border bg-background px-4 h-12 font-black uppercase text-[11px] tracking-widest text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
+                          <SelectValue
+                            placeholder={t("form.placeholders.selectThumbnail")}
+                          />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl border-border bg-card">
-                          {images.map((imageId) => (
-                            <SelectItem key={imageId} value={imageId} className="font-mono uppercase tracking-widest text-[10px] cursor-pointer">
-                              {imageId}
+                          {images.map((imageId, idx) => (
+                            <SelectItem
+                              key={imageId}
+                              value={imageId}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="relative h-8 w-8 overflow-hidden rounded-md border border-border bg-accent">
+                                  {storageUrls?.[imageId] ? (
+                                    <Image
+                                      src={storageUrls[imageId]}
+                                      alt=""
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  ) : (
+                                    <div className="flex h-full w-full items-center justify-center">
+                                      <ImageIcon
+                                        size={12}
+                                        className="text-muted-foreground/20"
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                                <span className="font-bold uppercase tracking-widest text-[10px]">
+                                  {t("form.fields.imageIndex", {
+                                    index: idx + 1,
+                                  })}
+                                  {idx === 0 && (
+                                    <span className="ml-2 text-[#ffc105]">
+                                      (Current Primary)
+                                    </span>
+                                  )}
+                                </span>
+                              </div>
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -670,13 +726,31 @@ export function ProductFormSheet({
                           name={`variants.${index}.linkedImageId` as const}
                           render={({ field }) => (
                             <Select value={field.value || undefined} onValueChange={field.onChange}>
-                              <SelectTrigger className="w-full rounded-xl border border-border bg-background px-3 h-11 font-mono text-[9px] tracking-tightest uppercase text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
+                              <SelectTrigger className="w-full rounded-xl border border-border bg-background px-3 h-11 font-black uppercase text-[10px] tracking-widest text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
                                 <SelectValue placeholder={t("form.placeholders.noLinkedImage")} />
                               </SelectTrigger>
                               <SelectContent className="rounded-xl border-border bg-card">
-                                {images.map((imageId) => (
-                                  <SelectItem key={imageId} value={imageId} className="font-mono uppercase tracking-widest text-[9px] cursor-pointer">
-                                    {imageId}
+                                {images.map((imageId, idx) => (
+                                  <SelectItem key={imageId} value={imageId} className="cursor-pointer">
+                                    <div className="flex items-center gap-2">
+                                      <div className="relative h-6 w-6 overflow-hidden rounded border border-border bg-accent">
+                                        {storageUrls?.[imageId] ? (
+                                          <Image
+                                            src={storageUrls[imageId]}
+                                            alt=""
+                                            fill
+                                            className="object-cover"
+                                          />
+                                        ) : (
+                                          <div className="flex h-full w-full items-center justify-center">
+                                            <ImageIcon size={10} className="text-muted-foreground/20" />
+                                          </div>
+                                        )}
+                                      </div>
+                                      <span className="font-bold uppercase tracking-widest text-[9px]">
+                                        {t("form.fields.imageIndex", { index: idx + 1 })}
+                                      </span>
+                                    </div>
                                   </SelectItem>
                                 ))}
                               </SelectContent>

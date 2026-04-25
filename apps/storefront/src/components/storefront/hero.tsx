@@ -23,10 +23,10 @@ export default async function Hero() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ffc105] opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ffc105]"></span>
               </span>
-              <span className="text-xs font-bold uppercase tracking-[0.25em] text-foreground">{t('badge')}</span>
+              <span className="text-xs font-semibold text-foreground">{t('badge')}</span>
             </div>
             
-            <h1 className="font-space-grotesk text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter leading-[1] text-foreground uppercase">
+            <h1 className="font-space-grotesk text-5xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tightest leading-[1] text-foreground">
               {t('title_part1')} <br className="hidden md:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ffc105] to-[#ff9900]">
                 {t('title_part2')}
@@ -34,7 +34,7 @@ export default async function Hero() {
               {t('title_part3')}
             </h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed font-light max-w-xl">
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed font-medium max-w-xl">
               {t('description')}
             </p>
 
@@ -42,7 +42,7 @@ export default async function Hero() {
               <Button
                 asChild
                 size="lg"
-                className="h-14 md:h-16 px-8 md:px-10 font-space-grotesk font-black text-sm md:text-lg uppercase tracking-widest rounded-2xl w-full sm:w-auto bg-[#ffc105] hover:bg-white text-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_-10px_rgba(255,193,5,0.4)]"
+                className="h-14 md:h-16 px-8 md:px-10 font-space-grotesk font-bold text-sm md:text-lg tracking-wide rounded-2xl w-full sm:w-auto bg-[#ffc105] hover:bg-white text-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_-10px_rgba(255,193,5,0.4)]"
               >
                 <Link href="/products" className="flex items-center justify-center gap-3">
                   <ShoppingBag size={22} className="fill-black/10" />
@@ -53,10 +53,10 @@ export default async function Hero() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="h-14 md:h-16 px-8 md:px-10 font-space-grotesk font-black text-sm md:text-lg uppercase tracking-widest rounded-2xl w-full sm:w-auto border-border hover:border-[#ffc105] hover:text-[#ffc105] bg-transparent transition-all"
+                className="h-14 md:h-16 px-8 md:px-10 font-space-grotesk font-bold text-sm md:text-lg tracking-wide rounded-2xl w-full sm:w-auto border-border hover:border-[#ffc105] hover:text-[#ffc105] bg-transparent transition-all"
               >
                 <Link href="/categories" className="flex items-center justify-center gap-3 group">
-                  {t('explore', { defaultValue: 'EXPLORE' })}
+                  {t('explore', { defaultValue: 'Explore' })}
                   <ArrowRight size={22} className={locale === "ar" ? "rotate-180 group-hover:-translate-x-1 transition-transform" : "group-hover:translate-x-1 transition-transform"} />
                 </Link>
               </Button>
@@ -79,8 +79,8 @@ export default async function Hero() {
               />
               <div className="absolute bottom-8 ltr:left-8 rtl:right-8 ltr:right-8 rtl:left-8 z-20 flex justify-between items-end">
                 <div className="space-y-2 backdrop-blur-md bg-white/5 border border-white/10 p-5 rounded-3xl">
-                  <p className="text-[#ffc105] font-black uppercase tracking-[0.4em] text-[9px] drop-shadow-sm">{t('newArrival', { defaultValue: 'NEW ARRIVAL' })}</p>
-                  <p className="text-white font-space-grotesk text-xl font-black tracking-tight drop-shadow-md">{t('featuredProduct', { defaultValue: 'Premium Wireless Audio' })}</p>
+                  <p className="text-[#ffc105] font-bold text-[10px] drop-shadow-sm">{t('newArrival', { defaultValue: 'NEW ARRIVAL' })}</p>
+                  <p className="text-white font-space-grotesk text-xl font-bold tracking-tight drop-shadow-md">{t('featuredProduct', { defaultValue: 'Premium Wireless Audio' })}</p>
                 </div>
               </div>
             </div>

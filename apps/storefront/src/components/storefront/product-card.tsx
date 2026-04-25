@@ -82,20 +82,20 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-secondary text-muted-foreground font-bold uppercase tracking-widest text-[10px]">
+          <div className="flex h-full w-full items-center justify-center bg-secondary text-muted-foreground font-semibold text-[10px]">
             {t("noImage")}
           </div>
         )}
 
         {hasSalePrice && !isOutOfStock ? (
-          <div className="absolute ltr:left-4 rtl:right-4 top-4 rounded-full bg-[#ffc105] px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.3em] text-black  ">
+          <div className="absolute ltr:left-4 rtl:right-4 top-4 rounded-full bg-[#ffc105] px-4 py-1.5 text-[10px] font-bold text-black">
             {t("badges.sale")}
           </div>
         ) : null}
 
         {isOutOfStock ? (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70 backdrop-blur-[4px] animate-in fade-in duration-500">
-            <span className="rounded-xl bg-red-600/20 border border-red-600/50 px-5 py-2.5 text-xs font-black uppercase tracking-[0.2em] text-red-500 shadow-[0_0_20px_rgba(220,38,38,0.2)]">
+            <span className="rounded-xl bg-red-600/20 border border-red-600/50 px-5 py-2.5 text-xs font-bold text-red-500">
               {t("badges.soldOut")}
             </span>
           </div>
@@ -103,15 +103,15 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="flex flex-1 flex-col p-3 sm:p-4 md:p-6">
-        <span className="mb-1.5 sm:mb-2 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[#ffc105]/80">
+        <span className="mb-1.5 sm:mb-2 text-[9px] sm:text-[11px] font-semibold text-[#ffc105]/80 uppercase">
           {product.categoryName || t("placeholderCategory")}
         </span>
 
-        <h3 className="mb-1.5 sm:mb-2 line-clamp-2 sm:line-clamp-1 font-space-grotesk text-sm sm:text-xl md:text-[1.4rem] font-black leading-tight text-foreground uppercase tracking-tighter group-hover:text-[#ffc105] transition-colors">
+        <h3 className="mb-1.5 sm:mb-2 line-clamp-2 sm:line-clamp-1 font-space-grotesk text-sm sm:text-xl md:text-[1.3rem] font-bold leading-tight text-foreground tracking-tight group-hover:text-[#ffc105] transition-colors">
           {locale === "en" ? product.name_en : product.name_ar}
         </h3>
 
-        <p className="hidden sm:block mb-4 sm:mb-6 animate-in fade-in line-clamp-2 text-sm leading-relaxed text-muted-foreground font-light h-[2.8rem] overflow-hidden overflow-ellipsis">
+        <p className="hidden sm:block mb-4 sm:mb-6 animate-in fade-in line-clamp-2 text-sm leading-relaxed text-muted-foreground font-normal h-[2.8rem] overflow-hidden overflow-ellipsis">
           {locale === "en"
             ? product.description_en || t("placeholder")
             : product.description_ar || t("placeholder")}
@@ -120,12 +120,12 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mt-auto flex flex-row items-end justify-between sm:items-center gap-2 sm:gap-4 w-full">
           <div className="flex shrink-0 flex-col">
             {hasSalePrice ? (
-              <s className="mb-0.5 font-space-grotesk text-[10px] sm:text-sm font-bold tracking-tight text-muted-foreground decoration-red-900/50">
+              <s className="mb-0.5 font-space-grotesk text-[10px] sm:text-sm font-semibold tracking-tight text-muted-foreground decoration-red-900/50">
                 {product.compareAtPrice?.toLocaleString(locale)}{" "}
                 <span className="text-[9px] sm:text-[10px]">EGP</span>
               </s>
             ) : null}
-            <span className="font-space-grotesk text-lg sm:text-2xl md:text-[1.6rem] font-black tracking-tightest text-foreground leading-none">
+            <span className="font-space-grotesk text-lg sm:text-2xl md:text-[1.5rem] font-bold tracking-tightest text-foreground leading-none">
               {displayPrice.toLocaleString(locale)}{" "}
               <span className="text-xs sm:text-lg text-[#ffc105]">EGP</span>
             </span>
@@ -134,10 +134,10 @@ export default function ProductCard({ product }: ProductCardProps) {
           <button
             disabled={isOutOfStock}
             onClick={handleAddToCart}
-            className="flex h-10 w-10 sm:h-12 md:h-14 sm:w-auto sm:flex-1 shrink-0 cursor-pointer items-center justify-center gap-1.5 sm:gap-2 rounded-[14px] sm:rounded-2xl bg-[#ffc105] sm:px-4 font-black text-black transition-all hover:bg-white active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-30 hover:shadow-[#ffc105]/20"
+            className="flex h-10 w-10 sm:h-12 md:h-14 sm:w-auto sm:flex-1 shrink-0 cursor-pointer items-center justify-center gap-1.5 sm:gap-2 rounded-[14px] sm:rounded-2xl bg-[#ffc105] sm:px-4 font-bold text-black transition-all hover:bg-white active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-30 hover:shadow-[#ffc105]/20"
           >
             <ShoppingCart size={18} className="md:h-5 md:w-5 shrink-0 sm:fill-black/5" />
-            <span className="hidden sm:inline-block whitespace-nowrap uppercase tracking-widest text-[9px] sm:text-xs">
+            <span className="hidden sm:inline-block whitespace-nowrap text-[10px] sm:text-xs">
               {t("actions.add")}
             </span>
           </button>

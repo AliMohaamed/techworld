@@ -79,7 +79,7 @@ export default function Header() {
                 className="group-hover:scale-110 transition-transform"
               />
               {itemCount > 0 && (
-                <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-lg bg-[#ffc105] text-[10px] font-black text-black ring-4 ring-background  ">
+                <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-lg bg-[#ffc105] text-[10px] font-bold text-black ring-4 ring-background  ">
                   {itemCount}
                 </span>
               )}

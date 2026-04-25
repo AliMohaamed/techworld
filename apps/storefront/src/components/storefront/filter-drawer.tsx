@@ -107,10 +107,10 @@ export default function FilterDrawer({ lockedCategoryId }: FilterDrawerProps) {
     <div className="hidden lg:block">
       <div className="sticky top-24 space-y-8 rounded-[32px] border border-border bg-card/60 p-8   backdrop-blur-xl transition-colors">
         <div className="space-y-3">
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
+          <p className="text-xs font-bold text-[#ffc105]">
             {t("desktop.badge")}
           </p>
-          <h2 className="font-space-grotesk text-3xl font-black uppercase tracking-tight text-foreground leading-none">
+          <h2 className="font-space-grotesk text-3xl font-bold tracking-tight text-foreground leading-none">
             {t("desktop.title")}
           </h2>
         </div>
@@ -133,7 +133,7 @@ export default function FilterDrawer({ lockedCategoryId }: FilterDrawerProps) {
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="inline-flex items-center gap-3 rounded-2xl border border-border bg-card px-6 py-4 font-space-grotesk text-xs font-black uppercase tracking-[0.25em] text-foreground transition-all hover:border-[#ffc105]/40 hover:text-[#ffc105] shadow-xl active:scale-[0.98]"
+          className="inline-flex items-center gap-3 rounded-2xl border border-border bg-card px-6 py-4 font-space-grotesk text-xs font-bold text-foreground transition-all hover:border-[#ffc105]/40 hover:text-[#ffc105]   active:scale-[0.98]"
         >
           <Funnel size={18} className="text-[#ffc105]" />
           {t("mobile.button")}
@@ -153,10 +153,10 @@ export default function FilterDrawer({ lockedCategoryId }: FilterDrawerProps) {
           <div className="absolute inset-x-0 bottom-0 rounded-t-[40px] border-t border-border bg-card px-8 pb-12 pt-8 shadow-[0_-10px_40px_rgba(0,0,0,0.2)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom duration-500">
             <div className="mb-8 flex items-center justify-between">
               <div className="space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
+                <p className="text-xs font-bold text-[#ffc105]">
                   {t("mobile.badge")}
                 </p>
-                <h2 className="font-space-grotesk text-3xl font-black uppercase tracking-tight text-foreground">
+                <h2 className="font-space-grotesk text-3xl font-bold tracking-tight text-foreground">
                   {t("mobile.title")}
                 </h2>
               </div>
@@ -212,7 +212,7 @@ function FilterFields({
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/60 block px-1">
+        <label className="text-xs font-bold text-muted-foreground/60 block px-1 uppercase">
           {t("labels.search")}
         </label>
         <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-5 py-4 focus-within:border-[#ffc105]/30 transition-colors  ">
@@ -227,7 +227,7 @@ function FilterFields({
       </div>
 
       <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/60 block px-1">
+        <label className="text-xs font-bold text-muted-foreground/60 block px-1 uppercase">
           {t("labels.category")}
         </label>
         <div className="relative">
@@ -260,7 +260,7 @@ function FilterFields({
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/60 block px-1">
+          <label className="text-xs font-bold text-muted-foreground/60 block px-1 uppercase">
             {t("labels.minPrice")}
           </label>
           <div className="relative">
@@ -271,13 +271,13 @@ function FilterFields({
               placeholder="0"
               className="w-full rounded-2xl border border-border bg-card px-5 py-4 text-sm text-foreground outline-none placeholder:text-muted-foreground/30   font-mono transition-colors"
             />
-            <span className="absolute ltr:right-5 rtl:left-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted-foreground/40">
+            <span className="absolute ltr:right-5 rtl:left-5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground/40">
               EGP
             </span>
           </div>
         </div>
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/60 block px-1">
+          <label className="text-xs font-bold text-muted-foreground/60 block px-1 uppercase">
             {t("labels.maxPrice")}
           </label>
           <div className="relative">
@@ -288,7 +288,7 @@ function FilterFields({
               placeholder={t("placeholders.maxPrice")}
               className="w-full rounded-2xl border border-border bg-card px-5 py-4 text-sm text-foreground outline-none placeholder:text-muted-foreground/30   font-mono transition-colors"
             />
-            <span className="absolute ltr:right-5 rtl:left-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted-foreground/40">
+            <span className="absolute ltr:right-5 rtl:left-5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground/40">
               EGP
             </span>
           </div>
@@ -296,7 +296,7 @@ function FilterFields({
       </div>
 
       <div className="space-y-2">
-        <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/60 px-1">
+        <label className="flex items-center gap-2 text-xs font-bold text-muted-foreground/60 px-1 uppercase">
           <SlidersHorizontal size={14} />
           {t("labels.sort")}
         </label>
@@ -339,14 +339,14 @@ function FilterActions({
       <button
         type="button"
         onClick={onClear}
-        className="flex-1 rounded-2xl border border-border px-6 py-4 font-space-grotesk text-xs font-black uppercase tracking-[0.25em] text-muted-foreground transition-all hover:border-foreground/20 hover:text-foreground hover:bg-accent active:scale-[0.98]"
+        className="flex-1 rounded-2xl border border-border px-6 py-4 font-space-grotesk text-xs font-bold text-muted-foreground transition-all hover:border-foreground/20 hover:text-foreground hover:bg-accent active:scale-[0.98]"
       >
         {t("actions.clear")}
       </button>
       <button
         type="button"
         onClick={onApply}
-        className="flex-1 rounded-2xl bg-[#ffc105] px-6 py-4 font-space-grotesk text-xs font-black uppercase tracking-[0.25em] text-black transition-all hover:bg-foreground hover:text-background shadow-[0_4px_20px_rgba(255,193,5,0.2)] active:scale-[0.98]"
+        className="flex-1 rounded-2xl bg-[#ffc105] px-6 py-4 font-space-grotesk text-xs font-bold text-black transition-all hover:bg-foreground hover:text-background shadow-[0_4px_20px_rgba(255,193,5,0.2)] active:scale-[0.98]"
       >
         {t("actions.apply")}
       </button>

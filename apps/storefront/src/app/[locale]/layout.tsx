@@ -12,7 +12,7 @@ const spaceGrotesk = Space_Grotesk({
 const cairo = Cairo({ subsets: ["arabic", "latin"] });
 
 export const metadata: Metadata = {
-  title: "TechWorld",
+  title: "Tech World",
   description: "Unified E-Commerce & Operations Engine",
 };
 

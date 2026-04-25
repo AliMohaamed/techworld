@@ -158,7 +158,8 @@
             "compareAt": "السعر المرجعي للمتغير",
             "linkedImage": "الصورة المرتبطة",
             "isDefault": "الاختيار الافتراضي"
-          }
+          },
+          "imageIndex": "صورة {index}"
         },
         "placeholders": {
           "selectCategory": "اختر قسماً",

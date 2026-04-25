@@ -45,7 +45,7 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
               href={`/products/${product.slug}` as any}
               className="group flex flex-col space-y-3"
             >
-              <div className="relative aspect-square overflow-hidden rounded-3xl border border-white/5 bg-zinc-900 shadow-xl transition-all group-hover:border-primary/30">
+              <div className="relative aspect-square overflow-hidden rounded-3xl border border-white/5 bg-zinc-900   transition-all group-hover:border-primary/30">
                 {product.thumbnail ? (
                   <Image
                     src={product.thumbnail}
@@ -59,15 +59,15 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
                     No Image
                   </div>
                 )}
-                
+
                 {hasDiscount && (
-                  <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider">
+                  <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px] font-black px-2 py-1 rounded-md uppercase">
                     Sale
                   </div>
                 )}
-                
+
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                  <span className="text-white text-xs font-bold uppercase tracking-widest">View Product</span>
+                  <span className="text-white text-xs font-bold uppercase">View Product</span>
                 </div>
               </div>
 

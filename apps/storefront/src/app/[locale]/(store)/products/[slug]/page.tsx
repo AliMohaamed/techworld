@@ -122,7 +122,7 @@ export default function ProductDetailPage() {
       <div className="flex min-h-[70vh] flex-col items-center justify-center p-8 text-center bg-background">
         <h1 className="font-space-grotesk text-4xl font-black uppercase text-foreground tracking-tight">{t('notFound.title')}</h1>
         <p className="mt-4 text-muted-foreground font-light max-w-md leading-relaxed">{t('notFound.description')}</p>
-        <Link href="/" className="mt-10 font-space-grotesk text-xs font-black uppercase tracking-[0.3em] text-[#ffc105] border border-[#ffc105]/20 px-8 py-3 rounded-full hover:bg-[#ffc105]/10 transition-all">
+        <Link href="/" className="mt-10 font-space-grotesk text-xs font-black uppercase text-[#ffc105] border border-[#ffc105]/20 px-8 py-3 rounded-full hover:bg-[#ffc105]/10 transition-all">
           {t('notFound.backToStore')}
         </Link>
       </div>
@@ -135,7 +135,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-background pb-24 transition-colors">
-      <nav className="container mx-auto p-4 md:p-8 text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">
+      <nav className="container mx-auto p-4 md:p-8 text-[10px] font-black uppercase text-muted-foreground/40">
         <div className="flex items-center ltr:space-x-4 rtl:space-x-reverse space-x-4 flex-wrap gap-y-2">
           <Link href="/" className="transition-colors hover:text-foreground">{t('breadcrumb.store')}</Link>
           <ChevronRight size={14} className={locale === 'ar' ? 'rotate-180' : ''} />
@@ -151,21 +151,23 @@ export default function ProductDetailPage() {
       </nav>
 
       <div className="container mx-auto px-4 md:px-8">
-        <div className="grid grid-cols-1 gap-16 lg:grid-cols-2">
-          <DynamicProductGallery
-            name={locale === 'en' ? product.name_en : product.name_ar}
-            images={galleryImages}
-            selectedImage={selectedImage}
-            onSelectImage={setSelectedImage}
-            statusLabel={statusLabel}
-          />
+        <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-start">
+          <div className="lg:sticky lg:top-24">
+            <DynamicProductGallery
+              name={locale === 'en' ? product.name_en : product.name_ar}
+              images={galleryImages}
+              selectedImage={selectedImage}
+              onSelectImage={setSelectedImage}
+              statusLabel={statusLabel}
+            />
+          </div>
 
           <div className="flex flex-col">
             <header className="mb-10 space-y-4">
-              <div className="inline-flex items-center space-x-2 bg-accent border border-border rounded-full px-4 py-2 w-fit">
+              {/* <div className="inline-flex items-center space-x-2 bg-accent border border-border rounded-full px-4 py-2 w-fit">
                 <div className="h-1.5 w-1.5 rounded-full bg-[#ffc105] shadow-[0_0_10px_rgba(255,193,5,0.5)]" />
                 <span className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground">{t('features.authentic')}</span>
-              </div>
+              </div> */}
               <h1 className="font-space-grotesk text-4xl font-black leading-[1.1] text-foreground md:text-6xl lg:text-7xl uppercase tracking-tightest">
                 {product.name_en}
               </h1>
@@ -185,7 +187,7 @@ export default function ProductDetailPage() {
               </div>
               <div className={`flex items-center gap-2 rounded-full px-4 py-2 border ${isOutOfStock ? "border-destructive/20 bg-destructive/5 text-destructive" : "border-[#ffc105]/20 bg-[#ffc105]/5 text-[#ffc105]"}`}>
                 <Zap size={14} className={isOutOfStock ? "text-destructive" : "text-[#ffc105]"} />
-                <span className="font-space-grotesk text-xs font-black uppercase tracking-widest leading-none">
+                <span className="font-space-grotesk text-xs font-black uppercase leading-none">
                   {t('pricing.unitsLeft', { count: availableUnits })}
                 </span>
               </div>
@@ -193,7 +195,7 @@ export default function ProductDetailPage() {
 
             {variantColorOptions.length > 0 ? (
               <div className="mb-8 space-y-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30 shadow-sm">{t('variants.colorways')}</p>
+                <p className="text-[10px] font-black uppercase text-muted-foreground/30 shadow-sm">{t('variants.colorways')}</p>
                 <div className="flex flex-wrap gap-4">
                   {variantColorOptions.map((sku: ProductSku) => {
                     const color = sku.variantAttributes?.color ?? sku.variantName;
@@ -207,12 +209,12 @@ export default function ProductDetailPage() {
                           setSelectedImage(sku.linkedImageId ?? product.thumbnail ?? product.images?.[0]);
                         }}
                         className={`flex items-center gap-4 rounded-2xl border px-6 py-4 text-left transition-all   ${isActive
-                            ? "border-[#ffc105] bg-[#ffc105]/10 text-foreground shadow-[0_0_20px_rgba(255,193,5,0.1)]"
-                            : "border-border bg-card text-muted-foreground hover:border-[#ffc105]/20 hover:text-foreground"
+                          ? "border-[#ffc105] bg-[#ffc105]/10 text-foreground shadow-[0_0_20px_rgba(255,193,5,0.1)]"
+                          : "border-border bg-card text-muted-foreground hover:border-[#ffc105]/20 hover:text-foreground"
                           }`}
                       >
                         <span className="h-4 w-4 rounded-full border border-border shadow-sm" style={{ backgroundColor: color }} />
-                        <span className="text-xs font-black uppercase tracking-[0.2em]">{color}</span>
+                        <span className="text-xs font-black uppercase">{color}</span>
                       </button>
                     );
                   })}
@@ -220,7 +222,7 @@ export default function ProductDetailPage() {
               </div>
             ) : variantOptions.length > 1 ? (
               <div className="mb-8 space-y-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/40 shadow-sm">{t('variants.variants')}</p>
+                <p className="text-[10px] font-black uppercase text-muted-foreground/40 shadow-sm">{t('variants.variants')}</p>
                 <div className="flex flex-wrap gap-4">
                   {variantOptions.map((sku: ProductSku) => {
                     const isActive = sku._id === selectedVariant?._id;
@@ -232,9 +234,9 @@ export default function ProductDetailPage() {
                           setSelectedSkuId(sku._id);
                           setSelectedImage(sku.linkedImageId ?? product.thumbnail ?? product.images?.[0]);
                         }}
-                        className={`rounded-2xl border px-6 py-4 text-xs font-black uppercase tracking-[0.2em] transition-all   ${isActive
-                            ? "border-[#ffc105] bg-[#ffc105]/10 text-foreground shadow-[0_0_20px_rgba(255,193,5,0.1)]"
-                            : "border-border bg-card text-muted-foreground hover:border-[#ffc105]/20 hover:text-foreground"
+                        className={`rounded-2xl border px-6 py-4 text-xs font-black uppercase transition-all   ${isActive
+                          ? "border-[#ffc105] bg-[#ffc105]/10 text-foreground shadow-[0_0_20px_rgba(255,193,5,0.1)]"
+                          : "border-border bg-card text-muted-foreground hover:border-[#ffc105]/20 hover:text-foreground"
                           }`}
                       >
                         {sku.variantName}
@@ -247,14 +249,14 @@ export default function ProductDetailPage() {
 
             {selectedVariant && (product?.skus?.length ?? 0) > 1 ? (
               <div className="mb-10 rounded-[32px] border border-border bg-accent/30 p-8   backdrop-blur-sm">
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30 mb-4">{t('variants.selected')}</p>
+                <p className="text-[10px] font-black uppercase text-muted-foreground/30 mb-4">{t('variants.selected')}</p>
                 <div className="flex flex-wrap gap-4 text-xs">
-                  <span className="rounded-full border border-[#ffc105]/20 bg-[#ffc105]/5 px-5 py-2 text-[#ffc105] font-black uppercase tracking-widest">{selectedVariant.variantName}</span>
+                  <span className="rounded-full border border-[#ffc105]/20 bg-[#ffc105]/5 px-5 py-2 text-[#ffc105] font-black uppercase">{selectedVariant.variantName}</span>
                   {selectedVariant.variantAttributes?.size ? (
-                    <span className="rounded-full border border-border px-5 py-2 text-muted-foreground font-black uppercase tracking-widest">{t('variants.size', { size: selectedVariant.variantAttributes.size })}</span>
+                    <span className="rounded-full border border-border px-5 py-2 text-muted-foreground font-black uppercase">{t('variants.size', { size: selectedVariant.variantAttributes.size })}</span>
                   ) : null}
                   {selectedVariant.variantAttributes?.type ? (
-                    <span className="rounded-full border border-border px-5 py-2 text-muted-foreground font-black uppercase tracking-widest">{t('variants.type', { type: selectedVariant.variantAttributes.type })}</span>
+                    <span className="rounded-full border border-border px-5 py-2 text-muted-foreground font-black uppercase">{t('variants.type', { type: selectedVariant.variantAttributes.type })}</span>
                   ) : null}
                 </div>
               </div>
@@ -273,7 +275,7 @@ export default function ProductDetailPage() {
               <button
                 disabled={isOutOfStock || isUnavailable}
                 onClick={handleAddToCart}
-                className="group relative flex w-full items-center justify-center gap-4 overflow-hidden rounded-2xl bg-[#ffc105] py-6 font-space-grotesk text-xl font-black uppercase tracking-[0.3em] text-black transition-all hover:bg-foreground hover:text-background active:scale-[0.97] disabled:grayscale disabled:opacity-30 shadow-[0_10px_30px_rgba(255,193,5,0.2)]"
+                className="group relative flex w-full items-center justify-center gap-4 overflow-hidden rounded-2xl bg-[#ffc105] py-6 font-space-grotesk text-xl font-black uppercase text-black transition-all hover:bg-foreground hover:text-background active:scale-[0.97] disabled:grayscale disabled:opacity-30 shadow-[0_10px_30px_rgba(255,193,5,0.2)]"
               >
                 <ShoppingBag size={24} className="group-hover:scale-110 transition-transform" />
                 {t('actions.addToCart')}
@@ -284,13 +286,13 @@ export default function ProductDetailPage() {
                   <div className="h-12 w-12 rounded-2xl bg-[#ffc105]/10 flex items-center justify-center text-[#ffc105]">
                     <Truck size={24} />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 leading-relaxed">{t('features.shipping')}</span>
+                  <span className="text-[10px] font-black uppercase text-muted-foreground/60 leading-relaxed">{t('features.shipping')}</span>
                 </div>
                 <div className="flex items-center gap-5 rounded-3xl border border-border bg-accent/20 p-6 shadow-sm backdrop-blur-sm">
                   <div className="h-12 w-12 rounded-2xl bg-[#ffc105]/10 flex items-center justify-center text-[#ffc105]">
                     <ShieldCheck size={24} />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 leading-relaxed">{t('features.cod')}</span>
+                  <span className="text-[10px] font-black uppercase text-muted-foreground/60 leading-relaxed">{t('features.cod')}</span>
                 </div>
               </div>
             </div>

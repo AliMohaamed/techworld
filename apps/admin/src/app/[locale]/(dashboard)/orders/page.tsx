@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { Link } from "@/navigation";
 import { useQuery, useMutation } from "convex/react";
-import { 
-  ArrowRight, ShieldAlert, ShoppingCart, Loader2, 
-  Search, Calendar, Filter, X, Package, Layers, 
-  TrendingUp, DollarSign, Box, CheckCircle2 
+import {
+  ArrowRight, ShieldAlert, ShoppingCart, Loader2,
+  Search, Calendar, Filter, X, Package, Layers,
+  TrendingUp, DollarSign, Box, CheckCircle2
 } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import { Id } from "@backend/convex/_generated/dataModel";
@@ -15,7 +15,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input } from "@techworld/ui";
 import { toast } from "sonner";
 
-type OrderState = 
+type OrderState =
   | "PENDING_PAYMENT_INPUT"
   | "AWAITING_VERIFICATION"
   | "CONFIRMED"
@@ -36,17 +36,17 @@ export default function OrdersPage() {
   const tStates = useTranslations("Orders.details.states");
   const locale = useLocale();
   const profile = useQuery(api.auth.getCurrentStaffProfile);
-  
+
   const canViewOrders =
     profile?.permissions?.some(
       (permission) => String(permission) === "VIEW_ORDERS",
     ) ?? false;
-    
+
   const canManageShipping =
     profile?.permissions?.some(
       (permission) => String(permission) === "MANAGE_SHIPPING_STATUS",
     ) ?? false;
-    
+
   const orders = useQuery(
     api.orders.listAllOrders,
     profile && canViewOrders ? {} : "skip",
@@ -54,9 +54,9 @@ export default function OrdersPage() {
 
   const products = useQuery(api.products.listAdminProducts, profile && canViewOrders ? {} : "skip");
   const categories = useQuery(api.categories.listAll, profile && canViewOrders ? {} : "skip");
-  
+
   const updateGenericStatus = useMutation(api.orders.updateGenericStatus);
-  
+
   const [filter, setFilter] = useState<FilterType>("ALL");
   const [updatingId, setUpdatingId] = useState<Id<"orders"> | null>(null);
 
@@ -86,9 +86,9 @@ export default function OrdersPage() {
 
   const visibleOrders = orders ? orders.filter(o => {
     const matchesStatus = filter === "ALL" || o.state === filter;
-    const matchesSearch = !search || 
-      o.customerName?.toLowerCase().includes(search.toLowerCase()) || 
-      o.customerPhone?.includes(search) || 
+    const matchesSearch = !search ||
+      o.customerName?.toLowerCase().includes(search.toLowerCase()) ||
+      o.customerPhone?.includes(search) ||
       o.shortCode?.toLowerCase().includes(search.toLowerCase());
     const matchesDate = filterByDate(o._creationTime, dateRange);
     const matchesProduct = selectedProductId === "ALL" || o.productId === selectedProductId;
@@ -102,8 +102,8 @@ export default function OrdersPage() {
     totalOrders: visibleOrders.length,
     totalRevenue: visibleOrders.reduce((acc, o) => acc + o.total_price + (o.appliedShippingFee || 0), 0),
     totalProducts: visibleOrders.reduce((acc, o) => acc + o.quantity, 0),
-    deliveryRate: visibleOrders.length > 0 
-      ? Math.round((visibleOrders.filter(o => o.state === "DELIVERED").length / visibleOrders.length) * 100) 
+    deliveryRate: visibleOrders.length > 0
+      ? Math.round((visibleOrders.filter(o => o.state === "DELIVERED").length / visibleOrders.length) * 100)
       : 0
   };
 
@@ -117,7 +117,7 @@ export default function OrdersPage() {
 
   const handleStatusChange = async (orderId: Id<"orders">, currentState: OrderState, newState: OrderState) => {
     if (currentState === newState) return;
-    
+
     setUpdatingId(orderId);
     try {
       await updateGenericStatus({ orderId, newState });
@@ -132,7 +132,7 @@ export default function OrdersPage() {
   };
 
   const getStatusColor = (state: string) => {
-    switch(state) {
+    switch (state) {
       case "AWAITING_VERIFICATION": return "bg-blue-500/10 text-blue-500 border-blue-500/20";
       case "CONFIRMED": return "bg-[#ffc105]/10 text-[#ffc105] border-[#ffc105]/20";
       case "READY_FOR_SHIPPING": return "bg-purple-500/10 text-purple-500 border-purple-500/20";
@@ -313,7 +313,7 @@ export default function OrdersPage() {
 
           <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-border/50">
             {states.map(s => (
-              <button 
+              <button
                 key={s}
                 onClick={() => setFilter(s)}
                 className={cn(
@@ -328,7 +328,7 @@ export default function OrdersPage() {
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-[32px] border border-border bg-card shadow-xl group transition-all hover:border-[#ffc105]/10">
+      <section className="overflow-hidden rounded-[32px] border border-border bg-card   group transition-all hover:border-[#ffc105]/10">
         <div className="border-b border-border bg-accent/30 px-8 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-4 w-1 bg-[#ffc105] rounded-full" />
@@ -479,20 +479,18 @@ export default function OrdersPage() {
                               <SelectItem
                                 key={state}
                                 value={state}
-                                className={`text-[10px] uppercase tracking-widest font-bold cursor-pointer hover:bg-accent hover:text-accent-foreground ${
-                                  state === order.state ? "opacity-50 cursor-not-allowed" : ""
-                                } ${
-                                  state === "CANCELLED" || state === "RTO" || state === "FLAGGED_FRAUD"
+                                className={`text-[10px] uppercase tracking-widest font-bold cursor-pointer hover:bg-accent hover:text-accent-foreground ${state === order.state ? "opacity-50 cursor-not-allowed" : ""
+                                  } ${state === "CANCELLED" || state === "RTO" || state === "FLAGGED_FRAUD"
                                     ? "text-destructive focus:text-destructive"
                                     : ""
-                                }`}
+                                  }`}
                               >
                                 {tStates(state)}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-                        
+
                         <Link href={`/orders/${order._id}`}>
                           <Button
                             size="sm"

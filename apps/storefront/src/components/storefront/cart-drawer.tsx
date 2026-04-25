@@ -69,7 +69,7 @@ export default function CartDrawer() {
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border p-8">
-            <h2 className="font-space-grotesk text-2xl font-black uppercase tracking-tight text-foreground flex items-center gap-3">
+            <h2 className="font-space-grotesk text-2xl font-bold tracking-tight text-foreground flex items-center gap-3">
               <div className="h-8 w-8 rounded-xl bg-[#ffc105]/10 flex items-center justify-center text-[#ffc105]">
                 <ShoppingBag size={20} />
               </div>
@@ -100,16 +100,16 @@ export default function CartDrawer() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <p className="font-space-grotesk text-lg font-black text-foreground uppercase tracking-tight">
+                  <p className="font-space-grotesk text-lg font-bold text-foreground tracking-tight">
                     {t("empty.title")}
                   </p>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground max-w-[220px] mx-auto leading-relaxed">
+                  <p className="text-xs font-medium text-muted-foreground max-w-[220px] mx-auto leading-relaxed">
                     {t("empty.description")}
                   </p>
                 </div>
                 <button
                   onClick={closeCart}
-                  className="mt-6 font-space-grotesk text-xs font-black text-[#ffc105] hover:text-foreground transition-all uppercase tracking-[0.3em] border border-[#ffc105]/20 px-8 py-3 rounded-full"
+                  className="mt-6 font-space-grotesk text-xs font-bold text-[#ffc105] hover:text-foreground transition-all border border-[#ffc105]/20 px-8 py-3 rounded-full"
                 >
                   {t("empty.cta")}
                 </button>
@@ -135,7 +135,7 @@ export default function CartDrawer() {
                         />
                       </div>
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-muted-foreground text-[9px] font-black uppercase tracking-widest text-center px-2">
+                      <div className="flex h-full w-full items-center justify-center text-muted-foreground text-[10px] font-medium text-center px-2">
                         {t("item.noImage")}
                       </div>
                     )}
@@ -147,7 +147,7 @@ export default function CartDrawer() {
                         <Link
                           href={`/products/${item.product?.slug || item.productId}`}
                           onClick={closeCart}
-                          className="font-space-grotesk text-sm font-black text-foreground hover:text-[#ffc105] transition-colors line-clamp-1 uppercase tracking-tight"
+                          className="font-space-grotesk text-sm font-bold text-foreground hover:text-[#ffc105] transition-colors line-clamp-1 tracking-tight"
                         >
                           {locale === "en"
                             ? item.product?.name_en
@@ -162,7 +162,7 @@ export default function CartDrawer() {
                           <Trash2 size={16} />
                         </button>
                       </div>
-                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground bg-secondary w-fit px-2 py-0.5 rounded shadow-sm">
+                      <p className="text-[10px] font-semibold text-muted-foreground bg-secondary w-fit px-2 py-0.5 rounded shadow-sm">
                         {item.sku?.variantName &&
                         item.sku.variantName !== "Default"
                           ? item.sku.variantName
@@ -186,7 +186,7 @@ export default function CartDrawer() {
                         >
                           <Minus size={14} />
                         </button>
-                        <span className="min-w-[2ch] text-center font-space-grotesk text-sm font-black text-foreground">
+                        <span className="min-w-[2ch] text-center font-space-grotesk text-sm font-bold text-foreground">
                           {item.quantity}
                         </span>
                         <button
@@ -207,7 +207,7 @@ export default function CartDrawer() {
                           <Plus size={14} />
                         </button>
                       </div>
-                      <span className="font-space-grotesk text-base font-black text-foreground tracking-tight">
+                      <span className="font-space-grotesk text-base font-bold text-foreground tracking-tight">
                         {(
                           (item.sku?.price ||
                             item.product?.selling_price ||
@@ -226,7 +226,7 @@ export default function CartDrawer() {
           {cart && cart.items.length > 0 && (
             <div className="border-t border-border bg-background p-8 space-y-8 shadow-[0_-15px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_-15px_40px_rgba(0,0,0,0.5)] backdrop-blur-3xl">
               <div className="space-y-4">
-                <p className="font-space-grotesk text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/50 ml-1">
+                <p className="font-space-grotesk text-[11px] font-bold text-muted-foreground/50 ml-1">
                   {t("promo.label")}
                 </p>
                 <PromoCodeInput
@@ -243,31 +243,31 @@ export default function CartDrawer() {
               </div>
 
               <div className="space-y-4">
-                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">
+                <div className="flex justify-between items-center text-xs font-semibold text-muted-foreground">
                   <span>{t("summary.subtotal")}</span>
                   <span className="text-foreground/80">
                     {(cart.subtotal || 0).toLocaleString(locale)} EGP
                   </span>
                 </div>
                 {cart.promoDiscount ? (
-                  <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-emerald-600 dark:text-emerald-500">
+                  <div className="flex justify-between items-center text-xs font-semibold text-emerald-600 dark:text-emerald-500">
                     <span>{t("summary.discount")}</span>
                     <span className="font-mono">
                       -{cart.promoDiscount.toLocaleString(locale)} EGP
                     </span>
                   </div>
                 ) : null}
-                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">
+                <div className="flex justify-between items-center text-xs font-semibold text-muted-foreground">
                   <span>{t("summary.shipping")}</span>
-                  <span className="text-muted-foreground/60 italic lowercase tracking-wide font-medium">
+                  <span className="text-muted-foreground/60 italic lowercase font-medium">
                     {t("summary.shippingNote")}
                   </span>
                 </div>
                 <div className="flex justify-between border-t border-border pt-8 text-foreground items-end">
-                  <span className="font-space-grotesk text-sm font-black uppercase tracking-[0.5em] text-muted-foreground/50 leading-none">
+                  <span className="font-space-grotesk text-xs font-bold text-muted-foreground/50 leading-none uppercase">
                     {t("summary.total")}
                   </span>
-                  <span className="font-space-grotesk text-4xl font-black text-[#ffc105] tracking-tightest leading-none">
+                  <span className="font-space-grotesk text-4xl font-bold text-[#ffc105] tracking-tightest leading-none">
                     {(cart.total || 0).toLocaleString(locale)}{" "}
                     <span className="text-lg">EGP</span>
                   </span>
@@ -277,7 +277,7 @@ export default function CartDrawer() {
               <Link
                 href="/checkout"
                 onClick={closeCart}
-                className="group relative flex w-full items-center justify-center gap-3 rounded-2xl bg-[#ffc105] py-5 font-space-grotesk text-lg font-black uppercase tracking-[0.3em] text-black transition-all hover:bg-foreground hover:text-background active:scale-[0.98] shadow-[0_10px_30px_rgba(255,193,5,0.2)]"
+                className="group relative flex w-full items-center justify-center gap-3 rounded-2xl bg-[#ffc105] py-5 font-space-grotesk text-lg font-bold text-black transition-all hover:bg-foreground hover:text-background active:scale-[0.98] shadow-[0_10px_30px_rgba(255,193,5,0.2)]"
               >
                 {t("summary.checkout")}
               </Link>

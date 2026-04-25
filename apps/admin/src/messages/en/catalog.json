@@ -158,7 +158,8 @@
             "compareAt": "Variant compare-at",
             "linkedImage": "Linked image",
             "isDefault": "Default Selection"
-          }
+          },
+          "imageIndex": "Image {index}"
         },
         "placeholders": {
           "selectCategory": "Select category",

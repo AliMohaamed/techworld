@@ -52,10 +52,10 @@ export function PromoCodeInput({
             <CheckCircle2 size={20} />
           </div>
           <div>
-            <p className="font-space-grotesk text-[10px] font-black uppercase tracking-[0.3em] text-emerald-600 dark:text-emerald-500/80">
+            <p className="font-space-grotesk text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-500/80">
               {appliedLabel}
             </p>
-            <p className="font-mono text-sm font-black text-foreground tracking-widest uppercase mt-0.5">
+            <p className="font-mono text-sm font-black text-foreground uppercase mt-0.5">
               {appliedCode}
             </p>
           </div>
@@ -64,7 +64,7 @@ export function PromoCodeInput({
           {isFreeShipping ? (
             <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-xl border border-emerald-500/20">
               <Truck size={14} />
-              <span className="text-[10px] uppercase tracking-widest font-black">{freeShippingLabel}</span>
+              <span className="text-[10px] uppercase font-black">{freeShippingLabel}</span>
             </div>
           ) : (
             <p className="font-space-grotesk text-base font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
@@ -73,7 +73,7 @@ export function PromoCodeInput({
           )}
           <button
             onClick={onRemove}
-            className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-red-500"
+            className="text-[10px] font-black uppercase text-muted-foreground transition-colors hover:text-red-500"
           >
             {removeLabel}
           </button>
@@ -91,7 +91,7 @@ export function PromoCodeInput({
             type="text"
             placeholder={placeholder}
             className={cn(
-              "w-full rounded-2xl border border-border bg-card py-5 ltr:pl-14 rtl:pr-14 ltr:pr-5 rtl:pl-5 font-mono text-sm font-black tracking-widest text-foreground uppercase placeholder:text-muted-foreground/30 focus:border-[#ffc105]/30 focus:outline-none transition-all",
+              "w-full rounded-2xl border border-border bg-card py-5 ltr:pl-14 rtl:pr-14 ltr:pr-5 rtl:pl-5 font-mono text-sm font-black text-foreground uppercase placeholder:text-muted-foreground/30 focus:border-[#ffc105]/30 focus:outline-none transition-all",
               error && "border-red-500/30 focus:border-red-500/50"
             )}
             value={inputValue}
@@ -102,7 +102,7 @@ export function PromoCodeInput({
         <Button
           onClick={handleApply}
           disabled={isLoading || !inputValue.trim()}
-          className="h-auto px-8 font-space-grotesk text-[11px] font-black uppercase tracking-[0.3em] rounded-2xl bg-secondary text-foreground border border-border hover:bg-[#ffc105] hover:text-black transition-all active:scale-95 disabled:opacity-50"
+          className="h-auto px-8 font-space-grotesk text-[11px] font-black uppercase rounded-2xl bg-secondary text-foreground border border-border hover:bg-[#ffc105] hover:text-black transition-all active:scale-95 disabled:opacity-50"
         >
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : applyLabel}
         </Button>
@@ -111,7 +111,7 @@ export function PromoCodeInput({
       {error && (
         <div className="flex items-center gap-3 rounded-xl bg-red-500/5 border border-red-500/20 p-4 text-red-500 dark:text-red-400 animate-in slide-in-from-top-2 duration-300">
           <AlertCircle size={16} />
-          <p className="text-[10px] font-black uppercase tracking-widest leading-relaxed">{error}</p>
+          <p className="text-[10px] font-black uppercase leading-relaxed">{error}</p>
         </div>
       )}
     </div>
