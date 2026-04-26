@@ -62,7 +62,7 @@ export default function TeamManagementPage() {
       prev.includes(perm) ? prev.filter((p) => p !== perm) : [...prev, perm],
     );
   };
-  
+
   const handleEdit = (user: any) => {
     setFormName(user.name);
     setFormEmail(user.email);
@@ -191,7 +191,7 @@ export default function TeamManagementPage() {
               setIsProvisioning(true);
               generatePassword();
             }}
-            className="rounded-2xl h-14 px-8 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all shadow-xl font-black uppercase tracking-widest text-[10px]"
+            className="rounded-2xl h-14 px-8 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-black uppercase tracking-widest text-[10px]"
           >
             <UserPlus className="ltr:mr-3 rtl:ml-3 h-4 w-4" />
             {t("header.provisionButton")}
@@ -257,7 +257,7 @@ export default function TeamManagementPage() {
                 />
               </div>
               <div className="space-y-3">
-                  <Label
+                <Label
                   htmlFor="staff-password"
                   className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40"
                 >
@@ -336,7 +336,7 @@ export default function TeamManagementPage() {
             <div className="flex flex-col sm:flex-row gap-4 pt-6">
               <Button
                 type="submit"
-                className="h-14 px-10 rounded-2xl bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all shadow-xl font-black uppercase tracking-[0.2em] text-[10px]"
+                className="h-14 px-10 rounded-2xl bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all   font-black uppercase tracking-[0.2em] text-[10px]"
               >
                 {editingStaffId ? t("edit.form.submit") : t("provision.form.submit")}
               </Button>
@@ -461,8 +461,8 @@ export default function TeamManagementPage() {
                                     const next = e.target.checked
                                       ? [...user.permissions, perm]
                                       : user.permissions.filter(
-                                          (p) => p !== perm,
-                                        );
+                                        (p) => p !== perm,
+                                      );
                                     handleUpdatePermissions(
                                       user._id,
                                       next as Permission[],

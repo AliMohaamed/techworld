@@ -84,10 +84,10 @@ export default function CatalogExplorer({
           <div className="absolute inset-0 bg-gradient-to-br from-[#ffc105]/5 to-transparent dark:hidden" />
 
           <div className="relative max-w-3xl space-y-6">
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
+            <p className="text-xs font-bold tracking-wider text-[#ffc105]">
               {eyebrow}
             </p>
-            <h1 className="font-space-grotesk text-4xl font-black uppercase tracking-tight text-foreground md:text-6xl md:leading-[1.1]">
+            <h1 className="font-space-grotesk text-4xl font-bold tracking-tight text-foreground md:text-6xl md:leading-[1.1]">
               {heading}
             </h1>
             <p className="max-w-2xl text-sm leading-8 text-muted-foreground md:text-lg font-light">
@@ -102,16 +102,16 @@ export default function CatalogExplorer({
           <div className="space-y-8">
             <div className="flex flex-wrap items-center justify-between gap-6 rounded-[28px] border border-border bg-secondary/50 ltr:px-8 rtl:px-8 py-5   backdrop-blur-sm">
               <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-muted-foreground/50">
+                <p className="text-xs font-bold tracking-wider text-muted-foreground/50 uppercase">
                   {t("results.eyebrow")}
                 </p>
-                <p className="font-space-grotesk text-xl font-black uppercase tracking-tight text-foreground">
+                <p className="font-space-grotesk text-xl font-bold tracking-tight text-foreground">
                   {t("results.count", { count: results.length })}
                 </p>
               </div>
               {searchQuery && (
                 <div className="px-5 py-2 rounded-full bg-accent border border-border">
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
                     {t("results.search", { query: searchQuery })}
                   </p>
                 </div>
@@ -121,10 +121,10 @@ export default function CatalogExplorer({
             {results.length === 0 && status === "Exhausted" ? (
               <div className="space-y-12">
                 <div className="rounded-[32px] border border-dashed border-border bg-secondary/30 px-8 py-16 text-center  ">
-                  <p className="text-[10px] font-black uppercase tracking-[0.35em] text-muted-foreground/40">
+                  <p className="text-xs font-bold tracking-wider text-muted-foreground/40 uppercase">
                     {t("empty.eyebrow")}
                   </p>
-                  <h2 className="mt-4 font-space-grotesk text-4xl font-black uppercase tracking-tight text-foreground">
+                  <h2 className="mt-4 font-space-grotesk text-4xl font-bold tracking-tight text-foreground">
                     {t("empty.title")}
                   </h2>
                   <p className="mx-auto mt-4 max-w-xl text-sm leading-8 text-muted-foreground font-light">
@@ -136,7 +136,7 @@ export default function CatalogExplorer({
                   <section className="space-y-8">
                     <div className="flex items-center space-x-4 rtl:space-x-reverse">
                       <div className="h-0.5 w-12 bg-[#ffc105]" />
-                      <p className="text-[11px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
+                      <p className="text-xs font-bold tracking-wider text-[#ffc105] uppercase">
                         {t("recommended.eyebrow")}
                       </p>
                     </div>

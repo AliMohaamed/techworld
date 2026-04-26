@@ -36,9 +36,9 @@ export default async function FeaturedProducts({ products }: FeaturedProductsPro
           <div className="space-y-2">
             <div className="inline-flex items-center space-x-2">
               <div className="h-1 w-8 bg-[#ffc105]" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#ffc105]">{t('badge')}</span>
+              <span className="text-[11px] font-semibold tracking-wide text-[#ffc105]">{t('badge')}</span>
             </div>
-            <h2 className="font-space-grotesk text-4xl font-black uppercase tracking-tighter text-foreground md:text-5xl lg:text-6xl">
+            <h2 className="font-space-grotesk text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
               {t('title')} <span className="text-muted-foreground/20 dark:text-zinc-800">{t('accentTitle')}</span>
             </h2>
           </div>

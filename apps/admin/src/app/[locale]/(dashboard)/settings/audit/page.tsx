@@ -64,7 +64,7 @@ export default function SettingsAuditPage() {
 
   return (
     <main className="space-y-8 pb-20 bg-background transition-colors">
-      <header className="rounded-[32px] border border-border bg-card px-8 py-10 shadow-xl relative overflow-hidden group">
+      <header className="rounded-[32px] border border-border bg-card px-8 py-10   relative overflow-hidden group">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,193,5,0.05),transparent_40%)]" />
         <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-[#ffc105]/5 to-transparent dark:hidden" />
 

@@ -238,7 +238,7 @@ export const updateOrderStatus = mutation({
     await ctx.db.patch(args.orderId, patch);
 
     if (order.customerPhone && order.shortCode) {
-      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppWebhook, {
+      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppMessage, {
         orderId: args.orderId,
         shortCode: order.shortCode,
         customerPhone: order.customerPhone,
@@ -347,7 +347,7 @@ export const payOrder = mutation({
     await ctx.db.patch(args.orderId, { state: "AWAITING_VERIFICATION" });
 
     if (order.customerPhone && order.shortCode) {
-      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppWebhook, {
+      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppMessage, {
         orderId: args.orderId,
         shortCode: order.shortCode,
         customerPhone: order.customerPhone,
@@ -401,7 +401,7 @@ export const updateRto = mutation({
     await ctx.db.patch(args.orderId, { state: "RTO" });
 
     if (order.customerPhone && order.shortCode) {
-      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppWebhook, {
+      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppMessage, {
         orderId: args.orderId,
         shortCode: order.shortCode,
         customerPhone: order.customerPhone,
@@ -471,7 +471,7 @@ export const updateGenericStatus = mutation({
     await ctx.db.patch(args.orderId, patch);
 
     if (order.customerPhone && order.shortCode) {
-      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppWebhook, {
+      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppMessage, {
         orderId: args.orderId,
         shortCode: order.shortCode,
         customerPhone: order.customerPhone,

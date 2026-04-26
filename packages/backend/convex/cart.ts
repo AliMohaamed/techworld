@@ -408,7 +408,7 @@ export const placeOrderFromSession = mutation({
     }
 
     if (!isBlacklisted && args.customerPhone && firstOrderId) {
-      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppWebhook, {
+      ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppMessage, {
         orderId: firstOrderId,
         shortCode: shortCode,
         customerPhone: args.customerPhone,

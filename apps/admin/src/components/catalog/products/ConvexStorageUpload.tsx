@@ -9,19 +9,15 @@ import { cn } from "@techworld/ui";
 
 export function ConvexStorageUpload({
   imageIds,
+  storageUrls,
   onChange,
 }: {
   imageIds: string[];
+  storageUrls?: Record<string, string | null>;
   onChange: (imageIds: string[]) => void;
 }) {
   const generateUploadUrl = useMutation(api.storage.generateCatalogUploadUrl);
   const [isUploading, setIsUploading] = useState(false);
-
-  // M1 FIX: Resolve storage IDs to actual image preview URLs.
-  const storageUrls = useQuery(
-    api.storage.getStorageUrls,
-    imageIds.length > 0 ? { storageIds: imageIds } : "skip",
-  );
 
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) {
@@ -55,6 +51,11 @@ export function ConvexStorageUpload({
     }
   };
 
+  const setAsPrimary = (id: string) => {
+    const nextImages = [id, ...imageIds.filter((imgId) => imgId !== id)];
+    onChange(nextImages);
+  };
+
   return (
     <div className="space-y-4 rounded-3xl border border-border bg-card p-6 shadow-sm transition-all focus-within:ring-2 focus-within:ring-[#ffc105]/20 focus-within:border-[#ffc105]/40">
       <label className="block cursor-pointer rounded-2xl border-2 border-dashed border-border/60 bg-accent/20 px-6 py-10 text-center transition-all hover:border-[#ffc105]/30 hover:bg-[#ffc105]/5 group">
@@ -82,10 +83,17 @@ export function ConvexStorageUpload({
         <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 pt-2">
           {imageIds.map((imageId, index) => {
             const previewUrl = storageUrls?.[imageId];
+            const isPrimary = index === 0;
+
             return (
               <div
                 key={imageId}
-                className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-accent   transition-all hover:scale-105 hover:shadow-xl hover:border-[#ffc105]/30"
+                className={cn(
+                  "group relative aspect-square overflow-hidden rounded-2xl border bg-accent transition-all hover:scale-105 hover: ",
+                  isPrimary
+                    ? "border-[#ffc105] ring-2 ring-[#ffc105]/20"
+                    : "border-border hover:border-[#ffc105]/30",
+                )}
               >
                 {/* Image preview */}
                 {previewUrl ? (
@@ -103,12 +111,21 @@ export function ConvexStorageUpload({
                   </div>
                 )}
 
-                {/* Primary badge */}
-                {index === 0 ? (
-                  <div className="absolute left-1.5 top-1.5 rounded-full bg-[#ffc105] px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-black  ">
+                {/* Primary badge/button */}
+                {isPrimary ? (
+                  <div className="absolute left-1.5 top-1.5 rounded-full bg-[#ffc105] px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-black shadow-sm">
                     Primary
                   </div>
-                ) : null}
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setAsPrimary(imageId)}
+                    className="absolute left-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-lg bg-background/80 text-foreground opacity-0 backdrop-blur transition-all hover:bg-[#ffc105] hover:text-black group-hover:opacity-100"
+                    title="Set as primary"
+                  >
+                    <UploadCloud size={10} className="rotate-180" />
+                  </button>
+                )}
 
                 {/* Remove button */}
                 <button
@@ -116,7 +133,7 @@ export function ConvexStorageUpload({
                   onClick={() =>
                     onChange(imageIds.filter((id) => id !== imageId))
                   }
-                  className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-lg bg-destructive text-destructive-foreground opacity-0 transition-all hover:scale-110 group-hover:opacity-100  "
+                  className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-lg bg-destructive text-destructive-foreground opacity-0 transition-all hover:scale-110 group-hover:opacity-100 shadow-sm"
                   aria-label="Remove image"
                 >
                   <X size={12} strokeWidth={3} />

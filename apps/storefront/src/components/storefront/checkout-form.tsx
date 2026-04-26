@@ -65,7 +65,7 @@ export default function CheckoutForm() {
   if (governorates && governorates.length === 0) {
     return (
       <div className="rounded-[32px] border border-destructive/20 bg-destructive/5 p-10 text-center  ">
-        <p className="text-destructive font-black uppercase tracking-widest text-xs leading-relaxed">{t('errors.noGovernorates')}</p>
+        <p className="text-destructive font-bold text-xs leading-relaxed">{t('errors.noGovernorates')}</p>
       </div>
     );
   }
@@ -76,13 +76,13 @@ export default function CheckoutForm() {
         {/* Shipping Section */}
         <div className="space-y-8">
           <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#ffc105] text-sm font-black text-black shadow-[0_4px_15px_rgba(255,193,5,0.3)]">1</div>
-            <h2 className="font-space-grotesk text-2xl font-black tracking-tight text-foreground uppercase">{t('shipping')}</h2>
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#ffc105] text-sm font-bold text-black shadow-[0_4px_15px_rgba(255,193,5,0.3)]">1</div>
+            <h2 className="font-space-grotesk text-2xl font-bold tracking-tight text-foreground">{t('shipping')}</h2>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground block px-1">{t('labels.fullName')}</label>
+              <label className="text-xs font-bold text-muted-foreground block px-1 uppercase">{t('labels.fullName')}</label>
               <div className="relative">
                 <input
                   required
@@ -95,7 +95,7 @@ export default function CheckoutForm() {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground block px-1">{t('labels.phone')}</label>
+              <label className="text-xs font-bold text-muted-foreground block px-1 uppercase">{t('labels.phone')}</label>
               <div className="relative">
                 <input
                   required
@@ -108,7 +108,7 @@ export default function CheckoutForm() {
               </div>
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <label className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground block px-1">{t('labels.governorate')}</label>
+              <label className="text-xs font-bold text-muted-foreground block px-1 uppercase">{t('labels.governorate')}</label>
               <div className="relative">
                 <select
                   required
@@ -129,7 +129,7 @@ export default function CheckoutForm() {
               </div>
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <label className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground block px-1">{t('labels.address')}</label>
+              <label className="text-xs font-bold text-muted-foreground block px-1 uppercase">{t('labels.address')}</label>
               <textarea
                 required
                 placeholder={t('labels.address')}
@@ -144,8 +144,8 @@ export default function CheckoutForm() {
         {/* Promo Code Section */}
         <div className="space-y-6">
           <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary text-sm font-black text-foreground border border-border">2</div>
-            <h2 className="font-space-grotesk text-2xl font-black tracking-tight text-foreground uppercase">{t('promo.label')}</h2>
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary text-sm font-bold text-foreground border border-border">2</div>
+            <h2 className="font-space-grotesk text-2xl font-bold tracking-tight text-foreground">{t('promo.label')}</h2>
           </div>
           <PromoCodeInput
             onApply={(code) => setFormData({ ...formData, promoCode: code })}
@@ -165,45 +165,45 @@ export default function CheckoutForm() {
         {/* Summary Recap Desktop */}
         <div className="rounded-[40px] border border-border bg-card/50 p-10 space-y-6   backdrop-blur-sm">
           <div className="flex justify-between items-center pb-6 border-b border-border">
-            <span className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.3em]">{t('summary.subtotal')}</span>
-            <span className="text-foreground font-space-grotesk font-black tracking-tight">{(cart?.subtotal || 0).toLocaleString(locale)} <span className="text-xs text-[#ffc105]">EGP</span></span>
+            <span className="text-muted-foreground text-xs font-bold uppercase">{t('summary.subtotal')}</span>
+            <span className="text-foreground font-space-grotesk font-bold tracking-tight">{(cart?.subtotal || 0).toLocaleString(locale)} <span className="text-xs text-[#ffc105]">EGP</span></span>
           </div>
 
           {cart?.promoType === "free_shipping" ? (
             <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-500">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em]">{t('summary.discount')}</span>
-              <span className="font-space-grotesk font-black tracking-tight uppercase tracking-widest text-[10px] bg-emerald-500/10 px-2 py-1 rounded">{t('summary.freeShipping')}</span>
+              <span className="text-xs font-bold uppercase">{t('summary.discount')}</span>
+              <span className="font-space-grotesk font-bold tracking-tight text-[10px] bg-emerald-500/10 px-2 py-1 rounded uppercase">{t('summary.freeShipping')}</span>
             </div>
           ) : cart?.promoDiscount ? (
             <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-500">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em]">{t('summary.discount')}</span>
-              <span className="font-space-grotesk font-black tracking-tight">-{cart.promoDiscount.toLocaleString(locale)} <span className="text-xs">EGP</span></span>
+              <span className="text-xs font-bold uppercase">{t('summary.discount')}</span>
+              <span className="font-space-grotesk font-bold tracking-tight">-{cart.promoDiscount.toLocaleString(locale)} <span className="text-xs">EGP</span></span>
             </div>
           ) : null}
 
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.3em]">{t('summary.shipping')}</span>
-            <span className="text-foreground font-space-grotesk font-black tracking-tight">
+            <span className="text-muted-foreground text-xs font-bold uppercase">{t('summary.shipping')}</span>
+            <span className="text-foreground font-space-grotesk font-bold tracking-tight">
               {!formData.governorateId ? (
                 <span className="text-muted-foreground italic text-[10px] lowercase tracking-wide font-medium">{t('errors.selectGovernorate')}</span>
               ) : selectedGov ? (
                 cart?.promoType === "free_shipping" ? (
                   <span className="text-emerald-500 flex items-center gap-2">
                     <span className="line-through text-muted-foreground opacity-50">{selectedGov.shippingFee.toLocaleString(locale)}</span>
-                    <span className="text-[10px] uppercase font-black tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded">{t('summary.freeShipping')}</span>
+                    <span className="text-[10px] uppercase font-black bg-emerald-500/10 px-2 py-0.5 rounded">{t('summary.freeShipping')}</span>
                   </span>
                 ) : (
                   <>{selectedGov.shippingFee.toLocaleString(locale)} <span className="text-xs text-[#ffc105]">EGP</span></>
                 )
               ) : (
-                <span className="text-muted-foreground text-[10px] uppercase font-black tracking-widest">{t('summary.loading')}</span>
+                <span className="text-muted-foreground text-xs font-bold tracking-wide uppercase">{t('summary.loading')}</span>
               )}
             </span>
           </div>
 
           <div className="flex justify-between items-center pt-8 border-t border-border">
-            <span className="text-foreground text-sm font-black uppercase tracking-[0.4em]">{t('summary.total')}</span>
-            <span className="text-[#ffc105] font-space-grotesk text-4xl font-black tracking-tightest">
+            <span className="text-foreground text-sm font-bold uppercase">{t('summary.total')}</span>
+            <span className="text-[#ffc105] font-space-grotesk text-4xl font-bold tracking-tightest">
               {((cart?.total || 0) + (cart?.promoType === "free_shipping" ? 0 : (selectedGov?.shippingFee || 0))).toLocaleString(locale)} <span className="text-lg">EGP</span>
             </span>
           </div>
@@ -213,7 +213,7 @@ export default function CheckoutForm() {
           <button
             disabled={isSubmitting || !cart}
             type="submit"
-            className="group relative flex w-full items-center justify-center gap-4 rounded-2xl bg-[#ffc105] py-6 font-space-grotesk text-xl font-black uppercase tracking-[0.3em] text-black transition-all hover:bg-foreground hover:text-background active:scale-[0.98] disabled:opacity-30 disabled:grayscale shadow-[0_10px_30px_rgba(255,193,5,0.2)]"
+            className="group relative flex w-full items-center justify-center gap-4 rounded-2xl bg-[#ffc105] py-6 font-space-grotesk text-xl font-bold text-black transition-all hover:bg-foreground hover:text-background active:scale-[0.98] disabled:opacity-30 disabled:grayscale shadow-[0_10px_30px_rgba(255,193,5,0.2)]"
           >
             {isSubmitting ? (
               <Loader2 className="animate-spin" size={28} />
@@ -226,7 +226,7 @@ export default function CheckoutForm() {
           </button>
           <div className="flex items-center justify-center gap-3 text-muted-foreground px-4 py-3 bg-secondary/20 rounded-xl border border-border">
             <ShieldCheck size={18} className="text-emerald-500" />
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] leading-relaxed text-center">
+            <p className="text-[11px] font-bold leading-relaxed text-center uppercase">
               {t('notice')}
             </p>
           </div>

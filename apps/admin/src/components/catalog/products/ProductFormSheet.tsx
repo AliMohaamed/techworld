@@ -3,8 +3,10 @@
 import { useEffect } from "react";
 import { useFieldArray, useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 
-import { useMutation } from "convex/react";
+
+import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
 import {
   Plus,
@@ -135,7 +137,7 @@ export function ProductFormSheet({
     formState: { errors, isSubmitting },
   } = useForm<ProductFormValues>({
     defaultValues: emptyValues,
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(productSchema as any),
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -143,6 +145,12 @@ export function ProductFormSheet({
     name: "variants",
   });
   const images = useWatch({ control, name: "images" }) ?? [];
+  const thumbnail = useWatch({ control, name: "thumbnail" });
+
+  const storageUrls = useQuery(
+    api.storage.getStorageUrls,
+    images.length > 0 ? { storageIds: images } : "skip",
+  );
 
   const handleRestock = async (index: number) => {
     const variant = getValues(`variants.${index}`);
@@ -224,7 +232,7 @@ export function ProductFormSheet({
   }, [open, product, reset]);
 
   const submit = handleSubmit(async (values) => {
-    const payload = buildPayload(values);
+    const payload = buildPayload(values as ProductFormSubmitValues);
 
 
     if (product) {
@@ -251,7 +259,7 @@ export function ProductFormSheet({
           <SheetHeader className="p-10 pb-10 border-b border-border bg-card relative z-10">
             <div className="flex items-center gap-3 mb-4">
               <Box className="text-[#ffc105]" size={24} />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-[#ffc105]">
                 {t("form.badge")}
               </p>
             </div>
@@ -272,7 +280,7 @@ export function ProductFormSheet({
             <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex items-center gap-3">
                 <Info size={18} className="text-[#ffc105]/60" />
-                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
+                <h3 className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
                   General Configuration
                 </h3>
               </div>
@@ -287,12 +295,12 @@ export function ProductFormSheet({
                     name="categoryId"
                     render={({ field }) => (
                       <Select value={field.value || undefined} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full rounded-xl border border-border bg-background px-4 h-12 font-bold uppercase text-[11px] tracking-widest text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
+                        <SelectTrigger className="w-full rounded-xl border border-border bg-background px-4 h-12 font-bold uppercase text-[11px] tracking-wide text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
                           <SelectValue placeholder={t("form.placeholders.selectCategory")} />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl border-border bg-card">
                           {categories.map((category) => (
-                            <SelectItem key={category._id} value={category._id} className="font-bold uppercase tracking-widest text-[11px] cursor-pointer">
+                            <SelectItem key={category._id} value={category._id} className="font-bold uppercase tracking-wide text-[11px] cursor-pointer">
                               {category.name_en}
                             </SelectItem>
                           ))}
@@ -312,10 +320,10 @@ export function ProductFormSheet({
                         type="button"
                         onClick={() => setValue("status", s as any)}
                         className={cn(
-                          "py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                          "py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all",
                           watch("status") === s
                             ? "bg-[#ffc105] text-black  "
-                            : "text-muted-foreground/40 hover:text-foreground",
+                            : "text-muted-foreground/60 hover:text-foreground",
                         )}
                       >
                         {t(`form.statusOptions.${s.toLowerCase()}`)}
@@ -326,7 +334,7 @@ export function ProductFormSheet({
                 </Field>
                 <div className="flex items-center justify-between p-6 rounded-2xl border border-[#ffc105]/20 bg-[#ffc105]/5 md:col-span-2">
                   <div className="space-y-1">
-                    <Label className="text-[11px] font-black uppercase tracking-widest text-foreground">
+                    <Label className="text-[11px] font-bold uppercase tracking-wide text-foreground">
                       {t("form.fields.isFeatured")}
                     </Label>
                     <p className="text-[10px] text-muted-foreground/60 font-medium leading-relaxed">
@@ -372,7 +380,7 @@ export function ProductFormSheet({
                   <Input
                     {...register("slug")}
                     placeholder={t("form.placeholders.slug")}
-                    className="rounded-xl border-border bg-background h-12 font-mono text-[10px] tracking-widest uppercase"
+                    className="rounded-xl border-border bg-background h-12 font-mono text-[11px] tracking-wide uppercase"
                   />
                 </Field>
                 <div className="grid grid-cols-3 gap-4 md:col-span-2">
@@ -388,7 +396,7 @@ export function ProductFormSheet({
                         placeholder="0.00"
                         className="rounded-xl border-border bg-background h-12 font-black tracking-tightest pr-12"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-muted-foreground/30">
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/60">
                         EGP
                       </span>
                     </div>
@@ -405,7 +413,7 @@ export function ProductFormSheet({
                         placeholder="0.00"
                         className="rounded-xl border-border bg-background h-12 font-black tracking-tightest pr-12 text-muted-foreground/60"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-muted-foreground/30">
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/60">
                         EGP
                       </span>
                     </div>
@@ -422,7 +430,7 @@ export function ProductFormSheet({
                         placeholder="0.00"
                         className="rounded-xl border-border bg-background h-12 font-black tracking-tightest pr-12 text-primary"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-muted-foreground/30">
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/60">
                         EGP
                       </span>
                     </div>
@@ -458,17 +466,20 @@ export function ProductFormSheet({
             <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
               <div className="flex items-center gap-3">
                 <ImageIcon size={18} className="text-[#ffc105]/60" />
-                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
+                <h3 className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
                   Media Assets
                 </h3>
               </div>
               <div className="p-8 rounded-[40px] border border-border bg-card   space-y-6">
                 <ConvexStorageUpload
                   imageIds={images}
+                  storageUrls={storageUrls}
                   onChange={(nextImages) => {
                     setValue("images", nextImages, { shouldValidate: true });
                     if (!getValues("thumbnail") && nextImages[0]) {
                       setValue("thumbnail", nextImages[0]);
+                    } else if (getValues("thumbnail") && !nextImages.includes(getValues("thumbnail")!)) {
+                      setValue("thumbnail", nextImages[0] || "");
                     }
                   }}
                 />
@@ -480,14 +491,59 @@ export function ProductFormSheet({
                     control={control}
                     name="thumbnail"
                     render={({ field }) => (
-                      <Select value={field.value || undefined} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full rounded-xl border border-border bg-background px-4 h-12 font-mono text-[10px] tracking-widest uppercase text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
-                          <SelectValue placeholder={t("form.placeholders.selectThumbnail")} />
+                      <Select
+                        value={field.value || undefined}
+                        onValueChange={(val) => {
+                          field.onChange(val);
+                          // Reorder images to make selected thumbnail the first one
+                          const nextImages = [
+                            val,
+                            ...images.filter((id) => id !== val),
+                          ];
+                          setValue("images", nextImages);
+                        }}
+                      >
+                        <SelectTrigger className="w-full rounded-xl border border-border bg-background px-4 h-12 font-bold uppercase text-[11px] tracking-wide text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
+                          <SelectValue
+                            placeholder={t("form.placeholders.selectThumbnail")}
+                          />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl border-border bg-card">
-                          {images.map((imageId) => (
-                            <SelectItem key={imageId} value={imageId} className="font-mono uppercase tracking-widest text-[10px] cursor-pointer">
-                              {imageId}
+                          {images.map((imageId, idx) => (
+                            <SelectItem
+                              key={imageId}
+                              value={imageId}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="relative h-8 w-8 overflow-hidden rounded-md border border-border bg-accent">
+                                  {storageUrls?.[imageId] ? (
+                                    <Image
+                                      src={storageUrls[imageId]}
+                                      alt=""
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  ) : (
+                                    <div className="flex h-full w-full items-center justify-center">
+                                      <ImageIcon
+                                        size={12}
+                                        className="text-muted-foreground/20"
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                                <span className="font-bold uppercase tracking-wide text-[11px]">
+                                  {t("form.fields.imageIndex", {
+                                    index: idx + 1,
+                                  })}
+                                  {idx === 0 && (
+                                    <span className="ml-2 text-[#ffc105]">
+                                      (Primary)
+                                    </span>
+                                  )}
+                                </span>
+                              </div>
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -503,14 +559,14 @@ export function ProductFormSheet({
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
                   <Layers size={18} className="text-[#ffc105]/60" />
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
+                  <h3 className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
                     Unified SKU Matrix
                   </h3>
                 </div>
                 <Button
                   type="button"
                   variant="outline"
-                  className="rounded-full border-[#ffc105]/20 text-[#ffc105] font-black uppercase tracking-widest text-[9px] h-8 px-4 hover:bg-[#ffc105]/10"
+                  className="rounded-full border-[#ffc105]/20 text-[#ffc105] font-bold uppercase tracking-wide text-[10px] h-8 px-4 hover:bg-[#ffc105]/10"
                   onClick={() =>
                     append({
                       ...emptyVariant,
@@ -535,7 +591,7 @@ export function ProductFormSheet({
                     <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between relative z-10">
                       <div className="flex items-center gap-3">
                         <div className="h-2 w-2 rounded-full bg-[#ffc105]" />
-                        <p className="text-[11px] font-black text-foreground uppercase tracking-widest">
+                        <p className="text-[11px] font-bold text-foreground uppercase tracking-wide">
                           {t("form.fields.variant", { index: index + 1 })}
                         </p>
                       </div>
@@ -543,7 +599,7 @@ export function ProductFormSheet({
                         <Button
                           type="button"
                           variant="ghost"
-                          className="h-9 px-4 rounded-full text-destructive/40 hover:text-destructive hover:bg-destructive/10 text-[9px] font-black uppercase tracking-widest"
+                          className="h-9 px-4 rounded-full text-destructive/60 hover:text-destructive hover:bg-destructive/10 text-[10px] font-bold uppercase tracking-wide"
                           onClick={() => remove(index)}
                         >
                           <Trash2 size={12} className="mr-2" />
@@ -559,7 +615,7 @@ export function ProductFormSheet({
                         <Input
                           {...register(`variants.${index}.variantName`)}
                           placeholder={t("form.placeholders.variantName")}
-                          className="rounded-xl border-border bg-background h-11 text-xs font-black uppercase tracking-widest"
+                          className="rounded-xl border-border bg-background h-11 text-xs font-bold uppercase tracking-wide"
                         />
                       </Field>
                       <Field
@@ -601,7 +657,7 @@ export function ProductFormSheet({
                             type="number"
                             {...register(`variants.${index}.real_stock`)}
                             placeholder="0"
-                            className="rounded-xl border-border bg-background h-11 text-xs font-black tracking-widest"
+                            className="rounded-xl border-border bg-background h-11 text-xs font-bold tracking-wide"
                           />
                           <Button
                             className="h-11 w-11 rounded-xl border-border bg-accent text-accent-foreground hover:bg-[#ffc105] hover:text-black hover:border-[#ffc105] transition-all shrink-0"
@@ -622,7 +678,7 @@ export function ProductFormSheet({
                           type="number"
                           {...register(`variants.${index}.display_stock`)}
                           placeholder="0"
-                          className="rounded-xl border-border bg-background h-11 text-xs font-black tracking-widest"
+                          className="rounded-xl border-border bg-background h-11 text-xs font-bold tracking-wide"
                         />
                       </Field>
                       <Field
@@ -637,7 +693,7 @@ export function ProductFormSheet({
                             placeholder="0.00"
                             className="rounded-xl border-border bg-background h-11 text-xs font-black tracking-widest pr-10"
                           />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[8px] font-black text-muted-foreground/30">
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/60">
                             EGP
                           </span>
                         </div>
@@ -656,7 +712,7 @@ export function ProductFormSheet({
                             placeholder="0.00"
                             className="rounded-xl border-border bg-background h-11 text-xs font-black tracking-widest pr-10 text-muted-foreground/40"
                           />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[8px] font-black text-muted-foreground/30">
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/60">
                             EGP
                           </span>
                         </div>
@@ -670,13 +726,31 @@ export function ProductFormSheet({
                           name={`variants.${index}.linkedImageId` as const}
                           render={({ field }) => (
                             <Select value={field.value || undefined} onValueChange={field.onChange}>
-                              <SelectTrigger className="w-full rounded-xl border border-border bg-background px-3 h-11 font-mono text-[9px] tracking-tightest uppercase text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
+                              <SelectTrigger className="w-full rounded-xl border border-border bg-background px-3 h-11 font-bold uppercase text-[11px] tracking-wide text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
                                 <SelectValue placeholder={t("form.placeholders.noLinkedImage")} />
                               </SelectTrigger>
                               <SelectContent className="rounded-xl border-border bg-card">
-                                {images.map((imageId) => (
-                                  <SelectItem key={imageId} value={imageId} className="font-mono uppercase tracking-widest text-[9px] cursor-pointer">
-                                    {imageId}
+                                {images.map((imageId, idx) => (
+                                  <SelectItem key={imageId} value={imageId} className="cursor-pointer">
+                                    <div className="flex items-center gap-2">
+                                      <div className="relative h-6 w-6 overflow-hidden rounded border border-border bg-accent">
+                                        {storageUrls?.[imageId] ? (
+                                          <Image
+                                            src={storageUrls[imageId]}
+                                            alt=""
+                                            fill
+                                            className="object-cover"
+                                          />
+                                        ) : (
+                                          <div className="flex h-full w-full items-center justify-center">
+                                            <ImageIcon size={10} className="text-muted-foreground/20" />
+                                          </div>
+                                        )}
+                                      </div>
+                                      <span className="font-bold uppercase tracking-wide text-[10px]">
+                                        {t("form.fields.imageIndex", { index: idx + 1 })}
+                                      </span>
+                                    </div>
                                   </SelectItem>
                                 ))}
                               </SelectContent>
@@ -694,14 +768,14 @@ export function ProductFormSheet({
           <div className="sticky bottom-0 z-30 flex flex-col gap-4 border-t border-border bg-card/90 px-10 py-8 backdrop-blur   sm:flex-row sm:items-center sm:justify-end">
             <Button
               variant="outline"
-              className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] border-border hover:bg-accent transition-all"
+              className="h-12 px-8 rounded-xl font-bold uppercase tracking-wide text-[11px] border-border hover:bg-accent transition-all"
               type="button"
               onClick={onClose}
             >
               {t("form.buttons.cancel")}
             </Button>
             <Button
-              className="h-12 px-10 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all   shadow-[#ffc105]/10"
+              className="h-12 px-10 rounded-xl font-bold uppercase tracking-wide text-[11px] bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all   shadow-[#ffc105]/10"
               disabled={isSubmitting}
               type="submit"
               onClick={() => void submit()}
@@ -735,12 +809,12 @@ function Field({
 
   return (
     <div className={cn("space-y-3", className)}>
-      <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
+      <Label className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
         {label}
       </Label>
       {children}
       {errorMessage && (
-        <p className="px-1 text-[10px] font-black text-destructive uppercase tracking-widest mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
+        <p className="px-1 text-[11px] font-bold text-destructive uppercase tracking-wide mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
           {errorMessage}
         </p>
       )}

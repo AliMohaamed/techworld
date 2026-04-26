@@ -63,13 +63,13 @@ export default function AdminDashboardPage() {
   return (
     <main className="space-y-8 animate-in fade-in duration-500 pb-12 bg-background transition-colors">
       {/* Header with Time Window Selector */}
-      <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 rounded-[32px] border border-border bg-card px-8 py-10 shadow-xl relative overflow-hidden group">
+      <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 rounded-[32px] border border-border bg-card px-8 py-10   relative overflow-hidden group">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,193,5,0.08),transparent_40%)]" />
         {/* Light mode decorative gradient */}
         <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-[#ffc105]/5 to-transparent dark:hidden" />
 
         <div className="relative z-10">
-          <p className="text-[11px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-[#ffc105]">
             {t("badge")}
           </p>
           <h1 className="mt-4 text-4xl font-black uppercase tracking-tightest text-foreground leading-tight md:text-5xl">
@@ -88,10 +88,10 @@ export default function AdminDashboardPage() {
               variant={timeWindow === window ? "default" : "ghost"}
               onClick={() => setTimeWindow(window)}
               className={cn(
-                "h-9 px-4 text-[10px] font-black uppercase tracking-widest transition-all",
+                "h-9 px-4 text-[11px] font-bold uppercase tracking-wide transition-all",
                 timeWindow === window
                   ? "bg-[#ffc105] text-black"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent",
+                  : "text-muted-foreground/80 hover:text-foreground hover:bg-accent",
               )}
             >
               {t(`timeWindows.${window}`)}
@@ -156,7 +156,7 @@ export default function AdminDashboardPage() {
               <h2 className="text-xl font-black text-foreground uppercase tracking-tightest leading-none">
                 {t("charts.salesVelocity.title")}
               </h2>
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 bg-accent px-4 py-2 rounded-full border border-border">
+              <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 bg-accent px-4 py-2 rounded-full border border-border">
                 <TrendingUp size={14} className="text-[#ffc105]" />
                 {t("charts.salesVelocity.legend")}
               </div>
@@ -190,12 +190,12 @@ export default function AdminDashboardPage() {
       {metrics?.metadata?.isFinancialsVisible && (
         <section className="grid gap-6 grid-cols-1 md:grid-cols-2">
           <div className="group rounded-[32px] border border-border bg-card p-10 border-l-8 border-l-[#ffc105]   transition-all hover:scale-[1.01]">
-            <h3 className="text-[10px] uppercase tracking-[0.4em] text-[#ffc105] font-black">
+            <h3 className="text-[11px] uppercase tracking-wide text-[#ffc105] font-bold">
               {t("health.snapshot")}
             </h3>
             <div className="mt-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/30">
+                <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
                   {t("health.grossRevenue")}
                 </p>
                 <h4 className="mt-3 text-4xl font-black text-foreground tracking-tightest uppercase">
@@ -203,7 +203,7 @@ export default function AdminDashboardPage() {
                 </h4>
               </div>
               <div className="md:text-right">
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/30">
+                <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
                   {t("health.accumulatedCogs")}
                 </p>
                 <h4 className="mt-3 text-4xl font-black text-foreground tracking-tightest uppercase">
@@ -215,7 +215,7 @@ export default function AdminDashboardPage() {
 
           <div className="rounded-[32px] border border-border bg-accent/10 p-10 flex items-center justify-center relative overflow-hidden group  ">
             <div className="absolute inset-0 bg-gradient-to-br from-[#ffc105]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-            <p className="text-[10px] font-black text-muted-foreground/20 text-center uppercase tracking-[0.5em] leading-[2.2] max-w-[320px]">
+            <p className="text-[11px] font-bold text-muted-foreground/60 text-center uppercase tracking-wide leading-[2.2] max-w-[320px]">
               {t("health.compliance")}
             </p>
           </div>
@@ -254,7 +254,7 @@ function KpiCard({
       )}
 
       <div className="flex items-center justify-between gap-3 relative z-10">
-        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">
+        <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
           {label}
         </span>
         <div

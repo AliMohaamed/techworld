@@ -147,7 +147,8 @@ export default defineSchema({
     .index("by_shortCode", ["shortCode"])
     .index("by_session", ["sessionId"])
     .index("by_state", ["state"])
-    .index("by_governorate", ["governorateId"]),
+    .index("by_governorate", ["governorateId"])
+    .index("by_customerPhone", ["customerPhone"]),
 
   audit_logs: defineTable({
     userId: v.optional(v.id("users")),

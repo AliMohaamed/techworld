@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { Link } from "@/navigation";
 import { useQuery, useMutation } from "convex/react";
-import { 
-  ArrowRight, ShieldAlert, ShoppingCart, Loader2, 
-  Search, Calendar, Filter, X, Package, Layers, 
-  TrendingUp, DollarSign, Box, CheckCircle2 
+import {
+  ArrowRight, ShieldAlert, ShoppingCart, Loader2,
+  Search, Calendar, Filter, X, Package, Layers,
+  TrendingUp, DollarSign, Box, CheckCircle2
 } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import { Id } from "@backend/convex/_generated/dataModel";
@@ -15,7 +15,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input } from "@techworld/ui";
 import { toast } from "sonner";
 
-type OrderState = 
+type OrderState =
   | "PENDING_PAYMENT_INPUT"
   | "AWAITING_VERIFICATION"
   | "CONFIRMED"
@@ -36,17 +36,17 @@ export default function OrdersPage() {
   const tStates = useTranslations("Orders.details.states");
   const locale = useLocale();
   const profile = useQuery(api.auth.getCurrentStaffProfile);
-  
+
   const canViewOrders =
     profile?.permissions?.some(
       (permission) => String(permission) === "VIEW_ORDERS",
     ) ?? false;
-    
+
   const canManageShipping =
     profile?.permissions?.some(
       (permission) => String(permission) === "MANAGE_SHIPPING_STATUS",
     ) ?? false;
-    
+
   const orders = useQuery(
     api.orders.listAllOrders,
     profile && canViewOrders ? {} : "skip",
@@ -54,9 +54,9 @@ export default function OrdersPage() {
 
   const products = useQuery(api.products.listAdminProducts, profile && canViewOrders ? {} : "skip");
   const categories = useQuery(api.categories.listAll, profile && canViewOrders ? {} : "skip");
-  
+
   const updateGenericStatus = useMutation(api.orders.updateGenericStatus);
-  
+
   const [filter, setFilter] = useState<FilterType>("ALL");
   const [updatingId, setUpdatingId] = useState<Id<"orders"> | null>(null);
 
@@ -86,9 +86,9 @@ export default function OrdersPage() {
 
   const visibleOrders = orders ? orders.filter(o => {
     const matchesStatus = filter === "ALL" || o.state === filter;
-    const matchesSearch = !search || 
-      o.customerName?.toLowerCase().includes(search.toLowerCase()) || 
-      o.customerPhone?.includes(search) || 
+    const matchesSearch = !search ||
+      o.customerName?.toLowerCase().includes(search.toLowerCase()) ||
+      o.customerPhone?.includes(search) ||
       o.shortCode?.toLowerCase().includes(search.toLowerCase());
     const matchesDate = filterByDate(o._creationTime, dateRange);
     const matchesProduct = selectedProductId === "ALL" || o.productId === selectedProductId;
@@ -102,8 +102,8 @@ export default function OrdersPage() {
     totalOrders: visibleOrders.length,
     totalRevenue: visibleOrders.reduce((acc, o) => acc + o.total_price + (o.appliedShippingFee || 0), 0),
     totalProducts: visibleOrders.reduce((acc, o) => acc + o.quantity, 0),
-    deliveryRate: visibleOrders.length > 0 
-      ? Math.round((visibleOrders.filter(o => o.state === "DELIVERED").length / visibleOrders.length) * 100) 
+    deliveryRate: visibleOrders.length > 0
+      ? Math.round((visibleOrders.filter(o => o.state === "DELIVERED").length / visibleOrders.length) * 100)
       : 0
   };
 
@@ -117,7 +117,7 @@ export default function OrdersPage() {
 
   const handleStatusChange = async (orderId: Id<"orders">, currentState: OrderState, newState: OrderState) => {
     if (currentState === newState) return;
-    
+
     setUpdatingId(orderId);
     try {
       await updateGenericStatus({ orderId, newState });
@@ -132,7 +132,7 @@ export default function OrdersPage() {
   };
 
   const getStatusColor = (state: string) => {
-    switch(state) {
+    switch (state) {
       case "AWAITING_VERIFICATION": return "bg-blue-500/10 text-blue-500 border-blue-500/20";
       case "CONFIRMED": return "bg-[#ffc105]/10 text-[#ffc105] border-[#ffc105]/20";
       case "READY_FOR_SHIPPING": return "bg-purple-500/10 text-purple-500 border-purple-500/20";
@@ -163,7 +163,7 @@ export default function OrdersPage() {
               <stat.icon className={stat.color} size={24} />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 mb-1">{stat.label}</p>
+              <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 mb-1">{stat.label}</p>
               <p className="text-2xl font-black tracking-tightest text-foreground">{stat.value}</p>
             </div>
           </div>
@@ -179,9 +179,9 @@ export default function OrdersPage() {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <ShoppingCart className="text-[#ffc105]" size={20} />
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
-                  {tQueue("badge")}
-                </p>
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-[#ffc105]">
+                    {tQueue("badge")}
+                  </p>
               </div>
               <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight">
                 {tQueue("title")}
@@ -204,7 +204,7 @@ export default function OrdersPage() {
                 <Filter size={14} className={cn("mr-2", locale === "ar" ? "ml-2 mr-0" : "mr-2 ml-0")} />
                 {tQueue("filters.advanced.title")}
                 {(search || dateRange !== "ALL_TIME" || selectedProductId !== "ALL" || selectedCategoryId !== "ALL") && (
-                  <span className="ml-2 w-5 h-5 flex items-center justify-center bg-[#ffc105] text-black rounded-full text-[8px]">
+                  <span className="ml-2 w-5 h-5 flex items-center justify-center bg-[#ffc105] text-black rounded-full text-[9px] font-bold">
                     {[search, dateRange !== "ALL_TIME", selectedProductId !== "ALL", selectedCategoryId !== "ALL"].filter(Boolean).length}
                   </span>
                 )}
@@ -218,7 +218,7 @@ export default function OrdersPage() {
             isFilterBarOpen ? "max-h-[500px] opacity-100 mt-2" : "max-h-0 opacity-0"
           )}>
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2">
+              <label className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 px-2">
                 {tQueue("filters.advanced.search")}
               </label>
               <div className="relative">
@@ -233,7 +233,7 @@ export default function OrdersPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2">
+              <label className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 px-2">
                 {tQueue("filters.advanced.date.label")}
               </label>
               <Select value={dateRange} onValueChange={(v) => setDateRange(v as DateRangePreset)}>
@@ -254,7 +254,7 @@ export default function OrdersPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2">
+              <label className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 px-2">
                 {tQueue("filters.advanced.product")}
               </label>
               <Select value={selectedProductId} onValueChange={setSelectedProductId}>
@@ -278,7 +278,7 @@ export default function OrdersPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2">
+              <label className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 px-2">
                 {tQueue("filters.advanced.category")}
               </label>
               <div className="flex gap-2">
@@ -313,11 +313,11 @@ export default function OrdersPage() {
 
           <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-border/50">
             {states.map(s => (
-              <button 
+              <button
                 key={s}
                 onClick={() => setFilter(s)}
                 className={cn(
-                  "px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-all border",
+                  "px-4 py-2 text-[11px] font-bold uppercase tracking-wide rounded-full transition-all border",
                   filter === s ? "bg-[#ffc105] text-black border-[#ffc105]" : "bg-card text-muted-foreground/60 border-border hover:bg-accent hover:text-foreground"
                 )}
               >
@@ -328,7 +328,7 @@ export default function OrdersPage() {
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-[32px] border border-border bg-card shadow-xl group transition-all hover:border-[#ffc105]/10">
+      <section className="overflow-hidden rounded-[32px] border border-border bg-card   group transition-all hover:border-[#ffc105]/10">
         <div className="border-b border-border bg-accent/30 px-8 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-4 w-1 bg-[#ffc105] rounded-full" />
@@ -336,15 +336,15 @@ export default function OrdersPage() {
               {tQueue("table.title")}
             </h2>
           </div>
-          <div className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em]">
-            Live Buffer • {visibleOrders.length} Records
+            <div className="text-[11px] font-bold text-muted-foreground/60 font-mono uppercase tracking-wide">
+              Live Buffer • {visibleOrders.length} Records
+            </div>
           </div>
-        </div>
 
         {profile === undefined || (canViewOrders && orders === undefined) ? (
           <div className="p-20 text-center">
             <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#ffc105]" />
-            <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+            <p className="mt-4 text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
               {tQueue("table.loading")}
             </p>
           </div>
@@ -353,7 +353,7 @@ export default function OrdersPage() {
             <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
               <ShieldAlert size={32} className="text-destructive" />
             </div>
-            <p className="text-sm font-black uppercase tracking-widest text-destructive/60">
+            <p className="text-sm font-bold uppercase tracking-wide text-destructive/80">
               {tQueue("table.noPermission")}
             </p>
           </div>
@@ -362,14 +362,14 @@ export default function OrdersPage() {
             <div className="h-16 w-16 rounded-full bg-[#ffc105]/10 flex items-center justify-center">
               <ShieldAlert size={32} className="text-[#ffc105]" />
             </div>
-            <p className="text-sm font-black uppercase tracking-widest text-[#ffc105]/60">
+            <p className="text-sm font-bold uppercase tracking-wide text-[#ffc105]">
               {tQueue("table.empty")}
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto scrollbar-hide">
             <table className="min-w-full text-left text-sm text-foreground">
-              <thead className="bg-accent/50 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60 border-b border-border">
+              <thead className="bg-accent/50 text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 border-b border-border">
                 <tr>
                   <th className="sticky left-0 bg-card py-4 px-6 z-10 w-64">
                     {tQueue("table.columns.customer")}
@@ -404,50 +404,50 @@ export default function OrdersPage() {
                     )}
                   >
                     <td className="sticky left-0 bg-card py-4 px-6 align-middle z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
-                      <div className="font-black text-foreground uppercase tracking-tightest leading-none truncate">
+                      <div className="font-bold text-foreground uppercase tracking-wide leading-none truncate">
                         {order.customerName ?? tQueue("table.walkInCustomer")}
                       </div>
-                      <div className="mt-2 text-[10px] font-bold text-muted-foreground/40 font-mono tracking-wider">
+                      <div className="mt-2 text-[11px] font-bold text-muted-foreground/60 font-mono tracking-wide">
                         {order.customerPhone ?? tQueue("table.noPhone")}
                       </div>
                     </td>
                     <td className="py-4 px-4 align-middle">
-                      <div className="font-bold text-foreground text-xs uppercase tracking-tightest max-w-[200px] truncate">
+                      <div className="font-bold text-foreground text-xs uppercase tracking-wide max-w-[200px] truncate">
                         {order.product?.name_en ?? tQueue("table.unknownProduct")}
                       </div>
-                      <div className="mt-1.5 text-[10px] font-black text-[#ffc105] uppercase tracking-widest truncate max-w-[200px]">
+                      <div className="mt-1.5 text-[11px] font-bold text-[#ffc105] uppercase tracking-wide truncate max-w-[200px]">
                         {order.category?.name_en ?? tQueue("table.noCategory")}
                       </div>
                     </td>
                     <td className="py-4 px-4 align-middle">
                       <span className={cn(
-                        "px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border whitespace-nowrap",
+                        "px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wide border whitespace-nowrap",
                         getStatusColor(order.state)
                       )}>
                         {tStates(order.state as OrderState)}
                       </span>
                     </td>
-                    <td className="py-4 px-4 align-middle text-center font-mono font-black text-sm text-muted-foreground">
+                    <td className="py-4 px-4 align-middle text-center font-mono font-bold text-sm text-muted-foreground/80">
                       {order.quantity.toLocaleString(locale)}
                     </td>
                     <td className="py-4 px-4 align-middle whitespace-nowrap">
-                      <span className="font-black text-sm tracking-tightest text-foreground">
+                      <span className="font-bold text-sm tracking-tightest text-foreground">
                         {(order.total_price + (order.appliedShippingFee || 0)).toLocaleString(locale)}
                       </span>
-                      <span className="ml-1 text-[9px] font-black text-muted-foreground/30 uppercase tracking-widest">
+                      <span className="ml-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wide">
                         EGP
                       </span>
                     </td>
                     <td className="py-4 px-4 align-middle">
                       {order.receiptUrl ? (
-                        <a
-                          className="inline-flex items-center gap-2 rounded-full border border-[#ffc105]/20 bg-[#ffc105]/5 px-3 py-1.5 text-[9px] font-black text-[#ffc105] uppercase tracking-widest hover:bg-[#ffc105] hover:text-black transition-all shadow-sm"
-                          href={order.receiptUrl}
-                          rel="noreferrer"
-                          target="_blank"
-                        >
-                          <ImageIcon size={10} /> {tQueue("table.viewReceipt")}
-                        </a>
+                          <a
+                            className="inline-flex items-center gap-2 rounded-full border border-[#ffc105]/40 bg-[#ffc105]/10 px-3 py-1.5 text-[10px] font-bold text-[#ffc105] uppercase tracking-wide hover:bg-[#ffc105] hover:text-black transition-all shadow-sm"
+                            href={order.receiptUrl}
+                            rel="noreferrer"
+                            target="_blank"
+                          >
+                            <ImageIcon size={10} /> {tQueue("table.viewReceipt")}
+                          </a>
                       ) : (
                         <span className="text-[10px] font-black text-muted-foreground/30 uppercase tracking-widest">
                           {tQueue("table.pendingReceipt")}
@@ -479,20 +479,18 @@ export default function OrdersPage() {
                               <SelectItem
                                 key={state}
                                 value={state}
-                                className={`text-[10px] uppercase tracking-widest font-bold cursor-pointer hover:bg-accent hover:text-accent-foreground ${
-                                  state === order.state ? "opacity-50 cursor-not-allowed" : ""
-                                } ${
-                                  state === "CANCELLED" || state === "RTO" || state === "FLAGGED_FRAUD"
+                                className={`text-[10px] uppercase tracking-widest font-bold cursor-pointer hover:bg-accent hover:text-accent-foreground ${state === order.state ? "opacity-50 cursor-not-allowed" : ""
+                                  } ${state === "CANCELLED" || state === "RTO" || state === "FLAGGED_FRAUD"
                                     ? "text-destructive focus:text-destructive"
                                     : ""
-                                }`}
+                                  }`}
                               >
                                 {tStates(state)}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-                        
+
                         <Link href={`/orders/${order._id}`}>
                           <Button
                             size="sm"

@@ -70,7 +70,7 @@ export default function FeaturedProductCard({
   return (
     <Link
       href={`/products/${product.slug || product._id}`}
-      className="group relative block h-[400px] sm:h-[500px] w-full overflow-hidden rounded-3xl border border-border bg-card/40 transition-all hover:border-[#ffc105]/20  "
+      className="group relative block h-[400px] sm:h-[500px] w-full overflow-hidden rounded-3xl border border-border bg-card transition-all hover:border-[#ffc105]/40 hover:shadow-2xl hover:shadow-[#ffc105]/10 active:scale-[0.99]"
     >
       <div className="absolute inset-0 z-0">
         {product.images?.[0] ? (
@@ -78,52 +78,53 @@ export default function FeaturedProductCard({
             src={product.images[0]}
             alt={locale === "en" ? product.name_en : product.name_ar}
             fill
-            className="object-cover opacity-60 transition-transform duration-700 group-hover:rotate-1 group-hover:scale-105"
+            className="object-cover opacity-80 transition-transform duration-700 group-hover:rotate-1 group-hover:scale-105"
           />
         ) : (
           <div className="h-full w-full bg-secondary" />
         )}
-        <div className="absolute inset-0 z-10 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        {/* Improved overlay: Darker gradient for better text legibility across all modes */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent dark:from-background dark:via-background/60" />
       </div>
 
       <div className="absolute inset-0 z-20 flex flex-col items-start justify-end space-y-3 sm:space-y-4 p-5 sm:p-8">
         <div className="flex items-center space-x-2 rounded-full bg-[#ffc105] px-3 py-1 scale-90 sm:scale-100 ltr:origin-left rtl:origin-right shadow-[0_0_15px_rgba(255,193,5,0.3)]">
           <Zap size={12} className="fill-black text-black" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-black leading-tight">
+          <span className="text-[10px] font-bold text-black leading-tight">
             {t("badges.featured")}
           </span>
         </div>
 
         <div className="space-y-1">
-          <h3 className="font-space-grotesk text-2xl font-black uppercase tracking-tighter leading-none text-foreground lg:text-3xl">
+          <h3 className="font-space-grotesk text-2xl font-bold tracking-tight leading-none text-white lg:text-3xl">
             {locale === "en" ? product.name_en : product.name_ar}
           </h3>
           {locale === "en" && (
-            <p className="font-arabic text-sm text-muted-foreground font-light">
+            <p className="font-arabic text-sm text-zinc-300 font-normal">
               {product.name_ar}
             </p>
           )}
         </div>
 
-        <p className="max-w-sm line-clamp-2 text-sm text-muted-foreground font-light leading-relaxed h-[2.8rem] overflow-hidden overflow-ellipsis">
+        <p className="max-w-sm line-clamp-2 text-sm text-zinc-300 font-normal leading-relaxed h-[2.8rem] overflow-hidden overflow-ellipsis">
           {locale === "en"
             ? product.description_en || t("placeholder")
             : product.description_ar || t("placeholder")}
         </p>
 
-        <div className="w-full border-t border-border pt-4 flex items-center justify-between">
+        <div className="w-full border-t border-white/10 pt-4 flex items-center justify-between">
           <div>
             {hasSalePrice ? (
-              <s className="mb-1 block font-space-grotesk text-sm font-bold text-muted-foreground/60">
+              <s className="mb-1 block font-space-grotesk text-sm font-semibold text-zinc-500">
                 {product.compareAtPrice?.toLocaleString(locale)} EGP
               </s>
             ) : null}
-            <span className="font-space-grotesk text-2xl font-black text-[#ffc105] tracking-tight">
+            <span className="font-space-grotesk text-2xl font-bold text-[#ffc105] tracking-tight">
               {displayPrice.toLocaleString(locale)} EGP
             </span>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse">
-            <div className="hidden sm:flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/50 text-foreground transition-all group-hover:bg-[#ffc105] group-hover:text-black">
+            <div className="hidden sm:flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white transition-all group-hover:bg-[#ffc105] group-hover:text-black">
               <ArrowRight
                 size={22}
                 className={locale === "ar" ? "rotate-180" : ""}
@@ -133,7 +134,7 @@ export default function FeaturedProductCard({
               size="sm"
               onClick={handleAddToCart}
               disabled={!defaultSku || defaultSku.display_stock < 1}
-              className="h-12 px-6 font-space-grotesk text-xs font-black uppercase tracking-widest rounded-2xl   hover:shadow-[#ffc105]/20 group/btn"
+              className="h-12 px-6 font-space-grotesk text-xs font-bold rounded-2xl   hover:shadow-[#ffc105]/20 group/btn"
             >
               {defaultSku && defaultSku.display_stock > 0 ? (
                 <>
