@@ -853,6 +853,7 @@ export const createProduct = mutation({
       });
     }
 
+    slug = await generateUniqueProductSlug(ctx, slug);
     const payload = {
       categoryId: args.categoryId,
       name_ar,
@@ -871,8 +872,6 @@ export const createProduct = mutation({
       slug,
       isFeatured: args.isFeatured,
     };
-
-    slug = await generateUniqueProductSlug(ctx, slug);
 
     const productId = await ctx.db.insert("products", payload);
 
@@ -924,7 +923,14 @@ export const updateProduct = mutation({
 
     const nextCategoryId = args.categoryId ?? existing.categoryId;
     const nextNameEn = args.name_en?.trim() || existing.name_en;
-    let nextSlug = args.slug !== undefined ? slugify(args.slug) : existing.slug || slugify(nextNameEn);
+    let nextSlug = existing.slug || slugify(nextNameEn);
+    
+    if (args.slug !== undefined && args.slug.trim() !== "") {
+      nextSlug = slugify(args.slug);
+    } else if (args.name_en !== undefined) {
+      // If the name was explicitly provided in the update, regenerate the slug
+      nextSlug = slugify(nextNameEn);
+    }
     const nextStatus = args.status ?? existing.status;
 
     if (!nextNameEn || !nextSlug) {
@@ -1059,6 +1065,7 @@ export const createAdvancedProduct = mutation({
     });
 
     // C1 FIX: Do NOT aggregate stock onto the product root. Stock lives on skus table only.
+    slug = await generateUniqueProductSlug(ctx, slug);
     const payload = {
       categoryId: args.categoryId,
       name_ar,
@@ -1077,8 +1084,6 @@ export const createAdvancedProduct = mutation({
       isFeatured: args.isFeatured,
       isActive: args.status === "PUBLISHED",
     };
-
-    slug = await generateUniqueProductSlug(ctx, slug);
     const productId = await ctx.db.insert("products", payload);
     await replaceAdvancedProductSkus(ctx, productId, normalizedVariants, user._id);
 
