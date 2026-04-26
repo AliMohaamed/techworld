@@ -134,6 +134,7 @@ export function ProductFormSheet({
     setValue,
     reset,
     watch,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormValues>({
     defaultValues: emptyValues,
@@ -231,20 +232,40 @@ export function ProductFormSheet({
     });
   }, [open, product, reset]);
 
-  const submit = handleSubmit(async (values) => {
-    const payload = buildPayload(values as ProductFormSubmitValues);
+  const submit = handleSubmit(
+    async (values) => {
+      try {
+        const payload = buildPayload(values as ProductFormSubmitValues);
 
+        if (product) {
+          await updateAdvancedProduct({ id: product._id, ...payload });
+          onSaved(t("messages.updated"));
+        } else {
+          await createAdvancedProduct(payload);
+          onSaved(t("messages.created"));
+        }
 
-    if (product) {
-      await updateAdvancedProduct({ id: product._id, ...payload });
-      onSaved(t("messages.updated"));
-    } else {
-      await createAdvancedProduct(payload);
-      onSaved(t("messages.created"));
+        onClose();
+      } catch (error: any) {
+        const errorMessage = error?.data?.message || error?.message || "An error occurred";
+        toast.error(errorMessage);
+        
+        if (error?.data?.code === "PRODUCT_SLUG_CONFLICT" || error?.data?.code === "SLUG_EXISTS") {
+          toast.error("A product with this slug already exists.");
+        }
+      }
+    },
+    (errors) => {
+      toast.error(t.has("messages.validationError") ? t("messages.validationError") : "Please fix the errors in the form before submitting.");
+      
+      setTimeout(() => {
+        const firstErrorElement = document.querySelector('.text-red-500');
+        if (firstErrorElement) {
+          firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
     }
-
-    onClose();
-  });
+  );
 
   return (
     <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -373,16 +394,7 @@ export function ProductFormSheet({
                     className="rounded-xl border-border bg-background h-12 font-black tracking-tightest placeholder:not-italic"
                   />
                 </Field>
-                <Field
-                  label={t("form.fields.slug")}
-                  error={errors.slug?.message}
-                >
-                  <Input
-                    {...register("slug")}
-                    placeholder={t("form.placeholders.slug")}
-                    className="rounded-xl border-border bg-background h-12 font-mono text-[11px] tracking-wide uppercase"
-                  />
-                </Field>
+
                 <div className="grid grid-cols-3 gap-4 md:col-span-2">
                   <Field
                     label={t("form.fields.sellingPrice")}
@@ -840,7 +852,7 @@ function buildPayload(values: ProductFormSubmitValues) {
     status: values.status,
     isFeatured: values.isFeatured,
     variants: values.variants.map((variant, index) => ({
-      id: variant.id as Id<"skus"> | undefined,
+      id: variant.id ? (variant.id as Id<"skus">) : undefined,
       variantName: variant.variantName,
       variantAttributes: {
         color: variant.color || undefined,

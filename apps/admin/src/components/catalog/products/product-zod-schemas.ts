@@ -34,7 +34,7 @@ export const productSchema = z.object({
   categoryId: z.string().min(1, "required"),
   name_en: z.string().trim().min(1, "required"),
   name_ar: z.string().trim().min(1, "required"),
-  slug: z.string().trim().min(1, "required"),
+  slug: z.string().trim().optional(),
   description_en: z.string().trim().optional(),
   description_ar: z.string().trim().optional(),
   selling_price: z.coerce.number().min(0, "nonNegative"),

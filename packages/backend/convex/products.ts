@@ -50,21 +50,30 @@ function sanitizeNumber(value: number, fieldLabel: string) {
   return value;
 }
 
-async function ensureUniqueProductSlug(
+async function generateUniqueProductSlug(
   ctx: Pick<QueryCtx, "db">,
-  slug: string,
+  baseSlug: string,
   excludeId?: Id<"products">,
-) {
-  const existing = await ctx.db
-    .query("products")
-    .withIndex("by_slug", (q) => q.eq("slug", slug))
-    .unique();
+): Promise<string> {
+  let slug = baseSlug;
+  let attempt = 0;
+  
+  while (true) {
+    const existing = await ctx.db
+      .query("products")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .first();
 
-  if (existing && existing._id !== excludeId) {
-    throw new ConvexError({
-      code: "PRODUCT_SLUG_CONFLICT",
-      message: "A product with this slug already exists.",
-    });
+    if (!existing || existing._id === excludeId) {
+      return slug;
+    }
+    
+    attempt++;
+    slug = `${baseSlug}-${attempt}`;
+    
+    if (attempt > 100) {
+      slug = `${baseSlug}-${Date.now()}`;
+    }
   }
 }
 
@@ -835,7 +844,7 @@ export const createProduct = mutation({
 
     const name_en = args.name_en.trim();
     const name_ar = args.name_ar.trim();
-    const slug = slugify(args.slug?.trim() || name_en);
+    let slug = slugify(args.slug?.trim() || name_en);
 
     if (!name_en || !name_ar || !slug) {
       throw new ConvexError({
@@ -863,7 +872,7 @@ export const createProduct = mutation({
       isFeatured: args.isFeatured,
     };
 
-    await ensureUniqueProductSlug(ctx, slug);
+    slug = await generateUniqueProductSlug(ctx, slug);
 
     const productId = await ctx.db.insert("products", payload);
 
@@ -915,7 +924,7 @@ export const updateProduct = mutation({
 
     const nextCategoryId = args.categoryId ?? existing.categoryId;
     const nextNameEn = args.name_en?.trim() || existing.name_en;
-    const nextSlug = args.slug !== undefined ? slugify(args.slug) : existing.slug || slugify(nextNameEn);
+    let nextSlug = args.slug !== undefined ? slugify(args.slug) : existing.slug || slugify(nextNameEn);
     const nextStatus = args.status ?? existing.status;
 
     if (!nextNameEn || !nextSlug) {
@@ -931,7 +940,7 @@ export const updateProduct = mutation({
       await ensureCategoryExists(ctx, nextCategoryId);
     }
 
-    await ensureUniqueProductSlug(ctx, nextSlug, args.id);
+    nextSlug = await generateUniqueProductSlug(ctx, nextSlug, args.id);
 
     const patch = {
       ...(args.categoryId !== undefined ? { categoryId: nextCategoryId } : {}),
@@ -1032,7 +1041,7 @@ export const createAdvancedProduct = mutation({
 
     const name_en = args.name_en.trim();
     const name_ar = args.name_ar.trim();
-    const slug = slugify(args.slug?.trim() || name_en);
+    let slug = slugify(args.slug?.trim() || name_en);
 
     if (!name_en || !name_ar || !slug) {
       throw new ConvexError({
@@ -1069,7 +1078,7 @@ export const createAdvancedProduct = mutation({
       isActive: args.status === "PUBLISHED",
     };
 
-    await ensureUniqueProductSlug(ctx, slug);
+    slug = await generateUniqueProductSlug(ctx, slug);
     const productId = await ctx.db.insert("products", payload);
     await replaceAdvancedProductSkus(ctx, productId, normalizedVariants, user._id);
 
@@ -1120,7 +1129,7 @@ export const updateAdvancedProduct = mutation({
 
     const name_en = args.name_en.trim();
     const name_ar = args.name_ar.trim();
-    const slug = slugify(args.slug?.trim() || name_en);
+    let slug = slugify(args.slug?.trim() || name_en);
 
     if (!name_en || !name_ar || !slug) {
       throw new ConvexError({
@@ -1129,7 +1138,7 @@ export const updateAdvancedProduct = mutation({
       });
     }
 
-    await ensureUniqueProductSlug(ctx, slug, args.id);
+    slug = await generateUniqueProductSlug(ctx, slug, args.id);
 
     const normalizedVariants = buildNormalizedAdvancedVariants({
       variants: args.variants,
