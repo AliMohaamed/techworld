@@ -872,7 +872,7 @@ export const createProduct = mutation({
       isFeatured: args.isFeatured,
     };
 
-    slug = await ensureUniqueProductSlug(ctx, slug);
+    slug = await generateUniqueProductSlug(ctx, slug);
 
     const productId = await ctx.db.insert("products", payload);
 
@@ -924,7 +924,7 @@ export const updateProduct = mutation({
 
     const nextCategoryId = args.categoryId ?? existing.categoryId;
     const nextNameEn = args.name_en?.trim() || existing.name_en;
-    const nextSlug = args.slug !== undefined ? slugify(args.slug) : existing.slug || slugify(nextNameEn);
+    let nextSlug = args.slug !== undefined ? slugify(args.slug) : existing.slug || slugify(nextNameEn);
     const nextStatus = args.status ?? existing.status;
 
     if (!nextNameEn || !nextSlug) {
@@ -940,7 +940,7 @@ export const updateProduct = mutation({
       await ensureCategoryExists(ctx, nextCategoryId);
     }
 
-    await ensureUniqueProductSlug(ctx, nextSlug, args.id);
+    nextSlug = await generateUniqueProductSlug(ctx, nextSlug, args.id);
 
     const patch = {
       ...(args.categoryId !== undefined ? { categoryId: nextCategoryId } : {}),
