@@ -19,8 +19,7 @@ function SuccessContent() {
   
   const generateWhatsAppLink = () => {
     if (!shortCode) return "#";
-    const messageTemplate = t('whatsappMessage');
-    const message = encodeURIComponent(messageTemplate.replace("{code}", shortCode));
+    const message = encodeURIComponent(t('whatsappMessage', { code: shortCode }));
     return `https://wa.me/${BUSINESS_WHATSAPP}?text=${message}`;
   };
 
@@ -76,15 +75,15 @@ function SuccessContent() {
               <ul className="space-y-8">
                 <li className="flex items-start gap-5 group/item">
                   <div className="mt-1 h-7 w-7 rounded-xl bg-[#ffc105]/10 border border-[#ffc105]/20 text-[12px] font-black text-[#ffc105] flex items-center justify-center shrink-0 group-hover/item:bg-[#ffc105] group-hover/item:text-black transition-all group-hover/item:scale-110">1</div>
-                  <p className="text-sm md:text-base leading-relaxed text-muted-foreground/60 font-medium" dangerouslySetInnerHTML={{ __html: t('nextSteps.step1') }} />
+                  <p className="text-sm md:text-base leading-relaxed text-muted-foreground/60 font-medium" dangerouslySetInnerHTML={{ __html: t.raw('nextSteps.step1') }} />
                 </li>
                 <li className="flex items-start gap-5 group/item">
                   <div className="mt-1 h-7 w-7 rounded-xl bg-[#ffc105]/10 border border-[#ffc105]/20 text-[12px] font-black text-[#ffc105] flex items-center justify-center shrink-0 group-hover/item:bg-[#ffc105] group-hover/item:text-black transition-all group-hover/item:scale-110">2</div>
-                  <p className="text-sm md:text-base leading-relaxed text-muted-foreground/60 font-medium" dangerouslySetInnerHTML={{ __html: t('nextSteps.step2') }} />
+                  <p className="text-sm md:text-base leading-relaxed text-muted-foreground/60 font-medium" dangerouslySetInnerHTML={{ __html: t.raw('nextSteps.step2') }} />
                 </li>
                 <li className="flex items-start gap-5 group/item">
                   <div className="mt-1 h-7 w-7 rounded-xl bg-[#ffc105]/10 border border-[#ffc105]/20 text-[12px] font-black text-[#ffc105] flex items-center justify-center shrink-0 group-hover/item:bg-[#ffc105] group-hover/item:text-black transition-all group-hover/item:scale-110">3</div>
-                  <p className="text-sm md:text-base leading-relaxed text-muted-foreground/60 font-medium" dangerouslySetInnerHTML={{ __html: t('nextSteps.step3') }} />
+                  <p className="text-sm md:text-base leading-relaxed text-muted-foreground/60 font-medium" dangerouslySetInnerHTML={{ __html: t.raw('nextSteps.step3') }} />
                 </li>
               </ul>
             </div>

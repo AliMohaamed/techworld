@@ -262,7 +262,7 @@ export default function OrderDetailsPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <ShoppingCart className="text-[#ffc105]" size={20} />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105] italic">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-[#ffc105]">
                 {t("badge")}
               </p>
             </div>
@@ -270,13 +270,19 @@ export default function OrderDetailsPage() {
               {order.customerName ?? tQueue("table.walkInCustomer")}
             </h1>
             <div className="flex flex-wrap items-center gap-4 mt-4">
-              <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 bg-accent/50 border border-border px-4 py-2 rounded-full">
+              <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 bg-accent/50 border border-border px-4 py-2 rounded-full">
                 <MapPin size={12} className="text-[#ffc105]" />
                 {order.customerAddress ?? t("notProvided")}
               </span>
+              {order.shortCode && (
+                <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wide text-[#ffc105] bg-[#ffc105]/10 border border-[#ffc105]/20 px-4 py-2 rounded-full">
+                  <Hash size={12} />
+                  {order.shortCode}
+                </span>
+              )}
               <span
                 className={cn(
-                  "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                  "px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-wide border",
                   order.state === "CONFIRMED" || order.state === "SHIPPED"
                     ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
                     : order.state === "CANCELLED"
@@ -290,7 +296,7 @@ export default function OrderDetailsPage() {
           </div>
 
           <div className="flex flex-col items-end gap-2">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/30">
+            <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
               {t("cards.revenue")}
             </p>
             <p className="text-4xl font-black text-foreground tabular-nums tracking-tighter italic">
@@ -591,19 +597,19 @@ export default function OrderDetailsPage() {
                   <div className="h-16 w-16 rounded-full bg-background border border-border flex items-center justify-center mx-auto mb-6 group-hover/drop:scale-110 transition-transform">
                     <ImageIcon className="text-muted-foreground/40" size={24} />
                   </div>
-                  <span className="block text-sm font-black uppercase tracking-widest text-foreground mb-2">
+                  <span className="block text-sm font-bold uppercase tracking-wide text-foreground mb-2">
                     {t("modal.select")}
                   </span>
-                  <span className="block text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 italic">
+                  <span className="block text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
                     {t("modal.types")}
                   </span>
 
                   {selectedFile && (
                     <div className="mt-8 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 animate-in zoom-in-95 duration-300">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 truncate">
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-emerald-500 truncate">
                         {selectedFile.name}
                       </p>
-                      <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-500/50 mt-1">
+                      <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-500/50 mt-1">
                         {Math.ceil(selectedFile.size / 1024)} KB
                       </p>
                     </div>
@@ -616,10 +622,10 @@ export default function OrderDetailsPage() {
                   <ShieldCheck size={20} />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="text-xs font-black uppercase tracking-widest text-foreground">
+                  <h4 className="text-xs font-bold uppercase tracking-wide text-foreground">
                     Identity & Audit
                   </h4>
-                  <p className="text-[10px] font-bold leading-relaxed text-muted-foreground/40 italic">
+                  <p className="text-[11px] font-medium leading-relaxed text-muted-foreground/80">
                     Verifying an order will mark it as confirmed and deduct
                     stock from the inventory. This action is logged in the
                     system audit trail.
@@ -630,7 +636,7 @@ export default function OrderDetailsPage() {
 
             <div className="p-10 border-t border-border bg-accent/20 gap-4 flex flex-col">
               <Button
-                className="w-full rounded-2xl h-14 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-black uppercase tracking-[0.2em] text-[10px]"
+                className="w-full rounded-2xl h-14 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-bold uppercase tracking-wide text-[11px]"
                 disabled={isSubmitting || !selectedFile}
                 onClick={() => void handleStatusChange("CONFIRMED")}
               >
@@ -650,7 +656,7 @@ export default function OrderDetailsPage() {
                 )}
               </Button>
               <Button
-                className="w-full rounded-2xl h-12 text-muted-foreground/40 hover:text-foreground font-black uppercase tracking-widest text-[10px] transition-all"
+                className="w-full rounded-2xl h-12 text-muted-foreground/60 hover:text-foreground font-bold uppercase tracking-wide text-[11px] transition-all"
                 onClick={() => setIsModalOpen(false)}
                 type="button"
                 variant="ghost"
@@ -676,7 +682,7 @@ export default function OrderDetailsPage() {
             <SheetHeader className="p-10 border-b border-border bg-accent/20">
               <div className="flex items-center gap-3 mb-4">
                 <Settings2 className="text-[#ffc105]" size={20} />
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105] italic">
+                <p className="text-[11px] font-bold uppercase tracking-wide text-[#ffc105]">
                   Admin Action
                 </p>
               </div>
@@ -693,7 +699,7 @@ export default function OrderDetailsPage() {
 
             <div className="flex-1 p-10 space-y-8 overflow-y-auto">
               <div className="space-y-4">
-                <label className="text-xs font-black uppercase tracking-widest text-foreground">
+                <label className="text-xs font-bold uppercase tracking-wide text-foreground">
                   New Status
                 </label>
                 <Select value={manualState} onValueChange={setManualState}>
@@ -738,7 +744,7 @@ export default function OrderDetailsPage() {
                   <div className="h-12 w-12 rounded-full bg-background border border-border flex items-center justify-center mx-auto mb-4 group-hover/drop:scale-110 transition-transform">
                     <ImageIcon className="text-muted-foreground/40" size={20} />
                   </div>
-                  <span className="block text-sm font-black uppercase tracking-widest text-foreground mb-1">
+                  <span className="block text-sm font-bold uppercase tracking-wide text-foreground mb-1">
                     {t("overrideModal.attach", {
                       defaultValue: "Attach Receipt (Optional)",
                     })}
@@ -746,7 +752,7 @@ export default function OrderDetailsPage() {
 
                   {selectedFile && (
                     <div className="mt-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 animate-in zoom-in-95 duration-300">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 truncate">
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-emerald-500 truncate">
                         {selectedFile.name}
                       </p>
                     </div>
@@ -757,7 +763,7 @@ export default function OrderDetailsPage() {
 
             <div className="p-10 border-t border-border bg-accent/20 gap-4 flex flex-col">
               <Button
-                className="w-full rounded-2xl h-14 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-black uppercase tracking-[0.2em] text-[10px]"
+                className="w-full rounded-2xl h-14 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-bold uppercase tracking-wide text-[11px]"
                 disabled={isSubmitting || !manualState}
                 onClick={handleManualOverride}
               >
@@ -779,7 +785,7 @@ export default function OrderDetailsPage() {
                 )}
               </Button>
               <Button
-                className="w-full rounded-2xl h-12 text-muted-foreground/40 hover:text-foreground font-black uppercase tracking-widest text-[10px] transition-all"
+                className="w-full rounded-2xl h-12 text-muted-foreground/60 hover:text-foreground font-bold uppercase tracking-wide text-[11px] transition-all"
                 onClick={() => setIsManualOverrideOpen(false)}
                 type="button"
                 variant="ghost"
@@ -806,7 +812,7 @@ function InfoCard({
   return (
     <div className="rounded-[24px] border border-border bg-accent/30 p-6 transition-all hover:border-[#ffc105]/20 group/card relative overflow-hidden">
       <div className="absolute top-0 right-0 w-16 h-16 bg-[#ffc105]/5 rounded-full blur-xl -mr-8 -mt-8 pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity" />
-      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30 relative z-10">
+      <p className="text-[11px] font-black uppercase tracking-[0.4em] text-muted-foreground/80 relative z-10">
         {label}
       </p>
       <p
@@ -831,5 +837,6 @@ import {
   FileText,
   ExternalLink,
   AlertCircle,
+  Hash,
   Image as ImageIcon,
 } from "lucide-react";

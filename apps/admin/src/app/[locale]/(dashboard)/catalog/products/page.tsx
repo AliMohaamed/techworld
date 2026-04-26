@@ -189,7 +189,7 @@ export default function AdminProductsPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Package className="text-[#ffc105]" size={20} />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-[#ffc105]">
                 {t("badge")}
               </p>
             </div>
@@ -203,7 +203,7 @@ export default function AdminProductsPage() {
           <Button
             type="button"
             onClick={openCreateSheet}
-            className="rounded-2xl h-14 px-10 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-black uppercase tracking-[0.2em] text-[10px]"
+            className="rounded-2xl h-14 px-10 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-bold uppercase tracking-wide text-[11px]"
           >
             <Plus className="ltr:mr-3 rtl:ml-3 h-4 w-4" />
             {t("actions.create")}
@@ -216,7 +216,7 @@ export default function AdminProductsPage() {
           <div className="flex items-center gap-4">
             <div className="h-6 w-1 bg-[#ffc105] rounded-full" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
                 {t("table.badge")}
               </p>
               <h2 className="text-2xl font-black text-foreground uppercase tracking-tightest leading-none mt-1">
@@ -225,7 +225,7 @@ export default function AdminProductsPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="rounded-full border border-border bg-background px-5 py-2 text-[10px] font-black text-muted-foreground/60 font-mono tracking-widest uppercase  ">
+            <span className="rounded-full border border-border bg-background px-5 py-2 text-[11px] font-bold text-muted-foreground/80 font-mono tracking-wide uppercase  ">
               {products
                 ? t("table.total", { count: products.length })
                 : t("table.loading")}
@@ -235,7 +235,7 @@ export default function AdminProductsPage() {
 
         <div className="overflow-x-auto scrollbar-hide">
           <table className="min-w-full text-left text-sm text-foreground">
-            <thead className="bg-accent/50 text-[10px] font-black uppercase tracking-[0.35em] text-muted-foreground/40 border-b border-border">
+            <thead className="bg-accent/50 text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 border-b border-border">
               <tr>
                 <th className="sticky left-0 bg-card py-4 px-6 z-10">
                   {t("table.columns.product")}
@@ -276,12 +276,12 @@ export default function AdminProductsPage() {
                         {product.name_en}
                       </p>
                       <p
-                        className="text-[10px] text-muted-foreground/40 font-mono tracking-widest mt-2 uppercase"
+                        className="text-[11px] text-muted-foreground/60 font-mono tracking-wide mt-2 uppercase"
                         dir="rtl"
                       >
                         {product.name_ar}
                       </p>
-                      <p className="mt-3 text-[9px] font-black text-[#ffc105] uppercase tracking-widest flex items-center gap-1.5 opacity-60">
+                      <p className="mt-3 text-[10px] font-bold text-[#ffc105] uppercase tracking-wide flex items-center gap-1.5 opacity-80">
                         <Plus size={10} className="rotate-45" />{" "}
                         {product.slug ?? t("table.noSlug")}
                       </p>
@@ -289,12 +289,12 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="py-6 px-4 align-middle">
                     <div className="flex flex-col gap-1.5">
-                      <span className="font-black text-[10px] text-foreground uppercase tracking-widest">
+                      <span className="font-bold text-[11px] text-foreground uppercase tracking-wide">
                         {product.categoryName}
                       </span>
                       <span
                         className={cn(
-                          "text-[9px] font-black uppercase tracking-widest py-0.5 px-2 rounded-full w-fit",
+                          "text-[10px] font-bold uppercase tracking-wide py-0.5 px-2 rounded-full w-fit",
                           product.isCategoryActive
                             ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
                             : "bg-destructive/10 text-destructive border border-destructive/20",
@@ -305,7 +305,7 @@ export default function AdminProductsPage() {
                           : t("table.inactiveCategory")}
                       </span>
                       {product.publicationBlockedReason && (
-                        <p className="mt-1 text-[9px] font-black text-amber-500 uppercase tracking-widest flex items-center gap-1">
+                        <p className="mt-1 text-[10px] font-bold text-amber-500 uppercase tracking-wide flex items-center gap-1">
                           <AlertCircle size={10} />{" "}
                           {product.publicationBlockedReason}
                         </p>
@@ -318,7 +318,7 @@ export default function AdminProductsPage() {
                         EGP {product.selling_price.toLocaleString(locale)}
                       </p>
                       {product.compareAtPrice ? (
-                        <p className="mt-1 text-[10px] font-black text-muted-foreground/30 line-through tracking-widest">
+                        <p className="mt-1 text-[11px] font-bold text-muted-foreground/40 line-through tracking-wide">
                           EGP {product.compareAtPrice.toLocaleString(locale)}
                         </p>
                       ) : null}
@@ -326,7 +326,7 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="py-6 px-4 align-middle">
                     <div className="flex flex-col gap-1.5">
-                      <p className="font-black text-[10px] text-foreground uppercase tracking-widest">
+                      <p className="font-bold text-[11px] text-foreground uppercase tracking-wide">
                         {t("table.variantsCount", {
                           count: product.skus?.length ?? 0,
                         })}
@@ -335,12 +335,12 @@ export default function AdminProductsPage() {
                         {product.skus?.slice(0, 3).map((sku) => (
                           <span
                             key={sku._id}
-                            className="text-[8px] font-black border border-border bg-background px-1.5 py-0.5 rounded uppercase tracking-widest text-muted-foreground/60"
+                            className="text-[9px] font-bold border border-border bg-background px-1.5 py-0.5 rounded uppercase tracking-wide text-muted-foreground/80"
                           >
                             {sku.variantName}
                           </span>
                         )) || (
-                            <span className="text-[8px] font-black border border-border bg-background px-1.5 py-0.5 rounded uppercase tracking-widest text-muted-foreground/30">
+                            <span className="text-[9px] font-bold border border-border bg-background px-1.5 py-0.5 rounded uppercase tracking-wide text-muted-foreground/60">
                               {t("table.defaultSkuOnly")}
                             </span>
                           )}
@@ -360,14 +360,14 @@ export default function AdminProductsPage() {
                             .reduce((s, sku) => s + sku.display_stock, 0)
                             .toLocaleString(locale)}
                         </p>
-                        <p className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[.2em] leading-none">
+                        <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wide leading-none">
                           {t("table.managedViaSkus")}
                         </p>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 group/input">
                         <Input
-                          className="w-20 h-9 rounded-lg bg-background border-border text-xs font-black uppercase tracking-widest focus:ring-primary/10 transition-all text-center px-2"
+                          className="w-20 h-9 rounded-lg bg-background border-border text-xs font-bold uppercase tracking-wide focus:ring-primary/10 transition-all text-center px-2"
                           type="number"
                           value={
                             displayDrafts[product._id] ??
@@ -403,7 +403,7 @@ export default function AdminProductsPage() {
                       <div className="flex flex-col gap-2">
                         {product.skus.map((sku) => (
                           <div key={sku._id} className="flex items-center justify-between gap-3 min-w-[120px]">
-                            <span className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest truncate max-w-[60px]">
+                            <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wide truncate max-w-[60px]">
                               {sku.variantName}
                             </span>
                             <div className="flex items-center bg-accent/30 rounded-lg p-0.5 border border-border/50">
@@ -416,7 +416,7 @@ export default function AdminProductsPage() {
                               >
                                 <Minus size={10} />
                               </Button>
-                              <span className="text-[10px] font-black min-w-[24px] text-center font-mono">
+                              <span className="text-[11px] font-bold min-w-[24px] text-center font-mono">
                                 {updatingSkuId === sku._id ? "..." : sku.real_stock}
                               </span>
                               <Button
@@ -435,7 +435,7 @@ export default function AdminProductsPage() {
                     ) : (
                       <div className="flex items-center gap-2 group/input">
                         <Input
-                          className="w-20 h-9 rounded-lg bg-background border-border text-xs font-black uppercase tracking-widest focus:ring-primary/10 transition-all text-center px-2"
+                          className="w-20 h-9 rounded-lg bg-background border-border text-xs font-bold uppercase tracking-wide focus:ring-primary/10 transition-all text-center px-2"
                           type="number"
                           value={
                             realDrafts[product._id] ??
@@ -466,7 +466,7 @@ export default function AdminProductsPage() {
                   <td className="py-6 px-4 align-middle">
                     <span
                       className={cn(
-                        "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[9px] font-black uppercase tracking-widest transition-all shadow-sm",
+                        "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-wide transition-all shadow-sm",
                         product.status === "PUBLISHED"
                           ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
                           : "border-border bg-background text-muted-foreground/40",
@@ -488,7 +488,7 @@ export default function AdminProductsPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="rounded-xl h-10 px-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-foreground hover:bg-accent transition-all"
+                        className="rounded-xl h-10 px-6 text-[11px] font-bold uppercase tracking-wide text-muted-foreground/60 hover:text-foreground hover:bg-accent transition-all"
                         onClick={() => openEditSheet(product._id)}
                       >
                         {t("actions.edit")}
@@ -498,7 +498,7 @@ export default function AdminProductsPage() {
                         type="button"
                         variant="outline"
                         className={cn(
-                          "rounded-xl h-10 px-5 text-[10px] font-black uppercase tracking-widest transition-all border-border shadow-sm   group/btn",
+                          "rounded-xl h-10 px-5 text-[11px] font-bold uppercase tracking-wide transition-all border-border shadow-sm   group/btn",
                           product.status === "PUBLISHED"
                             ? "text-destructive/40 hover:text-destructive hover:bg-destructive/10"
                             : "text-emerald-500/40 hover:text-emerald-500 hover:bg-emerald-500/10",

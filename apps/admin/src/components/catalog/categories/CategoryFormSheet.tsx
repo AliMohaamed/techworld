@@ -143,7 +143,7 @@ export function CategoryFormSheet({
           <SheetHeader className="p-10 pb-10 border-b border-border bg-card relative z-10">
             <div className="flex items-center gap-3 mb-4">
               <Layers className="text-[#ffc105]" size={24} />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-[#ffc105]">
                 {t("form.badge")}
               </p>
             </div>
@@ -164,7 +164,7 @@ export function CategoryFormSheet({
               <div className="space-y-3">
                 <Label
                   htmlFor="name_en"
-                  className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40"
+                  className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80"
                 >
                   {t("form.fields.nameEn")}
                 </Label>
@@ -178,14 +178,14 @@ export function CategoryFormSheet({
                     }))
                   }
                   placeholder={t("form.placeholders.nameEn")}
-                  className="rounded-xl border-border bg-background h-12 font-black uppercase tracking-tightest placeholder:not-italic"
+                  className="rounded-xl border-border bg-background h-12 font-bold uppercase tracking-wide placeholder:not-italic"
                 />
               </div>
 
               <div className="space-y-3">
                 <Label
                   htmlFor="name_ar"
-                  className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40"
+                  className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80"
                 >
                   {t("form.fields.nameAr")}
                 </Label>
@@ -200,14 +200,14 @@ export function CategoryFormSheet({
                     }))
                   }
                   placeholder={t("form.placeholders.nameAr")}
-                  className="rounded-xl border-border bg-background h-12 font-black tracking-tightest placeholder:not-italic"
+                  className="rounded-xl border-border bg-background h-12 font-bold tracking-wide placeholder:not-italic"
                 />
               </div>
 
               <div className="space-y-3">
                 <Label
                   htmlFor="slug"
-                  className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40"
+                  className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80"
                 >
                   {t("form.fields.slug")}
                 </Label>
@@ -221,14 +221,14 @@ export function CategoryFormSheet({
                       slug: event.target.value,
                     }))
                   }
-                  className="rounded-xl border-border bg-background h-11 font-mono text-[10px] tracking-widest uppercase"
+                  className="rounded-xl border-border bg-background h-11 font-mono text-[11px] tracking-wide uppercase"
                 />
               </div>
 
               <div className="space-y-3">
                 <Label
                   htmlFor="description_en"
-                  className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40"
+                  className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80"
                 >
                   {t("form.fields.descriptionEn")}
                 </Label>
@@ -249,7 +249,7 @@ export function CategoryFormSheet({
               <div className="space-y-3">
                 <Label
                   htmlFor="description_ar"
-                  className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40"
+                  className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80"
                 >
                   {t("form.fields.descriptionAr")}
                 </Label>
@@ -271,9 +271,9 @@ export function CategoryFormSheet({
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
                   <ImageIcon size={18} className="text-[#ffc105]/60" />
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
-                    {t("form.fields.thumbnailImageId")}
-                  </h3>
+                  <h3 className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
+                  {t("form.fields.thumbnailImageId")}
+                </h3>
                 </div>
                 <ConvexStorageUpload
                   imageIds={form.thumbnailImageId ? [form.thumbnailImageId] : []}
@@ -289,10 +289,10 @@ export function CategoryFormSheet({
               {!category?._id ? (
                 <div className="pt-4 flex items-center justify-between border-t border-border mt-6">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-foreground">
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">
                       Global Visibility
                     </p>
-                    <p className="text-[9px] font-medium text-muted-foreground/40 uppercase tracking-widest">
+                    <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wide">
                       Toggle category active state
                     </p>
                   </div>
@@ -312,7 +312,7 @@ export function CategoryFormSheet({
 
           <div className="sticky bottom-0 z-20 flex flex-col gap-3 border-t border-border bg-card/90 p-10 backdrop-blur   sm:flex-row sm:justify-end">
             <Button
-              className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] border-border hover:bg-accent transition-all"
+              className="h-12 px-8 rounded-xl font-bold uppercase tracking-wide text-[11px] border-border hover:bg-accent transition-all"
               variant="outline"
               type="button"
               onClick={onClose}
@@ -320,7 +320,7 @@ export function CategoryFormSheet({
               {t("form.buttons.cancel")}
             </Button>
             <Button
-              className="h-12 px-10 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all   shadow-[#ffc105]/10"
+              className="h-12 px-10 rounded-xl font-bold uppercase tracking-wide text-[11px] bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all   shadow-[#ffc105]/10"
               disabled={isSubmitting}
               type="submit"
               onClick={(e: any) => submit(e)}
