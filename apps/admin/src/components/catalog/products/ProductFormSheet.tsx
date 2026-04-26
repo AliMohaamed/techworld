@@ -232,7 +232,7 @@ export function ProductFormSheet({
   }, [open, product, reset]);
 
   const submit = handleSubmit(async (values) => {
-    const payload = buildPayload(values);
+    const payload = buildPayload(values as ProductFormSubmitValues);
 
 
     if (product) {

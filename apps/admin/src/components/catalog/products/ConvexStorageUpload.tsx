@@ -13,7 +13,7 @@ export function ConvexStorageUpload({
   onChange,
 }: {
   imageIds: string[];
-  storageUrls?: Record<string, string>;
+  storageUrls?: Record<string, string | null>;
   onChange: (imageIds: string[]) => void;
 }) {
   const generateUploadUrl = useMutation(api.storage.generateCatalogUploadUrl);
