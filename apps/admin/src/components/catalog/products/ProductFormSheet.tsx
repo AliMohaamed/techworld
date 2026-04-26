@@ -509,7 +509,7 @@ export function ProductFormSheet({
                           />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl border-border bg-card">
-                          {images.map((imageId, idx) => (
+                          {images.filter((id) => id && id.trim() !== "").map((imageId, idx) => (
                             <SelectItem
                               key={imageId}
                               value={imageId}
@@ -730,7 +730,7 @@ export function ProductFormSheet({
                                 <SelectValue placeholder={t("form.placeholders.noLinkedImage")} />
                               </SelectTrigger>
                               <SelectContent className="rounded-xl border-border bg-card">
-                                {images.map((imageId, idx) => (
+                                {images.filter((id) => id && id.trim() !== "").map((imageId, idx) => (
                                   <SelectItem key={imageId} value={imageId} className="cursor-pointer">
                                     <div className="flex items-center gap-2">
                                       <div className="relative h-6 w-6 overflow-hidden rounded border border-border bg-accent">

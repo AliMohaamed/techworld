@@ -43,11 +43,16 @@ function normalizeGreenApiPayload(
     const textData = (messageData.textMessageData ?? {}) as Record<string, unknown>;
     textBody = textData.textMessage ? String(textData.textMessage) : undefined;
   } else if (messageType === "imageMessage") {
-    const imageData = (messageData.imageMessageData ?? {}) as Record<string, unknown>;
+    // التعديل السحري هنا: قراءة البيانات من fileMessageData أو imageMessageData
+    const fileData = (messageData.fileMessageData ?? messageData.imageMessageData ?? {}) as Record<string, unknown>;
+    
     // Caption often contains the order shortcode (e.g. "TW-7K9XQA")
-    textBody = imageData.caption ? String(imageData.caption) : undefined;
-    mediaUrl = imageData.url ? String(imageData.url) : undefined;
-    mediaMimeType = imageData.mimeType ? String(imageData.mimeType) : undefined;
+    textBody = fileData.caption ? String(fileData.caption) : undefined;
+    
+    // استخراج رابط الصورة 
+    mediaUrl = fileData.downloadUrl ? String(fileData.downloadUrl) : (fileData.url ? String(fileData.url) : undefined);
+    
+    mediaMimeType = fileData.mimeType ? String(fileData.mimeType) : undefined;
   }
 
   return {
