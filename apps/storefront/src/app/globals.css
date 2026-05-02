@@ -53,3 +53,29 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+/* Swiper Pagination Styles */
+.product-main-swiper .swiper-pagination {
+  bottom: 20px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.product-main-swiper .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: white;
+  opacity: 0.5;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 0 !important;
+}
+
+.product-main-swiper .swiper-pagination-bullet-active {
+  background: var(--color-brand-yellow, #ffc105);
+  opacity: 1;
+  width: 24px;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(255, 193, 5, 0.4);
+}

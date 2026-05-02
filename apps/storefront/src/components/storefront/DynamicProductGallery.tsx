@@ -47,14 +47,15 @@ export function DynamicProductGallery({
   return (
     <div className="space-y-4">
       {/* Main Swiper */}
-      <div className="relative aspect-square overflow-hidden rounded-[28px] border border-border bg-card transition-colors">
+      <div className="relative aspect-square overflow-hidden bg-card transition-colors">
         {galleryImages.length > 0 ? (
           <Swiper
             onSwiper={setMainSwiper}
-            spaceBetween={10}
+            spaceBetween={0}
             thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+            pagination={{ clickable: true }}
             modules={[FreeMode, Thumbs, Pagination]}
-            className="h-full w-full"
+            className="h-full w-full product-main-swiper"
             onSlideChange={(swiper) => {
               const newImage = galleryImages[swiper.activeIndex];
               if (newImage && onSelectImage) {
@@ -70,7 +71,7 @@ export function DynamicProductGallery({
                   alt={`${name} - Image ${index + 1}`}
                   fill
                   priority={index === 0}
-                  className="object-contain p-4"
+                  className="object-contain"
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </SwiperSlide>
