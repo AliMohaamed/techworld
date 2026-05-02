@@ -1,13 +1,14 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import { useSearchParams } from "next/navigation";
 import { api } from "@backend/convex/_generated/api";
 import { Id } from "@backend/convex/_generated/dataModel";
 import FilterDrawer from "@/components/storefront/filter-drawer";
-import LoadMoreButton from "@/components/storefront/load-more-button";
 import ProductCard from "@/components/storefront/product-card";
 import { useTranslations, useLocale } from "next-intl";
+import { Loader2 } from "lucide-react";
 
 type CatalogExplorerProps = {
   lockedCategoryId?: string;
@@ -19,6 +20,9 @@ export default function CatalogExplorer({
   const t = useTranslations("CatalogExplorer");
   const locale = useLocale();
   const searchParams = useSearchParams();
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
   const searchQuery = searchParams.get("searchQuery") ?? undefined;
   const minPriceValue = searchParams.get("minPrice");
   const maxPriceValue = searchParams.get("maxPrice");
@@ -57,6 +61,26 @@ export default function CatalogExplorer({
     },
     { initialNumItems: 12 },
   );
+
+  useEffect(() => {
+    if (status !== "CanLoadMore") return;
+
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        loadMore(12);
+      }
+    });
+
+    if (loadMoreRef.current) {
+      observerRef.current.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) observerRef.current.disconnect();
+    };
+  }, [status, loadMore]);
 
   const recommendationResult = useQuery(
     api.products.getRecommendedProducts,
@@ -159,14 +183,11 @@ export default function CatalogExplorer({
                   ))}
                 </div>
 
-                <div className="flex justify-center pt-8">
-                  {status === "LoadingMore" || status === "CanLoadMore" ? (
-                    <LoadMoreButton
-                      disabled={status === "LoadingMore"}
-                      onClick={() => {
-                        loadMore(12);
-                      }}
-                    />
+                <div className="flex justify-center pt-8" ref={loadMoreRef}>
+                  {status === "LoadingMore" ? (
+                    <div className="flex items-center justify-center p-4">
+                      <Loader2 className="h-8 w-8 animate-spin text-[#ffc105]" />
+                    </div>
                   ) : null}
                 </div>
               </>
