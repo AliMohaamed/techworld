@@ -24,6 +24,7 @@ type CatalogProduct = {
   price?: number;
   slug?: string;
   cogs?: number;
+  sort_order?: number;
 };
 
 function normalizeOptionalString(value: string | undefined) {
@@ -118,6 +119,7 @@ const mapCatalogProduct = (product: CatalogProduct) => ({
   images: product.images,
   selling_price: product.selling_price,
   slug: product.slug,
+  sort_order: product.sort_order,
 });
 
 const matchesSearch = (product: CatalogProduct, rawQuery: string) => {
@@ -147,7 +149,13 @@ const sortCatalogProducts = (
     return sorted;
   }
 
-  sorted.sort((a, b) => b._creationTime - a._creationTime);
+  // Default sorting: sort_order ascending, then creationTime descending
+  sorted.sort((a, b) => {
+    const aOrder = a.sort_order ?? Number.MAX_SAFE_INTEGER;
+    const bOrder = b.sort_order ?? Number.MAX_SAFE_INTEGER;
+    if (aOrder !== bOrder) return aOrder - bOrder;
+    return b._creationTime - a._creationTime;
+  });
   return sorted;
 };
 
@@ -464,8 +472,9 @@ export const searchAndFilter = query({
       } else {
         baseQuery = ctx.db
           .query("products")
-          .withIndex("by_category", (q) => q.eq("categoryId", args.categoryId as Id<"categories">))
-          .filter((q) => q.eq(q.field("status"), "PUBLISHED"));
+          .withIndex("by_category_status_sort_order", (q) =>
+            q.eq("categoryId", args.categoryId as Id<"categories">).eq("status", "PUBLISHED"),
+          );
       }
     } else if (args.sortOrder === "price_asc" || args.sortOrder === "price_desc") {
       baseQuery = ctx.db
@@ -474,7 +483,7 @@ export const searchAndFilter = query({
     } else {
       baseQuery = ctx.db
         .query("products")
-        .withIndex("by_status", (q) => q.eq("status", "PUBLISHED"));
+        .withIndex("by_status_sort_order", (q) => q.eq("status", "PUBLISHED"));
     }
 
     if (args.sortOrder === "price_desc") {
@@ -536,7 +545,12 @@ export const getRecommendedProducts = query({
       products: await Promise.all(
         products
           .filter((product) => activeCategoryIds.has(product.categoryId))
-          .sort((a, b) => b._creationTime - a._creationTime)
+          .sort((a, b) => {
+            const aOrder = a.sort_order ?? Number.MAX_SAFE_INTEGER;
+            const bOrder = b.sort_order ?? Number.MAX_SAFE_INTEGER;
+            if (aOrder !== bOrder) return aOrder - bOrder;
+            return b._creationTime - a._creationTime;
+          })
           .slice(0, 4)
           .map(async (product) => {
             const mapped = mapCatalogProduct(product as CatalogProduct);
@@ -564,7 +578,7 @@ export const listAdminProducts = query({
 
     const products = await ctx.db.query("products").order("desc").collect();
 
-    return Promise.all(
+    const results = await Promise.all(
       products.map(async (product) => {
         const category = await ctx.db.get(product.categoryId);
         return {
@@ -576,6 +590,14 @@ export const listAdminProducts = query({
         };
       }),
     );
+
+    // Sort by sort_order ascending (products with sort_order come first, then by creation time)
+    return results.sort((a, b) => {
+      const aOrder = a.sort_order ?? Number.MAX_SAFE_INTEGER;
+      const bOrder = b.sort_order ?? Number.MAX_SAFE_INTEGER;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return b._creationTime - a._creationTime;
+    });
   },
 });
 
@@ -641,6 +663,12 @@ export const getForStorefront = query({
     return await Promise.all(
       publishedProducts
         .filter((p) => activeCategoryIds.has(p.categoryId))
+        .sort((a, b) => {
+          const aOrder = a.sort_order ?? Number.MAX_SAFE_INTEGER;
+          const bOrder = b.sort_order ?? Number.MAX_SAFE_INTEGER;
+          if (aOrder !== bOrder) return aOrder - bOrder;
+          return b._creationTime - a._creationTime;
+        })
         .map(async (p) => {
           const category = activeCategories.find((c) => c._id === p.categoryId);
           return {
@@ -875,6 +903,11 @@ export const createProduct = mutation({
 
     const productId = await ctx.db.insert("products", payload);
 
+    // Auto-assign sort_order: place new product at the end
+    const allProducts = await ctx.db.query("products").collect();
+    const maxOrder = allProducts.reduce((max, p) => Math.max(max, p.sort_order ?? 0), 0);
+    await ctx.db.patch(productId, { sort_order: maxOrder + 1 });
+
     await ctx.runMutation(internal.audit.logAudit, {
       userId: user._id,
       entityId: productId,
@@ -1085,6 +1118,12 @@ export const createAdvancedProduct = mutation({
       isActive: args.status === "PUBLISHED",
     };
     const productId = await ctx.db.insert("products", payload);
+
+    // Auto-assign sort_order: place new product at the end
+    const allProducts = await ctx.db.query("products").collect();
+    const maxOrder = allProducts.reduce((max, p) => Math.max(max, p.sort_order ?? 0), 0);
+    await ctx.db.patch(productId, { sort_order: maxOrder + 1 });
+
     await replaceAdvancedProductSkus(ctx, productId, normalizedVariants, user._id);
 
     await ctx.runMutation(internal.audit.logAudit, {
@@ -1217,5 +1256,55 @@ export const updateAdvancedProduct = mutation({
         variants: normalizedVariants,
       },
     });
+  },
+});
+
+export const reorderProducts = mutation({
+  args: {
+    updates: v.array(
+      v.object({
+        id: v.id("products"),
+        sort_order: v.number(),
+      }),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const user = await requirePermission(ctx, "MANAGE_PRODUCTS");
+
+    for (const update of args.updates) {
+      const product = await ctx.db.get(update.id);
+      if (!product) continue;
+      await ctx.db.patch(update.id, { sort_order: update.sort_order });
+    }
+
+    await writeAuditLog(ctx, {
+      userId: user._id,
+      entityId: "BATCH_REORDER",
+      actionType: "REORDER_PRODUCTS",
+      changes: {
+        count: args.updates.length,
+        updates: args.updates,
+      },
+    });
+  },
+});
+
+export const initializeSortOrder = mutation({
+  args: {},
+  handler: async (ctx) => {
+    await requirePermission(ctx, "MANAGE_PRODUCTS");
+
+    const products = await ctx.db.query("products").collect();
+
+    // Sort by creation time (oldest first) to assign sort_order
+    const sorted = [...products].sort((a, b) => a._creationTime - b._creationTime);
+
+    let order = 1;
+    for (const product of sorted) {
+      if (product.sort_order === undefined || product.sort_order === null) {
+        await ctx.db.patch(product._id, { sort_order: order });
+      }
+      order++;
+    }
   },
 });

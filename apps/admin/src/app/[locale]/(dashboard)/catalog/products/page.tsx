@@ -7,6 +7,7 @@ import { Button, Input, cn } from "@techworld/ui";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { ProductFormSheet } from "@/components/catalog/products/ProductFormSheet";
+import { ProductReorderPanel } from "@/components/catalog/products/ProductReorderPanel";
 import { useTranslations, useLocale } from "next-intl";
 import {
   Package,
@@ -20,6 +21,8 @@ import {
   Tag as TagIcon,
   CheckCircle2,
   AlertCircle,
+  GripVertical,
+  List,
 } from "lucide-react";
 
 type AdminProduct = {
@@ -74,6 +77,7 @@ export default function AdminProductsPage() {
     {},
   );
   const [realDrafts, setRealDrafts] = useState<Record<string, string>>({});
+  const [activeTab, setActiveTab] = useState<"table" | "reorder">("table");
 
   const adjustRealStock = async (
     skuId: Id<"skus">,
@@ -211,6 +215,37 @@ export default function AdminProductsPage() {
         </div>
       </section>
 
+      <div className="flex items-center gap-2 mb-2 px-2">
+        <button
+          type="button"
+          onClick={() => setActiveTab("table")}
+          className={cn(
+            "flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold transition-all",
+            activeTab === "table"
+              ? "bg-foreground text-background shadow-md"
+              : "bg-card text-muted-foreground/60 border border-border hover:border-[#ffc105]/30 hover:text-foreground"
+          )}
+        >
+          <List size={16} />
+          {t("reorder.tableTab")}
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("reorder")}
+          className={cn(
+            "flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold transition-all",
+            activeTab === "reorder"
+              ? "bg-[#ffc105] text-black shadow-md shadow-[#ffc105]/20"
+              : "bg-card text-muted-foreground/60 border border-border hover:border-[#ffc105]/30 hover:text-foreground"
+          )}
+        >
+          <GripVertical size={16} />
+          {t("reorder.tab")}
+        </button>
+      </div>
+
+
+      {activeTab === "table" ? (
       <section className="overflow-hidden rounded-[40px] border border-border bg-card   group transition-all hover:border-[#ffc105]/10">
         <div className="border-b border-border bg-accent/30 px-10 py-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
@@ -547,6 +582,16 @@ export default function AdminProductsPage() {
           </table>
         </div>
       </section>
+      ) : (
+        products ? (
+          <ProductReorderPanel products={products} />
+        ) : (
+          <section className="overflow-hidden rounded-[40px] border border-border bg-card p-20 text-center">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#ffc105] border-r-transparent" />
+            <p className="mt-4 text-xs font-bold text-muted-foreground/40">{t("table.loading")}</p>
+          </section>
+        )
+      )}
 
       <ProductFormSheet
         open={isSheetOpen}

@@ -103,6 +103,21 @@
         "defaultSkuOnly": "Default SKU only",
         "managedViaSkus": "Managed via SKUs — use Edit"
       },
+      "reorder": {
+        "tab": "Reorder",
+        "tableTab": "Table View",
+        "title": "Drag to Reorder Products",
+        "description": "Drag and drop products to set their display order on the storefront. The order you set here is the exact order customers will see.",
+        "badge": "Display Order",
+        "saveOrder": "Save Order",
+        "saving": "Saving...",
+        "saved": "Product order saved successfully.",
+        "saveFailed": "Failed to save product order.",
+        "initOrder": "Initialize Order",
+        "initSuccess": "Product order initialized from creation dates.",
+        "initFailed": "Failed to initialize product order.",
+        "position": "#{position}"
+      },
       "messages": {
         "restockPrompt": "Enter restock quantity for {name}:",
         "restockInvalid": "Invalid quantity",
