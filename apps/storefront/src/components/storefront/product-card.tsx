@@ -73,7 +73,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       href={`/products/${product.slug || product._id}`}
       className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-card transition-all hover:-translate-y-1 hover:  hover:shadow-black/20 dark:hover:shadow-black/50 border border-border active:scale-[0.99]"
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-2xl border-b border-border bg-secondary">
+      <div className="relative aspect-square w-full overflow-hidden rounded-t-2xl border-b border-border bg-secondary">
         {product.images?.[0] ? (
           <Image
             src={product.images[0]}
@@ -102,12 +102,12 @@ export default function ProductCard({ product }: ProductCardProps) {
         ) : null}
       </div>
 
-      <div className="flex flex-1 flex-col p-3 sm:p-4 md:p-6">
-        <span className="mb-1.5 sm:mb-2 text-[9px] sm:text-[11px] font-semibold text-[#ffc105]/80 uppercase">
+      <div className="flex flex-1 flex-col p-2.5 sm:p-4 md:p-6">
+        <span className="mb-1 sm:mb-2 text-[8px] sm:text-[11px] font-semibold text-[#ffc105]/80 uppercase truncate block">
           {product.categoryName || t("placeholderCategory")}
         </span>
 
-        <h3 className="mb-1.5 sm:mb-2 line-clamp-2 sm:line-clamp-1 font-space-grotesk text-sm sm:text-xl md:text-[1.3rem] font-bold leading-tight text-foreground tracking-tight group-hover:text-[#ffc105] transition-colors">
+        <h3 className="mb-1.5 sm:mb-2 line-clamp-2 font-space-grotesk text-xs sm:text-xl md:text-[1.3rem] font-bold leading-tight text-foreground tracking-tight group-hover:text-[#ffc105] transition-colors">
           {locale === "en" ? product.name_en : product.name_ar}
         </h3>
 
@@ -117,7 +117,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             : product.description_ar || t("placeholder")}
         </p>
 
-        <div className="mt-auto flex flex-row items-end justify-between sm:items-center gap-2 sm:gap-4 w-full">
+        <div className="mt-auto flex flex-row items-end justify-between sm:items-center gap-1.5 sm:gap-4 w-full">
           <div className="flex shrink-0 flex-col">
             {hasSalePrice ? (
               <s className="mb-0.5 font-space-grotesk text-[10px] sm:text-sm font-semibold tracking-tight text-muted-foreground decoration-red-900/50">
@@ -125,18 +125,18 @@ export default function ProductCard({ product }: ProductCardProps) {
                 <span className="text-[9px] sm:text-[10px]">EGP</span>
               </s>
             ) : null}
-            <span className="font-space-grotesk text-lg sm:text-2xl md:text-[1.5rem] font-bold tracking-tightest text-foreground leading-none">
+            <span className="font-space-grotesk text-sm sm:text-2xl md:text-[1.5rem] font-bold tracking-tightest text-foreground leading-none">
               {displayPrice.toLocaleString(locale)}{" "}
-              <span className="text-xs sm:text-lg text-[#ffc105]">EGP</span>
+              <span className="text-[9px] sm:text-lg text-[#ffc105]">EGP</span>
             </span>
           </div>
 
           <button
             disabled={isOutOfStock}
             onClick={handleAddToCart}
-            className="flex h-10 w-10 sm:h-12 md:h-14 sm:w-auto sm:flex-1 shrink-0 cursor-pointer items-center justify-center gap-1.5 sm:gap-2 rounded-[14px] sm:rounded-2xl bg-[#ffc105] sm:px-4 font-bold text-black transition-all hover:bg-white active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-30 hover:shadow-[#ffc105]/20"
+            className="flex h-8 w-8 sm:h-12 md:h-14 sm:w-auto sm:flex-1 shrink-0 cursor-pointer items-center justify-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl bg-[#ffc105] sm:px-4 font-bold text-black transition-all hover:bg-white active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-30 hover:shadow-[#ffc105]/20"
           >
-            <ShoppingCart size={18} className="md:h-5 md:w-5 shrink-0 sm:fill-black/5" />
+            <ShoppingCart size={14} className="md:h-5 md:w-5 shrink-0 sm:fill-black/5" />
             <span className="hidden sm:inline-block whitespace-nowrap text-[10px] sm:text-xs">
               {t("actions.add")}
             </span>

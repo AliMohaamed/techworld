@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { UploadCloud, X } from "lucide-react";
+import { UploadCloud, X, ArrowLeft, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { api } from "@backend/convex/_generated/api";
 import { cn } from "@techworld/ui";
@@ -56,6 +56,18 @@ export function ConvexStorageUpload({
     onChange(nextImages);
   };
 
+  const moveImage = (index: number, direction: "left" | "right") => {
+    const newImageIds = [...imageIds];
+    const targetIndex = direction === "left" ? index - 1 : index + 1;
+    if (targetIndex >= 0 && targetIndex < newImageIds.length) {
+      [newImageIds[index], newImageIds[targetIndex]] = [
+        newImageIds[targetIndex],
+        newImageIds[index],
+      ];
+      onChange(newImageIds);
+    }
+  };
+
   return (
     <div className="space-y-4 rounded-3xl border border-border bg-card p-6 shadow-sm transition-all focus-within:ring-2 focus-within:ring-[#ffc105]/20 focus-within:border-[#ffc105]/40">
       <label className="block cursor-pointer rounded-2xl border-2 border-dashed border-border/60 bg-accent/20 px-6 py-10 text-center transition-all hover:border-[#ffc105]/30 hover:bg-[#ffc105]/5 group">
@@ -80,7 +92,7 @@ export function ConvexStorageUpload({
       </label>
 
       {imageIds.length > 0 ? (
-        <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 pt-2">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 pt-2">
           {imageIds.map((imageId, index) => {
             const previewUrl = storageUrls?.[imageId];
             const isPrimary = index === 0;
@@ -89,7 +101,7 @@ export function ConvexStorageUpload({
               <div
                 key={imageId}
                 className={cn(
-                  "group relative aspect-square overflow-hidden rounded-2xl border bg-accent transition-all hover:scale-105 hover: ",
+                  "group relative aspect-square overflow-hidden rounded-2xl border bg-accent transition-all ",
                   isPrimary
                     ? "border-[#ffc105] ring-2 ring-[#ffc105]/20"
                     : "border-border hover:border-[#ffc105]/30",
@@ -111,6 +123,11 @@ export function ConvexStorageUpload({
                   </div>
                 )}
 
+                {/* Index badge */}
+                <div className="absolute bottom-1.5 left-1.5 rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
+                  #{index + 1}
+                </div>
+
                 {/* Primary badge/button */}
                 {isPrimary ? (
                   <div className="absolute left-1.5 top-1.5 rounded-full bg-[#ffc105] px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-black shadow-sm">
@@ -126,6 +143,26 @@ export function ConvexStorageUpload({
                     <UploadCloud size={10} className="rotate-180" />
                   </button>
                 )}
+
+                {/* Reorder buttons */}
+                <div className="absolute bottom-1.5 right-1.5 flex gap-1 opacity-0 transition-all group-hover:opacity-100">
+                  <button
+                    type="button"
+                    disabled={index === 0}
+                    onClick={() => moveImage(index, "left")}
+                    className="flex h-6 w-6 items-center justify-center rounded-lg bg-background/80 text-foreground backdrop-blur transition-all hover:bg-[#ffc105] hover:text-black disabled:opacity-30"
+                  >
+                    <ArrowLeft size={10} />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={index === imageIds.length - 1}
+                    onClick={() => moveImage(index, "right")}
+                    className="flex h-6 w-6 items-center justify-center rounded-lg bg-background/80 text-foreground backdrop-blur transition-all hover:bg-[#ffc105] hover:text-black disabled:opacity-30"
+                  >
+                    <ArrowRight size={10} />
+                  </button>
+                </div>
 
                 {/* Remove button */}
                 <button

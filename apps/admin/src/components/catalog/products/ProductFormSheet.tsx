@@ -488,10 +488,11 @@ export function ProductFormSheet({
                   storageUrls={storageUrls}
                   onChange={(nextImages) => {
                     setValue("images", nextImages, { shouldValidate: true });
-                    if (!getValues("thumbnail") && nextImages[0]) {
+                    // Always sync thumbnail with the first image in the ordered array
+                    if (nextImages.length > 0) {
                       setValue("thumbnail", nextImages[0]);
-                    } else if (getValues("thumbnail") && !nextImages.includes(getValues("thumbnail")!)) {
-                      setValue("thumbnail", nextImages[0] || "");
+                    } else {
+                      setValue("thumbnail", "");
                     }
                   }}
                 />
