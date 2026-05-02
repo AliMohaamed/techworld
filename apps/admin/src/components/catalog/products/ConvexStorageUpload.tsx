@@ -1,11 +1,132 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation, useQuery } from "convex/react";
-import { UploadCloud, X, ArrowLeft, ArrowRight } from "lucide-react";
+import { useMutation } from "convex/react";
+import { UploadCloud, X, GripVertical } from "lucide-react";
 import Image from "next/image";
 import { api } from "@backend/convex/_generated/api";
 import { cn } from "@techworld/ui";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+interface SortableItemProps {
+  imageId: string;
+  index: number;
+  isPrimary: boolean;
+  previewUrl?: string | null;
+  onRemove: (id: string) => void;
+  onSetPrimary: (id: string) => void;
+}
+
+function SortableItem({
+  imageId,
+  index,
+  isPrimary,
+  previewUrl,
+  onRemove,
+  onSetPrimary,
+}: SortableItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: imageId });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={cn(
+        "group relative aspect-square overflow-hidden rounded-2xl border bg-accent transition-all cursor-grab active:cursor-grabbing",
+        isPrimary
+          ? "border-[#ffc105] ring-2 ring-[#ffc105]/20"
+          : "border-border hover:border-[#ffc105]/30",
+        isDragging && "opacity-50 scale-105 shadow-2xl z-50"
+      )}
+    >
+      {/* Image preview */}
+      {previewUrl ? (
+        <Image
+          src={previewUrl}
+          alt={`Uploaded image ${index + 1}`}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="150px"
+          priority={index === 0}
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center text-muted-foreground/10">
+          <UploadCloud size={20} className="animate-pulse" />
+        </div>
+      )}
+
+      {/* Index badge - Always visible now */}
+      <div className="absolute bottom-1.5 right-1.5 rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm shadow-sm transition-all group-hover:bg-black/80">
+        #{index + 1}
+      </div>
+
+      {/* Primary badge/button */}
+      {isPrimary ? (
+        <div className="absolute left-1.5 top-1.5 rounded-full bg-[#ffc105] px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-black shadow-sm z-10">
+          Primary
+        </div>
+      ) : (
+        <button
+          type="button"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSetPrimary(imageId);
+          }}
+          className="absolute left-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-lg bg-background/80 text-foreground opacity-0 backdrop-blur transition-all hover:bg-[#ffc105] hover:text-black group-hover:opacity-100 z-10"
+          title="Set as primary"
+        >
+          <UploadCloud size={10} className="rotate-180" />
+        </button>
+      )}
+
+      {/* Remove button */}
+      <button
+        type="button"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+          onRemove(imageId);
+        }}
+        className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-lg bg-destructive text-destructive-foreground opacity-0 transition-all hover:scale-110 group-hover:opacity-100 shadow-sm z-10"
+        aria-label="Remove image"
+      >
+        <X size={12} strokeWidth={3} />
+      </button>
+    </div>
+  );
+}
 
 export function ConvexStorageUpload({
   imageIds,
@@ -19,11 +140,19 @@ export function ConvexStorageUpload({
   const generateUploadUrl = useMutation(api.storage.generateCatalogUploadUrl);
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleFiles = async (files: FileList | null) => {
-    if (!files || files.length === 0) {
-      return;
-    }
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
+  const handleFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
     setIsUploading(true);
     try {
       const uploadedIds: string[] = [];
@@ -36,37 +165,34 @@ export function ConvexStorageUpload({
           },
           body: file,
         });
-
-        if (!response.ok) {
-          throw new Error(`Upload failed for ${file.name}.`);
-        }
-
+        if (!response.ok) throw new Error(`Upload failed for ${file.name}.`);
         const payload = (await response.json()) as { storageId: string };
         uploadedIds.push(payload.storageId);
       }
-
-      onChange([...imageIds, ...uploadedIds]);
+      onChange([...imageIds, ...uploadedIds].filter((id) => id && id.trim() !== ""));
     } finally {
       setIsUploading(false);
     }
   };
 
   const setAsPrimary = (id: string) => {
-    const nextImages = [id, ...imageIds.filter((imgId) => imgId !== id)];
+    const nextImages = [
+      id,
+      ...imageIds.filter((imgId) => imgId !== id && imgId && imgId.trim() !== ""),
+    ];
     onChange(nextImages);
   };
 
-  const moveImage = (index: number, direction: "left" | "right") => {
-    const newImageIds = [...imageIds];
-    const targetIndex = direction === "left" ? index - 1 : index + 1;
-    if (targetIndex >= 0 && targetIndex < newImageIds.length) {
-      [newImageIds[index], newImageIds[targetIndex]] = [
-        newImageIds[targetIndex],
-        newImageIds[index],
-      ];
-      onChange(newImageIds);
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = imageIds.indexOf(active.id as string);
+      const newIndex = imageIds.indexOf(over.id as string);
+      onChange(arrayMove(imageIds, oldIndex, newIndex));
     }
   };
+
+  const activeImageIds = imageIds.filter((id) => id && id.trim() !== "");
 
   return (
     <div className="space-y-4 rounded-3xl border border-border bg-card p-6 shadow-sm transition-all focus-within:ring-2 focus-within:ring-[#ffc105]/20 focus-within:border-[#ffc105]/40">
@@ -91,95 +217,33 @@ export function ConvexStorageUpload({
         </div>
       </label>
 
-      {imageIds.length > 0 ? (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 pt-2">
-          {imageIds.map((imageId, index) => {
-            const previewUrl = storageUrls?.[imageId];
-            const isPrimary = index === 0;
-
-            return (
-              <div
-                key={imageId}
-                className={cn(
-                  "group relative aspect-square overflow-hidden rounded-2xl border bg-accent transition-all ",
-                  isPrimary
-                    ? "border-[#ffc105] ring-2 ring-[#ffc105]/20"
-                    : "border-border hover:border-[#ffc105]/30",
-                )}
-              >
-                {/* Image preview */}
-                {previewUrl ? (
-                  <Image
-                    src={previewUrl}
-                    alt={`Uploaded image ${index + 1}`}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    sizes="120px"
-                    priority={index === 0}
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-muted-foreground/10">
-                    <UploadCloud size={20} className="animate-pulse" />
-                  </div>
-                )}
-
-                {/* Index badge */}
-                <div className="absolute bottom-1.5 left-1.5 rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
-                  #{index + 1}
-                </div>
-
-                {/* Primary badge/button */}
-                {isPrimary ? (
-                  <div className="absolute left-1.5 top-1.5 rounded-full bg-[#ffc105] px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-black shadow-sm">
-                    Primary
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setAsPrimary(imageId)}
-                    className="absolute left-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-lg bg-background/80 text-foreground opacity-0 backdrop-blur transition-all hover:bg-[#ffc105] hover:text-black group-hover:opacity-100"
-                    title="Set as primary"
-                  >
-                    <UploadCloud size={10} className="rotate-180" />
-                  </button>
-                )}
-
-                {/* Reorder buttons */}
-                <div className="absolute bottom-1.5 right-1.5 flex gap-1 opacity-0 transition-all group-hover:opacity-100">
-                  <button
-                    type="button"
-                    disabled={index === 0}
-                    onClick={() => moveImage(index, "left")}
-                    className="flex h-6 w-6 items-center justify-center rounded-lg bg-background/80 text-foreground backdrop-blur transition-all hover:bg-[#ffc105] hover:text-black disabled:opacity-30"
-                  >
-                    <ArrowLeft size={10} />
-                  </button>
-                  <button
-                    type="button"
-                    disabled={index === imageIds.length - 1}
-                    onClick={() => moveImage(index, "right")}
-                    className="flex h-6 w-6 items-center justify-center rounded-lg bg-background/80 text-foreground backdrop-blur transition-all hover:bg-[#ffc105] hover:text-black disabled:opacity-30"
-                  >
-                    <ArrowRight size={10} />
-                  </button>
-                </div>
-
-                {/* Remove button */}
-                <button
-                  type="button"
-                  onClick={() =>
-                    onChange(imageIds.filter((id) => id !== imageId))
-                  }
-                  className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-lg bg-destructive text-destructive-foreground opacity-0 transition-all hover:scale-110 group-hover:opacity-100 shadow-sm"
-                  aria-label="Remove image"
-                >
-                  <X size={12} strokeWidth={3} />
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      ) : null}
+      {activeImageIds.length > 0 && (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={activeImageIds}
+            strategy={rectSortingStrategy}
+          >
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 pt-2">
+              {activeImageIds.map((imageId, index) => (
+                <SortableItem
+                  key={imageId}
+                  imageId={imageId}
+                  index={index}
+                  isPrimary={index === 0}
+                  previewUrl={storageUrls?.[imageId]}
+                  onRemove={(id) => onChange(imageIds.filter((imgId) => imgId !== id))}
+                  onSetPrimary={setAsPrimary}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      )}
     </div>
   );
 }
+

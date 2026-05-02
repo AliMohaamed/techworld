@@ -848,8 +848,8 @@ function buildPayload(values: ProductFormSubmitValues) {
     selling_price: values.selling_price,
     compareAtPrice: values.compareAtPrice,
     cogs: values.cogs,
-    thumbnail: values.thumbnail || values.images[0],
-    images: values.images,
+    thumbnail: values.thumbnail || values.images.filter(id => id && id.trim() !== "")[0],
+    images: values.images.filter(id => id && id.trim() !== ""),
     status: values.status,
     isFeatured: values.isFeatured,
     variants: values.variants.map((variant, index) => ({
