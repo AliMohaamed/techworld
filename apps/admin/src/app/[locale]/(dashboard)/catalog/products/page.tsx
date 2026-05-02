@@ -189,11 +189,11 @@ export default function AdminProductsPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Package className="text-[#ffc105]" size={20} />
-              <p className="text-[11px] font-bold uppercase tracking-wide text-[#ffc105]">
+              <p className="text-xs font-bold text-[#ffc105]">
                 {t("badge")}
               </p>
             </div>
-            <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight">
+            <h1 className="text-4xl font-bold text-foreground leading-tight">
               {t("title")}
             </h1>
             <p className="max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground/60">
@@ -203,7 +203,7 @@ export default function AdminProductsPage() {
           <Button
             type="button"
             onClick={openCreateSheet}
-            className="rounded-2xl h-14 px-10 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-bold uppercase tracking-wide text-[11px]"
+            className="rounded-2xl h-14 px-10 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all font-bold text-sm"
           >
             <Plus className="ltr:mr-3 rtl:ml-3 h-4 w-4" />
             {t("actions.create")}
@@ -216,16 +216,16 @@ export default function AdminProductsPage() {
           <div className="flex items-center gap-4">
             <div className="h-6 w-1 bg-[#ffc105] rounded-full" />
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
+              <p className="text-xs font-bold text-muted-foreground/60">
                 {t("table.badge")}
               </p>
-              <h2 className="text-2xl font-black text-foreground uppercase tracking-tightest leading-none mt-1">
+              <h2 className="text-2xl font-bold text-foreground mt-1">
                 {t("table.title")}
               </h2>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="rounded-full border border-border bg-background px-5 py-2 text-[11px] font-bold text-muted-foreground/80 font-mono tracking-wide uppercase  ">
+            <span className="rounded-full border border-border bg-background px-5 py-2 text-xs font-bold text-muted-foreground/60">
               {products
                 ? t("table.total", { count: products.length })
                 : t("table.loading")}
@@ -235,7 +235,7 @@ export default function AdminProductsPage() {
 
         <div className="overflow-x-auto scrollbar-hide">
           <table className="min-w-full text-left text-sm text-foreground">
-            <thead className="bg-accent/50 text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 border-b border-border">
+            <thead className="bg-accent/40 text-xs font-bold text-muted-foreground/60 border-b border-border">
               <tr>
                 <th className="sticky left-0 bg-card py-4 px-6 z-10">
                   {t("table.columns.product")}
@@ -272,16 +272,16 @@ export default function AdminProductsPage() {
                   <td className="sticky left-0 bg-card py-4 px-6 z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
                     <div className="flex flex-col relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none opacity-0 group-hover/row:opacity-100 transition-opacity" />
-                      <p className="font-black text-foreground text-lg uppercase tracking-tightest leading-none">
+                      <p className="font-bold text-foreground text-base">
                         {product.name_en}
                       </p>
                       <p
-                        className="text-[11px] text-muted-foreground/60 font-mono tracking-wide mt-2 uppercase"
+                        className="text-xs font-medium text-muted-foreground/50 mt-1"
                         dir="rtl"
                       >
                         {product.name_ar}
                       </p>
-                      <p className="mt-3 text-[10px] font-bold text-[#ffc105] uppercase tracking-wide flex items-center gap-1.5 opacity-80">
+                      <p className="mt-3 text-xs font-bold text-[#ffc105] flex items-center gap-1.5 opacity-80">
                         <Plus size={10} className="rotate-45" />{" "}
                         {product.slug ?? t("table.noSlug")}
                       </p>
@@ -289,12 +289,12 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="py-6 px-4 align-middle">
                     <div className="flex flex-col gap-1.5">
-                      <span className="font-bold text-[11px] text-foreground uppercase tracking-wide">
+                      <span className="font-bold text-xs text-foreground">
                         {product.categoryName}
                       </span>
                       <span
                         className={cn(
-                          "text-[10px] font-bold uppercase tracking-wide py-0.5 px-2 rounded-full w-fit",
+                          "text-xs font-bold py-0.5 px-2 rounded-full w-fit",
                           product.isCategoryActive
                             ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
                             : "bg-destructive/10 text-destructive border border-destructive/20",
@@ -305,7 +305,7 @@ export default function AdminProductsPage() {
                           : t("table.inactiveCategory")}
                       </span>
                       {product.publicationBlockedReason && (
-                        <p className="mt-1 text-[10px] font-bold text-amber-500 uppercase tracking-wide flex items-center gap-1">
+                        <p className="mt-1 text-xs font-bold text-amber-500 flex items-center gap-1">
                           <AlertCircle size={10} />{" "}
                           {product.publicationBlockedReason}
                         </p>
@@ -314,11 +314,11 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="py-6 px-4 align-middle">
                     <div className="flex flex-col">
-                      <p className="font-black text-sm text-foreground tracking-tightest">
+                      <p className="font-bold text-sm text-foreground">
                         EGP {product.selling_price.toLocaleString(locale)}
                       </p>
                       {product.compareAtPrice ? (
-                        <p className="mt-1 text-[11px] font-bold text-muted-foreground/40 line-through tracking-wide">
+                        <p className="mt-1 text-xs font-bold text-muted-foreground/30 line-through">
                           EGP {product.compareAtPrice.toLocaleString(locale)}
                         </p>
                       ) : null}
@@ -326,7 +326,7 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="py-6 px-4 align-middle">
                     <div className="flex flex-col gap-1.5">
-                      <p className="font-bold text-[11px] text-foreground uppercase tracking-wide">
+                      <p className="font-bold text-xs text-foreground">
                         {t("table.variantsCount", {
                           count: product.skus?.length ?? 0,
                         })}
@@ -335,7 +335,7 @@ export default function AdminProductsPage() {
                         {product.skus?.slice(0, 3).map((sku) => (
                           <span
                             key={sku._id}
-                            className="text-[9px] font-bold border border-border bg-background px-1.5 py-0.5 rounded uppercase tracking-wide text-muted-foreground/80"
+                            className="text-xs font-bold border border-border bg-background px-1.5 py-0.5 rounded text-muted-foreground/60"
                           >
                             {sku.variantName}
                           </span>
@@ -345,7 +345,7 @@ export default function AdminProductsPage() {
                             </span>
                           )}
                         {(product.skus?.length ?? 0) > 3 && (
-                          <span className="text-[8px] font-black px-1.5 py-0.5 text-muted-foreground/30">
+                          <span className="text-[8px] font-bold px-1.5 py-0.5 text-muted-foreground/30">
                             +{product.skus!.length - 3}
                           </span>
                         )}
@@ -355,12 +355,12 @@ export default function AdminProductsPage() {
                   <td className="py-6 px-4 align-middle">
                     {product.skus && product.skus.length > 0 ? (
                       <div className="flex flex-col gap-1">
-                        <p className="text-xs font-black text-foreground tracking-tightest">
+                        <p className="text-xs font-bold text-foreground">
                           {product.skus
                             .reduce((s, sku) => s + sku.display_stock, 0)
                             .toLocaleString(locale)}
                         </p>
-                        <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wide leading-none">
+                        <p className="text-xs font-semibold text-muted-foreground/40 leading-none">
                           {t("table.managedViaSkus")}
                         </p>
                       </div>
@@ -403,7 +403,7 @@ export default function AdminProductsPage() {
                       <div className="flex flex-col gap-2">
                         {product.skus.map((sku) => (
                           <div key={sku._id} className="flex items-center justify-between gap-3 min-w-[120px]">
-                            <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wide truncate max-w-[60px]">
+                            <span className="text-xs font-bold text-muted-foreground/40 truncate max-w-[60px]">
                               {sku.variantName}
                             </span>
                             <div className="flex items-center bg-accent/30 rounded-lg p-0.5 border border-border/50">
@@ -416,7 +416,7 @@ export default function AdminProductsPage() {
                               >
                                 <Minus size={10} />
                               </Button>
-                              <span className="text-[11px] font-bold min-w-[24px] text-center font-mono">
+                              <span className="text-xs font-bold min-w-[24px] text-center font-mono">
                                 {updatingSkuId === sku._id ? "..." : sku.real_stock}
                               </span>
                               <Button
@@ -466,10 +466,10 @@ export default function AdminProductsPage() {
                   <td className="py-6 px-4 align-middle">
                     <span
                       className={cn(
-                        "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-wide transition-all shadow-sm",
+                        "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold transition-all shadow-sm",
                         product.status === "PUBLISHED"
                           ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
-                          : "border-border bg-background text-muted-foreground/40",
+                          : "border-border bg-background text-muted-foreground/30",
                       )}
                     >
                       <div
@@ -477,7 +477,7 @@ export default function AdminProductsPage() {
                           "h-1.5 w-1.5 rounded-full",
                           product.status === "PUBLISHED"
                             ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
-                            : "bg-muted-foreground/40",
+                            : "bg-muted-foreground/30",
                         )}
                       />
                       {product.status}
@@ -488,7 +488,7 @@ export default function AdminProductsPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="rounded-xl h-10 px-6 text-[11px] font-bold uppercase tracking-wide text-muted-foreground/60 hover:text-foreground hover:bg-accent transition-all"
+                        className="rounded-xl h-10 px-6 text-xs font-bold text-muted-foreground/60 hover:text-foreground hover:bg-accent transition-all"
                         onClick={() => openEditSheet(product._id)}
                       >
                         {t("actions.edit")}
@@ -498,7 +498,7 @@ export default function AdminProductsPage() {
                         type="button"
                         variant="outline"
                         className={cn(
-                          "rounded-xl h-10 px-5 text-[11px] font-bold uppercase tracking-wide transition-all border-border shadow-sm   group/btn",
+                          "rounded-xl h-10 px-5 text-xs font-bold transition-all border-border shadow-sm   group/btn",
                           product.status === "PUBLISHED"
                             ? "text-destructive/40 hover:text-destructive hover:bg-destructive/10"
                             : "text-emerald-500/40 hover:text-emerald-500 hover:bg-emerald-500/10",
@@ -522,7 +522,7 @@ export default function AdminProductsPage() {
                 <tr>
                   <td colSpan={8} className="py-20 text-center">
                     <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#ffc105] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-                    <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                    <p className="mt-4 text-xs font-bold text-muted-foreground/40">
                       {t("table.loading")}
                     </p>
                   </td>
@@ -537,7 +537,7 @@ export default function AdminProductsPage() {
                     <div className="h-16 w-16 rounded-full bg-accent/20 flex items-center justify-center">
                       <Package size={32} className="text-muted-foreground/20" />
                     </div>
-                    <p className="text-sm font-black uppercase tracking-widest text-muted-foreground/20">
+                    <p className="text-sm font-bold text-muted-foreground/30">
                       {t("table.empty")}
                     </p>
                   </td>

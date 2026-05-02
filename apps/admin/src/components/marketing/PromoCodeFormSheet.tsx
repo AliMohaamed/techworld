@@ -145,11 +145,11 @@ export function PromoCodeFormSheet({
           <SheetHeader className="border-b border-border bg-card p-10 space-y-4 relative z-10">
             <div className="flex items-center gap-2">
               <div className="h-1 w-6 bg-[#ffc105] rounded-full" />
-              <p className="text-[11px] font-bold uppercase tracking-wide text-[#ffc105]">
+              <p className="text-xs font-bold text-[#ffc105]">
                 {t("form.badge")}
               </p>
             </div>
-            <SheetTitle className="text-3xl font-black uppercase tracking-tightest text-foreground m-0 leading-tight italic">
+            <SheetTitle className="text-3xl font-bold text-foreground m-0 leading-tight">
               {promoCode ? t("form.editTitle") : t("form.createTitle")}
             </SheetTitle>
             <SheetDescription className="text-sm text-muted-foreground/60 font-medium leading-relaxed">
@@ -165,7 +165,7 @@ export function PromoCodeFormSheet({
               <div className="space-y-3">
                 <Label
                   htmlFor="promo-code"
-                  className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80"
+                  className="text-xs font-bold text-muted-foreground/80"
                 >
                   {t("form.fields.code")}
                 </Label>
@@ -176,7 +176,7 @@ export function PromoCodeFormSheet({
                   {...register("code")}
                 />
                 {errors.code && (
-                  <p className="text-[11px] font-bold text-destructive uppercase tracking-wide mt-1">
+                  <p className="text-xs font-bold text-destructive mt-1">
                     {errors.code.message}
                   </p>
                 )}
@@ -184,7 +184,7 @@ export function PromoCodeFormSheet({
 
               <div className="space-y-3">
                 <Label
-                  className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80"
+                  className="text-xs font-bold text-muted-foreground/80"
                 >
                   {t("form.fields.type")}
                 </Label>
@@ -193,13 +193,13 @@ export function PromoCodeFormSheet({
                   name="type"
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full rounded-xl border border-border bg-background px-5 h-[54px] text-sm font-bold uppercase tracking-wide text-foreground transition-all outline-none hover:border-border/80 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50 shadow-sm">
+                      <SelectTrigger className="w-full rounded-xl border border-border bg-background px-5 h-[54px] text-sm font-bold text-foreground transition-all outline-none hover:border-border/80 focus:border-[#ffc105] focus:ring-1 focus:ring-[#ffc105]/50 shadow-sm">
                         <SelectValue placeholder={t("form.fields.type")} />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border-border bg-card">
-                        <SelectItem value="percentage" className="font-bold uppercase tracking-wide text-xs cursor-pointer">{t("form.types.percentage")}</SelectItem>
-                        <SelectItem value="fixed" className="font-bold uppercase tracking-wide text-xs cursor-pointer">{t("form.types.fixed")}</SelectItem>
-                        <SelectItem value="free_shipping" className="font-bold uppercase tracking-wide text-xs cursor-pointer">{t("form.types.freeShipping")}</SelectItem>
+                        <SelectItem value="percentage" className="font-bold text-xs cursor-pointer">{t("form.types.percentage")}</SelectItem>
+                        <SelectItem value="fixed" className="font-bold text-xs cursor-pointer">{t("form.types.fixed")}</SelectItem>
+                        <SelectItem value="free_shipping" className="font-bold text-xs cursor-pointer">{t("form.types.freeShipping")}</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -210,7 +210,7 @@ export function PromoCodeFormSheet({
                 <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <Label
                     htmlFor="promo-value"
-                    className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80"
+                    className="text-xs font-bold text-muted-foreground/80"
                   >
                     {selectedType === "percentage"
                       ? t("form.fields.percentageValue")
@@ -224,12 +224,12 @@ export function PromoCodeFormSheet({
                       className="rounded-xl border-border bg-background h-12 text-sm font-bold tracking-wide pl-5"
                       {...register("value")}
                     />
-                    <div className="absolute right-5 top-1/2 -translate-y-1/2 text-[11px] font-bold text-muted-foreground/80">
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground/80">
                       {selectedType === "percentage" ? "%" : "EGP"}
                     </div>
                   </div>
                   {errors.value && (
-                    <p className="text-[11px] font-bold text-destructive uppercase tracking-wide mt-1">
+                    <p className="text-xs font-bold text-destructive mt-1">
                       {errors.value.message}
                     </p>
                   )}
@@ -240,7 +240,7 @@ export function PromoCodeFormSheet({
                 <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <Label
                     htmlFor="promo-max-discount"
-                    className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80"
+                    className="text-xs font-bold text-muted-foreground/80"
                   >
                     {t("form.fields.maxDiscount")}
                   </Label>
@@ -259,7 +259,7 @@ export function PromoCodeFormSheet({
               <div className="space-y-3">
                 <Label
                   htmlFor="promo-max-uses"
-                  className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80"
+                  className="text-xs font-bold text-muted-foreground/80"
                 >
                   {t("form.fields.maxUses")}
                 </Label>
@@ -271,7 +271,7 @@ export function PromoCodeFormSheet({
                   {...register("max_uses")}
                 />
                 {errors.max_uses && (
-                  <p className="text-[11px] font-bold text-destructive uppercase tracking-wide mt-1">
+                  <p className="text-xs font-bold text-destructive mt-1">
                     {errors.max_uses.message}
                   </p>
                 )}
@@ -280,7 +280,7 @@ export function PromoCodeFormSheet({
               <div className="space-y-3">
                 <Label
                   htmlFor="promo-expiry-date"
-                  className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80"
+                  className="text-xs font-bold text-muted-foreground/80"
                 >
                   {t("form.fields.expiryDate")}
                 </Label>
@@ -293,7 +293,7 @@ export function PromoCodeFormSheet({
               </div>
             </div>
 
-            <div className="flex items-start gap-4 rounded-2xl border border-destructive/20 bg-destructive/5 p-5 text-[11px] font-bold uppercase tracking-wide text-destructive/80 leading-relaxed shadow-sm">
+            <div className="flex items-start gap-4 rounded-2xl border border-destructive/20 bg-destructive/5 p-5 text-xs font-bold text-destructive/80 leading-relaxed shadow-sm">
               <span className="shrink-0 text-lg">⚠️</span>
               <span>{t("form.fields.bundleOverlap")}</span>
             </div>
@@ -303,14 +303,14 @@ export function PromoCodeFormSheet({
             <div className="flex gap-4">
               <Button
                 variant="outline"
-                className="flex-1 h-14 rounded-2xl font-bold uppercase tracking-wide text-[11px] border-border hover:bg-accent transition-all"
+                className="flex-1 h-14 rounded-2xl font-bold text-xs border-border hover:bg-accent transition-all"
                 type="button"
                 onClick={() => onOpenChange(false)}
               >
                 {t("form.buttons.cancel")}
               </Button>
               <Button
-                className="flex-1 h-14 rounded-2xl font-bold uppercase tracking-wide text-[11px] bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all   shadow-[#ffc105]/10"
+                className="flex-1 h-14 rounded-2xl font-bold text-xs bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all shadow-[#ffc105]/10"
                 type="submit"
                 onClick={() => handleSubmit(onSubmit)()}
                 disabled={isSubmitting}

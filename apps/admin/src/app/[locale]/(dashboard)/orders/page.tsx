@@ -163,8 +163,8 @@ export default function OrdersPage() {
               <stat.icon className={stat.color} size={24} />
             </div>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 mb-1">{stat.label}</p>
-              <p className="text-2xl font-black tracking-tightest text-foreground">{stat.value}</p>
+              <p className="text-xs font-bold text-muted-foreground/60 mb-1">{stat.label}</p>
+              <p className="text-2xl font-bold text-foreground">{stat.value}</p>
             </div>
           </div>
         ))}
@@ -177,38 +177,38 @@ export default function OrdersPage() {
         <div className="relative z-10 flex flex-col gap-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <div className="flex items-center gap-3 mb-4">
-                <ShoppingCart className="text-[#ffc105]" size={20} />
-                  <p className="text-[11px] font-bold uppercase tracking-wide text-[#ffc105]">
-                    {tQueue("badge")}
-                  </p>
-              </div>
-              <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight">
-                {tQueue("title")}
-              </h1>
+               <div className="flex items-center gap-3 mb-4">
+                 <ShoppingCart className="text-[#ffc105]" size={20} />
+                   <p className="text-xs font-bold text-[#ffc105]">
+                     {tQueue("badge")}
+                   </p>
+               </div>
+               <h1 className="text-4xl font-bold text-foreground leading-tight">
+                 {tQueue("title")}
+               </h1>
               <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground/60">
                 {tQueue("description")}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setIsFilterBarOpen(!isFilterBarOpen)}
-                className={cn(
-                  "rounded-2xl h-12 px-6 text-[10px] font-black uppercase tracking-widest transition-all",
-                  isFilterBarOpen || search || dateRange !== "ALL_TIME" || selectedProductId !== "ALL" || selectedCategoryId !== "ALL"
-                    ? "border-[#ffc105] text-[#ffc105] bg-[#ffc105]/5"
-                    : "border-border text-muted-foreground"
-                )}
-              >
-                <Filter size={14} className={cn("mr-2", locale === "ar" ? "ml-2 mr-0" : "mr-2 ml-0")} />
-                {tQueue("filters.advanced.title")}
-                {(search || dateRange !== "ALL_TIME" || selectedProductId !== "ALL" || selectedCategoryId !== "ALL") && (
-                  <span className="ml-2 w-5 h-5 flex items-center justify-center bg-[#ffc105] text-black rounded-full text-[9px] font-bold">
-                    {[search, dateRange !== "ALL_TIME", selectedProductId !== "ALL", selectedCategoryId !== "ALL"].filter(Boolean).length}
-                  </span>
-                )}
-              </Button>
+               <Button
+                 variant="outline"
+                 onClick={() => setIsFilterBarOpen(!isFilterBarOpen)}
+                 className={cn(
+                   "rounded-2xl h-12 px-6 text-xs font-bold transition-all",
+                   isFilterBarOpen || search || dateRange !== "ALL_TIME" || selectedProductId !== "ALL" || selectedCategoryId !== "ALL"
+                     ? "border-[#ffc105] text-[#ffc105] bg-[#ffc105]/5"
+                     : "border-border text-muted-foreground"
+                 )}
+               >
+                 <Filter size={14} className={cn("mr-2", locale === "ar" ? "ml-2 mr-0" : "mr-2 ml-0")} />
+                 {tQueue("filters.advanced.title")}
+                 {(search || dateRange !== "ALL_TIME" || selectedProductId !== "ALL" || selectedCategoryId !== "ALL") && (
+                   <span className="ml-2 w-5 h-5 flex items-center justify-center bg-[#ffc105] text-black rounded-full text-[10px] font-bold">
+                     {[search, dateRange !== "ALL_TIME", selectedProductId !== "ALL", selectedCategoryId !== "ALL"].filter(Boolean).length}
+                   </span>
+                 )}
+               </Button>
             </div>
           </div>
 
@@ -218,9 +218,9 @@ export default function OrdersPage() {
             isFilterBarOpen ? "max-h-[500px] opacity-100 mt-2" : "max-h-0 opacity-0"
           )}>
             <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 px-2">
-                {tQueue("filters.advanced.search")}
-              </label>
+               <label className="text-xs font-bold text-muted-foreground/60 px-2">
+                 {tQueue("filters.advanced.search")}
+               </label>
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40" size={14} />
                 <Input
@@ -233,9 +233,9 @@ export default function OrdersPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 px-2">
-                {tQueue("filters.advanced.date.label")}
-              </label>
+               <label className="text-xs font-bold text-muted-foreground/60 px-2">
+                 {tQueue("filters.advanced.date.label")}
+               </label>
               <Select value={dateRange} onValueChange={(v) => setDateRange(v as DateRangePreset)}>
                 <SelectTrigger className="h-12 rounded-2xl bg-accent/20 border-border/50 focus:border-[#ffc105]/50 text-xs font-bold px-4">
                   <div className="flex items-center gap-2">
@@ -244,19 +244,19 @@ export default function OrdersPage() {
                   </div>
                 </SelectTrigger>
                 <SelectContent className="rounded-2xl border-border bg-card">
-                  {(["TODAY", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_90_DAYS", "ALL_TIME"] as DateRangePreset[]).map(p => (
-                    <SelectItem key={p} value={p} className="text-xs font-bold uppercase tracking-widest">
-                      {tQueue(`filters.advanced.date.${p}`)}
-                    </SelectItem>
-                  ))}
+                   {(["TODAY", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_90_DAYS", "ALL_TIME"] as DateRangePreset[]).map(p => (
+                     <SelectItem key={p} value={p} className="text-xs font-bold">
+                       {tQueue(`filters.advanced.date.${p}`)}
+                     </SelectItem>
+                   ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 px-2">
-                {tQueue("filters.advanced.product")}
-              </label>
+               <label className="text-xs font-bold text-muted-foreground/60 px-2">
+                 {tQueue("filters.advanced.product")}
+               </label>
               <Select value={selectedProductId} onValueChange={setSelectedProductId}>
                 <SelectTrigger className="h-12 rounded-2xl bg-accent/20 border-border/50 focus:border-[#ffc105]/50 text-xs font-bold px-4">
                   <div className="flex items-center gap-2 text-left truncate">
@@ -265,7 +265,7 @@ export default function OrdersPage() {
                   </div>
                 </SelectTrigger>
                 <SelectContent className="rounded-2xl border-border bg-card max-h-60">
-                  <SelectItem value="ALL" className="text-xs font-bold uppercase tracking-widest">
+                  <SelectItem value="ALL" className="text-xs font-bold">
                     {tQueue("filters.ALL")}
                   </SelectItem>
                   {products?.map(p => (
@@ -278,9 +278,9 @@ export default function OrdersPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 px-2">
-                {tQueue("filters.advanced.category")}
-              </label>
+               <label className="text-xs font-bold text-muted-foreground/60 px-2">
+                 {tQueue("filters.advanced.category")}
+               </label>
               <div className="flex gap-2">
                 <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId}>
                   <SelectTrigger className="h-12 rounded-2xl bg-accent/20 border-border/50 focus:border-[#ffc105]/50 text-xs font-bold px-4 grow">
@@ -290,9 +290,9 @@ export default function OrdersPage() {
                     </div>
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-border bg-card">
-                    <SelectItem value="ALL" className="text-xs font-bold uppercase tracking-widest">
-                      {tQueue("filters.ALL")}
-                    </SelectItem>
+                    <SelectItem value="ALL" className="text-xs font-bold">
+                     {tQueue("filters.ALL")}
+                   </SelectItem>
                     {categories?.map(c => (
                       <SelectItem key={c._id} value={c._id} className="text-xs font-bold">
                         {locale === "ar" ? c.name_ar : c.name_en}
@@ -313,47 +313,47 @@ export default function OrdersPage() {
 
           <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-border/50">
             {states.map(s => (
-              <button
-                key={s}
-                onClick={() => setFilter(s)}
-                className={cn(
-                  "px-4 py-2 text-[11px] font-bold uppercase tracking-wide rounded-full transition-all border",
-                  filter === s ? "bg-[#ffc105] text-black border-[#ffc105]" : "bg-card text-muted-foreground/60 border-border hover:bg-accent hover:text-foreground"
-                )}
-              >
-                {s === "ALL" ? tQueue("table.filters.ALL") : tStates(s as OrderState)}
-              </button>
+               <button
+                 key={s}
+                 onClick={() => setFilter(s)}
+                 className={cn(
+                   "px-4 py-2 text-xs font-bold rounded-full transition-all border",
+                   filter === s ? "bg-[#ffc105] text-black border-[#ffc105]" : "bg-card text-muted-foreground/60 border-border hover:bg-accent hover:text-foreground"
+                 )}
+               >
+                 {s === "ALL" ? tQueue("table.filters.ALL") : tStates(s as OrderState)}
+               </button>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-[32px] border border-border bg-card   group transition-all hover:border-[#ffc105]/10">
+      <section className="overflow-hidden rounded-[32px] border border-border bg-card group transition-all hover:border-[#ffc105]/10">
         <div className="border-b border-border bg-accent/30 px-8 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-4 w-1 bg-[#ffc105] rounded-full" />
-            <h2 className="text-sm font-black text-foreground uppercase tracking-widest">
-              {tQueue("table.title")}
-            </h2>
+             <h2 className="text-sm font-bold text-foreground">
+               {tQueue("table.title")}
+             </h2>
           </div>
-            <div className="text-[11px] font-bold text-muted-foreground/60 font-mono uppercase tracking-wide">
-              Live Buffer • {visibleOrders.length} Records
-            </div>
+             <div className="text-xs font-bold text-muted-foreground/40">
+               Live Buffer • {visibleOrders.length} Records
+             </div>
           </div>
 
         {profile === undefined || (canViewOrders && orders === undefined) ? (
           <div className="p-20 text-center">
             <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#ffc105]" />
-            <p className="mt-4 text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
-              {tQueue("table.loading")}
-            </p>
+             <p className="mt-4 text-xs font-bold text-muted-foreground/60">
+               {tQueue("table.loading")}
+             </p>
           </div>
         ) : !canViewOrders ? (
           <div className="flex flex-col items-center justify-center p-20 text-center gap-4">
             <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
               <ShieldAlert size={32} className="text-destructive" />
             </div>
-            <p className="text-sm font-bold uppercase tracking-wide text-destructive/80">
+            <p className="text-sm font-bold text-destructive/80">
               {tQueue("table.noPermission")}
             </p>
           </div>
@@ -362,14 +362,14 @@ export default function OrdersPage() {
             <div className="h-16 w-16 rounded-full bg-[#ffc105]/10 flex items-center justify-center">
               <ShieldAlert size={32} className="text-[#ffc105]" />
             </div>
-            <p className="text-sm font-bold uppercase tracking-wide text-[#ffc105]">
+            <p className="text-sm font-bold text-[#ffc105]">
               {tQueue("table.empty")}
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto scrollbar-hide">
-            <table className="min-w-full text-left text-sm text-foreground">
-              <thead className="bg-accent/50 text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80 border-b border-border">
+             <table className="min-w-full text-left text-sm text-foreground">
+               <thead className="bg-accent/40 text-xs font-bold text-muted-foreground/60 border-b border-border">
                 <tr>
                   <th className="sticky left-0 bg-card py-4 px-6 z-10 w-64">
                     {tQueue("table.columns.customer")}
@@ -404,54 +404,54 @@ export default function OrdersPage() {
                     )}
                   >
                     <td className="sticky left-0 bg-card py-4 px-6 align-middle z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
-                      <div className="font-bold text-foreground uppercase tracking-wide leading-none truncate">
-                        {order.customerName ?? tQueue("table.walkInCustomer")}
-                      </div>
-                      <div className="mt-2 text-[11px] font-bold text-muted-foreground/60 font-mono tracking-wide">
-                        {order.customerPhone ?? tQueue("table.noPhone")}
-                      </div>
+                       <div className="font-bold text-foreground leading-none truncate">
+                         {order.customerName ?? tQueue("table.walkInCustomer")}
+                       </div>
+                       <div className="mt-2 text-xs font-semibold text-muted-foreground/40 font-mono">
+                         {order.customerPhone ?? tQueue("table.noPhone")}
+                       </div>
                     </td>
                     <td className="py-4 px-4 align-middle">
-                      <div className="font-bold text-foreground text-xs uppercase tracking-wide max-w-[200px] truncate">
-                        {order.product?.name_en ?? tQueue("table.unknownProduct")}
-                      </div>
-                      <div className="mt-1.5 text-[11px] font-bold text-[#ffc105] uppercase tracking-wide truncate max-w-[200px]">
-                        {order.category?.name_en ?? tQueue("table.noCategory")}
-                      </div>
+                       <div className="font-bold text-foreground text-xs max-w-[200px] truncate">
+                         {order.product?.name_en ?? tQueue("table.unknownProduct")}
+                       </div>
+                       <div className="mt-1.5 text-xs font-bold text-[#ffc105] truncate max-w-[200px]">
+                         {order.category?.name_en ?? tQueue("table.noCategory")}
+                       </div>
                     </td>
                     <td className="py-4 px-4 align-middle">
-                      <span className={cn(
-                        "px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wide border whitespace-nowrap",
-                        getStatusColor(order.state)
-                      )}>
-                        {tStates(order.state as OrderState)}
-                      </span>
+                       <span className={cn(
+                         "px-3 py-1.5 rounded-full text-xs font-bold border whitespace-nowrap",
+                         getStatusColor(order.state)
+                       )}>
+                         {tStates(order.state as OrderState)}
+                       </span>
                     </td>
                     <td className="py-4 px-4 align-middle text-center font-mono font-bold text-sm text-muted-foreground/80">
                       {order.quantity.toLocaleString(locale)}
                     </td>
                     <td className="py-4 px-4 align-middle whitespace-nowrap">
-                      <span className="font-bold text-sm tracking-tightest text-foreground">
-                        {(order.total_price + (order.appliedShippingFee || 0)).toLocaleString(locale)}
-                      </span>
-                      <span className="ml-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wide">
-                        EGP
-                      </span>
+                       <span className="font-bold text-sm text-foreground">
+                         {(order.total_price + (order.appliedShippingFee || 0)).toLocaleString(locale)}
+                       </span>
+                       <span className="ml-1 text-xs font-bold text-muted-foreground/40">
+                         EGP
+                       </span>
                     </td>
                     <td className="py-4 px-4 align-middle">
                       {order.receiptUrl ? (
-                          <a
-                            className="inline-flex items-center gap-2 rounded-full border border-[#ffc105]/40 bg-[#ffc105]/10 px-3 py-1.5 text-[10px] font-bold text-[#ffc105] uppercase tracking-wide hover:bg-[#ffc105] hover:text-black transition-all shadow-sm"
-                            href={order.receiptUrl}
-                            rel="noreferrer"
-                            target="_blank"
-                          >
-                            <ImageIcon size={10} /> {tQueue("table.viewReceipt")}
-                          </a>
+                             <a
+                               className="inline-flex items-center gap-2 rounded-full border border-[#ffc105]/40 bg-[#ffc105]/10 px-3 py-1.5 text-xs font-bold text-[#ffc105] hover:bg-[#ffc105] hover:text-black transition-all shadow-sm"
+                               href={order.receiptUrl}
+                               rel="noreferrer"
+                               target="_blank"
+                             >
+                               <ImageIcon size={10} /> {tQueue("table.viewReceipt")}
+                             </a>
                       ) : (
-                        <span className="text-[10px] font-black text-muted-foreground/30 uppercase tracking-widest">
-                          {tQueue("table.pendingReceipt")}
-                        </span>
+                         <span className="text-xs font-bold text-muted-foreground/20">
+                           {tQueue("table.pendingReceipt")}
+                         </span>
                       )}
                     </td>
                     <td className="py-4 px-6 align-middle text-right">
@@ -460,9 +460,9 @@ export default function OrdersPage() {
                           value={order.state}
                           onValueChange={(value) => value && handleStatusChange(order._id, order.state as OrderState, value as OrderState)}
                         >
-                          <SelectTrigger className="w-36 h-9 text-[10px] uppercase tracking-widest font-bold font-mono rounded-xl bg-background border-border/50 hover:bg-accent/20 focus:ring-primary/50 text-foreground">
-                            <SelectValue placeholder={tStates(order.state as OrderState)} />
-                          </SelectTrigger>
+                           <SelectTrigger className="w-36 h-9 text-xs font-bold rounded-xl bg-background border-border/50 hover:bg-accent/20 focus:ring-primary/50 text-foreground">
+                             <SelectValue placeholder={tStates(order.state as OrderState)} />
+                           </SelectTrigger>
                           <SelectContent className="rounded-xl border-border bg-card">
                             {([
                               "PENDING_PAYMENT_INPUT",
@@ -476,27 +476,27 @@ export default function OrdersPage() {
                               "FLAGGED_FRAUD",
                               "CANCELLED",
                             ] as OrderState[]).map((state) => (
-                              <SelectItem
-                                key={state}
-                                value={state}
-                                className={`text-[10px] uppercase tracking-widest font-bold cursor-pointer hover:bg-accent hover:text-accent-foreground ${state === order.state ? "opacity-50 cursor-not-allowed" : ""
-                                  } ${state === "CANCELLED" || state === "RTO" || state === "FLAGGED_FRAUD"
-                                    ? "text-destructive focus:text-destructive"
-                                    : ""
-                                  }`}
-                              >
-                                {tStates(state)}
-                              </SelectItem>
+                               <SelectItem
+                                 key={state}
+                                 value={state}
+                                 className={`text-xs font-bold cursor-pointer hover:bg-accent hover:text-accent-foreground ${state === order.state ? "opacity-50 cursor-not-allowed" : ""
+                                   } ${state === "CANCELLED" || state === "RTO" || state === "FLAGGED_FRAUD"
+                                     ? "text-destructive focus:text-destructive"
+                                     : ""
+                                   }`}
+                               >
+                                 {tStates(state)}
+                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
 
                         <Link href={`/orders/${order._id}`}>
-                          <Button
-                            size="sm"
-                            type="button"
-                            className="rounded-xl h-9 px-4 text-[10px] font-black uppercase tracking-widest bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all group/btn"
-                          >
+                           <Button
+                             size="sm"
+                             type="button"
+                             className="rounded-xl h-9 px-4 text-xs font-bold bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all group/btn"
+                           >
                             {tQueue("table.review")}
                             <ArrowRight
                               size={12}

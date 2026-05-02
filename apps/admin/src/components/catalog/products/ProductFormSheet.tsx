@@ -355,10 +355,10 @@ export function ProductFormSheet({
                 </Field>
                 <div className="flex items-center justify-between p-6 rounded-2xl border border-[#ffc105]/20 bg-[#ffc105]/5 md:col-span-2">
                   <div className="space-y-1">
-                    <Label className="text-[11px] font-bold uppercase tracking-wide text-foreground">
+                    <Label className="text-xs font-bold text-foreground">
                       {t("form.fields.isFeatured")}
                     </Label>
-                    <p className="text-[10px] text-muted-foreground/60 font-medium leading-relaxed">
+                    <p className="text-xs text-muted-foreground/60 font-medium leading-relaxed">
                       {t("form.fields.isFeaturedDescription")}
                     </p>
                   </div>
@@ -380,7 +380,7 @@ export function ProductFormSheet({
                   <Input
                     {...register("name_en")}
                     placeholder={t("form.placeholders.nameEn")}
-                    className="rounded-xl border-border bg-background h-12 font-black uppercase tracking-tightest placeholder:not-italic"
+                    className="rounded-xl border-border bg-background h-12 font-semibold placeholder:not-italic"
                   />
                 </Field>
                 <Field
@@ -391,7 +391,7 @@ export function ProductFormSheet({
                     dir="rtl"
                     {...register("name_ar")}
                     placeholder={t("form.placeholders.nameAr")}
-                    className="rounded-xl border-border bg-background h-12 font-black tracking-tightest placeholder:not-italic"
+                    className="rounded-xl border-border bg-background h-12 font-semibold placeholder:not-italic"
                   />
                 </Field>
 
@@ -406,9 +406,9 @@ export function ProductFormSheet({
                         step="0.01"
                         {...register("selling_price")}
                         placeholder="0.00"
-                        className="rounded-xl border-border bg-background h-12 font-black tracking-tightest pr-12"
+                        className="rounded-xl border-border bg-background h-12 font-semibold pr-12"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/60">
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground/60">
                         EGP
                       </span>
                     </div>
@@ -423,9 +423,9 @@ export function ProductFormSheet({
                         step="0.01"
                         {...register("compareAtPrice")}
                         placeholder="0.00"
-                        className="rounded-xl border-border bg-background h-12 font-black tracking-tightest pr-12 text-muted-foreground/60"
+                        className="rounded-xl border-border bg-background h-12 font-semibold pr-12 text-muted-foreground/60"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/60">
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground/60">
                         EGP
                       </span>
                     </div>
@@ -440,9 +440,9 @@ export function ProductFormSheet({
                         step="0.01"
                         {...register("cogs")}
                         placeholder="0.00"
-                        className="rounded-xl border-border bg-background h-12 font-black tracking-tightest pr-12 text-primary"
+                        className="rounded-xl border-border bg-background h-12 font-semibold pr-12 text-primary"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/60">
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground/60">
                         EGP
                       </span>
                     </div>
@@ -516,7 +516,7 @@ export function ProductFormSheet({
                           setValue("images", nextImages);
                         }}
                       >
-                        <SelectTrigger className="w-full rounded-xl border border-border bg-background px-4 h-12 font-bold uppercase text-[11px] tracking-wide text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
+                        <SelectTrigger className="w-full rounded-xl border border-border bg-background px-4 h-12 font-semibold text-sm text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
                           <SelectValue
                             placeholder={t("form.placeholders.selectThumbnail")}
                           />
@@ -546,7 +546,7 @@ export function ProductFormSheet({
                                     </div>
                                   )}
                                 </div>
-                                <span className="font-bold uppercase tracking-wide text-[11px]">
+                                <span className="font-semibold text-xs">
                                   {t("form.fields.imageIndex", {
                                     index: idx + 1,
                                   })}
@@ -572,14 +572,14 @@ export function ProductFormSheet({
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
                   <Layers size={18} className="text-[#ffc105]/60" />
-                  <h3 className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
+                  <h3 className="text-sm font-bold text-foreground">
                     Unified SKU Matrix
                   </h3>
                 </div>
                 <Button
                   type="button"
                   variant="outline"
-                  className="rounded-full border-[#ffc105]/20 text-[#ffc105] font-bold uppercase tracking-wide text-[10px] h-8 px-4 hover:bg-[#ffc105]/10"
+                  className="rounded-full border-[#ffc105]/20 text-[#ffc105] font-semibold text-xs h-8 px-4 hover:bg-[#ffc105]/10"
                   onClick={() =>
                     append({
                       ...emptyVariant,
@@ -604,7 +604,7 @@ export function ProductFormSheet({
                     <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between relative z-10">
                       <div className="flex items-center gap-3">
                         <div className="h-2 w-2 rounded-full bg-[#ffc105]" />
-                        <p className="text-[11px] font-bold text-foreground uppercase tracking-wide">
+                        <p className="text-xs font-bold text-foreground">
                           {t("form.fields.variant", { index: index + 1 })}
                         </p>
                       </div>
@@ -612,7 +612,7 @@ export function ProductFormSheet({
                         <Button
                           type="button"
                           variant="ghost"
-                          className="h-9 px-4 rounded-full text-destructive/60 hover:text-destructive hover:bg-destructive/10 text-[10px] font-bold uppercase tracking-wide"
+                          className="h-9 px-4 rounded-full text-destructive/60 hover:text-destructive hover:bg-destructive/10 text-xs font-semibold"
                           onClick={() => remove(index)}
                         >
                           <Trash2 size={12} className="mr-2" />
@@ -628,7 +628,7 @@ export function ProductFormSheet({
                         <Input
                           {...register(`variants.${index}.variantName`)}
                           placeholder={t("form.placeholders.variantName")}
-                          className="rounded-xl border-border bg-background h-11 text-xs font-bold uppercase tracking-wide"
+                          className="rounded-xl border-border bg-background h-11 text-sm font-semibold"
                         />
                       </Field>
                       <Field
@@ -670,7 +670,7 @@ export function ProductFormSheet({
                             type="number"
                             {...register(`variants.${index}.real_stock`)}
                             placeholder="0"
-                            className="rounded-xl border-border bg-background h-11 text-xs font-bold tracking-wide"
+                            className="rounded-xl border-border bg-background h-11 text-sm font-semibold"
                           />
                           <Button
                             className="h-11 w-11 rounded-xl border-border bg-accent text-accent-foreground hover:bg-[#ffc105] hover:text-black hover:border-[#ffc105] transition-all shrink-0"
@@ -691,7 +691,7 @@ export function ProductFormSheet({
                           type="number"
                           {...register(`variants.${index}.display_stock`)}
                           placeholder="0"
-                          className="rounded-xl border-border bg-background h-11 text-xs font-bold tracking-wide"
+                          className="rounded-xl border-border bg-background h-11 text-sm font-semibold"
                         />
                       </Field>
                       <Field
@@ -704,9 +704,9 @@ export function ProductFormSheet({
                             step="0.01"
                             {...register(`variants.${index}.price`)}
                             placeholder="0.00"
-                            className="rounded-xl border-border bg-background h-11 text-xs font-black tracking-widest pr-10"
+                            className="rounded-xl border-border bg-background h-11 text-sm font-bold pr-10"
                           />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/60">
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground/60">
                             EGP
                           </span>
                         </div>
@@ -723,9 +723,9 @@ export function ProductFormSheet({
                             step="0.01"
                             {...register(`variants.${index}.compareAtPrice`)}
                             placeholder="0.00"
-                            className="rounded-xl border-border bg-background h-11 text-xs font-black tracking-widest pr-10 text-muted-foreground/40"
+                            className="rounded-xl border-border bg-background h-11 text-sm font-bold pr-10 text-muted-foreground/40"
                           />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/60">
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground/60">
                             EGP
                           </span>
                         </div>
@@ -739,7 +739,7 @@ export function ProductFormSheet({
                           name={`variants.${index}.linkedImageId` as const}
                           render={({ field }) => (
                             <Select value={field.value || undefined} onValueChange={field.onChange}>
-                              <SelectTrigger className="w-full rounded-xl border border-border bg-background px-3 h-11 font-bold uppercase text-[11px] tracking-wide text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
+                              <SelectTrigger className="w-full rounded-xl border border-border bg-background px-3 h-11 font-semibold text-xs text-foreground transition-all focus:ring-1 focus:ring-[#ffc105] focus:border-[#ffc105]">
                                 <SelectValue placeholder={t("form.placeholders.noLinkedImage")} />
                               </SelectTrigger>
                               <SelectContent className="rounded-xl border-border bg-card">
@@ -760,7 +760,7 @@ export function ProductFormSheet({
                                           </div>
                                         )}
                                       </div>
-                                      <span className="font-bold uppercase tracking-wide text-[10px]">
+                                      <span className="font-semibold text-xs">
                                         {t("form.fields.imageIndex", { index: idx + 1 })}
                                       </span>
                                     </div>
@@ -781,14 +781,14 @@ export function ProductFormSheet({
           <div className="sticky bottom-0 z-30 flex flex-col gap-4 border-t border-border bg-card/90 px-10 py-8 backdrop-blur   sm:flex-row sm:items-center sm:justify-end">
             <Button
               variant="outline"
-              className="h-12 px-8 rounded-xl font-bold uppercase tracking-wide text-[11px] border-border hover:bg-accent transition-all"
+              className="h-12 px-8 rounded-xl font-semibold text-sm border-border hover:bg-accent transition-all"
               type="button"
               onClick={onClose}
             >
               {t("form.buttons.cancel")}
             </Button>
             <Button
-              className="h-12 px-10 rounded-xl font-bold uppercase tracking-wide text-[11px] bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all   shadow-[#ffc105]/10"
+              className="h-12 px-10 rounded-xl font-bold text-sm bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all   shadow-[#ffc105]/10"
               disabled={isSubmitting}
               type="submit"
               onClick={() => void submit()}

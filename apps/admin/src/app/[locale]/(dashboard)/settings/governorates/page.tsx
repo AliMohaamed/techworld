@@ -137,11 +137,11 @@ export default function GovernoratesSettingsPage() {
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-4">
             <MapPin className="text-[#ffc105]" size={20} />
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105] italic">
+            <p className="text-xs font-bold text-[#ffc105]">
               {t('badge')}
             </p>
           </div>
-          <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight italic">
+          <h1 className="text-4xl font-bold text-foreground leading-tight">
             {t('title')}
           </h1>
           <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground/60">
@@ -156,10 +156,10 @@ export default function GovernoratesSettingsPage() {
           <div className="relative z-10">
             <div className="mb-8 flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
+                <p className="text-xs font-bold text-muted-foreground/50">
                   {editingId ? t('form.edit') : t('form.new')}
                 </p>
-                <h2 className="mt-1 text-2xl font-black text-foreground uppercase tracking-tightest italic">
+                <h2 className="mt-1 text-2xl font-bold text-foreground">
                   {editingId ? t('form.updateTitle') : t('form.createTitle')}
                 </h2>
               </div>
@@ -168,7 +168,7 @@ export default function GovernoratesSettingsPage() {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="rounded-xl font-black uppercase tracking-widest text-[10px] h-8"
+                  className="rounded-xl font-bold text-xs h-8"
                   onClick={() => {
                     setEditingId(null);
                     reset(emptyValues);
@@ -188,19 +188,19 @@ export default function GovernoratesSettingsPage() {
               </FormField>
               <FormField label={t('form.nameAr')} error={errors.name_ar?.message}>
                 <div className="relative group/field">
-                  <Input dir="rtl" {...register("name_ar")} placeholder="e.g. القاهرة" className="bg-accent/30 border-border/50 h-12 rounded-2xl pr-4 focus:ring-[#ffc105] transition-all" />
+                  <Input dir="rtl" {...register("name_ar")} placeholder="e.g. القاهرة" className="h-12 rounded-xl" />
                 </div>
               </FormField>
               <FormField label={t('form.fee')} error={errors.shippingFee?.message}>
                 <div className="relative group/field">
-                  <div className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">EGP</div>
-                  <Input step="0.01" type="number" {...register("shippingFee")} placeholder="0.00" className="bg-accent/30 border-border/50 h-12 rounded-2xl px-4 focus:ring-[#ffc105] transition-all" />
+                  <div className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground/40">EGP</div>
+                  <Input step="0.01" type="number" {...register("shippingFee")} placeholder="0.00" className="h-12 rounded-xl pr-12 font-semibold" />
                 </div>
               </FormField>
               {!editingId && (
                 <div className="pt-2">
-                  <div className="flex items-center justify-between p-4 rounded-2xl border border-border bg-accent/10">
-                    <Label className="text-[10px] font-black uppercase tracking-[0.2em]">{t('form.activeLabel')}</Label>
+                  <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-accent/20">
+                    <Label className="text-xs font-bold">{t('form.activeLabel')}</Label>
                     <Switch
                       checked={isActiveValue}
                       onCheckedChange={(checked) => reset({ ...watch(), isActive: checked })}
@@ -210,8 +210,7 @@ export default function GovernoratesSettingsPage() {
               )}
             </div>
 
-
-            <Button disabled={isSubmitting} type="submit" className="mt-8 w-full rounded-2xl h-14 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-black uppercase tracking-[0.2em] text-[10px]">
+            <Button disabled={isSubmitting} type="submit" className="mt-8 w-full rounded-xl h-12 font-bold text-sm">
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent" />
@@ -219,7 +218,7 @@ export default function GovernoratesSettingsPage() {
                 </div>
               ) : (
                 <>
-                  <Sparkles className="ltr:mr-3 rtl:ml-3 h-4 w-4" />
+                  <Sparkles className="ltr:mr-2 rtl:ml-2 h-4 w-4" />
                   {editingId ? t('form.submitUpdate') : t('form.submitCreate')}
                 </>
               )}
@@ -227,8 +226,8 @@ export default function GovernoratesSettingsPage() {
           </div>
         </form>
 
-        <section className="xl:col-span-8 rounded-[40px] border border-border bg-card   overflow-hidden group transition-all hover:border-[#ffc105]/10">
-          <div className="border-b border-border bg-accent/30 px-10 py-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <section className="xl:col-span-8 rounded-3xl border border-border bg-card overflow-hidden">
+          <div className="border-b border-border bg-accent/20 px-10 py-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               <div className="h-6 w-1 bg-[#ffc105] rounded-full" />
               <div>
@@ -237,7 +236,7 @@ export default function GovernoratesSettingsPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="rounded-full border border-border bg-background px-5 py-2 text-[10px] font-black text-muted-foreground/60 font-mono tracking-widest uppercase shadow-inner">
+              <span className="rounded-full border border-border bg-background px-5 py-2 text-xs font-bold text-muted-foreground shadow-inner">
                 {governorates ? t('table.total', { count: governorates.length }) : t('table.loading')}
               </span>
             </div>
@@ -245,7 +244,7 @@ export default function GovernoratesSettingsPage() {
 
           <div className="overflow-x-auto scrollbar-hide">
             <table className="min-w-full text-left text-sm text-foreground">
-              <thead className="bg-accent/50 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60 border-b border-border">
+              <thead className="bg-accent/40 text-xs font-bold text-muted-foreground/60 border-b border-border">
                 <tr>
                   <th className="sticky left-0 bg-card py-4 px-6 z-10">{t('table.columns.name')}</th>
                   <th className="py-4 px-4">{t('table.columns.fee')}</th>
@@ -257,16 +256,16 @@ export default function GovernoratesSettingsPage() {
                 {governorates?.map((gov) => (
                   <tr key={gov._id} className="group/row hover:bg-accent/20 transition-all">
                     <td className="sticky left-0 bg-card py-4 px-6 align-middle z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
-                      <div className="font-black text-foreground uppercase tracking-tightest leading-none">{gov.name_en}</div>
-                      <div className="mt-2 text-xs font-bold text-muted-foreground/40 italic" dir="rtl">{gov.name_ar}</div>
+                      <div className="font-bold text-foreground text-sm">{gov.name_en}</div>
+                      <div className="mt-1 text-xs font-medium text-muted-foreground/50" dir="rtl">{gov.name_ar}</div>
                     </td>
-                    <td className="py-4 px-4 align-middle font-mono font-black text-base text-muted-foreground group-hover/row:text-foreground transition-colors">
-                      {gov.shippingFee.toLocaleString(locale)} <span className="text-[10px] uppercase tracking-widest text-muted-foreground/30">EGP</span>
+                    <td className="py-4 px-4 align-middle font-semibold text-base text-muted-foreground group-hover/row:text-foreground transition-colors">
+                      {gov.shippingFee.toLocaleString(locale)} <span className="text-xs font-bold text-muted-foreground/30">EGP</span>
                     </td>
                     <td className="py-4 px-4 align-middle">
                       <span
                         className={cn(
-                          "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                          "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border",
                           gov.isActive
                             ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
                             : "bg-destructive/10 border-destructive/20 text-destructive"
@@ -290,7 +289,7 @@ export default function GovernoratesSettingsPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="rounded-xl h-9 px-4 border-border/50 hover:bg-[#ffc105] hover:border-[#ffc105] hover:text-black font-black uppercase tracking-widest text-[10px] transition-all"
+                          className="rounded-xl h-9 px-4 border-border/50 hover:bg-[#ffc105] hover:border-[#ffc105] hover:text-black font-bold text-xs transition-all"
                           onClick={() => setEditingId(gov._id)}
                         >
                           <Pencil size={12} className="ltr:mr-2 rtl:ml-2" />
@@ -301,7 +300,7 @@ export default function GovernoratesSettingsPage() {
                           variant="ghost"
                           disabled={busyId === gov._id}
                           className={cn(
-                            "rounded-xl h-9 px-4 font-black uppercase tracking-widest text-[10px] transition-all",
+                            "rounded-xl h-9 px-4 font-bold text-xs transition-all",
                             gov.isActive
                               ? "text-destructive hover:bg-destructive/10 hover:text-destructive"
                               : "text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-500"
@@ -330,7 +329,7 @@ export default function GovernoratesSettingsPage() {
                   <tr>
                     <td colSpan={4} className="py-20 text-center">
                       <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#ffc105] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-                      <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{t('table.loading')}</p>
+                      <p className="mt-4 text-xs font-bold text-muted-foreground/40">{t('table.loading')}</p>
                     </td>
                   </tr>
                 )}
@@ -341,7 +340,7 @@ export default function GovernoratesSettingsPage() {
                         <div className="h-16 w-16 rounded-full bg-[#ffc105]/10 flex items-center justify-center">
                           <Truck size={32} className="text-[#ffc105]" />
                         </div>
-                        <p className="text-sm font-black uppercase tracking-widest text-[#ffc105]/60">{t('table.empty')}</p>
+                        <p className="text-sm font-bold text-[#ffc105]/60">{t('table.empty')}</p>
                       </div>
                     </td>
                   </tr>
@@ -357,7 +356,7 @@ export default function GovernoratesSettingsPage() {
           <Info size={20} />
         </div>
         <div className="space-y-1">
-          <h4 className="text-sm font-black uppercase tracking-widest text-foreground">{t('messages.infoTitle')}</h4>
+          <h4 className="text-sm font-bold text-foreground">{t('messages.infoTitle')}</h4>
           <p className="text-xs font-semibold leading-relaxed text-muted-foreground/60 max-w-4xl">
             {t('messages.infoDescription')}
           </p>
@@ -378,15 +377,13 @@ function FormField({
 }) {
   return (
     <div className="space-y-2">
-      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 px-1">{label}</Label>
+      <Label className="text-xs font-bold text-muted-foreground px-1">{label}</Label>
       {children}
       {error && (
-        <p className="px-1 text-[10px] font-black text-destructive uppercase tracking-widest animate-in fade-in slide-in-from-top-1 duration-200">
+        <p className="px-1 text-xs font-bold text-destructive mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
           {error}
         </p>
       )}
     </div>
   );
 }
-
-

@@ -93,7 +93,7 @@ function SortableItem({
 
       {/* Primary badge/button */}
       {isPrimary ? (
-        <div className="absolute left-1.5 top-1.5 rounded-full bg-[#ffc105] px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-black shadow-sm z-10">
+        <div className="absolute left-1.5 top-1.5 rounded-full bg-[#ffc105] px-3 py-1 text-[10px] font-bold text-black shadow-sm z-10">
           Primary
         </div>
       ) : (
@@ -208,10 +208,10 @@ export function ConvexStorageUpload({
           <div className="h-12 w-12 rounded-2xl bg-[#ffc105]/10 flex items-center justify-center text-[#ffc105] shadow-sm transform transition-transform group-hover:scale-110 group-hover:rotate-3">
             <UploadCloud size={24} />
           </div>
-          <span className="text-sm font-black uppercase tracking-widest text-foreground group-hover:text-[#ffc105] transition-colors">
+          <span className="text-sm font-bold text-foreground group-hover:text-[#ffc105] transition-colors">
             {isUploading ? "Uploading images..." : "Upload product images"}
           </span>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/30">
+          <span className="text-xs font-medium text-muted-foreground/50">
             JPG, PNG, WebP • Convex Edge Storage
           </span>
         </div>

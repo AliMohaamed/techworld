@@ -106,10 +106,10 @@ function LoginScreen() {
 
       <div className="w-full max-w-md rounded-[28px] border border-border bg-card p-8   transition-all">
         <div className="mb-8 space-y-3">
-          <p className="text-[11px] font-bold uppercase tracking-[0.35em] text-[#ffc105]">
+          <p className="text-xs font-bold text-[#ffc105]">
             Internal Admin Access
           </p>
-          <h1 className="text-3xl font-black uppercase tracking-tight text-foreground">
+          <h1 className="text-3xl font-bold text-foreground">
             Sign In
           </h1>
           <p className="text-sm leading-6 text-muted-foreground/60">
@@ -127,7 +127,7 @@ function LoginScreen() {
               {...register("email")}
             />
             {errors.email ? (
-              <p className="text-xs font-bold uppercase tracking-widest text-destructive mt-1">
+              <p className="text-xs font-bold text-destructive mt-1">
                 {errors.email.message}
               </p>
             ) : null}
@@ -140,13 +140,13 @@ function LoginScreen() {
               {...register("password")}
             />
             {errors.password ? (
-              <p className="text-xs font-bold uppercase tracking-widest text-destructive mt-1">
+              <p className="text-xs font-bold text-destructive mt-1">
                 {errors.password.message}
               </p>
             ) : null}
           </div>
-          <button
-            className="w-full flex h-12 items-center justify-center rounded-xl bg-[#ffc105] text-sm font-black uppercase tracking-widest text-black transition-all hover:bg-foreground hover:text-background disabled:opacity-50 cursor-pointer   active:scale-[0.98]"
+            <button
+              className="w-full flex h-12 items-center justify-center rounded-xl bg-[#ffc105] text-sm font-bold text-black transition-all hover:bg-foreground hover:text-background disabled:opacity-50 cursor-pointer   active:scale-[0.98]"
             disabled={isSubmitting}
             type="submit"
           >
@@ -191,9 +191,9 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
               <ShieldX size={48} />
             </div>
           </div>
-          <h1 className="mb-2 text-2xl font-black text-foreground uppercase tracking-tight">
-            Access Denied
-          </h1>
+           <h1 className="mb-2 text-2xl font-bold text-foreground">
+             Access Denied
+           </h1>
           <p className="mb-8 text-sm leading-6 text-muted-foreground/60">
             Your authentication session is valid, but no staff record was found
             for <strong>{profile?.authUser?.email}</strong>. Admin access must
@@ -201,7 +201,7 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
           </p>
           <Button
             onClick={() => void authClient.signOut()}
-            className="w-full h-12 rounded-xl text-black font-black uppercase tracking-widest"
+            className="w-full h-12 rounded-xl text-black font-bold"
           >
             <LogOut size={16} className="ltr:mr-2 rtl:ml-2" />
             Sign Out
@@ -220,16 +220,16 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
               <ShieldX size={48} />
             </div>
           </div>
-          <h1 className="mb-2 text-2xl font-black text-foreground uppercase tracking-tight">
-            Account Suspended
-          </h1>
+           <h1 className="mb-2 text-2xl font-bold text-foreground">
+             Account Suspended
+           </h1>
           <p className="mb-8 text-sm leading-6 text-muted-foreground/60">
             Your staff account has been deactivated by the platform
             administrator. Access to the dashboard is currently restricted.
           </p>
           <Button
             onClick={() => void authClient.signOut()}
-            className="w-full h-12 rounded-xl text-black font-black uppercase tracking-widest"
+            className="w-full h-12 rounded-xl text-black font-bold"
           >
             <LogOut size={16} className="ltr:mr-2 rtl:ml-2" />
             Sign Out
@@ -262,12 +262,12 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
                       <ShieldCheck size={18} />
                     </div>
                     <div className="min-w-0 text-left">
-                      <p className="text-[10px] uppercase tracking-[0.35em] text-[#ffc105] truncate font-black">
-                        TechWorld Ops
-                      </p>
-                      <h1 className="text-base font-black uppercase tracking-tight truncate text-foreground">
-                        Admin Panel
-                      </h1>
+                       <p className="text-xs font-semibold text-muted-foreground">
+                         TechWorld Ops
+                       </p>
+                        <h1 className="text-lg font-bold truncate text-foreground">
+                          Admin Panel
+                        </h1>
                     </div>
                   </div>
                   <Sidebar
@@ -284,10 +284,10 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
                 <ShieldCheck size={18} />
               </div>
               <div className="min-w-0">
-                <p className="text-[11px] uppercase tracking-[0.35em] text-[#ffc105] font-black">
-                  TechWorld Ops
-                </p>
-                <h1 className="text-lg font-black uppercase tracking-tight truncate max-w-[150px] sm:max-w-none text-foreground">
+                 <p className="text-xs font-bold text-[#ffc105]">
+                   TechWorld Ops
+                 </p>
+                 <h1 className="text-lg font-bold truncate max-w-[150px] sm:max-w-none text-foreground">
                   Admin Dashboard{" "}
                  
                 </h1>
@@ -305,13 +305,13 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
               aria-label={`Switch language to ${nextLocale === "ar" ? "Arabic" : "English"}`}
             >
               <Languages size={14} className="sm:mr-2" />
-              <span className="font-black uppercase tracking-widest text-[10px]">
-                {nextLocale === "ar" ? "AR" : "EN"}
-              </span>
+               <span className="font-bold text-xs">
+                 {nextLocale === "ar" ? "AR" : "EN"}
+               </span>
             </Button>
             <ThemeToggle />
             <div className="h-4 w-px bg-border hidden sm:block" />
-            <span className="hidden md:inline text-[10px] font-black uppercase tracking-widest">
+             <span className="hidden md:inline text-xs font-bold">
               {profile.authUser?.email}
             </span>
             <Button
@@ -322,9 +322,9 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
               className="px-2 sm:px-3 h-9 rounded-lg border-border hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all"
             >
               <LogOut size={14} className="sm:mr-2" />
-              <span className="hidden sm:inline font-black uppercase tracking-widest text-[10px]">
-                Sign Out
-              </span>
+               <span className="hidden sm:inline font-bold text-xs">
+                 Sign Out
+               </span>
             </Button>
           </div>
         </div>

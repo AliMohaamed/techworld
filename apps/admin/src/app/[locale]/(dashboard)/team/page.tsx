@@ -175,11 +175,11 @@ export default function TeamManagementPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Users className="text-[#ffc105]" size={20} />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105] italic">
+              <p className="text-xs font-bold text-[#ffc105]">
                 {t("header.badge")}
               </p>
             </div>
-            <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight italic">
+            <h1 className="text-4xl font-bold text-foreground leading-tight">
               {t("header.title")}
             </h1>
             <p className="max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground/60">
@@ -191,7 +191,7 @@ export default function TeamManagementPage() {
               setIsProvisioning(true);
               generatePassword();
             }}
-            className="rounded-2xl h-14 px-8 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-black uppercase tracking-widest text-[10px]"
+            className="rounded-2xl h-14 px-8 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all font-bold text-xs"
           >
             <UserPlus className="ltr:mr-3 rtl:ml-3 h-4 w-4" />
             {t("header.provisionButton")}
@@ -206,7 +206,7 @@ export default function TeamManagementPage() {
           <div className="flex items-center justify-between mb-10 relative z-10">
             <div className="flex items-center gap-3">
               <ShieldCheck className="text-primary" size={20} />
-              <h2 className="text-2xl font-black text-foreground uppercase tracking-tightest italic">
+              <h2 className="text-2xl font-bold text-foreground mt-1">
                 {editingStaffId ? t("edit.title") : t("provision.title")}
               </h2>
             </div>
@@ -228,7 +228,7 @@ export default function TeamManagementPage() {
               <div className="space-y-3">
                 <Label
                   htmlFor="staff-name"
-                  className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40"
+                  className="text-xs font-bold text-muted-foreground/40"
                 >
                   {t("provision.form.name")}
                 </Label>
@@ -237,13 +237,13 @@ export default function TeamManagementPage() {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder={t("provision.form.namePlaceholder")}
-                  className="rounded-xl bg-background border-border h-12 font-black uppercase tracking-tightest focus:border-primary/40 focus:ring-primary/10"
+                  className="rounded-xl bg-background border-border h-12 font-bold focus:border-primary/40 focus:ring-primary/10"
                 />
               </div>
               <div className="space-y-3">
                 <Label
                   htmlFor="staff-email"
-                  className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40"
+                  className="text-xs font-bold text-muted-foreground/40"
                 >
                   {t("provision.form.email")}
                 </Label>
@@ -253,13 +253,13 @@ export default function TeamManagementPage() {
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
                   placeholder={t("provision.form.emailPlaceholder")}
-                  className="rounded-xl bg-background border-border h-12 font-black tracking-tightest focus:border-primary/40 focus:ring-primary/10"
+                  className="rounded-xl bg-background border-border h-12 font-bold focus:border-primary/40 focus:ring-primary/10"
                 />
               </div>
               <div className="space-y-3">
                 <Label
                   htmlFor="staff-password"
-                  className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40"
+                  className="text-xs font-bold text-muted-foreground/40"
                 >
                   {editingStaffId ? t("edit.form.password") : t("provision.form.password")}
                 </Label>
@@ -288,7 +288,7 @@ export default function TeamManagementPage() {
             </div>
 
             <div className="space-y-6">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 flex items-center gap-2">
+              <Label className="text-xs font-bold text-muted-foreground/40 flex items-center gap-2">
                 <Shield size={12} /> {t("provision.form.permissions")}
               </Label>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -299,7 +299,7 @@ export default function TeamManagementPage() {
                     <label
                       key={perm}
                       className={cn(
-                        "flex items-center gap-3 rounded-2xl border p-5 text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer shadow-sm group",
+                        "flex items-center gap-3 rounded-2xl border p-5 text-xs font-bold transition-all cursor-pointer shadow-sm group",
                         owned
                           ? selected
                             ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400 dark:text-emerald-300"
@@ -336,7 +336,7 @@ export default function TeamManagementPage() {
             <div className="flex flex-col sm:flex-row gap-4 pt-6">
               <Button
                 type="submit"
-                className="h-14 px-10 rounded-2xl bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all   font-black uppercase tracking-[0.2em] text-[10px]"
+                className="h-14 px-10 rounded-2xl bg-[#ffc105] text-black hover:bg-foreground hover:text-background transition-all font-bold text-sm"
               >
                 {editingStaffId ? t("edit.form.submit") : t("provision.form.submit")}
               </Button>
@@ -348,7 +348,7 @@ export default function TeamManagementPage() {
                   setEditingStaffId(null);
                   resetForm();
                 }}
-                className="h-14 px-10 rounded-2xl text-muted-foreground/40 hover:text-foreground hover:bg-accent transition-all font-black uppercase tracking-widest text-[10px]"
+                className="h-14 px-10 rounded-2xl text-muted-foreground/40 hover:text-foreground hover:bg-accent transition-all font-bold text-sm"
               >
                 {t("provision.form.cancel")}
               </Button>
@@ -362,16 +362,16 @@ export default function TeamManagementPage() {
           <div className="flex items-center gap-4">
             <div className="h-6 w-1 bg-[#ffc105] rounded-full" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
+              <p className="text-xs font-bold text-muted-foreground/30">
                 {t("list.badge")}
               </p>
-              <h2 className="text-2xl font-black text-foreground uppercase tracking-tightest italic leading-none mt-1">
+              <h2 className="text-2xl font-bold text-foreground leading-none mt-1">
                 {t("list.title")}
               </h2>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="rounded-full border border-border bg-background px-5 py-2 text-[10px] font-black text-muted-foreground/60 font-mono tracking-widest uppercase  ">
+            <span className="rounded-full border border-border bg-background px-5 py-2 text-xs font-bold text-muted-foreground/60">
               {staff
                 ? t("list.count", { count: staff.length })
                 : t("list.loading")}
@@ -381,7 +381,7 @@ export default function TeamManagementPage() {
 
         <div className="overflow-x-auto min-h-[300px] scrollbar-hide">
           <table className="min-w-full text-left text-sm text-foreground">
-            <thead className="bg-accent/50 text-[10px] font-black uppercase tracking-[0.35em] text-muted-foreground/40 border-b border-border">
+            <thead className="bg-accent/40 text-xs font-bold text-muted-foreground/40 border-b border-border">
               <tr>
                 <th className="sticky left-0 bg-card py-4 px-6 z-10">
                   {t("list.table.columns.name")}
@@ -406,14 +406,14 @@ export default function TeamManagementPage() {
                   <td className="sticky left-0 bg-card py-4 px-6 z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
                     <div className="flex flex-col relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none opacity-0 group-hover/row:opacity-100 transition-opacity" />
-                      <p className="font-black text-foreground text-lg uppercase tracking-tightest leading-none italic">
+                      <p className="font-bold text-foreground text-base leading-none">
                         {user.name}
                       </p>
                       <p className="text-[10px] text-muted-foreground/40 font-mono tracking-widest mt-2 uppercase">
                         {user.email}
                       </p>
                       {me?._id === user._id && (
-                        <span className="flex items-center gap-1.5 text-[9px] text-[#ffc105] font-black uppercase tracking-[.3em] mt-3 bg-[#ffc105]/10 border border-[#ffc105]/20 rounded-full px-3 py-1 w-fit italic shadow-sm">
+                        <span className="flex items-center gap-1.5 text-xs text-[#ffc105] font-bold mt-3 bg-[#ffc105]/10 border border-[#ffc105]/20 rounded-full px-3 py-1 w-fit shadow-sm">
                           <CheckCircle2 size={10} /> {t("list.table.me")}
                         </span>
                       )}
@@ -422,7 +422,7 @@ export default function TeamManagementPage() {
                   <td className="py-6 px-4 align-middle">
                     <span
                       className={cn(
-                        "px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all shadow-sm",
+                        "px-4 py-2 rounded-full text-xs font-bold border transition-all shadow-sm",
                         user.isActive === false
                           ? "bg-destructive/10 text-destructive border-destructive/20"
                           : "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
@@ -444,7 +444,7 @@ export default function TeamManagementPage() {
                               <label
                                 key={perm}
                                 className={cn(
-                                  "flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-[9px] font-black uppercase tracking-widest transition-all shadow-sm group/perm",
+                                  "flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-xs font-bold transition-all shadow-sm group/perm",
                                   owned
                                     ? has
                                       ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
@@ -490,7 +490,7 @@ export default function TeamManagementPage() {
                         user.permissions.map((perm) => (
                           <span
                             key={String(perm)}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 shadow-sm transition-all hover:border-[#ffc105]/30 hover:text-foreground"
+                            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-xs font-bold text-muted-foreground/60 shadow-sm transition-all hover:border-[#ffc105]/30 hover:text-foreground"
                           >
                             <div className="h-1 w-1 rounded-full bg-emerald-500/40" />{" "}
                             {formatPermissionName(String(perm))}
@@ -507,7 +507,7 @@ export default function TeamManagementPage() {
                             size="sm"
                             variant="ghost"
                             className={cn(
-                              "rounded-xl h-10 px-6 text-[10px] font-black uppercase tracking-[0.2em] italic shadow-sm transition-all  ",
+                              "rounded-xl h-10 px-6 text-xs font-bold shadow-sm transition-all  ",
                               editingId === user._id
                                 ? "bg-[#ffc105] text-black hover:bg-foreground hover:text-background"
                                 : "text-muted-foreground/40 hover:text-foreground hover:bg-accent",
@@ -526,7 +526,7 @@ export default function TeamManagementPage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="rounded-xl h-10 px-6 text-[10px] font-black uppercase tracking-[0.2em] italic shadow-sm transition-all text-muted-foreground/40 hover:text-foreground hover:bg-accent"
+                            className="rounded-xl h-10 px-6 text-xs font-bold shadow-sm transition-all text-muted-foreground/40 hover:text-foreground hover:bg-accent"
                             disabled={busyId === user._id || isProvisioning}
                             onClick={() => handleEdit(user)}
                           >

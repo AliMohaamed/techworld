@@ -77,25 +77,25 @@ export default function AdminCategoriesPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Layers className="text-[#ffc105]" size={20} />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
+               <p className="text-xs font-bold text-[#ffc105]">
                 {t("badge")}
               </p>
             </div>
-            <h1 className="text-5xl font-black uppercase tracking-tightest text-foreground leading-tight">
+            <h1 className="text-4xl font-bold text-foreground leading-tight">
               {t("title")}
             </h1>
             <p className="max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground/60">
               {t("description")}
             </p>
           </div>
-          <Button
-            type="button"
-            onClick={openCreateSheet}
-            className="rounded-2xl h-14 px-10 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-black uppercase tracking-[0.2em] text-[10px]"
-          >
-            <Plus className="ltr:mr-3 rtl:ml-3 h-4 w-4" />
-            {t("actions.create")}
-          </Button>
+           <Button
+             type="button"
+             onClick={openCreateSheet}
+             className="rounded-2xl h-14 px-10 bg-foreground text-background hover:bg-[#ffc105] hover:text-black transition-all   font-bold text-sm"
+           >
+             <Plus className="ltr:mr-3 rtl:ml-3 h-4 w-4" />
+             {t("actions.create")}
+           </Button>
         </div>
       </section>
 
@@ -104,26 +104,26 @@ export default function AdminCategoriesPage() {
           <div className="flex items-center gap-4">
             <div className="h-6 w-1 bg-[#ffc105] rounded-full" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30">
-                {t("table.badge")}
-              </p>
-              <h2 className="text-2xl font-black text-foreground uppercase tracking-tightest leading-none mt-1">
-                {t("table.title")}
-              </h2>
+               <p className="text-xs font-bold text-muted-foreground/30">
+                 {t("table.badge")}
+               </p>
+               <h2 className="text-2xl font-bold text-foreground mt-1">
+                 {t("table.title")}
+               </h2>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="rounded-full border border-border bg-background px-5 py-2 text-[10px] font-black text-muted-foreground/60 font-mono tracking-widest uppercase  ">
-              {categories
-                ? t("table.total", { count: categories.length })
-                : t("table.loading")}
-            </span>
+             <span className="rounded-full border border-border bg-background px-5 py-2 text-xs font-bold text-muted-foreground/60">
+               {categories
+                 ? t("table.total", { count: categories.length })
+                 : t("table.loading")}
+             </span>
           </div>
         </div>
 
         <div className="overflow-x-auto scrollbar-hide">
-          <table className="min-w-full text-left text-sm text-foreground">
-            <thead className="bg-accent/50 text-[10px] font-black uppercase tracking-[0.35em] text-muted-foreground/40 border-b border-border">
+           <table className="min-w-full text-left text-sm text-foreground">
+             <thead className="bg-accent/40 text-xs font-bold text-muted-foreground/60 border-b border-border">
               <tr>
                 <th className="sticky left-0 bg-card py-4 px-6 z-10">
                   {t("table.columns.name")}
@@ -151,62 +151,62 @@ export default function AdminCategoriesPage() {
                   <td className="sticky left-0 bg-card py-4 px-6 z-10 group-hover/row:bg-accent/20 transition-all border-r border-border/50">
                     <div className="flex flex-col relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none opacity-0 group-hover/row:opacity-100 transition-opacity" />
-                      <p className="font-black text-foreground text-lg uppercase tracking-tightest leading-none">
-                        {category.name_en}
-                      </p>
-                      <p
-                        className="text-[10px] text-muted-foreground/40 font-mono tracking-widest mt-2 uppercase w-fit"
-                        dir="rtl"
-                      >
-                        {category.name_ar}
-                      </p>
+                       <p className="font-bold text-foreground text-base">
+                         {category.name_en}
+                       </p>
+                       <p
+                         className="text-xs font-medium text-muted-foreground/40 mt-1"
+                         dir="rtl"
+                       >
+                         {category.name_ar}
+                       </p>
                     </div>
                   </td>
-                  <td className="py-6 px-4 align-middle font-black text-[10px] uppercase tracking-widest text-[#ffc105]/60">
-                    /{category.slug}
+                   <td className="py-6 px-4 align-middle font-bold text-xs text-[#ffc105]/60">
+                     /{category.slug}
+                   </td>
+                  <td className="py-6 px-4 align-middle">
+                     <div className="flex items-center gap-2.5">
+                       <TagIcon size={12} className="text-muted-foreground/30" />
+                       <span className="font-bold text-sm text-foreground">
+                         {category.productCount}
+                       </span>
+                       <span className="text-xs font-bold text-muted-foreground/30 leading-none">
+                         {t("table.products")}
+                       </span>
+                     </div>
                   </td>
                   <td className="py-6 px-4 align-middle">
-                    <div className="flex items-center gap-2.5">
-                      <TagIcon size={12} className="text-muted-foreground/30" />
-                      <span className="font-black text-sm text-foreground tracking-tightest">
-                        {category.productCount}
-                      </span>
-                      <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-widest leading-none">
-                        {t("table.products")}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-6 px-4 align-middle">
-                    <span
-                      className={cn(
-                        "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[9px] font-black uppercase tracking-widest transition-all shadow-sm",
-                        category.isActive
-                          ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
-                          : "border-destructive/20 bg-destructive/10 text-destructive",
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          "h-1.5 w-1.5 rounded-full",
-                          category.isActive
-                            ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
-                            : "bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]",
-                        )}
-                      />
-                      {category.isActive ? "Active" : "Inactive"}
-                    </span>
+                     <span
+                       className={cn(
+                         "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold transition-all shadow-sm",
+                         category.isActive
+                           ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
+                           : "border-destructive/20 bg-destructive/10 text-destructive",
+                       )}
+                     >
+                       <div
+                         className={cn(
+                           "h-1.5 w-1.5 rounded-full",
+                           category.isActive
+                             ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                             : "bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]",
+                         )}
+                       />
+                       {category.isActive ? "Active" : "Inactive"}
+                     </span>
                   </td>
                   <td className="py-4 px-6 align-middle text-right">
                     <div className="flex items-center justify-end gap-3">
-                      <Button
-                        size="sm"
-                        type="button"
-                        variant="ghost"
-                        className="rounded-xl h-10 px-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-foreground hover:bg-accent transition-all"
-                        onClick={() => openEditSheet(category._id)}
-                      >
-                        {t("actions.edit")}
-                      </Button>
+                       <Button
+                         size="sm"
+                         type="button"
+                         variant="ghost"
+                         className="rounded-xl h-10 px-6 text-xs font-bold text-muted-foreground/60 hover:text-foreground hover:bg-accent transition-all"
+                         onClick={() => openEditSheet(category._id)}
+                       >
+                         {t("actions.edit")}
+                       </Button>
                       <Button
                         size="sm"
                         type="button"
@@ -230,9 +230,9 @@ export default function AdminCategoriesPage() {
                 <tr>
                   <td colSpan={5} className="py-20 text-center">
                     <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#ffc105] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-                    <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
-                      {t("table.loading")}
-                    </p>
+                     <p className="mt-4 text-xs font-bold text-muted-foreground/40">
+                       {t("table.loading")}
+                     </p>
                   </td>
                 </tr>
               )}
@@ -245,9 +245,9 @@ export default function AdminCategoriesPage() {
                     <div className="h-16 w-16 rounded-full bg-accent/20 flex items-center justify-center">
                       <Layers size={32} className="text-muted-foreground/20" />
                     </div>
-                    <p className="text-sm font-black uppercase tracking-widest text-muted-foreground/20">
-                      {t("table.empty")}
-                    </p>
+                     <p className="text-sm font-bold text-muted-foreground/20">
+                       {t("table.empty")}
+                     </p>
                   </td>
                 </tr>
               )}

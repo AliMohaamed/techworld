@@ -116,11 +116,11 @@ export default function SystemSettingsPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Settings2 className="text-[#ffc105]" size={20} />
-              <p className="text-[11px] font-black uppercase tracking-[0.4em] text-[#ffc105]">
+              <p className="text-xs font-bold text-[#ffc105]">
                 {t("badge")}
               </p>
             </div>
-            <h1 className="text-4xl font-black uppercase tracking-tightest text-foreground leading-tight md:text-5xl italic">
+            <h1 className="text-4xl font-bold text-foreground leading-tight md:text-5xl">
               {t("title")}
             </h1>
             <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground font-medium">
@@ -130,7 +130,7 @@ export default function SystemSettingsPage() {
           <Link href={"/settings/audit" as any}>
             <Button
               variant="outline"
-              className="rounded-xl border-border bg-accent/50 hover:bg-[#ffc105] hover:text-black hover:border-[#ffc105] transition-all font-black uppercase tracking-widest text-[10px] h-11 px-6 shadow-sm"
+              className="rounded-xl border-border bg-accent/50 hover:bg-[#ffc105] hover:text-black hover:border-[#ffc105] transition-all font-bold text-xs h-11 px-6 shadow-sm"
             >
               <HistoryIcon size={16} className="ltr:mr-2 rtl:ml-2" />
               {t("auditLogButton")}
@@ -144,7 +144,7 @@ export default function SystemSettingsPage() {
         <section className="space-y-6">
           <div className="flex items-center gap-3 px-4">
             <ShieldAlert size={18} className="text-muted-foreground/40" />
-            <h2 className="text-[10px] uppercase font-black tracking-[0.4em] text-muted-foreground/30">
+            <h2 className="text-xs font-bold text-muted-foreground/30">
               {t("toggles.title")}
             </h2>
           </div>
@@ -152,7 +152,7 @@ export default function SystemSettingsPage() {
           <div className="overflow-hidden rounded-[32px] border border-border bg-card divide-y divide-border   transition-all">
             <div className="flex items-center justify-between p-8 hover:bg-accent/30 transition-colors group">
               <div className="space-y-2">
-                <h3 className="font-black text-foreground uppercase tracking-tight italic transition-colors group-hover:text-[#ffc105]">
+                <h3 className="font-bold text-foreground transition-colors group-hover:text-[#ffc105]">
                   {t("toggles.maintenance.title")}
                 </h3>
                 <p className="text-xs text-muted-foreground/60 max-w-[320px] font-medium leading-relaxed">
@@ -167,7 +167,7 @@ export default function SystemSettingsPage() {
 
             <div className="flex items-center justify-between p-8 hover:bg-accent/30 transition-colors group">
               <div className="space-y-2">
-                <h3 className="font-black text-foreground uppercase tracking-tight italic transition-colors group-hover:text-[#ffc105]">
+                <h3 className="font-bold text-foreground transition-colors group-hover:text-[#ffc105]">
                   {t("toggles.cod.title")}
                 </h3>
                 <p className="text-xs text-muted-foreground/60 max-w-[320px] font-medium leading-relaxed">
@@ -187,14 +187,14 @@ export default function SystemSettingsPage() {
           <div className="flex items-center justify-between px-4">
             <div className="flex items-center gap-3">
               <Ban size={18} className="text-muted-foreground/40" />
-              <h2 className="text-[10px] uppercase font-black tracking-[0.4em] text-muted-foreground/30">
+              <h2 className="text-xs font-bold text-muted-foreground/30">
                 {t("blacklist.title")}
               </h2>
             </div>
             <Button
               size="sm"
               variant="outline"
-              className="rounded-full h-8 text-[9px] font-black uppercase tracking-widest border-[#ffc105]/20 text-[#ffc105] hover:bg-[#ffc105]/10"
+              className="rounded-full h-8 text-xs font-bold border-[#ffc105]/20 text-[#ffc105] hover:bg-[#ffc105]/10"
               onClick={() => setIsBlacklisting(!isBlacklisting)}
             >
               {isBlacklisting ? (
@@ -216,22 +216,22 @@ export default function SystemSettingsPage() {
               >
                 <div className="space-y-6">
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                    <Label className="text-xs font-bold text-muted-foreground/40">
                       {t("blacklist.form.phoneLabel")}
                     </Label>
                     <Input
                       {...register("phoneNumber")}
                       placeholder={t("blacklist.form.phonePlaceholder")}
-                      className="rounded-xl bg-background border-border h-12 text-sm font-black tracking-tight"
+                      className="rounded-xl bg-background border-border h-12 text-sm font-bold"
                     />
                     {errors.phoneNumber && (
-                      <p className="text-[10px] font-black text-destructive uppercase tracking-widest mt-1">
+                      <p className="text-xs font-bold text-destructive mt-1">
                         {t("blacklist.form.errors.invalidPhone")}
                       </p>
                     )}
                   </div>
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                    <Label className="text-xs font-bold text-muted-foreground/40">
                       {t("blacklist.form.reasonLabel")}
                     </Label>
                     <Input
@@ -240,14 +240,14 @@ export default function SystemSettingsPage() {
                       className="rounded-xl bg-background border-border h-12 text-sm font-medium"
                     />
                     {errors.reason && (
-                      <p className="text-[10px] font-black text-destructive uppercase tracking-widest mt-1">
+                      <p className="text-xs font-bold text-destructive mt-1">
                         {t("blacklist.form.errors.reasonRequired")}
                       </p>
                     )}
                   </div>
                   <Button
                     type="submit"
-                    className="w-full h-12 rounded-xl bg-[#ffc105] text-black font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-all   shadow-[#ffc105]/10"
+                    className="w-full h-12 rounded-xl bg-[#ffc105] text-black font-bold hover:bg-foreground hover:text-background transition-all shadow-[#ffc105]/10"
                     disabled={isAddingToBlacklist}
                   >
                     {isAddingToBlacklist ? (
@@ -270,7 +270,7 @@ export default function SystemSettingsPage() {
                     size={48}
                     className="mx-auto mb-6 text-muted-foreground/10"
                   />
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/20 italic">
+                  <p className="text-xs font-bold text-muted-foreground/20">
                     {t("blacklist.empty")}
                   </p>
                 </div>
