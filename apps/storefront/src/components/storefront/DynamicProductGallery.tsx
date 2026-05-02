@@ -47,54 +47,62 @@ export function DynamicProductGallery({
   return (
     <div className="space-y-4">
       {/* Main Swiper */}
-      <div className="relative aspect-square overflow-hidden bg-card transition-colors">
-        {galleryImages.length > 0 ? (
-          <Swiper
-            onSwiper={setMainSwiper}
-            spaceBetween={0}
-            thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
-            pagination={{ clickable: true }}
-            modules={[FreeMode, Thumbs, Pagination]}
-            className="h-full w-full product-main-swiper"
-            onSlideChange={(swiper) => {
-              const newImage = galleryImages[swiper.activeIndex];
-              if (newImage && onSelectImage) {
-                onSelectImage(newImage);
-              }
-            }}
-          >
+      <div className="relative">
+        <div className="relative aspect-square overflow-hidden bg-card transition-colors">
+          {galleryImages.length > 0 ? (
+            <Swiper
+              onSwiper={setMainSwiper}
+              spaceBetween={0}
+              thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+              pagination={{
+                clickable: true,
+                el: '.product-details-pagination'
+              }}
+              modules={[FreeMode, Thumbs, Pagination]}
+              className="h-full w-full product-main-swiper"
+              onSlideChange={(swiper) => {
+                const newImage = galleryImages[swiper.activeIndex];
+                if (newImage && onSelectImage) {
+                  onSelectImage(newImage);
+                }
+              }}
+            >
 
-            {galleryImages.map((image, index) => (
-              <SwiperSlide key={`${image}-${index}`} className="relative h-full w-full">
-                <Image
-                  src={image}
-                  alt={`${name} - Image ${index + 1}`}
-                  fill
-                  priority={index === 0}
-                  className="object-contain"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground/30 font-medium">
-            No Image
-          </div>
-        )}
+              {galleryImages.map((image, index) => (
+                <SwiperSlide key={`${image}-${index}`} className="relative h-full w-full">
+                  <Image
+                    src={image}
+                    alt={`${name} - Image ${index + 1}`}
+                    fill
+                    priority={index === 0}
+                    className="object-contain"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground/30 font-medium">
+              No Image
+            </div>
+          )}
 
-        {statusLabel ? (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-md pointer-events-none">
-            <span className="rounded-full bg-destructive px-6 py-2 text-sm font-bold text-destructive-foreground uppercase">
-              {statusLabel}
-            </span>
-          </div>
-        ) : null}
+          {statusLabel ? (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-md pointer-events-none">
+              <span className="rounded-full bg-destructive px-6 py-2 text-sm font-bold text-destructive-foreground uppercase">
+                {statusLabel}
+              </span>
+            </div>
+          ) : null}
+        </div>
+        
+        {/* Pagination below the image */}
+        <div className="product-details-pagination flex justify-center mt-4 h-4" />
       </div>
 
-      {/* Thumbs Swiper */}
+      {/* Thumbs Swiper - Hidden on Mobile */}
       {galleryImages.length > 1 ? (
-        <div className="mt-4">
+        <div className="mt-4 hidden md:block">
           <Swiper
             onSwiper={setThumbsSwiper}
             spaceBetween={12}

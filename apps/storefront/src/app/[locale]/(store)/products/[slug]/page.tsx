@@ -151,7 +151,7 @@ export default function ProductDetailPage() {
       </nav>
 
       <div className="container mx-auto px-4 md:px-8">
-        <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-start">
+        <div className="grid grid-cols-1 gap-8 lg:gap-16 lg:grid-cols-2 lg:items-start">
           <div className="lg:sticky lg:top-24">
             <DynamicProductGallery
               name={locale === 'en' ? product.name_en : product.name_ar}
@@ -185,12 +185,12 @@ export default function ProductDetailPage() {
                   </s>
                 ) : null}
               </div>
-              <div className={`flex items-center gap-2 rounded-full px-4 py-2 border ${isOutOfStock ? "border-destructive/20 bg-destructive/5 text-destructive" : "border-[#ffc105]/20 bg-[#ffc105]/5 text-[#ffc105]"}`}>
+              {/* <div className={`flex items-center gap-2 rounded-full px-4 py-2 border ${isOutOfStock ? "border-destructive/20 bg-destructive/5 text-destructive" : "border-[#ffc105]/20 bg-[#ffc105]/5 text-[#ffc105]"}`}>
                 <Zap size={14} className={isOutOfStock ? "text-destructive" : "text-[#ffc105]"} />
                 <span className="font-space-grotesk text-xs font-black uppercase leading-none">
                   {t('pricing.unitsLeft', { count: availableUnits })}
                 </span>
-              </div>
+              </div> */}
             </div>
 
             {variantColorOptions.length > 0 ? (
