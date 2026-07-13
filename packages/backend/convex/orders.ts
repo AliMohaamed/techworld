@@ -219,7 +219,7 @@ export const updateOrderStatus = mutation({
 
     const patch: {
       state: "CONFIRMED" | "CANCELLED" | "STALLED_PAYMENT";
-      paymentReceiptRef?: Id<"_storage">;
+      paymentReceiptRef?: string;
     } = {
       state: args.newState,
     };

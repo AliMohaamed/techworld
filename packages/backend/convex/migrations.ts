@@ -203,6 +203,29 @@ export const patchOrderReceiptRef = mutation({
 });
 
 /**
+ * Clears an order's payment receipt reference (removes the field entirely).
+ * Used to reconcile orders whose legacy Convex receipt blob was unrecoverable
+ * before the R2 migration (the underlying file no longer resolved).
+ */
+export const clearOrderReceiptRef = mutation({
+  args: {
+    docId: v.id("orders"),
+    token: v.string(),
+  },
+  handler: async (ctx, args) => {
+    checkToken(args.token);
+
+    const order = await ctx.db.get(args.docId);
+    if (!order) {
+      throw new Error(`Order ${args.docId} not found`);
+    }
+
+    await ctx.db.patch(args.docId, { paymentReceiptRef: undefined });
+    return { docId: args.docId, cleared: true, previousRef: order.paymentReceiptRef ?? null };
+  },
+});
+
+/**
  * Deletes a file from legacy Convex storage.
  * Used exclusively by the migration script --reap-convex cleanup step.
  */

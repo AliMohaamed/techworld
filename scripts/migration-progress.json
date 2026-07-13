@@ -131,7 +131,8 @@
     "field": "paymentReceiptRef",
     "oldRef": "kg23cwpb2rgty7frjd73cje9a585jcf8",
     "newRef": "",
-    "status": "failed",
+    "status": "cleared",
+    "note": "Legacy Convex blob was unrecoverable (getUrl null). Ref cleared via migrations:clearOrderReceiptRef on 2026-07-14; dummy dev data.",
     "migratedAt": 1783966698123
   },
   {
@@ -140,7 +141,8 @@
     "field": "paymentReceiptRef",
     "oldRef": "kg23qnvhtk3jc5rapbehby1hnd85j9jw",
     "newRef": "",
-    "status": "failed",
+    "status": "cleared",
+    "note": "Legacy Convex blob was unrecoverable (getUrl null). Ref cleared via migrations:clearOrderReceiptRef on 2026-07-14; dummy dev data.",
     "migratedAt": 1783966698124
   }
 ]

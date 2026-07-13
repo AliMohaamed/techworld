@@ -217,7 +217,7 @@ export const applyReceiptToOrder = internalMutation({
 export const attachReceiptManually = mutation({
   args: {
     orderId: v.id("orders"),
-    mediaStorageId: v.id("_storage"),
+    mediaStorageId: v.string(),
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {

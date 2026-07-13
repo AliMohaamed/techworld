@@ -1,15 +1,15 @@
 import { internalAction, internalQuery } from "./_generated/server";
-import { v } from "convex/values";
 import * as r2 from "./lib/r2";
 import { internal } from "./_generated/api";
 
 /**
- * Internal query to safely collect all referenced storage reference strings
- * and a list of existing legacy Convex storage files from the transactional database.
+ * Internal query to collect all referenced storage reference strings from the
+ * transactional database. All storage now lives in Cloudflare R2 (the legacy
+ * Convex _storage migration is complete), so only R2 refs are collected.
  */
 export const getSweepMetadata = internalQuery({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx): Promise<{ referencedRefs: string[] }> => {
     const referencedRefs = new Set<string>();
 
     // 1. Gather product refs (thumbnail & gallery images)
@@ -47,26 +47,26 @@ export const getSweepMetadata = internalQuery({
       }
     }
 
-    // 5. Gather legacy Convex storage files
-    const legacyStorageFiles = await ctx.db.system.query("_storage").collect();
-    const legacyStorageIds = legacyStorageFiles.map((file) => file._id);
-
     return {
       referencedRefs: Array.from(referencedRefs),
-      legacyStorageIds,
     };
   },
 });
 
 /**
- * Sweep orphaned catalog files from Cloudflare R2 and legacy Convex storage.
+ * Sweep orphaned catalog files from Cloudflare R2.
  * Runs as an action because it performs HTTP calls to the Cloudflare R2 API.
  */
 export const sweepOrphanedCatalogFiles = internalAction({
   args: {},
-  handler: async (ctx) => {
+  handler: async (
+    ctx
+  ): Promise<{
+    deletedR2Count: number;
+    referencedCount: number;
+  }> => {
     // 1. Fetch DB metadata
-    const { referencedRefs, legacyStorageIds } = await ctx.runQuery(
+    const { referencedRefs } = await ctx.runQuery(
       internal.sweepJobs.getSweepMetadata
     );
 
@@ -105,22 +105,8 @@ export const sweepOrphanedCatalogFiles = internalAction({
       }
     }
 
-    // 4. Delete unreferenced objects in legacy Convex storage (transition phase)
-    let deletedConvexCount = 0;
-    for (const id of legacyStorageIds) {
-      if (!referencedSet.has(id)) {
-        try {
-          await ctx.storage.delete(id);
-          deletedConvexCount++;
-        } catch (error) {
-          console.error(`Failed to delete legacy Convex storage file ${id}:`, error);
-        }
-      }
-    }
-
     return {
       deletedR2Count,
-      deletedConvexCount,
       referencedCount: referencedSet.size,
     };
   },

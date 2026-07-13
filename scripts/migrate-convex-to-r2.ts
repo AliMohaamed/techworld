@@ -25,7 +25,7 @@ interface ProgressEntry {
   field: string;
   oldRef: string;
   newRef: string;
-  status: "done" | "failed";
+  status: "done" | "failed" | "cleared";
   migratedAt: number;
 }
 
@@ -138,9 +138,21 @@ async function run() {
     console.log("\n--- Starting Verification ---");
     const progress = loadProgress();
     const successfulEntries = progress.filter((p) => p.status === "done");
+    const failedEntries = progress.filter((p) => p.status === "failed");
     console.log(`Loaded ${successfulEntries.length} migrated entries from progress file.`);
 
     let errorCount = 0;
+
+    // Any entry that failed to migrate is a verification error — the file was
+    // never uploaded to R2 and the DB still points at a (now dead) legacy ref.
+    if (failedEntries.length > 0) {
+      console.error(`\n${failedEntries.length} entr${failedEntries.length === 1 ? "y" : "ies"} FAILED to migrate and must be reconciled:`);
+      for (const entry of failedEntries) {
+        console.error(`✗ FAILED (never uploaded): ${entry.table}.${entry.field} (${entry.docId}) -> oldRef ${entry.oldRef}`);
+        errorCount++;
+      }
+    }
+
     for (const entry of successfulEntries) {
       const key = entry.newRef.slice(3); // Remove "r2:" prefix
       try {
