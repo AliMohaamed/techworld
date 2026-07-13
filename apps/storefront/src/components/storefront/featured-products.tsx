@@ -2,7 +2,7 @@ import type { Id } from "@backend/convex/_generated/dataModel";
 import { getTranslations } from "next-intl/server";
 import { FeaturedProductsCarousel } from "./FeaturedProductsCarousel";
 
-type FeaturedProduct = {
+export type FeaturedProduct = {
   _id: Id<"products">;
   name_ar: string;
   name_en: string;

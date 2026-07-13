@@ -88,7 +88,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    // @ts-expect-error — fetchMutation works with internal refs from Next.js server context
     await fetchMutation(api.webhooks.processInboundReceipt, {
       payload: normalized,
     });
