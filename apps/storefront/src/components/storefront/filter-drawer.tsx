@@ -206,7 +206,7 @@ function FilterFields({
   draft: DraftFilters;
   lockedCategoryId?: string;
   onChange: (key: keyof DraftFilters, value: string) => void;
-  t: ((key: string) => string) & Record<string, unknown>;
+  t: any;
   locale: string;
 }) {
   return (
@@ -324,7 +324,7 @@ function FilterActions({
 }: {
   onApply: () => void;
   onClear: () => void;
-  t: ((key: string) => string) & Record<string, unknown>;
+  t: any;
 }) {
   return (
     <div className="flex gap-3">
