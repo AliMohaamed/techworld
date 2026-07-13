@@ -1,0 +1,24 @@
+2026-07-13T18:09:06.003Z - Fatal error in migration script - ConvexError: [CONVEX Q(migrations:listRefsToMigrate)] [Request ID: c77d5617f9b10126] Server Error
+Uncaught ConvexError: {"code":"CONFIGURATION_ERROR","message":"Backend MIGRATION_TOKEN env var is not set in the Convex dashboard."}
+    at checkToken (../convex/migrations.ts:10:6)
+    at handler (../convex/migrations.ts:35:4)
+
+  Called by client
+    at OptimisticQueryResults.queryResult (file:///D:/Freelance/techworld/website/node_modules/convex/src/browser/sync/optimistic_updates_impl.ts:232:11)
+    at BaseConvexClient.localQueryResultByToken (file:///D:/Freelance/techworld/website/node_modules/convex/src/browser/sync/client.ts:760:40)
+    at ConvexClient._transition (file:///D:/Freelance/techworld/website/node_modules/convex/src/browser/simple_client.ts:456:36)
+    at PaginatedQueryClient.onTransition (file:///D:/Freelance/techworld/website/node_modules/convex/src/browser/simple_client.ts:147:30)
+    at PaginatedQueryClient.onBaseTransition (file:///D:/Freelance/techworld/website/node_modules/convex/src/browser/sync/paginated_query_client.ts:271:10)
+    at file:///D:/Freelance/techworld/website/node_modules/convex/src/browser/sync/paginated_query_client.ts:90:12
+    at BaseConvexClient.handleTransition (file:///D:/Freelance/techworld/website/node_modules/convex/src/browser/sync/client.ts:620:7)
+    at BaseConvexClient.notifyOnQueryResultChanges (file:///D:/Freelance/techworld/website/node_modules/convex/src/browser/sync/client.ts:596:10)
+    at WebSocketManager.onMessage (file:///D:/Freelance/techworld/website/node_modules/convex/src/browser/sync/client.ts:475:20)
+    at WebSocket.ws.onmessage (file:///D:/Freelance/techworld/website/node_modules/convex/src/browser/sync/web_socket_manager.ts:470:29)
+2026-07-13T18:18:18.119Z - Failed to migrate orders.paymentReceiptRef (j972xcfk7fvy313kz1rp4h9a4s85hh7t) - Error: Failed to resolve storage URL for ref kg23cwpb2rgty7frjd73cje9a585jcf8
+    at file:///D:/Freelance/techworld/website/scripts/migrate-convex-to-r2.ts:243:23
+    at async Promise.all (index 0)
+    at async run (file:///D:/Freelance/techworld/website/scripts/migrate-convex-to-r2.ts:218:9)
+2026-07-13T18:18:18.124Z - Failed to migrate orders.paymentReceiptRef (j97f995saxpv1pdffz6vphp62h85kze4) - Error: Failed to resolve storage URL for ref kg23qnvhtk3jc5rapbehby1hnd85j9jw
+    at file:///D:/Freelance/techworld/website/scripts/migrate-convex-to-r2.ts:243:23
+    at async Promise.all (index 1)
+    at async run (file:///D:/Freelance/techworld/website/scripts/migrate-convex-to-r2.ts:218:9)

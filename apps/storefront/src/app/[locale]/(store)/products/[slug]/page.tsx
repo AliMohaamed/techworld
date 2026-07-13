@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { useParams } from "next/navigation";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
 import { useCart } from "@/providers/cart-provider";
-import { ChevronRight, ShoppingBag, Truck, ShieldCheck, Zap } from "lucide-react";
+import { ChevronRight, ShoppingBag, Truck, ShieldCheck } from "lucide-react";
 import { Link } from "@/navigation";
 import { DynamicProductGallery } from "@/components/storefront/DynamicProductGallery";
 import { RelatedProducts } from "@techworld/ui";
@@ -48,15 +48,12 @@ export default function ProductDetailPage() {
   const [selectedSkuId, setSelectedSkuId] = useState<Id<"skus"> | undefined>(undefined);
   const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    if (!product?.skus?.length) {
-      setSelectedSkuId(undefined);
-      return;
-    }
-
-    const nextSku = product.skus.find((sku: ProductSku) => sku.isDefault) ?? product.skus[0];
-    setSelectedSkuId(nextSku?._id);
-  }, [product]);
+  const defaultSkuId = product?.skus?.find((sku: ProductSku) => sku.isDefault)?._id ?? product?.skus?.[0]?._id;
+  if (selectedSkuId === undefined && defaultSkuId !== undefined) {
+    setSelectedSkuId(defaultSkuId);
+  } else if (selectedSkuId !== undefined && !product?.skus?.length) {
+    setSelectedSkuId(undefined);
+  }
 
   const selectedVariant = product?.skus?.find((sku: ProductSku) => sku._id === selectedSkuId) ?? product?.skus?.[0];
   const variantColorOptions =
@@ -72,7 +69,6 @@ export default function ProductDetailPage() {
     ) ?? [];
   const variantOptions = product?.skus ?? [];
 
-  const activeImage = selectedImage ?? selectedVariant?.linkedImageId ?? product?.thumbnail ?? product?.images?.[0];
   const galleryImages = product
     ? uniqueImages([selectedVariant?.linkedImageId, product.thumbnail, ...(product.images ?? [])])
     : [];
@@ -81,9 +77,10 @@ export default function ProductDetailPage() {
   const hasSalePrice = compareAtPrice !== undefined && compareAtPrice > displayPrice;
   const availableUnits = selectedVariant?.display_stock ?? 0;
 
-  useEffect(() => {
-    setSelectedImage(activeImage);
-  }, [activeImage, selectedSkuId]);
+  const handleVariantSelect = (skuId: Id<"skus">, linkedImage?: string) => {
+    setSelectedSkuId(skuId);
+    setSelectedImage(linkedImage ?? product?.thumbnail ?? product?.images?.[0]);
+  };
 
   const handleAddToCart = async () => {
     if (!product) return;
@@ -106,7 +103,7 @@ export default function ProductDetailPage() {
     return (
       <div className="container mx-auto animate-pulse p-4 md:p-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <div className="aspect-square rounded-[32px] bg-muted  " />
+          <div className="aspect-square rounded-2xl bg-muted" />
           <div className="space-y-6">
             <div className="h-12 w-3/4 rounded-xl bg-muted" />
             <div className="h-8 w-1/4 rounded-xl bg-muted" />
@@ -122,7 +119,7 @@ export default function ProductDetailPage() {
       <div className="flex min-h-[70vh] flex-col items-center justify-center p-8 text-center bg-background">
         <h1 className="font-space-grotesk text-4xl font-black uppercase text-foreground tracking-tight">{t('notFound.title')}</h1>
         <p className="mt-4 text-muted-foreground font-light max-w-md leading-relaxed">{t('notFound.description')}</p>
-        <Link href="/" className="mt-10 font-space-grotesk text-xs font-black uppercase text-[#ffc105] border border-[#ffc105]/20 px-8 py-3 rounded-full hover:bg-[#ffc105]/10 transition-all">
+        <Link href="/" className="mt-10 font-space-grotesk text-xs font-black uppercase text-primary border border-primary/20 px-8 py-3 rounded-lg hover:bg-primary/10 transition-all">
           {t('notFound.backToStore')}
         </Link>
       </div>
@@ -135,7 +132,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-background pb-24 transition-colors">
-      <nav className="container mx-auto p-4 md:p-8 text-[10px] font-black uppercase text-muted-foreground/40">
+      <nav className="container mx-auto p-4 md:p-8 text-[10px] font-black uppercase text-label-muted">
         <div className="flex items-center ltr:space-x-4 rtl:space-x-reverse space-x-4 flex-wrap gap-y-2">
           <Link href="/" className="transition-colors hover:text-foreground">{t('breadcrumb.store')}</Link>
           <ChevronRight size={14} className={locale === 'ar' ? 'rotate-180' : ''} />
@@ -146,7 +143,7 @@ export default function ProductDetailPage() {
             {(locale === 'en' ? product.categoryName_en : product.categoryName_ar) || t('breadcrumb.category')}
           </Link>
           <ChevronRight size={14} className={locale === 'ar' ? 'rotate-180' : ''} />
-          <span className="truncate text-muted-foreground/60 font-medium max-w-[200px] md:max-w-none">{locale === 'en' ? product.name_en : product.name_ar}</span>
+          <span className="truncate text-label-muted font-medium max-w-[200px] md:max-w-none">{locale === 'en' ? product.name_en : product.name_ar}</span>
         </div>
       </nav>
 
@@ -171,16 +168,16 @@ export default function ProductDetailPage() {
               <h1 className="font-space-grotesk text-4xl font-black leading-[1.1] text-foreground md:text-6xl lg:text-7xl uppercase tracking-tightest">
                 {product.name_en}
               </h1>
-              <p className="ltr:text-right rtl:text-right font-arabic text-2xl leading-relaxed text-[#ffc105] font-light">{product.name_ar}</p>
+              <p className="ltr:text-right rtl:text-right font-arabic text-2xl leading-relaxed text-primary font-light">{product.name_ar}</p>
             </header>
 
             <div className="mb-10 flex flex-wrap items-center gap-8 border-b border-border pb-10">
               <div className="flex items-center gap-4">
                 <span className="font-space-grotesk text-5xl font-black tracking-tightest text-foreground">
-                  {displayPrice.toLocaleString(locale)} <span className="text-2xl text-[#ffc105]">{t('pricing.currency')}</span>
+                  {displayPrice.toLocaleString(locale)} <span className="text-2xl text-primary">{t('pricing.currency')}</span>
                 </span>
                 {hasSalePrice ? (
-                  <s className="font-space-grotesk text-xl font-bold text-muted-foreground/30 decoration-destructive/40">
+                  <s className="font-space-grotesk text-xl font-bold text-label-muted/30 decoration-destructive/40">
                     {compareAtPrice.toLocaleString(locale)}
                   </s>
                 ) : null}
@@ -204,13 +201,12 @@ export default function ProductDetailPage() {
                       <button
                         key={sku._id}
                         type="button"
-                        onClick={() => {
-                          setSelectedSkuId(sku._id);
-                          setSelectedImage(sku.linkedImageId ?? product.thumbnail ?? product.images?.[0]);
+onClick={() => {
+                          handleVariantSelect(sku._id, sku.linkedImageId ?? product.thumbnail ?? product.images?.[0]);
                         }}
-                        className={`flex items-center gap-4 rounded-2xl border px-6 py-4 text-left transition-all   ${isActive
-                          ? "border-[#ffc105] bg-[#ffc105]/10 text-foreground shadow-[0_0_20px_rgba(255,193,5,0.1)]"
-                          : "border-border bg-card text-muted-foreground hover:border-[#ffc105]/20 hover:text-foreground"
+                        className={`flex items-center gap-4 rounded-xl border px-6 py-4 text-left transition-all ${isActive
+                          ? "border-primary bg-primary/10 text-foreground"
+                          : "border-border bg-card text-muted-foreground hover:border-primary/20 hover:text-foreground"
                           }`}
                       >
                         <span className="h-4 w-4 rounded-full border border-border shadow-sm" style={{ backgroundColor: color }} />
@@ -230,13 +226,12 @@ export default function ProductDetailPage() {
                       <button
                         key={sku._id}
                         type="button"
-                        onClick={() => {
-                          setSelectedSkuId(sku._id);
-                          setSelectedImage(sku.linkedImageId ?? product.thumbnail ?? product.images?.[0]);
+onClick={() => {
+                          handleVariantSelect(sku._id, sku.linkedImageId ?? product.thumbnail ?? product.images?.[0]);
                         }}
-                        className={`rounded-2xl border px-6 py-4 text-xs font-black uppercase transition-all   ${isActive
-                          ? "border-[#ffc105] bg-[#ffc105]/10 text-foreground shadow-[0_0_20px_rgba(255,193,5,0.1)]"
-                          : "border-border bg-card text-muted-foreground hover:border-[#ffc105]/20 hover:text-foreground"
+                        className={`rounded-xl border px-6 py-4 text-xs font-black uppercase transition-all ${isActive
+                          ? "border-primary bg-primary/10 text-foreground"
+                          : "border-border bg-card text-muted-foreground hover:border-primary/20 hover:text-foreground"
                           }`}
                       >
                         {sku.variantName}
@@ -248,10 +243,10 @@ export default function ProductDetailPage() {
             ) : null}
 
             {selectedVariant && (product?.skus?.length ?? 0) > 1 ? (
-              <div className="mb-10 rounded-[32px] border border-border bg-accent/30 p-8   backdrop-blur-sm">
-                <p className="text-[10px] font-black uppercase text-muted-foreground/30 mb-4">{t('variants.selected')}</p>
-                <div className="flex flex-wrap gap-4 text-xs">
-                  <span className="rounded-full border border-[#ffc105]/20 bg-[#ffc105]/5 px-5 py-2 text-[#ffc105] font-black uppercase">{selectedVariant.variantName}</span>
+              <div className="mb-10 rounded-2xl border border-border bg-accent/30 p-6 backdrop-blur-sm">
+                <p className="text-[10px] font-black uppercase text-label-muted mb-4">{t('variants.selected')}</p>
+                <div className="flex flex-wrap gap-3 text-xs">
+                  <span className="rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-primary font-black uppercase">{selectedVariant.variantName}</span>
                   {selectedVariant.variantAttributes?.size ? (
                     <span className="rounded-full border border-border px-5 py-2 text-muted-foreground font-black uppercase">{t('variants.size', { size: selectedVariant.variantAttributes.size })}</span>
                   ) : null}
@@ -263,9 +258,9 @@ export default function ProductDetailPage() {
             ) : null}
 
             <div className="mb-12 space-y-6">
-              <p className="text-sm md:text-base leading-8 text-muted-foreground font-medium">{product.description_en}</p>
+              <p className="text-sm md:text-base leading-8 text-label-muted font-medium">{product.description_en}</p>
               <div className="border-t border-border pt-8 ltr:text-right rtl:text-right">
-                <p className="font-arabic text-xl md:text-2xl leading-relaxed text-muted-foreground/60 font-medium">
+                <p className="font-arabic text-xl md:text-2xl leading-relaxed text-label-muted/60 font-medium">
                   {product.description_ar}
                 </p>
               </div>
@@ -275,24 +270,24 @@ export default function ProductDetailPage() {
               <button
                 disabled={isOutOfStock || isUnavailable}
                 onClick={handleAddToCart}
-                className="group relative flex w-full items-center justify-center gap-4 overflow-hidden rounded-2xl bg-[#ffc105] py-6 font-space-grotesk text-xl font-black uppercase text-black transition-all hover:bg-foreground hover:text-background active:scale-[0.97] disabled:grayscale disabled:opacity-30 shadow-[0_10px_30px_rgba(255,193,5,0.2)]"
+                className="group relative flex w-full items-center justify-center gap-4 rounded-xl bg-primary py-5 font-space-grotesk text-lg font-black uppercase text-primary-foreground transition-all hover:brightness-110 active:scale-[0.97] disabled:grayscale disabled:opacity-30"
               >
                 <ShoppingBag size={24} className="group-hover:scale-110 transition-transform" />
                 {t('actions.addToCart')}
               </button>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex items-center gap-5 rounded-3xl border border-border bg-accent/20 p-6 shadow-sm backdrop-blur-sm">
-                  <div className="h-12 w-12 rounded-2xl bg-[#ffc105]/10 flex items-center justify-center text-[#ffc105]">
-                    <Truck size={24} />
+                <div className="flex items-center gap-5 rounded-2xl border border-border bg-accent/20 p-5">
+                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <Truck size={20} />
                   </div>
-                  <span className="text-[10px] font-black uppercase text-muted-foreground/60 leading-relaxed">{t('features.shipping')}</span>
+                  <span className="text-[10px] font-black uppercase text-label-muted leading-relaxed">{t('features.shipping')}</span>
                 </div>
-                <div className="flex items-center gap-5 rounded-3xl border border-border bg-accent/20 p-6 shadow-sm backdrop-blur-sm">
-                  <div className="h-12 w-12 rounded-2xl bg-[#ffc105]/10 flex items-center justify-center text-[#ffc105]">
-                    <ShieldCheck size={24} />
+                <div className="flex items-center gap-5 rounded-2xl border border-border bg-accent/20 p-5">
+                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <ShieldCheck size={20} />
                   </div>
-                  <span className="text-[10px] font-black uppercase text-muted-foreground/60 leading-relaxed">{t('features.cod')}</span>
+                  <span className="text-[10px] font-black uppercase text-label-muted leading-relaxed">{t('features.cod')}</span>
                 </div>
               </div>
             </div>

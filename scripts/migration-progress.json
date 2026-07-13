@@ -1,0 +1,146 @@
+[
+  {
+    "docId": "jd7073jn3jdfbzxt3ym26tnnjx838ksr",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg28trpkbpqtw24dekmx7aaqvs838gr8",
+    "newRef": "r2:public/catalog/7b46e283-8860-4071-a3cd-4f4b00fc28ae.jpg",
+    "status": "done",
+    "migratedAt": 1783966692810
+  },
+  {
+    "docId": "jd7073jn3jdfbzxt3ym26tnnjx838ksr",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg2ahjensn1jgrwvjttg27zyk58398mt",
+    "newRef": "r2:public/catalog/e716e135-17e4-49d5-998c-738481bdd048.png",
+    "status": "done",
+    "migratedAt": 1783966692848
+  },
+  {
+    "docId": "jd7073jn3jdfbzxt3ym26tnnjx838ksr",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg2ecke2111nshv0mejzdchdc1838s72",
+    "newRef": "r2:public/catalog/951c85f6-7d1f-4920-81fd-758aa6f8d048.png",
+    "status": "done",
+    "migratedAt": 1783966693069
+  },
+  {
+    "docId": "jd7073jn3jdfbzxt3ym26tnnjx838ksr",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg28trpkbpqtw24dekmx7aaqvs838gr8",
+    "newRef": "r2:public/catalog/0ffca0f8-5902-48fc-be4a-05e4770b3ae3.jpg",
+    "status": "done",
+    "migratedAt": 1783966693088
+  },
+  {
+    "docId": "jd72cg7p9rah9f1rhg4jktyars8591eg",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg22yxrxg82mmzxy0s9sq0wxwd85830t",
+    "newRef": "r2:public/catalog/7faa3986-515f-4987-9cf9-8b5e897eb201.jpg",
+    "status": "done",
+    "migratedAt": 1783966693914
+  },
+  {
+    "docId": "jd72cg7p9rah9f1rhg4jktyars8591eg",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg22pa9ezx77q4x7r8apxa3wgx859e2g",
+    "newRef": "r2:public/catalog/aa1a2e3d-f4e1-4e67-b1db-f80d25d09dd1.jpg",
+    "status": "done",
+    "migratedAt": 1783966694108
+  },
+  {
+    "docId": "jd72cg7p9rah9f1rhg4jktyars8591eg",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg27rm4gt7gveyenm82ycy7fhd859ng9",
+    "newRef": "r2:public/catalog/025994ad-551d-460a-9804-c7357ab83e7f.jpg",
+    "status": "done",
+    "migratedAt": 1783966694158
+  },
+  {
+    "docId": "jd72cg7p9rah9f1rhg4jktyars8591eg",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg22yxrxg82mmzxy0s9sq0wxwd85830t",
+    "newRef": "r2:public/catalog/e97cd844-73a3-4374-8bb2-b273e5ee11b0.jpg",
+    "status": "done",
+    "migratedAt": 1783966694324
+  },
+  {
+    "docId": "jd75rd2e5n2wkjqch08t6nbpw985jgmn",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg2359n5kmjyzgv3jqq4k6bdp185j7y9",
+    "newRef": "r2:public/catalog/7d8514a0-6538-4a2f-8012-37d4cfae33e7.jpg",
+    "status": "done",
+    "migratedAt": 1783966695263
+  },
+  {
+    "docId": "jd75rd2e5n2wkjqch08t6nbpw985jgmn",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg20sam2f0xgqcaex7e4q16er985jrh4",
+    "newRef": "r2:public/catalog/d3ac4dea-b942-4047-86b7-979a0786e75d.jpg",
+    "status": "done",
+    "migratedAt": 1783966695278
+  },
+  {
+    "docId": "jd75rd2e5n2wkjqch08t6nbpw985jgmn",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg2359n5kmjyzgv3jqq4k6bdp185j7y9",
+    "newRef": "r2:public/catalog/ca274581-ee23-42f3-b82d-6aecceecedd2.jpg",
+    "status": "done",
+    "migratedAt": 1783966695302
+  },
+  {
+    "docId": "jd7ewcvyvmhvyvnrj9bgge8kg585kk11",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg24ykbh6mef8xbezmxbgefx5185kjrt",
+    "newRef": "r2:public/catalog/ad3e36c1-e021-4aa8-b78f-b6869827aea6.png",
+    "status": "done",
+    "migratedAt": 1783966695748
+  },
+  {
+    "docId": "jd7ewcvyvmhvyvnrj9bgge8kg585kk11",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg24ykbh6mef8xbezmxbgefx5185kjrt",
+    "newRef": "r2:public/catalog/f403faed-21d4-4397-8332-d390f02b9e71.png",
+    "status": "done",
+    "migratedAt": 1783966697344
+  },
+  {
+    "docId": "jd7ewcvyvmhvyvnrj9bgge8kg585kk11",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg2928z8bwzrbfbcmd1yfbspw985khfe",
+    "newRef": "r2:public/catalog/93148d11-4c35-4717-ac85-c1a1f35b8a5f.png",
+    "status": "done",
+    "migratedAt": 1783966697831
+  },
+  {
+    "docId": "j972xcfk7fvy313kz1rp4h9a4s85hh7t",
+    "table": "orders",
+    "field": "paymentReceiptRef",
+    "oldRef": "kg23cwpb2rgty7frjd73cje9a585jcf8",
+    "newRef": "",
+    "status": "failed",
+    "migratedAt": 1783966698123
+  },
+  {
+    "docId": "j97f995saxpv1pdffz6vphp62h85kze4",
+    "table": "orders",
+    "field": "paymentReceiptRef",
+    "oldRef": "kg23qnvhtk3jc5rapbehby1hnd85j9jw",
+    "newRef": "",
+    "status": "failed",
+    "migratedAt": 1783966698124
+  }
+]

@@ -105,12 +105,12 @@ export default function FilterDrawer({ lockedCategoryId }: FilterDrawerProps) {
 
   const desktopPanel = (
     <div className="hidden lg:block">
-      <div className="sticky top-24 space-y-8 rounded-[32px] border border-border bg-card/60 p-8   backdrop-blur-xl transition-colors">
-        <div className="space-y-3">
-          <p className="text-xs font-bold text-[#ffc105]">
+      <div className="sticky top-24 space-y-6 rounded-2xl border border-border bg-card/60 p-6 backdrop-blur-sm">
+        <div className="space-y-2">
+          <p className="text-xs font-bold text-primary">
             {t("desktop.badge")}
           </p>
-          <h2 className="font-space-grotesk text-3xl font-bold tracking-tight text-foreground leading-none">
+          <h2 className="font-space-grotesk text-2xl font-bold tracking-tight text-foreground leading-none">
             {t("desktop.title")}
           </h2>
         </div>
@@ -133,9 +133,9 @@ export default function FilterDrawer({ lockedCategoryId }: FilterDrawerProps) {
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="inline-flex items-center gap-3 rounded-2xl border border-border bg-card px-6 py-4 font-space-grotesk text-xs font-bold text-foreground transition-all hover:border-[#ffc105]/40 hover:text-[#ffc105]   active:scale-[0.98]"
+          className="inline-flex items-center gap-2.5 rounded-xl border border-border bg-card px-5 py-3 font-space-grotesk text-xs font-bold text-foreground transition-all hover:border-primary/30 hover:text-primary active:scale-[0.98]"
         >
-          <Funnel size={18} className="text-[#ffc105]" />
+          <Funnel size={16} className="text-primary" />
           {t("mobile.button")}
         </button>
       </div>
@@ -143,29 +143,29 @@ export default function FilterDrawer({ lockedCategoryId }: FilterDrawerProps) {
       {desktopPanel}
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md lg:hidden animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm lg:hidden animate-in fade-in duration-200">
           <button
             type="button"
             aria-label={t("mobile.closeAria")}
             className="absolute inset-0"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute inset-x-0 bottom-0 rounded-t-[40px] border-t border-border bg-card px-8 pb-12 pt-8 shadow-[0_-10px_40px_rgba(0,0,0,0.2)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom duration-500">
-            <div className="mb-8 flex items-center justify-between">
-              <div className="space-y-2">
-                <p className="text-xs font-bold text-[#ffc105]">
+          <div className="absolute inset-x-0 bottom-0 rounded-t-2xl border-t border-border bg-card px-6 pb-10 pt-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
+            <div className="mb-6 flex items-center justify-between">
+              <div className="space-y-1.5">
+                <p className="text-xs font-bold text-primary">
                   {t("mobile.badge")}
                 </p>
-                <h2 className="font-space-grotesk text-3xl font-bold tracking-tight text-foreground">
+                <h2 className="font-space-grotesk text-2xl font-bold tracking-tight text-foreground">
                   {t("mobile.title")}
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="rounded-full border border-border p-3 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                className="rounded-lg border border-border p-2.5 text-label-muted transition-colors hover:bg-accent hover:text-foreground"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
             <FilterFields
@@ -176,7 +176,7 @@ export default function FilterDrawer({ lockedCategoryId }: FilterDrawerProps) {
               t={t}
               locale={locale}
             />
-            <div className="mt-10">
+            <div className="mt-8">
               <FilterActions
                 onApply={applyFilters}
                 onClear={clearFilters}
@@ -206,36 +206,32 @@ function FilterFields({
   draft: DraftFilters;
   lockedCategoryId?: string;
   onChange: (key: keyof DraftFilters, value: string) => void;
-  t: any;
+  t: ((key: string) => string) & Record<string, unknown>;
   locale: string;
 }) {
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <label className="text-xs font-bold text-muted-foreground/60 block px-1 uppercase">
-          {t("labels.search")}
-        </label>
-        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-5 py-4 focus-within:border-[#ffc105]/30 transition-colors  ">
-          <Search size={18} className="text-muted-foreground/50" />
+    <div className="space-y-5">
+      <div className="space-y-1.5">
+        <label className="text-[11px] font-semibold text-label-muted block px-1 uppercase tracking-wider">{t("labels.search")}</label>
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3.5 focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10 transition-all">
+          <Search size={16} className="text-label-muted/50" />
           <input
             value={draft.searchQuery}
             onChange={(event) => onChange("searchQuery", event.target.value)}
             placeholder={t("placeholders.search")}
-            className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground/30 font-medium"
+            className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-label-muted/30 font-medium"
           />
         </div>
       </div>
 
-      <div className="space-y-2">
-        <label className="text-xs font-bold text-muted-foreground/60 block px-1 uppercase">
-          {t("labels.category")}
-        </label>
+      <div className="space-y-1.5">
+        <label className="text-[11px] font-semibold text-label-muted block px-1 uppercase tracking-wider">{t("labels.category")}</label>
         <div className="relative">
           <select
             value={draft.categoryId}
             onChange={(event) => onChange("categoryId", event.target.value)}
             disabled={Boolean(lockedCategoryId)}
-            className="w-full rounded-2xl border border-border bg-card px-5 py-4 text-sm text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-40 appearance-none   transition-colors"
+            className="w-full rounded-xl border border-border bg-card px-4 py-3.5 text-sm text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-40 appearance-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
           >
             <option value="" className="bg-card">
               {t("options.allCategories")}
@@ -251,60 +247,56 @@ function FilterFields({
             ))}
           </select>
           {!lockedCategoryId && (
-            <div className="pointer-events-none absolute ltr:right-5 rtl:left-5 top-1/2 -translate-y-1/2 text-muted-foreground/50">
+            <div className="pointer-events-none absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 text-label-muted/40">
               <SlidersHorizontal size={14} />
             </div>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="text-xs font-bold text-muted-foreground/60 block px-1 uppercase">
-            {t("labels.minPrice")}
-          </label>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-semibold text-label-muted block px-1 uppercase tracking-wider">{t("labels.minPrice")}</label>
           <div className="relative">
             <input
               value={draft.minPrice}
               onChange={(event) => onChange("minPrice", event.target.value)}
               inputMode="numeric"
               placeholder="0"
-              className="w-full rounded-2xl border border-border bg-card px-5 py-4 text-sm text-foreground outline-none placeholder:text-muted-foreground/30   font-mono transition-colors"
+              className="w-full rounded-xl border border-border bg-card px-4 py-3.5 text-sm text-foreground outline-none placeholder:text-label-muted/30 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 font-mono transition-all"
             />
-            <span className="absolute ltr:right-5 rtl:left-5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground/40">
+            <span className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-label-muted/40">
               EGP
             </span>
           </div>
         </div>
-        <div className="space-y-2">
-          <label className="text-xs font-bold text-muted-foreground/60 block px-1 uppercase">
-            {t("labels.maxPrice")}
-          </label>
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-semibold text-label-muted block px-1 uppercase tracking-wider">{t("labels.maxPrice")}</label>
           <div className="relative">
             <input
               value={draft.maxPrice}
               onChange={(event) => onChange("maxPrice", event.target.value)}
               inputMode="numeric"
               placeholder={t("placeholders.maxPrice")}
-              className="w-full rounded-2xl border border-border bg-card px-5 py-4 text-sm text-foreground outline-none placeholder:text-muted-foreground/30   font-mono transition-colors"
+              className="w-full rounded-xl border border-border bg-card px-4 py-3.5 text-sm text-foreground outline-none placeholder:text-label-muted/30 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 font-mono transition-all"
             />
-            <span className="absolute ltr:right-5 rtl:left-5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground/40">
+            <span className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-label-muted/40">
               EGP
             </span>
           </div>
         </div>
       </div>
 
-      <div className="space-y-2">
-        <label className="flex items-center gap-2 text-xs font-bold text-muted-foreground/60 px-1 uppercase">
-          <SlidersHorizontal size={14} />
+      <div className="space-y-1.5">
+        <label className="flex items-center gap-1.5 text-[11px] font-semibold text-label-muted px-1 uppercase tracking-wider">
+          <SlidersHorizontal size={12} />
           {t("labels.sort")}
         </label>
         <div className="relative">
           <select
             value={draft.sortOrder}
             onChange={(event) => onChange("sortOrder", event.target.value)}
-            className="w-full rounded-2xl border border-border bg-card px-5 py-4 text-sm text-foreground outline-none appearance-none   transition-colors"
+            className="w-full rounded-xl border border-border bg-card px-4 py-3.5 text-sm text-foreground outline-none appearance-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
           >
             <option value="newest" className="bg-card">
               {t("options.sort.newest")}
@@ -316,7 +308,7 @@ function FilterFields({
               {t("options.sort.price_desc")}
             </option>
           </select>
-          <div className="pointer-events-none absolute ltr:right-5 rtl:left-5 top-1/2 -translate-y-1/2 text-muted-foreground/50">
+          <div className="pointer-events-none absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 text-label-muted/40">
             <SlidersHorizontal size={14} className="rotate-90" />
           </div>
         </div>
@@ -332,21 +324,21 @@ function FilterActions({
 }: {
   onApply: () => void;
   onClear: () => void;
-  t: any;
+  t: ((key: string) => string) & Record<string, unknown>;
 }) {
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-3">
       <button
         type="button"
         onClick={onClear}
-        className="flex-1 rounded-2xl border border-border px-6 py-4 font-space-grotesk text-xs font-bold text-muted-foreground transition-all hover:border-foreground/20 hover:text-foreground hover:bg-accent active:scale-[0.98]"
+        className="flex-1 rounded-xl border border-border px-5 py-3.5 font-space-grotesk text-xs font-bold text-label-muted transition-all hover:border-foreground/20 hover:text-foreground hover:bg-accent active:scale-[0.98]"
       >
         {t("actions.clear")}
       </button>
       <button
         type="button"
         onClick={onApply}
-        className="flex-1 rounded-2xl bg-[#ffc105] px-6 py-4 font-space-grotesk text-xs font-bold text-black transition-all hover:bg-foreground hover:text-background shadow-[0_4px_20px_rgba(255,193,5,0.2)] active:scale-[0.98]"
+        className="flex-1 rounded-xl bg-primary px-5 py-3.5 font-space-grotesk text-xs font-bold text-primary-foreground transition-all hover:brightness-110 active:scale-[0.98]"
       >
         {t("actions.apply")}
       </button>

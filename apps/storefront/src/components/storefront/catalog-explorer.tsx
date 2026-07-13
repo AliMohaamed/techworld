@@ -102,40 +102,39 @@ export default function CatalogExplorer({
 
   return (
     <div className="min-h-screen bg-background px-4 pb-20 pt-8 md:px-8">
-      <div className="mx-auto max-w-7xl space-y-10">
-        <section className="overflow-hidden rounded-[32px] border border-border bg-card/30 dark:bg-[radial-gradient(circle_at_top,#2b2b2b,transparent_50%),linear-gradient(180deg,#111111,#050505)] px-6 py-12 md:px-12   relative">
-          {/* Light mode decorative gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#ffc105]/5 to-transparent dark:hidden" />
+      <div className="mx-auto max-w-7xl space-y-8">
+        <section className="overflow-hidden rounded-2xl border border-border bg-card/30 px-6 py-10 md:px-10 relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent dark:from-primary/10 dark:to-transparent" />
 
-          <div className="relative max-w-3xl space-y-6">
-            <p className="text-xs font-bold tracking-wider text-[#ffc105]">
+          <div className="relative max-w-2xl space-y-4">
+            <p className="text-xs font-bold tracking-wider text-primary uppercase">
               {eyebrow}
             </p>
-            <h1 className="font-space-grotesk text-4xl font-bold tracking-tight text-foreground md:text-6xl md:leading-[1.1]">
+            <h1 className="font-space-grotesk text-3xl font-bold tracking-tight text-foreground md:text-5xl md:leading-[1.1]">
               {heading}
             </h1>
-            <p className="max-w-2xl text-sm leading-8 text-muted-foreground md:text-lg font-light">
+            <p className="max-w-xl text-sm leading-7 text-label-muted md:text-base">
               {description}
             </p>
           </div>
         </section>
 
-        <div className="grid gap-8 lg:grid-cols-[340px_minmax(0,1fr)]">
+        <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
           <FilterDrawer lockedCategoryId={lockedCategoryId} />
 
-          <div className="space-y-8">
-            <div className="flex flex-wrap items-center justify-between gap-6 rounded-[28px] border border-border bg-secondary/50 ltr:px-8 rtl:px-8 py-5   backdrop-blur-sm">
-              <div className="space-y-1">
-                <p className="text-xs font-bold tracking-wider text-muted-foreground/50 uppercase">
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-secondary/50 px-6 py-4 backdrop-blur-sm">
+              <div className="space-y-0.5">
+                <p className="text-[10px] font-semibold tracking-wider text-label-muted uppercase">
                   {t("results.eyebrow")}
                 </p>
-                <p className="font-space-grotesk text-xl font-bold tracking-tight text-foreground">
+                <p className="font-space-grotesk text-lg font-bold tracking-tight text-foreground">
                   {t("results.count", { count: results.length })}
                 </p>
               </div>
               {searchQuery && (
-                <div className="px-5 py-2 rounded-full bg-accent border border-border">
-                  <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                <div className="px-4 py-1.5 rounded-md bg-accent border border-border">
+                  <p className="text-[11px] font-semibold tracking-wide text-label-muted uppercase">
                     {t("results.search", { query: searchQuery })}
                   </p>
                 </div>
@@ -143,31 +142,32 @@ export default function CatalogExplorer({
             </div>
 
             {results.length === 0 && status === "Exhausted" ? (
-              <div className="space-y-12">
-                <div className="rounded-[32px] border border-dashed border-border bg-secondary/30 px-8 py-16 text-center  ">
-                  <p className="text-xs font-bold tracking-wider text-muted-foreground/40 uppercase">
+              <div className="space-y-10">
+                <div className="rounded-2xl border border-dashed border-border bg-secondary/30 px-8 py-16 text-center">
+                  <p className="text-[10px] font-semibold tracking-wider text-label-muted/40 uppercase">
                     {t("empty.eyebrow")}
                   </p>
-                  <h2 className="mt-4 font-space-grotesk text-4xl font-bold tracking-tight text-foreground">
+                  <h2 className="mt-3 font-space-grotesk text-3xl font-bold tracking-tight text-foreground">
                     {t("empty.title")}
                   </h2>
-                  <p className="mx-auto mt-4 max-w-xl text-sm leading-8 text-muted-foreground font-light">
+                  <p className="mx-auto mt-3 max-w-md text-sm leading-7 text-label-muted">
                     {t("empty.description")}
                   </p>
                 </div>
 
                 {recommendationResult?.products?.length ? (
-                  <section className="space-y-8">
-                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                      <div className="h-0.5 w-12 bg-[#ffc105]" />
-                      <p className="text-xs font-bold tracking-wider text-[#ffc105] uppercase">
+                  <section className="space-y-6">
+                    <div className="flex items-center gap-3">
+                      <div className="h-0.5 w-8 bg-primary rounded-full" />
+                      <p className="text-[11px] font-semibold tracking-wider text-primary uppercase">
                         {t("recommended.eyebrow")}
                       </p>
                     </div>
-                    <div className="grid grid-cols-2 gap-3 sm:gap-6 xl:grid-cols-4">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-4">
                       {recommendationResult.products.map((product) => (
                         <ProductCard
                           key={product._id}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Convex query return type
                           product={product as any}
                         />
                       ))}
@@ -177,16 +177,17 @@ export default function CatalogExplorer({
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-2 gap-3 sm:gap-6 xl:grid-cols-3">
+                <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                   {results.map((product) => (
-                    <ProductCard key={product._id} product={product as any} />
+                    <ProductCard key={product._id} product={product as any} // eslint-disable-line @typescript-eslint/no-explicit-any -- Convex query return type
+                    />
                   ))}
                 </div>
 
-                <div className="flex justify-center pt-8" ref={loadMoreRef}>
+                <div className="flex justify-center pt-6" ref={loadMoreRef}>
                   {status === "LoadingMore" ? (
                     <div className="flex items-center justify-center p-4">
-                      <Loader2 className="h-8 w-8 animate-spin text-[#ffc105]" />
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
                     </div>
                   ) : null}
                 </div>

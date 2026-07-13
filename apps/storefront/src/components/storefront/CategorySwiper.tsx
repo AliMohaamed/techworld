@@ -7,8 +7,15 @@ import 'swiper/css/free-mode';
 import { Link } from "@/navigation";
 import { ArrowUpRight, Cpu, MousePointer2, Headphones } from "lucide-react";
 
+interface CategoryItem {
+  _id: string;
+  name_en: string;
+  name_ar: string;
+  slug: string;
+}
+
 interface CategorySwiperProps {
-  categories: any[];
+  categories: CategoryItem[];
   locale: string;
 }
 
@@ -35,17 +42,17 @@ export function CategorySwiper({ categories, locale }: CategorySwiperProps) {
           <SwiperSlide key={category._id}>
             <Link
               href={`/categories/${category.slug || category._id}`}
-              className="group relative h-[320px] overflow-hidden rounded-[24px] bg-card border border-border p-8 flex flex-col justify-between hover:border-[#ffc105]/40 transition-all   hover:shadow-[#ffc105]/5"
+              className="group relative h-[320px] overflow-hidden rounded-xl bg-card border border-border p-8 flex flex-col justify-between hover:border-primary/30 transition-all"
             >
-              <div className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center text-[#ffc105] group-hover:scale-110 transition-transform">
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                 {getCategoryIcon(category.slug)}
               </div>
 
               <div className="space-y-1">
-                <h3 className="font-space-grotesk text-2xl font-bold text-foreground tracking-tight group-hover:text-[#ffc105] transition-colors line-clamp-1">
+                <h3 className="font-space-grotesk text-2xl font-bold text-foreground tracking-tight group-hover:text-primary transition-colors line-clamp-1">
                   {locale === 'en' ? category.name_en : category.name_ar}
                 </h3>
-                <p className="text-muted-foreground/60 text-xs font-medium leading-relaxed">
+                <p className="text-label-muted text-xs font-medium leading-relaxed">
                   {category.slug.replace('-', ' ')}
                 </p>
               </div>

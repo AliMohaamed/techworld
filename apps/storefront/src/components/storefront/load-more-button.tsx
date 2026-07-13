@@ -14,7 +14,7 @@ export default function LoadMoreButton({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className="rounded-full border border-border bg-secondary px-6 py-4 font-space-grotesk text-xs font-black uppercase tracking-[0.28em] text-foreground transition-all hover:border-[#ffc105]/40 hover:text-[#ffc105] disabled:cursor-not-allowed disabled:opacity-50   hover:shadow-[#ffc105]/10"
+      className="rounded-lg border border-border bg-secondary px-6 py-3.5 font-space-grotesk text-xs font-bold uppercase tracking-[0.2em] text-foreground transition-all hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]"
     >
       Load More
     </button>

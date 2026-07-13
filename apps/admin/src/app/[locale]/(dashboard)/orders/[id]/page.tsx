@@ -5,6 +5,7 @@ import { Link, useRouter } from "@/navigation";
 import { useParams } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
+import imageCompression from "browser-image-compression";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -93,21 +94,34 @@ export default function OrderDetailsPage() {
       return undefined;
     }
 
-    const uploadUrl = await generateReceiptUploadUrl({});
+    // Compress receipt image (keeping original file format/type)
+    let compressed: File;
+    try {
+      compressed = await imageCompression(selectedFile, {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 2400,
+        useWebWorker: true,
+      });
+    } catch (err) {
+      console.error("Receipt compression failed, uploading original:", err);
+      compressed = selectedFile;
+    }
+
+    const contentType = selectedFile.type;
+    const { uploadUrl, key } = await generateReceiptUploadUrl({ contentType });
     const response = await fetch(uploadUrl, {
-      method: "POST",
+      method: "PUT",
       headers: {
-        "Content-Type": selectedFile.type,
+        "Content-Type": contentType,
       },
-      body: selectedFile,
+      body: compressed,
     });
 
     if (!response.ok) {
       throw new Error("Receipt upload failed.");
     }
 
-    const payload = (await response.json()) as { storageId: Id<"_storage"> };
-    return payload.storageId;
+    return `r2:${key}`;
   };
 
   const handleStatusChange = async (
