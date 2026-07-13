@@ -11,10 +11,10 @@ export function NewsletterForm() {
       <input 
         type="email" 
         placeholder={t('newsletter.placeholder')} 
-        className="w-full bg-card border border-border rounded-2xl py-5 px-6 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-[#ffc105]/20 transition-all ltr:pr-14 rtl:pl-14 font-medium"
+        className="w-full bg-card border border-border rounded-xl py-4 px-5 text-sm text-foreground placeholder:text-label-muted/40 focus:outline-none focus:border-primary/30 focus:ring-2 focus:ring-primary/10 transition-all ltr:pr-12 rtl:pl-12 font-medium"
       />
-      <button className="absolute ltr:right-3 rtl:left-3 top-2.5 h-10 w-10 bg-[#ffc105] rounded-xl flex items-center justify-center text-black hover:bg-white  transition-all active:scale-95">
-        <Mail size={18} />
+      <button className="absolute ltr:right-2.5 rtl:left-2.5 top-2 h-8 w-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground hover:brightness-110 transition-all active:scale-95">
+        <Mail size={16} />
       </button>
     </div>
   );

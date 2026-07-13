@@ -88,14 +88,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    // @ts-ignore — fetchMutation works with internal refs from Next.js server context
+    // @ts-expect-error — fetchMutation works with internal refs from Next.js server context
     await fetchMutation(api.webhooks.processInboundReceipt, {
       payload: normalized,
     });
 
     return NextResponse.json({ ok: true });
-  } catch (e: any) {
-    console.error("Webhook processing error:", e);
-    return NextResponse.json({ error: e.message || String(e) }, { status: 500 });
+  } catch (e) {
+    const error = e instanceof Error ? e : new Error(String(e));
+    console.error("Webhook processing error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

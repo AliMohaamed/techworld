@@ -30,19 +30,19 @@ export default async function FeaturedProducts({ products }: FeaturedProductsPro
   if (!products || products.length === 0) return null;
 
   return (
-    <section id="featured" className="bg-background px-4 py-24 md:px-8">
-      <div className="container mx-auto space-y-12">
-        <div className="flex flex-col justify-between gap-6 border-b border-border pb-8 md:flex-row md:items-end">
+    <section id="featured" className="bg-background px-4 py-20 md:px-8">
+      <div className="container mx-auto space-y-10">
+        <div className="flex flex-col justify-between gap-5 border-b border-border pb-6 md:flex-row md:items-end">
           <div className="space-y-2">
-            <div className="inline-flex items-center space-x-2">
-              <div className="h-1 w-8 bg-[#ffc105]" />
-              <span className="text-[11px] font-semibold tracking-wide text-[#ffc105]">{t('badge')}</span>
+            <div className="flex items-center gap-2.5">
+              <div className="h-1 w-6 bg-primary rounded-full" />
+              <span className="text-[11px] font-semibold tracking-wider text-primary uppercase">{t('badge')}</span>
             </div>
-            <h2 className="font-space-grotesk text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
-              {t('title')} <span className="text-muted-foreground/20 dark:text-zinc-800">{t('accentTitle')}</span>
+            <h2 className="font-space-grotesk text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
+              {t('title')} <span className="text-label-muted/20">{t('accentTitle')}</span>
             </h2>
           </div>
-          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+          <p className="max-w-xs text-sm leading-relaxed text-label-muted">
             {t('description')}
           </p>
         </div>

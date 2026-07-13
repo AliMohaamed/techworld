@@ -2,17 +2,22 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { requirePermission } from "./lib/rbac";
 import { Id } from "./_generated/dataModel";
+import { resolveRef } from "./lib/storageRef";
+import * as r2 from "./lib/r2";
 
 export const generateCatalogUploadUrl = mutation({
-  args: {},
-  handler: async (ctx) => {
+  args: { contentType: v.string() },
+  handler: async (ctx, args) => {
     await requirePermission(ctx, "MANAGE_PRODUCTS");
-    return await ctx.storage.generateUploadUrl();
+    const uuid = crypto.randomUUID();
+    const key = `public/catalog/${uuid}.webp`;
+    const uploadUrl = await r2.presignPut(key, args.contentType, 600);
+    return { uploadUrl, key };
   },
 });
 
 /**
- * Resolves one or more Convex storage IDs to their serving URLs.
+ * Resolves one or more storage references (either R2 keys or legacy Convex storage IDs) to serving URLs.
  * Used by the admin upload component to preview images immediately after upload.
  */
 export const getStorageUrls = query({
@@ -21,7 +26,7 @@ export const getStorageUrls = query({
     const results: Record<string, string | null> = {};
     for (const id of args.storageIds) {
       try {
-        results[id] = await ctx.storage.getUrl(id as Id<"_storage">);
+        results[id] = await resolveRef(ctx, id);
       } catch {
         results[id] = null;
       }

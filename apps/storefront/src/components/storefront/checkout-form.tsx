@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@backend/convex/_generated/api";
 import { useSession } from "@/providers/session-provider";
-import { useCart } from "@/providers/cart-provider";
 import { ChevronRight, ShieldCheck, Loader2 } from "lucide-react";
 import { useRouter } from "@/navigation";
 import { useTranslations, useLocale } from "next-intl";
@@ -64,76 +63,73 @@ export default function CheckoutForm() {
 
   if (governorates && governorates.length === 0) {
     return (
-      <div className="rounded-[32px] border border-destructive/20 bg-destructive/5 p-10 text-center  ">
-        <p className="text-destructive font-bold text-xs leading-relaxed">{t('errors.noGovernorates')}</p>
+      <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-10 text-center">
+        <p className="text-destructive font-semibold text-sm leading-relaxed">{t('errors.noGovernorates')}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-12">
-      <form onSubmit={handleSubmit} className="space-y-12">
-        {/* Shipping Section */}
-        <div className="space-y-8">
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#ffc105] text-sm font-bold text-black shadow-[0_4px_15px_rgba(255,193,5,0.3)]">1</div>
-            <h2 className="font-space-grotesk text-2xl font-bold tracking-tight text-foreground">{t('shipping')}</h2>
+    <div className="space-y-10">
+      <form onSubmit={handleSubmit} className="space-y-10">
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
+              1
+            </div>
+            <h2 className="font-space-grotesk text-xl font-bold tracking-tight text-foreground">{t('shipping')}</h2>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-muted-foreground block px-1 uppercase">{t('labels.fullName')}</label>
-              <div className="relative">
-                <input
-                  required
-                  type="text"
-                  placeholder={t('labels.fullName')}
-                  className="w-full rounded-2xl border border-border bg-card p-5 text-foreground placeholder:text-muted-foreground/30 focus:border-[#ffc105]/30 focus:outline-none transition-all   font-medium"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                />
-              </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-label-muted block uppercase tracking-wider">{t('labels.fullName')}</label>
+              <input
+                required
+                type="text"
+                placeholder={t('labels.fullName')}
+                className="w-full rounded-xl border border-border bg-card p-4 text-foreground text-sm placeholder:text-label-muted/40 focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all font-medium"
+                value={formData.fullName}
+                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+              />
             </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-muted-foreground block px-1 uppercase">{t('labels.phone')}</label>
-              <div className="relative">
-                <input
-                  required
-                  type="tel"
-                  placeholder="01xxxxxxxxx"
-                  className="w-full rounded-2xl border border-border bg-card p-5 text-foreground placeholder:text-muted-foreground/30 focus:border-[#ffc105]/30 focus:outline-none transition-all   font-mono"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                />
-              </div>
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-label-muted block uppercase tracking-wider">{t('labels.phone')}</label>
+              <input
+                required
+                type="tel"
+                placeholder="01xxxxxxxxx"
+                className="w-full rounded-xl border border-border bg-card p-4 text-foreground text-sm placeholder:text-label-muted/40 focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all font-mono"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              />
             </div>
-            <div className="space-y-2 sm:col-span-2">
-              <label className="text-xs font-bold text-muted-foreground block px-1 uppercase">{t('labels.governorate')}</label>
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="text-[11px] font-semibold text-label-muted block uppercase tracking-wider">{t('labels.governorate')}</label>
               <div className="relative">
                 <select
                   required
-                  className="w-full rounded-2xl border border-border bg-card p-5 text-foreground focus:border-[#ffc105]/30 focus:outline-none appearance-none transition-all   font-medium"
+                  className="w-full rounded-xl border border-border bg-card p-4 text-foreground text-sm focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/10 appearance-none transition-all font-medium"
                   value={formData.governorateId}
                   onChange={(e) => setFormData({ ...formData, governorateId: e.target.value as Id<"governorates"> })}
                 >
-                  <option value="" disabled className="text-muted-foreground">{t('labels.governorate')}</option>
+                  <option value="" disabled className="text-label-muted">{t('labels.governorate')}</option>
                   {governorates?.map((gov) => (
                     <option key={gov._id} value={gov._id} className="bg-card text-foreground">
                       {locale === 'en' ? gov.name_en : gov.name_ar} ({gov.shippingFee.toLocaleString(locale)} EGP)
                     </option>
                   ))}
                 </select>
-                <div className="pointer-events-none absolute ltr:right-6 rtl:left-6 top-1/2 -translate-y-1/2 text-muted-foreground">
-                  <ChevronRight size={18} className="rotate-90" />
+                <div className="pointer-events-none absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 text-label-muted">
+                  <ChevronRight size={16} className="rotate-90" />
                 </div>
               </div>
             </div>
-            <div className="space-y-2 sm:col-span-2">
-              <label className="text-xs font-bold text-muted-foreground block px-1 uppercase">{t('labels.address')}</label>
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="text-[11px] font-semibold text-label-muted block uppercase tracking-wider">{t('labels.address')}</label>
               <textarea
                 required
                 placeholder={t('labels.address')}
-                className="min-h-[150px] w-full rounded-3xl border border-border bg-card p-6 text-foreground placeholder:text-muted-foreground/30 focus:border-[#ffc105]/30 focus:outline-none transition-all   resize-none font-medium leading-relaxed"
+                className="min-h-[130px] w-full rounded-xl border border-border bg-card p-4 text-foreground text-sm placeholder:text-label-muted/40 focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all resize-none font-medium leading-relaxed"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               />
@@ -141,11 +137,10 @@ export default function CheckoutForm() {
           </div>
         </div>
 
-        {/* Promo Code Section */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary text-sm font-bold text-foreground border border-border">2</div>
-            <h2 className="font-space-grotesk text-2xl font-bold tracking-tight text-foreground">{t('promo.label')}</h2>
+        <div className="space-y-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-secondary text-sm font-bold text-foreground">2</div>
+            <h2 className="font-space-grotesk text-xl font-bold tracking-tight text-foreground">{t('promo.label')}</h2>
           </div>
           <PromoCodeInput
             onApply={(code) => setFormData({ ...formData, promoCode: code })}
@@ -162,71 +157,70 @@ export default function CheckoutForm() {
           />
         </div>
 
-        {/* Summary Recap Desktop */}
-        <div className="rounded-[40px] border border-border bg-card/50 p-10 space-y-6   backdrop-blur-sm">
-          <div className="flex justify-between items-center pb-6 border-b border-border">
-            <span className="text-muted-foreground text-xs font-bold uppercase">{t('summary.subtotal')}</span>
-            <span className="text-foreground font-space-grotesk font-bold tracking-tight">{(cart?.subtotal || 0).toLocaleString(locale)} <span className="text-xs text-[#ffc105]">EGP</span></span>
+        <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8 space-y-5 backdrop-blur-sm">
+          <div className="flex justify-between items-center pb-4 border-b border-border">
+            <span className="text-label-muted text-xs font-semibold uppercase tracking-wider">{t('summary.subtotal')}</span>
+            <span className="text-foreground font-space-grotesk font-bold tracking-tight">{(cart?.subtotal || 0).toLocaleString(locale)} <span className="text-xs text-primary">EGP</span></span>
           </div>
 
           {cart?.promoType === "free_shipping" ? (
-            <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-500">
-              <span className="text-xs font-bold uppercase">{t('summary.discount')}</span>
-              <span className="font-space-grotesk font-bold tracking-tight text-[10px] bg-emerald-500/10 px-2 py-1 rounded uppercase">{t('summary.freeShipping')}</span>
+            <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
+              <span className="text-xs font-semibold uppercase tracking-wider">{t('summary.discount')}</span>
+              <span className="font-space-grotesk font-bold text-[11px] bg-emerald-500/10 px-2 py-0.5 rounded uppercase">{t('summary.freeShipping')}</span>
             </div>
           ) : cart?.promoDiscount ? (
-            <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-500">
-              <span className="text-xs font-bold uppercase">{t('summary.discount')}</span>
+            <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
+              <span className="text-xs font-semibold uppercase tracking-wider">{t('summary.discount')}</span>
               <span className="font-space-grotesk font-bold tracking-tight">-{cart.promoDiscount.toLocaleString(locale)} <span className="text-xs">EGP</span></span>
             </div>
           ) : null}
 
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground text-xs font-bold uppercase">{t('summary.shipping')}</span>
+            <span className="text-label-muted text-xs font-semibold uppercase tracking-wider">{t('summary.shipping')}</span>
             <span className="text-foreground font-space-grotesk font-bold tracking-tight">
               {!formData.governorateId ? (
-                <span className="text-muted-foreground italic text-[10px] lowercase tracking-wide font-medium">{t('errors.selectGovernorate')}</span>
+                <span className="text-label-muted italic text-xs lowercase tracking-wide font-medium">{t('errors.selectGovernorate')}</span>
               ) : selectedGov ? (
                 cart?.promoType === "free_shipping" ? (
-                  <span className="text-emerald-500 flex items-center gap-2">
-                    <span className="line-through text-muted-foreground opacity-50">{selectedGov.shippingFee.toLocaleString(locale)}</span>
-                    <span className="text-[10px] uppercase font-black bg-emerald-500/10 px-2 py-0.5 rounded">{t('summary.freeShipping')}</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                    <span className="line-through text-label-muted/50">{selectedGov.shippingFee.toLocaleString(locale)}</span>
+                    <span className="text-[11px] uppercase font-bold bg-emerald-500/10 px-2 py-0.5 rounded">{t('summary.freeShipping')}</span>
                   </span>
                 ) : (
-                  <>{selectedGov.shippingFee.toLocaleString(locale)} <span className="text-xs text-[#ffc105]">EGP</span></>
+                  <>{selectedGov.shippingFee.toLocaleString(locale)} <span className="text-xs text-primary">EGP</span></>
                 )
               ) : (
-                <span className="text-muted-foreground text-xs font-bold tracking-wide uppercase">{t('summary.loading')}</span>
+                <span className="text-label-muted text-xs font-semibold tracking-wide uppercase">{t('summary.loading')}</span>
               )}
             </span>
           </div>
 
-          <div className="flex justify-between items-center pt-8 border-t border-border">
-            <span className="text-foreground text-sm font-bold uppercase">{t('summary.total')}</span>
-            <span className="text-[#ffc105] font-space-grotesk text-4xl font-bold tracking-tightest">
-              {((cart?.total || 0) + (cart?.promoType === "free_shipping" ? 0 : (selectedGov?.shippingFee || 0))).toLocaleString(locale)} <span className="text-lg">EGP</span>
+          <div className="flex justify-between items-center pt-5 border-t border-border">
+            <span className="text-foreground text-sm font-bold uppercase tracking-wider">{t('summary.total')}</span>
+            <span className="text-primary font-space-grotesk text-3xl font-bold tracking-tight">
+              {((cart?.total || 0) + (cart?.promoType === "free_shipping" ? 0 : (selectedGov?.shippingFee || 0))).toLocaleString(locale)} <span className="text-base">EGP</span>
             </span>
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-5">
           <button
             disabled={isSubmitting || !cart}
             type="submit"
-            className="group relative flex w-full items-center justify-center gap-4 rounded-2xl bg-[#ffc105] py-6 font-space-grotesk text-xl font-bold text-black transition-all hover:bg-foreground hover:text-background active:scale-[0.98] disabled:opacity-30 disabled:grayscale shadow-[0_10px_30px_rgba(255,193,5,0.2)]"
+            className="group flex w-full items-center justify-center gap-3 rounded-xl bg-primary py-5 font-space-grotesk text-lg font-bold text-primary-foreground transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-30 disabled:grayscale"
           >
             {isSubmitting ? (
-              <Loader2 className="animate-spin" size={28} />
+              <Loader2 className="animate-spin" size={24} />
             ) : (
               <>
                 {t('actions.confirm')}
-                <ChevronRight size={24} className={`transition-transform group-hover:translate-x-1 ${locale === 'ar' ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
+                <ChevronRight size={20} className={`transition-transform group-hover:translate-x-0.5 ${locale === 'ar' ? 'rotate-180 group-hover:-translate-x-0.5' : ''}`} />
               </>
             )}
           </button>
-          <div className="flex items-center justify-center gap-3 text-muted-foreground px-4 py-3 bg-secondary/20 rounded-xl border border-border">
-            <ShieldCheck size={18} className="text-emerald-500" />
-            <p className="text-[11px] font-bold leading-relaxed text-center uppercase">
+          <div className="flex items-center justify-center gap-2.5 text-label-muted py-3">
+            <ShieldCheck size={16} className="text-emerald-500" />
+            <p className="text-[11px] font-semibold leading-relaxed text-center uppercase tracking-wider">
               {t('notice')}
             </p>
           </div>

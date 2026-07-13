@@ -1,11 +1,13 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query, MutationCtx, QueryCtx } from "./_generated/server";
+import { mutation, query, MutationCtx, QueryCtx, internalAction } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
 import { requirePermission } from "./lib/rbac";
 import { hasPermission } from "./lib/permissions";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 import { writeAuditLog } from "./lib/audit";
+import { resolveRef, isR2Ref, r2KeyFromRef } from "./lib/storageRef";
+import * as r2 from "./lib/r2";
 
 type CatalogProduct = {
   _id: Id<"products">;
@@ -228,7 +230,7 @@ export async function resolveStorageRef(
   }
  
   try {
-    return (await ctx.storage.getUrl(fileRef as Id<"_storage">)) ?? undefined;
+    return (await resolveRef(ctx, fileRef)) ?? undefined;
   } catch {
     return undefined;
   }
@@ -1033,10 +1035,16 @@ export const updateProduct = mutation({
     // Delete orphaned storage IDs
     for (const id of oldStorageIds) {
       if (!newStorageIds.has(id)) {
-        try {
-          await ctx.storage.delete(id as Id<"_storage">);
-        } catch (error) {
-          console.error(`Failed to delete orphaned product image ${id}:`, error);
+        if (isR2Ref(id)) {
+          await ctx.scheduler.runAfter(0, internal.products.deleteObjectAction, {
+            key: r2KeyFromRef(id),
+          });
+        } else {
+          try {
+            await ctx.storage.delete(id as Id<"_storage">);
+          } catch (error) {
+            console.error(`Failed to delete orphaned product image ${id}:`, error);
+          }
         }
       }
     }
@@ -1238,10 +1246,16 @@ export const updateAdvancedProduct = mutation({
     // Delete orphaned storage IDs
     for (const id of oldStorageIds) {
       if (!newStorageIds.has(id)) {
-        try {
-          await ctx.storage.delete(id as Id<"_storage">);
-        } catch (error) {
-          console.error(`Failed to delete orphaned product image ${id}:`, error);
+        if (isR2Ref(id)) {
+          await ctx.scheduler.runAfter(0, internal.products.deleteObjectAction, {
+            key: r2KeyFromRef(id),
+          });
+        } else {
+          try {
+            await ctx.storage.delete(id as Id<"_storage">);
+          } catch (error) {
+            console.error(`Failed to delete orphaned product image ${id}:`, error);
+          }
         }
       }
     }
@@ -1305,6 +1319,17 @@ export const initializeSortOrder = mutation({
         await ctx.db.patch(product._id, { sort_order: order });
       }
       order++;
+    }
+  },
+});
+
+export const deleteObjectAction = internalAction({
+  args: { key: v.string() },
+  handler: async (ctx, args) => {
+    try {
+      await r2.deleteObject(args.key);
+    } catch (error) {
+      console.error(`Failed to delete R2 object with key ${args.key}:`, error);
     }
   },
 });

@@ -42,7 +42,6 @@ export default function FeaturedProductCard({
   const { openCart } = useCart();
   const addToCart = useMutation(api.cart.addToCart);
 
-  // Resolve default SKU for stock and cart purposes
   const defaultSku =
     product.skus?.find((s) => s.isDefault) ?? product.skus?.[0];
   const displayPrice = defaultSku?.price || product.selling_price;
@@ -70,7 +69,7 @@ export default function FeaturedProductCard({
   return (
     <Link
       href={`/products/${product.slug || product._id}`}
-      className="group relative block h-[400px] sm:h-[500px] w-full overflow-hidden rounded-3xl border border-border bg-card transition-all hover:border-[#ffc105]/40 hover:shadow-2xl hover:shadow-[#ffc105]/10 active:scale-[0.99]"
+      className="group relative block h-[400px] sm:h-[500px] w-full overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-primary/30 active:scale-[0.99]"
     >
       <div className="absolute inset-0 z-0">
         {product.images?.[0] ? (
@@ -78,55 +77,54 @@ export default function FeaturedProductCard({
             src={product.images[0]}
             alt={locale === "en" ? product.name_en : product.name_ar}
             fill
-            className="object-cover opacity-80 transition-transform duration-700 group-hover:rotate-1 group-hover:scale-105"
+            className="object-cover opacity-80 transition-transform duration-500 group-hover:scale-[1.03]"
           />
         ) : (
           <div className="h-full w-full bg-secondary" />
         )}
-        {/* Improved overlay: Darker gradient for better text legibility across all modes */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent dark:from-background dark:via-background/60" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-foreground/90 via-foreground/40 to-transparent" />
       </div>
 
-      <div className="absolute inset-0 z-20 flex flex-col items-start justify-end space-y-3 sm:space-y-4 p-5 sm:p-8">
-        <div className="flex items-center space-x-2 rounded-full bg-[#ffc105] px-3 py-1 scale-90 sm:scale-100 ltr:origin-left rtl:origin-right shadow-[0_0_15px_rgba(255,193,5,0.3)]">
-          <Zap size={12} className="fill-black text-black" />
-          <span className="text-[10px] font-bold text-black leading-tight">
+      <div className="absolute inset-0 z-20 flex flex-col items-start justify-end p-5 sm:p-8">
+        <div className="flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1 shadow-sm">
+          <Zap size={10} className="fill-primary-foreground text-primary-foreground" />
+          <span className="text-[10px] font-bold text-primary-foreground leading-tight uppercase tracking-wider">
             {t("badges.featured")}
           </span>
         </div>
 
-        <div className="space-y-1">
-          <h3 className="font-space-grotesk text-2xl font-bold tracking-tight leading-none text-white lg:text-3xl">
+        <div className="mt-3 space-y-1">
+          <h3 className="font-space-grotesk text-xl sm:text-2xl font-bold tracking-tight leading-none text-white">
             {locale === "en" ? product.name_en : product.name_ar}
           </h3>
           {locale === "en" && (
-            <p className="font-arabic text-sm text-zinc-300 font-normal">
+            <p className="text-sm text-white/60 font-normal">
               {product.name_ar}
             </p>
           )}
         </div>
 
-        <p className="max-w-sm line-clamp-2 text-sm text-zinc-300 font-normal leading-relaxed h-[2.8rem] overflow-hidden overflow-ellipsis">
+        <p className="mt-2 max-w-sm line-clamp-2 text-sm text-white/70 font-normal leading-relaxed">
           {locale === "en"
             ? product.description_en || t("placeholder")
             : product.description_ar || t("placeholder")}
         </p>
 
-        <div className="w-full border-t border-white/10 pt-4 flex items-center justify-between">
+        <div className="w-full border-t border-white/10 pt-4 mt-auto flex items-center justify-between">
           <div>
             {hasSalePrice ? (
-              <s className="mb-1 block font-space-grotesk text-sm font-semibold text-zinc-500">
+              <s className="mb-0.5 block font-space-grotesk text-sm font-semibold text-white/40">
                 {product.compareAtPrice?.toLocaleString(locale)} EGP
               </s>
             ) : null}
-            <span className="font-space-grotesk text-2xl font-bold text-[#ffc105] tracking-tight">
+            <span className="font-space-grotesk text-xl sm:text-2xl font-bold text-primary tracking-tight">
               {displayPrice.toLocaleString(locale)} EGP
             </span>
           </div>
-          <div className="flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse">
-            <div className="hidden sm:flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white transition-all group-hover:bg-[#ffc105] group-hover:text-black">
+          <div className="flex items-center gap-2 sm:gap-3 rtl:gap-2 rtl:sm:gap-3">
+            <div className="hidden sm:flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-white transition-all group-hover:bg-primary group-hover:text-primary-foreground">
               <ArrowRight
-                size={22}
+                size={20}
                 className={locale === "ar" ? "rotate-180" : ""}
               />
             </div>
@@ -134,13 +132,13 @@ export default function FeaturedProductCard({
               size="sm"
               onClick={handleAddToCart}
               disabled={!defaultSku || defaultSku.display_stock < 1}
-              className="h-12 px-6 font-space-grotesk text-xs font-bold rounded-2xl   hover:shadow-[#ffc105]/20 group/btn"
+              className="h-10 px-4 font-space-grotesk text-xs font-bold rounded-xl"
             >
               {defaultSku && defaultSku.display_stock > 0 ? (
                 <>
                   <ShoppingCart
-                    size={16}
-                    className="ltr:mr-2 rtl:ml-2 group-hover/btn:scale-110 transition-transform"
+                    size={14}
+                    className="ltr:mr-1.5 rtl:ml-1.5"
                   />
                   <span>{t("actions.addSimple")}</span>
                 </>

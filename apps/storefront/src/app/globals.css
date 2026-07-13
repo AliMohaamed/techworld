@@ -28,19 +28,18 @@
   --chart-3: oklch(0.546 0.245 262.881);
   --chart-4: oklch(0.488 0.243 264.376);
   --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
+  --sidebar: oklch(0.96 0.006 85);
+  --sidebar-foreground: oklch(0.15 0.01 85);
+  --sidebar-primary: oklch(0.20 0.01 85);
+  --sidebar-primary-foreground: oklch(0.98 0.004 85);
+  --sidebar-accent: oklch(0.94 0.015 85);
+  --sidebar-accent-foreground: oklch(0.20 0.01 85);
+  --sidebar-border: oklch(0.91 0.008 85);
   --sidebar-ring: oklch(0.708 0 0);
-  
-  /* Swiper Global Overrides */
-  --swiper-theme-color: #ffc105;
-  --swiper-pagination-color: #ffc105;
-  --swiper-navigation-color: #ffc105;
+
+  --swiper-theme-color: var(--brand);
+  --swiper-pagination-color: var(--brand);
+  --swiper-navigation-color: var(--brand);
 }
 
 .dark {
@@ -49,17 +48,16 @@
   --chart-3: oklch(0.546 0.245 262.881);
   --chart-4: oklch(0.488 0.243 264.376);
   --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: #1a1814;
-  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar: oklch(0.16 0.008 85);
+  --sidebar-foreground: oklch(0.95 0.006 85);
   --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-primary-foreground: oklch(0.98 0.004 85);
+  --sidebar-accent: oklch(0.24 0.012 85);
+  --sidebar-accent-foreground: oklch(0.95 0.006 85);
+  --sidebar-border: oklch(0.28 0.008 85);
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* Swiper Pagination Styles */
 .product-details-pagination {
   display: flex;
   justify-content: center;
@@ -70,8 +68,8 @@
 .product-details-pagination .swiper-pagination-bullet {
   width: 10px;
   height: 10px;
-  background: #cbd5e1;
-  opacity: 0.4;
+  background: var(--muted-foreground);
+  opacity: 0.3;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin: 0 !important;
   border-radius: 50%;
@@ -80,16 +78,15 @@
 }
 
 .dark .product-details-pagination .swiper-pagination-bullet {
-  background: #475569;
-  opacity: 0.6;
+  background: var(--muted-foreground);
+  opacity: 0.4;
 }
 
 .product-details-pagination .swiper-pagination-bullet-active {
-  background: #ffc105 !important;
+  background: var(--brand) !important;
   opacity: 1;
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  box-shadow: 0 0 15px rgba(255, 193, 5, 0.5);
   transform: scale(1.1);
 }

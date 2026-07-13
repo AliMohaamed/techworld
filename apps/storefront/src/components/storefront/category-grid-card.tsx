@@ -20,29 +20,29 @@ export default async function CategoryGridCard({ category }: CategoryGridCardPro
   return (
     <Link
       href={`/categories/${category.slug || category._id}`}
-      className="group relative overflow-hidden rounded-[40px] border border-border bg-card p-10 transition-all duration-500 hover:-translate-y-2 hover:border-[#ffc105]/30   hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
+      className="group relative overflow-hidden rounded-2xl border border-border bg-card p-8 sm:p-10 transition-all duration-300 hover:border-primary/30 hover:-translate-y-1"
     >
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,193,5,0.05),transparent_50%)] dark:bg-[linear-gradient(135deg,rgba(255,193,5,0.1),transparent_50%)] opacity-40 transition-opacity duration-500 group-hover:opacity-100" />
-      <div className="relative flex min-h-[320px] flex-col justify-between gap-12">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="relative flex min-h-[280px] flex-col justify-between gap-10">
         <div className="flex items-start justify-between">
-          <span className="rounded-full border border-border bg-accent px-4 py-1.5 text-xs font-bold text-muted-foreground/60 shadow-sm uppercase tracking-wide">
+          <span className="rounded-md border border-border bg-secondary px-3 py-1 text-[10px] font-semibold text-label-muted uppercase tracking-wider">
             {category.slug.replaceAll("-", " ")}
           </span>
-          <span className="rounded-2xl border border-border bg-secondary p-3 text-muted-foreground transition-all duration-500 group-hover:bg-[#ffc105] group-hover:text-black group-hover:rotate-45  ">
-            <ArrowUpRight size={22} />
+          <span className="rounded-lg border border-border bg-secondary p-2.5 text-label-muted transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:rotate-45">
+            <ArrowUpRight size={18} />
           </span>
         </div>
 
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <h2 className="font-space-grotesk text-4xl font-bold text-foreground transition-all duration-500 group-hover:text-[#ffc105] group-hover:scale-105 origin-left rtl:origin-right leading-none tracking-tight">
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <h2 className="font-space-grotesk text-3xl sm:text-4xl font-bold text-foreground transition-colors duration-300 group-hover:text-primary leading-none tracking-tight">
               {locale === "en" ? category.name_en : category.name_ar}
             </h2>
-            <p className="font-arabic text-xl text-[#ffc105]/70 font-light opacity-60 group-hover:opacity-100 transition-opacity">
+            <p className="text-sm text-primary/60 font-normal opacity-60 group-hover:opacity-100 transition-opacity">
               {locale === "en" ? category.name_ar : category.name_en}
             </p>
           </div>
-          <p className="max-w-sm text-xs font-medium leading-relaxed text-muted-foreground/50 group-hover:text-muted-foreground transition-colors tracking-wide uppercase">
+          <p className="max-w-sm text-xs font-medium leading-relaxed text-label-muted group-hover:text-foreground transition-colors tracking-wide uppercase">
             {(locale === "en"
               ? category.description_en
               : category.description_ar) ?? t("card.defaultDescription")}

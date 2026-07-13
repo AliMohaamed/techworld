@@ -1,67 +1,113 @@
-import { internalMutation } from "./_generated/server";
-import { v } from "convex/values";
+import { internalAction, internalQuery } from "./_generated/server";
+import * as r2 from "./lib/r2";
+import { internal } from "./_generated/api";
 
 /**
- * Collects string storage ID values into the referenced set.
+ * Internal query to collect all referenced storage reference strings from the
+ * transactional database. All storage now lives in Cloudflare R2 (the legacy
+ * Convex _storage migration is complete), so only R2 refs are collected.
  */
-function collectReferencedStorageIds(values: Array<string | undefined | null>, collector: Set<string>) {
-  for (const value of values) {
-    if (typeof value === "string" && value.length > 0) {
-      collector.add(value);
-    }
-  }
-}
-
-
-
-/**
- * H3 FIX: Orphan sweep using metadata collection to avoid multiple paginated calls.
- *
- * Strategy:
- * 1. Collects all product/sku/category records for reference analysis.
- * 2. Scans `_storage` and deletes files that match no referenced IDs.
- * 
- * This is safe at current scale and complies with Convex's single-pagination constraint.
- */
-export const sweepOrphanedCatalogFiles = internalMutation({
+export const getSweepMetadata = internalQuery({
   args: {},
-  handler: async (ctx) => {
-    const referencedIds = new Set<string>();
+  handler: async (ctx): Promise<{ referencedRefs: string[] }> => {
+    const referencedRefs = new Set<string>();
 
-    // Build the referenced set by paging through each entity table separately.
-    // Each table is scanned in PAGE_SIZE chunks to stay within memory limits.
-    // Build the referenced set by collecting all entity rows.
-    // NOTE: This assumes table sizes are within memory limits for metadata extraction.
+    // 1. Gather product refs (thumbnail & gallery images)
     const products = await ctx.db.query("products").collect();
     for (const product of products) {
-      collectReferencedStorageIds([product.thumbnail], referencedIds);
-      collectReferencedStorageIds(product.images, referencedIds);
+      if (product.thumbnail) {
+        referencedRefs.add(product.thumbnail);
+      }
+      product.images?.forEach((img) => {
+        if (img) referencedRefs.add(img);
+      });
     }
 
+    // 2. Gather SKU refs (linkedImageId)
     const skus = await ctx.db.query("skus").collect();
     for (const sku of skus) {
-      collectReferencedStorageIds([sku.linkedImageId], referencedIds);
+      if (sku.linkedImageId) {
+        referencedRefs.add(sku.linkedImageId);
+      }
     }
 
+    // 3. Gather category refs (thumbnailImageId)
     const categories = await ctx.db.query("categories").collect();
     for (const category of categories) {
-      collectReferencedStorageIds([category.thumbnailImageId], referencedIds);
+      if (category.thumbnailImageId) {
+        referencedRefs.add(category.thumbnailImageId);
+      }
     }
 
-    // Now scan _storage and delete unreferenced files.
-    let deletedCount = 0;
-    const storageFiles = await ctx.db.system.query("_storage").collect();
-
-    for (const file of storageFiles) {
-      if (!referencedIds.has(String(file._id))) {
-        await ctx.storage.delete(file._id);
-        deletedCount += 1;
+    // 4. Gather order payment receipts (paymentReceiptRef)
+    const orders = await ctx.db.query("orders").collect();
+    for (const order of orders) {
+      if (order.paymentReceiptRef) {
+        referencedRefs.add(order.paymentReceiptRef);
       }
     }
 
     return {
-      deletedCount,
-      referencedCount: referencedIds.size,
+      referencedRefs: Array.from(referencedRefs),
+    };
+  },
+});
+
+/**
+ * Sweep orphaned catalog files from Cloudflare R2.
+ * Runs as an action because it performs HTTP calls to the Cloudflare R2 API.
+ */
+export const sweepOrphanedCatalogFiles = internalAction({
+  args: {},
+  handler: async (
+    ctx
+  ): Promise<{
+    deletedR2Count: number;
+    referencedCount: number;
+  }> => {
+    // 1. Fetch DB metadata
+    const { referencedRefs } = await ctx.runQuery(
+      internal.sweepJobs.getSweepMetadata
+    );
+
+    const referencedSet = new Set(referencedRefs);
+
+    // 2. List all objects currently stored in Cloudflare R2 bucket under public/ and receipts/
+    const r2Keys: string[] = [];
+
+    // Paginate through public/
+    let continuationToken: string | undefined = undefined;
+    do {
+      const result = await r2.listObjects("public/", continuationToken);
+      r2Keys.push(...result.keys);
+      continuationToken = result.nextToken;
+    } while (continuationToken);
+
+    // Paginate through receipts/
+    continuationToken = undefined;
+    do {
+      const result = await r2.listObjects("receipts/", continuationToken);
+      r2Keys.push(...result.keys);
+      continuationToken = result.nextToken;
+    } while (continuationToken);
+
+    // 3. Delete unreferenced objects in Cloudflare R2
+    let deletedR2Count = 0;
+    for (const key of r2Keys) {
+      const ref = `r2:${key}`;
+      if (!referencedSet.has(ref)) {
+        try {
+          await r2.deleteObject(key);
+          deletedR2Count++;
+        } catch (error) {
+          console.error(`Failed to delete orphaned R2 object ${key}:`, error);
+        }
+      }
+    }
+
+    return {
+      deletedR2Count,
+      referencedCount: referencedSet.size,
     };
   },
 });

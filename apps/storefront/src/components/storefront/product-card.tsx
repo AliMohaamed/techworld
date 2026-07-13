@@ -41,7 +41,6 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { openCart } = useCart();
   const addToCart = useMutation(api.cart.addToCart);
 
-  // Resolve the default SKU for stock display and cart purposes
   const defaultSku =
     product.skus?.find((s) => s.isDefault) ?? product.skus?.[0];
   const displayStock = defaultSku?.display_stock ?? product.display_stock ?? 0;
@@ -71,73 +70,74 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
       href={`/products/${product.slug || product._id}`}
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-card transition-all hover:-translate-y-1 hover:  hover:shadow-black/20 dark:hover:shadow-black/50 border border-border active:scale-[0.99]"
+      className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-card border border-border transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 active:scale-[0.99]"
     >
-      <div className="relative aspect-square w-full overflow-hidden rounded-t-2xl border-b border-border bg-secondary">
+      <div className="relative aspect-square w-full overflow-hidden border-b border-border bg-secondary">
         {product.images?.[0] ? (
           <Image
             src={product.images[0]}
             alt={locale === "en" ? product.name_en : product.name_ar}
             fill
-            className="object-cover transition-transform duration-700 group-hover:scale-110"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-secondary text-muted-foreground font-semibold text-[10px]">
+          <div className="flex h-full w-full items-center justify-center bg-secondary text-label-muted text-xs font-semibold">
             {t("noImage")}
           </div>
         )}
 
         {hasSalePrice && !isOutOfStock ? (
-          <div className="absolute ltr:left-4 rtl:right-4 top-4 rounded-full bg-[#ffc105] px-4 py-1.5 text-[10px] font-bold text-black">
+          <div className="absolute ltr:left-3 rtl:right-3 top-3 rounded-md bg-primary px-2.5 py-1 text-[10px] font-bold text-primary-foreground uppercase tracking-wider">
             {t("badges.sale")}
           </div>
         ) : null}
 
         {isOutOfStock ? (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70 backdrop-blur-[4px] animate-in fade-in duration-500">
-            <span className="rounded-xl bg-red-600/20 border border-red-600/50 px-5 py-2.5 text-xs font-bold text-red-500">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60 backdrop-blur-[2px]">
+            <span className="rounded-lg bg-destructive/15 border border-destructive/30 px-4 py-2 text-xs font-bold text-destructive">
               {t("badges.soldOut")}
             </span>
           </div>
         ) : null}
       </div>
 
-      <div className="flex flex-1 flex-col p-2.5 sm:p-4 md:p-6">
-        <span className="mb-1 sm:mb-2 text-[8px] sm:text-[11px] font-semibold text-[#ffc105]/80 uppercase truncate block">
+      <div className="flex flex-1 flex-col p-3 sm:p-4">
+        <span className="mb-1 text-[11px] font-semibold text-primary/70 uppercase tracking-wider truncate">
           {product.categoryName || t("placeholderCategory")}
         </span>
 
-        <h3 className="mb-1.5 sm:mb-2 line-clamp-2 font-space-grotesk text-xs sm:text-xl md:text-[1.3rem] font-bold leading-tight text-foreground tracking-tight group-hover:text-[#ffc105] transition-colors">
+        <h3 className="mb-2 line-clamp-2 font-space-grotesk text-sm sm:text-base font-bold leading-tight text-foreground group-hover:text-primary transition-colors">
           {locale === "en" ? product.name_en : product.name_ar}
         </h3>
 
-        <p className="hidden sm:block mb-4 sm:mb-6 animate-in fade-in line-clamp-2 text-sm leading-relaxed text-muted-foreground font-normal h-[2.8rem] overflow-hidden overflow-ellipsis">
+        <p className="hidden sm:block mb-4 line-clamp-2 text-sm leading-relaxed text-label-muted">
           {locale === "en"
             ? product.description_en || t("placeholder")
             : product.description_ar || t("placeholder")}
         </p>
 
-        <div className="mt-auto flex flex-row items-end justify-between sm:items-center gap-1.5 sm:gap-4 w-full">
-          <div className="flex shrink-0 flex-col">
+        <div className="mt-auto flex items-end justify-between gap-2">
+          <div className="flex flex-col">
             {hasSalePrice ? (
-              <s className="mb-0.5 font-space-grotesk text-[10px] sm:text-sm font-semibold tracking-tight text-muted-foreground decoration-red-900/50">
+              <s className="text-xs text-label-muted line-through decoration-destructive/40">
                 {product.compareAtPrice?.toLocaleString(locale)}{" "}
-                <span className="text-[9px] sm:text-[10px]">EGP</span>
+                <span className="text-[10px]">EGP</span>
               </s>
             ) : null}
-            <span className="font-space-grotesk text-sm sm:text-2xl md:text-[1.5rem] font-bold tracking-tightest text-foreground leading-none">
+            <span className="font-space-grotesk text-base sm:text-lg font-bold tracking-tight text-foreground leading-none">
               {displayPrice.toLocaleString(locale)}{" "}
-              <span className="text-[9px] sm:text-lg text-[#ffc105]">EGP</span>
+              <span className="text-xs text-primary font-semibold">EGP</span>
             </span>
           </div>
 
           <button
             disabled={isOutOfStock}
             onClick={handleAddToCart}
-            className="flex h-8 w-8 sm:h-12 md:h-14 sm:w-auto sm:flex-1 shrink-0 cursor-pointer items-center justify-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl bg-[#ffc105] sm:px-4 font-bold text-black transition-all hover:bg-white active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-30 hover:shadow-[#ffc105]/20"
+            className="flex h-9 w-9 sm:h-10 sm:w-auto shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg sm:rounded-xl bg-primary sm:px-4 font-bold text-primary-foreground transition-all hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-30"
           >
-            <ShoppingCart size={14} className="md:h-5 md:w-5 shrink-0 sm:fill-black/5" />
-            <span className="hidden sm:inline-block whitespace-nowrap text-[10px] sm:text-xs">
+            <ShoppingCart size={15} className="sm:hidden fill-primary-foreground/10" />
+            <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold">
+              <ShoppingCart size={14} className="fill-primary-foreground/10" />
               {t("actions.add")}
             </span>
           </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useSyncExternalStore } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 interface SessionContextType {
@@ -9,20 +9,27 @@ interface SessionContextType {
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-export function SessionProvider({ children }: { children: ReactNode }) {
-  const [sessionId, setSessionId] = useState<string | null>(null);
+function subscribe() {
+  return () => {};
+}
 
-  useEffect(() => {
-    let id = localStorage.getItem("store_session_id");
-    if (!id) {
-      id = uuidv4();
-      localStorage.setItem("store_session_id", id);
-    }
-    setSessionId(id);
-  }, []);
+function getSnapshot(): string {
+  let id = localStorage.getItem("store_session_id");
+  if (!id) {
+    id = uuidv4();
+    localStorage.setItem("store_session_id", id);
+  }
+  return id;
+}
+
+function getServerSnapshot(): string {
+  return "";
+}
+
+export function SessionProvider({ children }: { children: ReactNode }) {
+  const sessionId = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   if (!sessionId) {
-    // Render nothing or a skeleton while initializing to prevent hydration mismatch
     return null;
   }
 
@@ -40,6 +47,3 @@ export function useSession() {
   }
   return context;
 }
-
-
-

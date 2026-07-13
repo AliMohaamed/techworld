@@ -19,7 +19,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const mainSku = product.skus?.find((s: any) => s.isDefault) || product.skus?.[0];
+  type ProductSku = {
+  _id: string;
+  isDefault?: boolean;
+  linkedImageId?: string;
+  price?: number;
+};
+
+const mainSku = product.skus?.find((s: ProductSku) => s.isDefault) || product.skus?.[0];
   const ogImage = product.thumbnail || product.images?.[0];
 
   return {

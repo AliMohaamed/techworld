@@ -6,6 +6,7 @@ import { scheduleAuditLog, writeAuditLog } from "./lib/audit";
 import { Doc, Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import { orderStateValidator } from "./schema";
+import { resolveRef } from "./lib/storageRef";
 
 async function getOrderOrThrow(ctx: { db: { get: (id: Id<"orders">) => Promise<Doc<"orders"> | null> } }, orderId: Id<"orders">) {
   const order = await ctx.db.get(orderId);
@@ -47,7 +48,7 @@ async function getReceiptUrl(ctx: Pick<QueryCtx, "storage">, receiptRef: string 
   }
 
   try {
-    return await ctx.storage.getUrl(receiptRef as Id<"_storage">);
+    return await resolveRef(ctx, receiptRef);
   } catch {
     return null;
   }
@@ -200,7 +201,7 @@ export const updateOrderStatus = mutation({
       v.literal("CANCELLED"),
       v.literal("STALLED_PAYMENT"),
     ),
-    manualReceiptId: v.optional(v.id("_storage")),
+    manualReceiptId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const requiredPermission =
@@ -218,7 +219,7 @@ export const updateOrderStatus = mutation({
 
     const patch: {
       state: "CONFIRMED" | "CANCELLED" | "STALLED_PAYMENT";
-      paymentReceiptRef?: Id<"_storage">;
+      paymentReceiptRef?: string;
     } = {
       state: args.newState,
     };
@@ -426,7 +427,7 @@ export const updateGenericStatus = mutation({
   args: {
     orderId: v.id("orders"),
     newState: orderStateValidator,
-    manualReceiptId: v.optional(v.id("_storage")),
+    manualReceiptId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // Manual override only requires VIEW_ORDERS — any admin who can see orders can override status.

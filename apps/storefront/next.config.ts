@@ -1,43 +1,22 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
-import path from "path";
 
 const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
-function toRemoteUrl(urlValue: string | undefined) {
-  if (!urlValue) {
-    return null;
-  }
-
-  try {
-    return new URL(urlValue);
-  } catch {
-    return null;
-  }
-}
-
 const remotePatterns: any[] = [
-  ...[
-    toRemoteUrl(process.env.NEXT_PUBLIC_CONVEX_SITE_URL),
-    toRemoteUrl(process.env.NEXT_PUBLIC_CONVEX_URL),
-  ]
-    .filter((url): url is URL => url !== null)
-    .map((url) => ({
-      protocol: url.protocol.replace(":", "") as "http" | "https",
-      hostname: url.hostname,
-      port: url.port,
-      pathname: "/**",
-    })),
   {
     protocol: "https",
-    hostname: "clean-heron-293.convex.cloud",
+    hostname: "cdn.techworldegypt.com",
     pathname: "/**",
   },
   {
     protocol: "https",
-    hostname: "usable-wren-18.convex.cloud",
+    hostname: "pub-73aedd8a4e824555a4079204e3f4b219.r2.dev",
     pathname: "/**",
   },
+  ...(process.env.NEXT_PUBLIC_R2_PUBLIC_HOST
+    ? [{ protocol: "https" as const, hostname: process.env.NEXT_PUBLIC_R2_PUBLIC_HOST, pathname: "/**" }]
+    : []),
 ];
 
 const nextConfig: NextConfig = {

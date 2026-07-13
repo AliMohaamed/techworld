@@ -2,8 +2,9 @@ import { internalAction, internalMutation, mutation } from "./_generated/server"
 import { v } from "convex/values";
 import { requirePermission } from "./lib/rbac";
 import { internal } from "./_generated/api";
-import { Id } from "./_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
 import { buildMessageForState, formatChatId, sendViaGreenApi, sendViaStub } from "./lib/whatsapp";
+import * as r2 from "./lib/r2";
 
 async function sha256(message: string) {
   const msgBuffer = new TextEncoder().encode(message);
@@ -143,12 +144,21 @@ export const downloadAndAttachMedia = internalAction({
         return;
       }
 
-      const blob = await response.blob();
-      const storageId = await ctx.storage.store(blob);
+      const contentType = response.headers.get("Content-Type") || "application/octet-stream";
+      const buffer = await response.arrayBuffer();
+
+      const uuid = crypto.randomUUID();
+      const mimeParts = contentType.split("/");
+      const ext = mimeParts[mimeParts.length - 1] || "bin";
+      const key = `receipts/${uuid}.${ext}`;
+
+      // Upload directly to Cloudflare R2
+      await r2.putBuffer(key, buffer, contentType);
+      const storageRef = `r2:${key}`;
 
       await ctx.runMutation(internal.webhooks.applyReceiptToOrder, {
         orderId: args.orderId,
-        storageId,
+        storageRef,
       });
     } catch (e) {
       console.error("Error downloading or storing media:", e);
@@ -168,7 +178,7 @@ export const downloadAndAttachMedia = internalAction({
 export const applyReceiptToOrder = internalMutation({
   args: {
     orderId: v.id("orders"),
-    storageId: v.id("_storage"),
+    storageRef: v.string(),
   },
   handler: async (ctx, args) => {
     const order = await ctx.db.get(args.orderId);
@@ -178,9 +188,9 @@ export const applyReceiptToOrder = internalMutation({
     }
 
     const patch: {
-      paymentReceiptRef: Id<"_storage">;
+      paymentReceiptRef: string;
       state?: "AWAITING_VERIFICATION";
-    } = { paymentReceiptRef: args.storageId };
+    } = { paymentReceiptRef: args.storageRef };
 
     if (order.state === "PENDING_PAYMENT_INPUT") {
       patch.state = "AWAITING_VERIFICATION";
@@ -192,7 +202,7 @@ export const applyReceiptToOrder = internalMutation({
       entityId: args.orderId,
       actionType: "WEBHOOK_RECEIPT_ATTACHED",
       changes: {
-        storageId: args.storageId,
+        storageRef: args.storageRef,
         previousState: order.state,
         newState: patch.state ?? order.state,
         source: "WHATSAPP_WEBHOOK",
@@ -207,7 +217,7 @@ export const applyReceiptToOrder = internalMutation({
 export const attachReceiptManually = mutation({
   args: {
     orderId: v.id("orders"),
-    mediaStorageId: v.id("_storage"),
+    mediaStorageId: v.string(),
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {

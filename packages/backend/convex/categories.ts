@@ -3,6 +3,7 @@ import { mutation, query, QueryCtx } from "./_generated/server";
 import { requirePermission } from "./lib/rbac";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
+import { isR2Ref, r2KeyFromRef } from "./lib/storageRef";
 
 function normalizeOptionalString(value: string | undefined) {
   const normalized = value?.trim();
@@ -169,10 +170,16 @@ export const updateCategory = mutation({
     const nextThumbnail = normalizeOptionalString(changes.thumbnailImageId);
 
     if (nextThumbnail !== undefined && previous.thumbnailImageId && previous.thumbnailImageId !== nextThumbnail) {
-      try {
-        await ctx.storage.delete(previous.thumbnailImageId as Id<"_storage">);
-      } catch (error) {
-        console.error("Failed to delete orphaned category image:", error);
+      if (isR2Ref(previous.thumbnailImageId)) {
+        await ctx.scheduler.runAfter(0, internal.products.deleteObjectAction, {
+          key: r2KeyFromRef(previous.thumbnailImageId),
+        });
+      } else {
+        try {
+          await ctx.storage.delete(previous.thumbnailImageId as Id<"_storage">);
+        } catch (error) {
+          console.error("Failed to delete orphaned category image:", error);
+        }
       }
     }
 

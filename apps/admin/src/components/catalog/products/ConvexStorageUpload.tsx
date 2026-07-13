@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { UploadCloud, X, GripVertical } from "lucide-react";
+import imageCompression from "browser-image-compression";
 import Image from "next/image";
 import { api } from "@backend/convex/_generated/api";
 import { cn } from "@techworld/ui";
@@ -153,23 +154,61 @@ export function ConvexStorageUpload({
 
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
+
+    // Pre-upload validation: max 10MB per file, must be an image
+    for (const file of Array.from(files)) {
+      if (file.size > 10 * 1024 * 1024) {
+        alert(`File "${file.name}" is too large. Maximum allowed size is 10 MB.`);
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        alert(`File "${file.name}" is not a valid image.`);
+        return;
+      }
+    }
+
     setIsUploading(true);
     try {
-      const uploadedIds: string[] = [];
+      const uploadedRefs: string[] = [];
       for (const file of Array.from(files)) {
-        const uploadUrl = await generateUploadUrl({});
+        // Compress image to WebP with browser-image-compression
+        let compressed: File;
+        try {
+          compressed = await imageCompression(file, {
+            maxSizeMB: 0.2,
+            maxWidthOrHeight: 1600,
+            useWebWorker: true,
+            fileType: "image/webp",
+            initialQuality: 0.85,
+          });
+        } catch (err) {
+          console.error("Image compression failed, uploading original:", err);
+          compressed = file;
+        }
+
+        const contentType = "image/webp";
+        // Get R2 presigned PUT URL
+        const { uploadUrl, key } = await generateUploadUrl({ contentType });
+
+        // PUT to Cloudflare R2
         const response = await fetch(uploadUrl, {
-          method: "POST",
+          method: "PUT",
           headers: {
-            "Content-Type": file.type || "application/octet-stream",
+            "Content-Type": contentType,
           },
-          body: file,
+          body: compressed,
         });
-        if (!response.ok) throw new Error(`Upload failed for ${file.name}.`);
-        const payload = (await response.json()) as { storageId: string };
-        uploadedIds.push(payload.storageId);
+
+        if (!response.ok) {
+          throw new Error(`Upload to R2 failed for ${file.name}. Status: ${response.status}`);
+        }
+
+        uploadedRefs.push(`r2:${key}`);
       }
-      onChange([...imageIds, ...uploadedIds].filter((id) => id && id.trim() !== ""));
+      onChange([...imageIds, ...uploadedRefs].filter((id) => id && id.trim() !== ""));
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert(error instanceof Error ? error.message : "Image upload failed.");
     } finally {
       setIsUploading(false);
     }
@@ -212,7 +251,7 @@ export function ConvexStorageUpload({
             {isUploading ? "Uploading images..." : "Upload product images"}
           </span>
           <span className="text-xs font-medium text-muted-foreground/50">
-            JPG, PNG, WebP • Convex Edge Storage
+            JPG, PNG, WebP • Cloudflare R2
           </span>
         </div>
       </label>
