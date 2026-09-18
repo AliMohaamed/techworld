@@ -8,6 +8,7 @@ import { Link } from "@/navigation";
 import CheckoutForm from "@/components/storefront/checkout-form";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
+import { ColorSwatch } from "@techworld/ui";
 
 export default function CheckoutPage() {
   const t = useTranslations("CheckoutPage");
@@ -112,11 +113,20 @@ export default function CheckoutPage() {
                           ? item.product?.name_en
                           : item.product?.name_ar}
                       </p>
-                      <p className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/40 mt-2 bg-accent w-fit px-2 py-0.5 rounded">
-                        {item.sku?.variantName &&
-                        item.sku.variantName !== "Default"
-                          ? item.sku.variantName
-                          : t("summary.defaultVariant")}
+                      <p className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/40 mt-2 bg-accent w-fit px-2 py-0.5 rounded inline-flex items-center gap-1.5">
+                        {item.sku?.variantName && item.sku.variantName !== "Default" && (
+                          <ColorSwatch
+                            color={item.sku.variantAttributes?.colorCode || item.sku.variantAttributes?.color || item.sku.variantName}
+                            fallbackName={item.sku.variantName}
+                            size="xs"
+                          />
+                        )}
+                        <span>
+                          {item.sku?.variantName &&
+                          item.sku.variantName !== "Default"
+                            ? item.sku.variantName
+                            : t("summary.defaultVariant")}
+                        </span>
                       </p>
                       <p className="font-space-grotesk text-lg font-black text-foreground mt-3 uppercase tracking-tighter">
                         {(

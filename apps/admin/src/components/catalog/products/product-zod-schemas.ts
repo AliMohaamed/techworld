@@ -9,6 +9,7 @@ export const variantSchema = z.object({
   id: z.string().optional(),
   variantName: z.string().trim().min(1, "required"),
   color: z.string().trim().optional(),
+  colorCode: z.string().trim().optional(),
   size: z.string().trim().optional(),
   type: z.string().trim().optional(),
   real_stock: z.coerce.number().min(0, "nonNegative"),

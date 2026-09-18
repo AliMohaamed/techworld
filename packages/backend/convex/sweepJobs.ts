@@ -64,13 +64,32 @@ export const sweepOrphanedCatalogFiles = internalAction({
   ): Promise<{
     deletedR2Count: number;
     referencedCount: number;
+    skipped?: string;
   }> => {
+    // The R2 bucket is shared across Convex deployments, so a sweep driven by
+    // one deployment's database sees every other deployment's objects as
+    // orphans. Deleting is therefore opt-in and only safe once each deployment
+    // owns its own bucket (or key namespace).
+    if (process.env.R2_SWEEP_ENABLED !== "true") {
+      console.warn(
+        "R2 orphan sweep skipped: set R2_SWEEP_ENABLED=true on this deployment to enable it."
+      );
+      return { deletedR2Count: 0, referencedCount: 0, skipped: "disabled" };
+    }
+
     // 1. Fetch DB metadata
     const { referencedRefs } = await ctx.runQuery(
       internal.sweepJobs.getSweepMetadata
     );
 
     const referencedSet = new Set(referencedRefs);
+
+    // An empty reference set means the query found nothing to protect, which
+    // would delete the whole bucket. Treat it as a bug, not as "all orphaned".
+    if (referencedSet.size === 0) {
+      console.error("R2 orphan sweep aborted: no referenced refs found.");
+      return { deletedR2Count: 0, referencedCount: 0, skipped: "no-references" };
+    }
 
     // 2. List all objects currently stored in Cloudflare R2 bucket under public/ and receipts/
     const r2Keys: string[] = [];
@@ -92,16 +111,29 @@ export const sweepOrphanedCatalogFiles = internalAction({
     } while (continuationToken);
 
     // 3. Delete unreferenced objects in Cloudflare R2
+    const orphanKeys = r2Keys.filter((key) => !referencedSet.has(`r2:${key}`));
+
+    // Refuse to run when the "orphans" are most of the bucket — that is the
+    // signature of a misconfiguration (wrong deployment, wrong bucket, partial
+    // migration), not of genuine garbage.
+    if (r2Keys.length > 0 && orphanKeys.length > r2Keys.length * 0.2) {
+      console.error(
+        `R2 orphan sweep aborted: ${orphanKeys.length} of ${r2Keys.length} objects looked orphaned.`
+      );
+      return {
+        deletedR2Count: 0,
+        referencedCount: referencedSet.size,
+        skipped: "too-many-orphans",
+      };
+    }
+
     let deletedR2Count = 0;
-    for (const key of r2Keys) {
-      const ref = `r2:${key}`;
-      if (!referencedSet.has(ref)) {
-        try {
-          await r2.deleteObject(key);
-          deletedR2Count++;
-        } catch (error) {
-          console.error(`Failed to delete orphaned R2 object ${key}:`, error);
-        }
+    for (const key of orphanKeys) {
+      try {
+        await r2.deleteObject(key);
+        deletedR2Count++;
+      } catch (error) {
+        console.error(`Failed to delete orphaned R2 object ${key}:`, error);
       }
     }
 

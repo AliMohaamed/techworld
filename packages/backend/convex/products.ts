@@ -708,6 +708,7 @@ const advancedVariantInputValidator = v.object({
     color: v.optional(v.string()),
     size: v.optional(v.string()),
     type: v.optional(v.string()),
+    colorCode: v.optional(v.string()),
   }),
   real_stock: v.number(),
   display_stock: v.number(),
@@ -729,7 +730,7 @@ function buildNormalizedAdvancedVariants(args: {
   variants: Array<{
     id?: Id<"skus">;
     variantName: string;
-    variantAttributes: { color?: string; size?: string; type?: string };
+    variantAttributes: { color?: string; size?: string; type?: string; colorCode?: string };
     real_stock: number;
     display_stock: number;
     price: number;
@@ -759,7 +760,7 @@ function buildNormalizedAdvancedVariants(args: {
 function normalizeAdvancedVariant(variant: {
   id?: Id<"skus">;
   variantName: string;
-  variantAttributes: { color?: string; size?: string; type?: string };
+  variantAttributes: { color?: string; size?: string; type?: string; colorCode?: string };
   real_stock: number;
   display_stock: number;
   price: number;
@@ -782,6 +783,7 @@ function normalizeAdvancedVariant(variant: {
       color: normalizeOptionalString(variant.variantAttributes.color),
       size: normalizeOptionalString(variant.variantAttributes.size),
       type: normalizeOptionalString(variant.variantAttributes.type),
+      colorCode: normalizeOptionalString(variant.variantAttributes.colorCode),
     },
     real_stock: sanitizeNumber(variant.real_stock, "Variant real stock"),
     display_stock: sanitizeNumber(variant.display_stock, "Variant display stock"),
