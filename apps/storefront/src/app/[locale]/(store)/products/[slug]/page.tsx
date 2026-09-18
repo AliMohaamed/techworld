@@ -10,7 +10,7 @@ import { useCart } from "@/providers/cart-provider";
 import { ChevronRight, ShoppingBag, Truck, ShieldCheck } from "lucide-react";
 import { Link } from "@/navigation";
 import { DynamicProductGallery } from "@/components/storefront/DynamicProductGallery";
-import { RelatedProducts } from "@techworld/ui";
+import { RelatedProducts, ColorSwatch } from "@techworld/ui";
 import { useTranslations, useLocale } from "next-intl";
 
 type ProductSku = {
@@ -20,6 +20,7 @@ type ProductSku = {
     color?: string;
     size?: string;
     type?: string;
+    colorCode?: string;
   };
   real_stock: number;
   display_stock: number;
@@ -196,21 +197,27 @@ export default function ProductDetailPage() {
                 <div className="flex flex-wrap gap-4">
                   {variantColorOptions.map((sku: ProductSku) => {
                     const color = sku.variantAttributes?.color ?? sku.variantName;
+                    const colorValue = sku.variantAttributes?.colorCode || sku.variantAttributes?.color || sku.variantName;
                     const isActive = sku._id === selectedVariant?._id;
                     return (
                       <button
                         key={sku._id}
                         type="button"
-onClick={() => {
+                        onClick={() => {
                           handleVariantSelect(sku._id, sku.linkedImageId ?? product.thumbnail ?? product.images?.[0]);
                         }}
-                        className={`flex items-center gap-4 rounded-xl border px-6 py-4 text-left transition-all ${isActive
-                          ? "border-primary bg-primary/10 text-foreground"
-                          : "border-border bg-card text-muted-foreground hover:border-primary/20 hover:text-foreground"
+                        className={`flex items-center gap-3.5 rounded-xl border px-5 py-4 text-left transition-all ${isActive
+                          ? "border-primary bg-primary/10 text-foreground shadow-sm"
+                          : "border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground"
                           }`}
                       >
-                        <span className="h-4 w-4 rounded-full border border-border shadow-sm" style={{ backgroundColor: color }} />
-                        <span className="text-xs font-black uppercase">{color}</span>
+                        <ColorSwatch
+                          color={colorValue}
+                          fallbackName={sku.variantName}
+                          size="md"
+                          selected={isActive}
+                        />
+                        <span className="text-xs font-black uppercase tracking-tight">{color}</span>
                       </button>
                     );
                   })}
@@ -222,19 +229,26 @@ onClick={() => {
                 <div className="flex flex-wrap gap-4">
                   {variantOptions.map((sku: ProductSku) => {
                     const isActive = sku._id === selectedVariant?._id;
+                    const colorValue = sku.variantAttributes?.colorCode || sku.variantAttributes?.color || sku.variantName;
                     return (
                       <button
                         key={sku._id}
                         type="button"
-onClick={() => {
+                        onClick={() => {
                           handleVariantSelect(sku._id, sku.linkedImageId ?? product.thumbnail ?? product.images?.[0]);
                         }}
-                        className={`rounded-xl border px-6 py-4 text-xs font-black uppercase transition-all ${isActive
-                          ? "border-primary bg-primary/10 text-foreground"
+                        className={`flex items-center gap-2.5 rounded-xl border px-5 py-3.5 text-xs font-black uppercase transition-all ${isActive
+                          ? "border-primary bg-primary/10 text-foreground shadow-sm"
                           : "border-border bg-card text-muted-foreground hover:border-primary/20 hover:text-foreground"
                           }`}
                       >
-                        {sku.variantName}
+                        <ColorSwatch
+                          color={colorValue}
+                          fallbackName={sku.variantName}
+                          size="xs"
+                          selected={isActive}
+                        />
+                        <span>{sku.variantName}</span>
                       </button>
                     );
                   })}
@@ -246,7 +260,14 @@ onClick={() => {
               <div className="mb-10 rounded-2xl border border-border bg-accent/30 p-6 backdrop-blur-sm">
                 <p className="text-[10px] font-black uppercase text-label-muted mb-4">{t('variants.selected')}</p>
                 <div className="flex flex-wrap gap-3 text-xs">
-                  <span className="rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-primary font-black uppercase">{selectedVariant.variantName}</span>
+                  <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-primary font-black uppercase">
+                    <ColorSwatch
+                      color={selectedVariant.variantAttributes?.colorCode || selectedVariant.variantAttributes?.color || selectedVariant.variantName}
+                      fallbackName={selectedVariant.variantName}
+                      size="xs"
+                    />
+                    <span>{selectedVariant.variantName}</span>
+                  </span>
                   {selectedVariant.variantAttributes?.size ? (
                     <span className="rounded-full border border-border px-5 py-2 text-muted-foreground font-black uppercase">{t('variants.size', { size: selectedVariant.variantAttributes.size })}</span>
                   ) : null}

@@ -11,7 +11,7 @@ import {
   useQuery,
 } from "convex/react";
 import { useForm } from "react-hook-form";
-import { ShieldCheck, ShieldX, LogOut, Menu, Languages } from "lucide-react";
+import { ShieldCheck, ShieldX, LogOut, Menu, Languages, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@techworld/ui/button";
@@ -84,10 +84,18 @@ function LoginScreen() {
     }
 
     try {
-      await authClient.signIn.email({
+      // better-auth resolves with { data, error } instead of throwing, so the
+      // error has to be read off the result or the failure is silent.
+      const { error } = await authClient.signIn.email({
         email: parsed.data.email,
         password: parsed.data.password,
       });
+
+      if (error) {
+        toast.error("Sign-in failed", {
+          description: error.message ?? "Invalid admin credentials.",
+        });
+      }
     } catch (caughtError) {
       const message =
         caughtError instanceof Error
@@ -166,7 +174,20 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
   const [isPending, startTransition] = React.useTransition();
 
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [isSigningOut, setIsSigningOut] = React.useState(false);
   const nextLocale = locale === "en" ? "ar" : "en";
+
+  const handleSignOut = async () => {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
+    try {
+      await authClient.signOut();
+    } catch (error) {
+      console.error("Sign out error:", error);
+    } finally {
+      window.location.href = `/${locale}`;
+    }
+  };
 
   const handleLocaleToggle = () => {
     startTransition(() => {
@@ -200,11 +221,18 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
             be provisioned by the platform owner.
           </p>
           <Button
-            onClick={() => void authClient.signOut()}
-            className="w-full h-12 rounded-xl text-black font-bold"
+            onClick={handleSignOut}
+            disabled={isSigningOut}
+            className="w-full h-12 rounded-xl text-black font-bold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
-            <LogOut size={16} className="ltr:mr-2 rtl:ml-2" />
-            Sign Out
+            {isSigningOut ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <LogOut size={16} className="ltr:mr-2 rtl:ml-2" />
+            )}
+            {isSigningOut
+              ? (locale === "ar" ? "جاري الخروج..." : "Signing out...")
+              : (locale === "ar" ? "تسجيل الخروج" : "Sign Out")}
           </Button>
         </div>
       </main>
@@ -228,11 +256,18 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
             administrator. Access to the dashboard is currently restricted.
           </p>
           <Button
-            onClick={() => void authClient.signOut()}
-            className="w-full h-12 rounded-xl text-black font-bold"
+            onClick={handleSignOut}
+            disabled={isSigningOut}
+            className="w-full h-12 rounded-xl text-black font-bold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
-            <LogOut size={16} className="ltr:mr-2 rtl:ml-2" />
-            Sign Out
+            {isSigningOut ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <LogOut size={16} className="ltr:mr-2 rtl:ml-2" />
+            )}
+            {isSigningOut
+              ? (locale === "ar" ? "جاري الخروج..." : "Signing out...")
+              : (locale === "ar" ? "تسجيل الخروج" : "Sign Out")}
           </Button>
         </div>
       </main>
@@ -276,6 +311,25 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
                     className="block w-full border-none bg-transparent p-0 shadow-none"
                     onItemClick={() => setIsMenuOpen(false)}
                   />
+                  <div className="mt-auto pt-4 border-t border-border">
+                    <Button
+                      onClick={handleSignOut}
+                      disabled={isSigningOut}
+                      variant="outline"
+                      className="w-full justify-start text-xs font-bold gap-2 text-destructive border-destructive/20 hover:bg-destructive hover:text-destructive-foreground cursor-pointer"
+                    >
+                      {isSigningOut ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <LogOut size={16} />
+                      )}
+                      <span>
+                        {isSigningOut
+                          ? (locale === "ar" ? "جاري الخروج..." : "Signing out...")
+                          : (locale === "ar" ? "تسجيل الخروج" : "Sign Out")}
+                      </span>
+                    </Button>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
@@ -315,16 +369,23 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
               {profile.authUser?.email}
             </span>
             <Button
-              onClick={() => void authClient.signOut()}
+              onClick={handleSignOut}
+              disabled={isSigningOut}
               size="sm"
               type="button"
               variant="outline"
-              className="px-2 sm:px-3 h-9 rounded-lg border-border hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all"
+              className="px-2 sm:px-3 h-9 rounded-lg border-border hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all gap-1.5 cursor-pointer disabled:opacity-50"
             >
-              <LogOut size={14} className="sm:mr-2" />
-               <span className="hidden sm:inline font-bold text-xs">
-                 Sign Out
-               </span>
+              {isSigningOut ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <LogOut size={14} className="sm:mr-1 rtl:sm:ml-1" />
+              )}
+              <span className="hidden sm:inline font-bold text-xs">
+                {isSigningOut
+                  ? (locale === "ar" ? "جاري الخروج..." : "Signing out...")
+                  : (locale === "ar" ? "تسجيل الخروج" : "Sign Out")}
+              </span>
             </Button>
           </div>
         </div>

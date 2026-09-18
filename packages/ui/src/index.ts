@@ -16,6 +16,8 @@ export { SheetOverlay as SheetBackdrop, SheetContent as SheetPopup, SheetPortal 
 
 // Utilities
 export { cn } from "./lib/utils";
+export * from "./lib/colors";
+export * from "./components/ui/color-swatch";
 
 // Storefront Components
 export * from "./components/storefront/PromoCodeInput";

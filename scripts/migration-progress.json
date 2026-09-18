@@ -144,5 +144,1337 @@
     "status": "cleared",
     "note": "Legacy Convex blob was unrecoverable (getUrl null). Ref cleared via migrations:clearOrderReceiptRef on 2026-07-14; dummy dev data.",
     "migratedAt": 1783966698124
+  },
+  {
+    "docId": "jh7cekbjz3nks13p3sphwevfqh83e5yg",
+    "table": "categories",
+    "field": "thumbnailImageId",
+    "oldRef": "kg20pw80p5qcrgqwxcnfy8vjad83fj53",
+    "newRef": "",
+    "status": "failed",
+    "migratedAt": 1783979048263
+  },
+  {
+    "docId": "jx73w4rer3wpgq8p7cnz2515an83eh2j",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg22mdc66xkrskjkekk6123wxx85wavj",
+    "newRef": "r2:public/catalog/fbffff61-8f32-4b27-87ae-526d402d26f5.png",
+    "status": "done",
+    "migratedAt": 1783979052883
+  },
+  {
+    "docId": "jx73w4rer3wpgq8p7cnz2515an83eh2j",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg2dw2rjm6he0t6za71n0q335185xzmm",
+    "newRef": "r2:public/catalog/ca661ee3-6027-44cb-a66f-81fc0dcf7df9.png",
+    "status": "done",
+    "migratedAt": 1783979055202
+  },
+  {
+    "docId": "jx73w4rer3wpgq8p7cnz2515an83eh2j",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg2ayp708m2dsmmyh7z1rfnmmn85w12g",
+    "newRef": "r2:public/catalog/7ab023ee-0775-44bf-ba0d-4a041cbaa0ed.png",
+    "status": "done",
+    "migratedAt": 1783979057658
+  },
+  {
+    "docId": "jx73w4rer3wpgq8p7cnz2515an83eh2j",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg2ayp708m2dsmmyh7z1rfnmmn85w12g",
+    "newRef": "r2:public/catalog/12fe6c5d-02b2-4c30-9d75-9e10cca9dcfc.png",
+    "status": "done",
+    "migratedAt": 1783979058391
+  },
+  {
+    "docId": "jx73w4rer3wpgq8p7cnz2515an83eh2j",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg29wa7dvay80b9qpr4jv614md85xhq9",
+    "newRef": "r2:public/catalog/326fcd6e-8701-4a78-b53b-45fb8a0443ce.png",
+    "status": "done",
+    "migratedAt": 1783979066598
+  },
+  {
+    "docId": "jx73w4rer3wpgq8p7cnz2515an83eh2j",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg25bcp6vq1bgay89g2pwk09dh85xsdp",
+    "newRef": "r2:public/catalog/89e43456-4cee-4688-80ad-261f3e10ab52.png",
+    "status": "done",
+    "migratedAt": 1783979070939
+  },
+  {
+    "docId": "jx73w4rer3wpgq8p7cnz2515an83eh2j",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg2et3e603zafjpq47534pbmk985xp1y",
+    "newRef": "r2:public/catalog/c5753e6b-a250-419a-b438-ea18301c121a.png",
+    "status": "done",
+    "migratedAt": 1783979072810
+  },
+  {
+    "docId": "jx73w4rer3wpgq8p7cnz2515an83eh2j",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg20x539ppbx693m0kqmcvdj9x85xdvs",
+    "newRef": "r2:public/catalog/00a17f94-2b74-46f3-8b57-09963d3c79c0.png",
+    "status": "done",
+    "migratedAt": 1783979074639
+  },
+  {
+    "docId": "jx7256g3xp4mv23t62x8wn0zb585jnm8",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg23m5kpm8xdfm336w3kt90ym185jmp0",
+    "newRef": "r2:public/catalog/fe1d034f-91c5-4051-b027-5cc5eb08d2f6.png",
+    "status": "done",
+    "migratedAt": 1783979082228
+  },
+  {
+    "docId": "jx7256g3xp4mv23t62x8wn0zb585jnm8",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg280ds374ezrey5b7m92pqahh85j5sw",
+    "newRef": "r2:public/catalog/5290c1aa-6ff2-46b5-a326-6b3d09e2e754.png",
+    "status": "done",
+    "migratedAt": 1783979083678
+  },
+  {
+    "docId": "jx7256g3xp4mv23t62x8wn0zb585jnm8",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg23m5kpm8xdfm336w3kt90ym185jmp0",
+    "newRef": "r2:public/catalog/7257c817-f9d3-4c54-adb3-03072ea648b0.png",
+    "status": "done",
+    "migratedAt": 1783979086599
+  },
+  {
+    "docId": "jx7256g3xp4mv23t62x8wn0zb585jnm8",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg28gfcrvaqzhbp8j0r065vbp585k4ve",
+    "newRef": "r2:public/catalog/c89a155a-06eb-49e6-9420-feeaafe1d5d4.png",
+    "status": "done",
+    "migratedAt": 1783979088196
+  },
+  {
+    "docId": "jx7256g3xp4mv23t62x8wn0zb585jnm8",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg29ry25tfr9empn96gdb69q9985kyt5",
+    "newRef": "r2:public/catalog/2106c663-cfa3-4383-a275-0718ef420f64.png",
+    "status": "done",
+    "migratedAt": 1783979094792
+  },
+  {
+    "docId": "jx79qcz8wejh4213ggejx7ah0585jhwd",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg26327t7pjb4abqkm1h2h87cn85xhhd",
+    "newRef": "r2:public/catalog/b0c84c92-feaf-4731-8076-52bd9ccf79c6.png",
+    "status": "done",
+    "migratedAt": 1783979096404
+  },
+  {
+    "docId": "jx7256g3xp4mv23t62x8wn0zb585jnm8",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg2a3jmjyrymghcttmz93z9v1n85k2b9",
+    "newRef": "r2:public/catalog/6321e19d-eacf-4db1-b772-4e2a22e01267.png",
+    "status": "done",
+    "migratedAt": 1783979099305
+  },
+  {
+    "docId": "jx7256g3xp4mv23t62x8wn0zb585jnm8",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg2dh622mhmn8y0dh9awp321md85jyy8",
+    "newRef": "r2:public/catalog/050cc8d0-f6fa-404a-95de-d36c726d325c.png",
+    "status": "done",
+    "migratedAt": 1783979099829
+  },
+  {
+    "docId": "jx79qcz8wejh4213ggejx7ah0585jhwd",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg20mb02475psxtnnhvb0rv6ws85xazn",
+    "newRef": "r2:public/catalog/9c0994e8-2e9d-4f99-8d19-43c00470f13d.png",
+    "status": "done",
+    "migratedAt": 1783979102874
+  },
+  {
+    "docId": "jx79qcz8wejh4213ggejx7ah0585jhwd",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg26327t7pjb4abqkm1h2h87cn85xhhd",
+    "newRef": "r2:public/catalog/3c89384b-3efb-4160-99bb-30b1318bb74b.png",
+    "status": "done",
+    "migratedAt": 1783979106978
+  },
+  {
+    "docId": "jx79qcz8wejh4213ggejx7ah0585jhwd",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg2cvt8fs31p3eqsmwkm7n229985w8z4",
+    "newRef": "r2:public/catalog/c1d8551e-f5f0-4f54-af0b-57ac87bd4cfa.png",
+    "status": "done",
+    "migratedAt": 1783979107435
+  },
+  {
+    "docId": "jx79qcz8wejh4213ggejx7ah0585jhwd",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg2f014vfeaqjn0567txe6gd3185xyrp",
+    "newRef": "r2:public/catalog/2447cc58-3e4b-4d4e-8037-bb29313eaba8.png",
+    "status": "done",
+    "migratedAt": 1783979109648
+  },
+  {
+    "docId": "jx79qcz8wejh4213ggejx7ah0585jhwd",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg2cms9hsqxxvfzag6yc92z5zh85wtej",
+    "newRef": "r2:public/catalog/a5157f9e-4626-4b95-bfec-4ee63219ecf5.png",
+    "status": "done",
+    "migratedAt": 1783979116799
+  },
+  {
+    "docId": "jx7ea1z5drfnaqsqqa7hmj9mw985x7mq",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg2evz1wr91an1bafdh2qhfnvh85xbgb",
+    "newRef": "r2:public/catalog/e0405e05-a3ff-4987-91aa-20280389a5ec.png",
+    "status": "done",
+    "migratedAt": 1783979122143
+  },
+  {
+    "docId": "jx79qcz8wejh4213ggejx7ah0585jhwd",
+    "table": "products",
+    "field": "images[7]",
+    "oldRef": "kg270dxh6cpn5g1r2ksxy2dhm585x495",
+    "newRef": "r2:public/catalog/620a22ad-bf38-4101-b43f-a3ff85f24377.png",
+    "status": "done",
+    "migratedAt": 1783979124323
+  },
+  {
+    "docId": "jx79qcz8wejh4213ggejx7ah0585jhwd",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg2anyjg5w5eh4149t76fzqjs985w53f",
+    "newRef": "r2:public/catalog/d55d8ccb-1059-48fa-bf37-24a437a29b2a.png",
+    "status": "done",
+    "migratedAt": 1783979124407
+  },
+  {
+    "docId": "jx7ea1z5drfnaqsqqa7hmj9mw985x7mq",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg28t0gcgk0kf7eg1emk31g3j985xmpw",
+    "newRef": "r2:public/catalog/285d236c-36e4-4826-a748-8079cb19be70.png",
+    "status": "done",
+    "migratedAt": 1783979133554
+  },
+  {
+    "docId": "jx7ea1z5drfnaqsqqa7hmj9mw985x7mq",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg233b3dw7cckme4r5ytz49v4585x2a3",
+    "newRef": "r2:public/catalog/97c8421c-2950-4c8d-ae59-946ea9d75f83.png",
+    "status": "done",
+    "migratedAt": 1783979137986
+  },
+  {
+    "docId": "jx7ea1z5drfnaqsqqa7hmj9mw985x7mq",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg22a27t6sbqvgyme6mqd4d44585xz54",
+    "newRef": "r2:public/catalog/dcf90c77-210c-4b8e-a9c8-6c6e9136171b.png",
+    "status": "done",
+    "migratedAt": 1783979139174
+  },
+  {
+    "docId": "jx7ea1z5drfnaqsqqa7hmj9mw985x7mq",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg2evz1wr91an1bafdh2qhfnvh85xbgb",
+    "newRef": "r2:public/catalog/0836e1cc-3e0d-42e6-901f-4fabbb8c8e41.png",
+    "status": "done",
+    "migratedAt": 1783979140401
+  },
+  {
+    "docId": "jx7ea1z5drfnaqsqqa7hmj9mw985x7mq",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg2ct8rgrgsha1rs9et7r2rvyd85w3g5",
+    "newRef": "r2:public/catalog/51df2116-78b5-40e9-a5a7-8d5e293564c8.png",
+    "status": "done",
+    "migratedAt": 1783979151284
+  },
+  {
+    "docId": "jx743y5gdanqt8jakdpjz2w35d85xtq6",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg24pke0yz8xdegajhh77jtks585wp5j",
+    "newRef": "r2:public/catalog/2749ffba-c731-4f6e-9bdf-937b880d8ce4.png",
+    "status": "done",
+    "migratedAt": 1783979154349
+  },
+  {
+    "docId": "jx7ea1z5drfnaqsqqa7hmj9mw985x7mq",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg27btv0jn1rrmk9hhayh7xyjn85xt12",
+    "newRef": "r2:public/catalog/12f31247-3435-471f-802e-5be40769633f.png",
+    "status": "done",
+    "migratedAt": 1783979155176
+  },
+  {
+    "docId": "jx7ea1z5drfnaqsqqa7hmj9mw985x7mq",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg26yv23fxsg5pt9fkr977cdy185x79b",
+    "newRef": "r2:public/catalog/603cef2e-a24c-48b2-aa5c-321114660446.png",
+    "status": "done",
+    "migratedAt": 1783979157121
+  },
+  {
+    "docId": "jx743y5gdanqt8jakdpjz2w35d85xtq6",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg2e9ddgdq3jf4b4mbh1r05qzx85wf9c",
+    "newRef": "r2:public/catalog/18632513-b0d9-48c2-992c-c832adff241c.png",
+    "status": "done",
+    "migratedAt": 1783979162696
+  },
+  {
+    "docId": "jx743y5gdanqt8jakdpjz2w35d85xtq6",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg24pke0yz8xdegajhh77jtks585wp5j",
+    "newRef": "r2:public/catalog/0bf404fc-a5f5-4abc-b1b9-57dee1b269cf.png",
+    "status": "done",
+    "migratedAt": 1783979163808
+  },
+  {
+    "docId": "jx743y5gdanqt8jakdpjz2w35d85xtq6",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg2am459hp730x2h7geg25gvf585xha0",
+    "newRef": "r2:public/catalog/5f0d1878-da21-4bce-a685-5ca44fd6e617.png",
+    "status": "done",
+    "migratedAt": 1783979167511
+  },
+  {
+    "docId": "jx743y5gdanqt8jakdpjz2w35d85xtq6",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg232f82z3603zptcqt3fanagx85xhkf",
+    "newRef": "r2:public/catalog/c2aeb633-44cb-413d-a371-2ef28ad8ce03.png",
+    "status": "done",
+    "migratedAt": 1783979168452
+  },
+  {
+    "docId": "jx743y5gdanqt8jakdpjz2w35d85xtq6",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg24qqnv94jav1g3n8phx9yknh85xw13",
+    "newRef": "r2:public/catalog/1e32e7a2-4457-446a-b3c1-68d0f6379e04.png",
+    "status": "done",
+    "migratedAt": 1783979177940
+  },
+  {
+    "docId": "jx743y5gdanqt8jakdpjz2w35d85xtq6",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg21rb19p38acnct4j5wgvwaz185wf1j",
+    "newRef": "r2:public/catalog/6c1851e3-00bb-4fdb-bca4-2b58c3ca8890.png",
+    "status": "done",
+    "migratedAt": 1783979180368
+  },
+  {
+    "docId": "jx743y5gdanqt8jakdpjz2w35d85xtq6",
+    "table": "products",
+    "field": "images[7]",
+    "oldRef": "kg237he0xn0kys6m6n9qzdrz3585x8ew",
+    "newRef": "r2:public/catalog/2c4affcb-83d9-452e-bdd6-ee4ebb091d9e.png",
+    "status": "done",
+    "migratedAt": 1783979182627
+  },
+  {
+    "docId": "jx743y5gdanqt8jakdpjz2w35d85xtq6",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg2a11rczc7vgky4j6fgytw41185x34t",
+    "newRef": "r2:public/catalog/bb4c9c2c-60ec-4b19-8e71-c09d1fde9b2f.png",
+    "status": "done",
+    "migratedAt": 1783979186301
+  },
+  {
+    "docId": "jx7833qp1ybbtmhkw9d5tg61zs85w5vv",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg28790zjntcqchaaydzjh76r985w6yx",
+    "newRef": "r2:public/catalog/acb42d65-4c01-4dc7-8702-2b84955bc934.png",
+    "status": "done",
+    "migratedAt": 1783979191602
+  },
+  {
+    "docId": "jx743y5gdanqt8jakdpjz2w35d85xtq6",
+    "table": "products",
+    "field": "images[8]",
+    "oldRef": "kg29sjje0rfj3h7sp4t429gnf585xqx1",
+    "newRef": "r2:public/catalog/75cc5ffe-ed0b-4975-88c6-d5b0d7e4b18f.png",
+    "status": "done",
+    "migratedAt": 1783979196679
+  },
+  {
+    "docId": "jx7833qp1ybbtmhkw9d5tg61zs85w5vv",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg2avyj3tsr9nf9arws81n4hyx85xn6n",
+    "newRef": "r2:public/catalog/7f34c077-cc44-42ae-b939-2cb9655fc7e3.png",
+    "status": "done",
+    "migratedAt": 1783979196900
+  },
+  {
+    "docId": "jx7833qp1ybbtmhkw9d5tg61zs85w5vv",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg2avyj3tsr9nf9arws81n4hyx85xn6n",
+    "newRef": "r2:public/catalog/bad2e41f-e62b-478d-b55d-244d969439b7.png",
+    "status": "done",
+    "migratedAt": 1783979198518
+  },
+  {
+    "docId": "jx7833qp1ybbtmhkw9d5tg61zs85w5vv",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg22dcy2fhj1d7f6jm767s2ea185xtph",
+    "newRef": "r2:public/catalog/6735845b-8e85-46fe-880d-921185fd26b0.png",
+    "status": "done",
+    "migratedAt": 1783979206004
+  },
+  {
+    "docId": "jx7833qp1ybbtmhkw9d5tg61zs85w5vv",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg2brnpw79zrh6b5wh72kn146n85w0yw",
+    "newRef": "r2:public/catalog/497c2e12-beab-4ab4-a102-e5c96f2a8246.png",
+    "status": "done",
+    "migratedAt": 1783979208868
+  },
+  {
+    "docId": "jx7833qp1ybbtmhkw9d5tg61zs85w5vv",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg24162e2j6cepr02jd5dfvkhd85xxrq",
+    "newRef": "r2:public/catalog/f282e9a4-19db-4185-9205-8d9651197af1.png",
+    "status": "done",
+    "migratedAt": 1783979210552
+  },
+  {
+    "docId": "jx7833qp1ybbtmhkw9d5tg61zs85w5vv",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg20pr6bgn3jsvf82czxkb8xfh85xgnq",
+    "newRef": "r2:public/catalog/c96efc13-dda5-4d3a-abd1-763aba6c19b1.png",
+    "status": "done",
+    "migratedAt": 1783979213892
+  },
+  {
+    "docId": "jx78md50d7zh2xw1bf1j5fkxss85xavp",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg2bn6t71bc71w3ycecxgkqmf985wehc",
+    "newRef": "r2:public/catalog/3f4b7443-5a45-40e5-af3b-b01f0ef90e75.png",
+    "status": "done",
+    "migratedAt": 1783979218173
+  },
+  {
+    "docId": "jx78md50d7zh2xw1bf1j5fkxss85xavp",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg26qgvc3m2w34z25cq087rmtd85x8r5",
+    "newRef": "r2:public/catalog/bc1a0762-85ce-44ce-a0db-b6541cd6ffb1.png",
+    "status": "done",
+    "migratedAt": 1783979221476
+  },
+  {
+    "docId": "jx78md50d7zh2xw1bf1j5fkxss85xavp",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg26qgvc3m2w34z25cq087rmtd85x8r5",
+    "newRef": "r2:public/catalog/d811e861-004e-4b0a-9f3e-8dab5b2c7a58.png",
+    "status": "done",
+    "migratedAt": 1783979222827
+  },
+  {
+    "docId": "jx7833qp1ybbtmhkw9d5tg61zs85w5vv",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg27vm9fh0k5rp0v2xjm0e201d85x1rp",
+    "newRef": "r2:public/catalog/1635acf6-92af-4947-b393-96f265ae0cf6.png",
+    "status": "done",
+    "migratedAt": 1783979224346
+  },
+  {
+    "docId": "jx78md50d7zh2xw1bf1j5fkxss85xavp",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg25mqq75qnae3kxtvew060er985x4ce",
+    "newRef": "r2:public/catalog/980069fa-4059-42cf-8a2f-231baa6b3676.png",
+    "status": "done",
+    "migratedAt": 1783979234439
+  },
+  {
+    "docId": "jx78md50d7zh2xw1bf1j5fkxss85xavp",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg27t9bx993zw1pvcjbw3qxdsd85xw1h",
+    "newRef": "r2:public/catalog/5f3446ed-f489-4e9c-b491-3871b5b7929a.png",
+    "status": "done",
+    "migratedAt": 1783979237607
+  },
+  {
+    "docId": "jx78md50d7zh2xw1bf1j5fkxss85xavp",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg2d2zxc2j55nez196aan2nma985xxbw",
+    "newRef": "r2:public/catalog/90febd2e-959f-48ff-aae9-63b5c9e2cc2f.png",
+    "status": "done",
+    "migratedAt": 1783979239158
+  },
+  {
+    "docId": "jx78md50d7zh2xw1bf1j5fkxss85xavp",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg2f1gttmy70fyqtyyyzg68t8x85xcfy",
+    "newRef": "r2:public/catalog/e71813ec-2704-4a96-8bf9-b91ad4a5576e.png",
+    "status": "done",
+    "migratedAt": 1783979239809
+  },
+  {
+    "docId": "jx73fn6kf41ky8xab4259zkrnd85xjss",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg28sm0f14ypsenk3grn48h7yx85xdye",
+    "newRef": "r2:public/catalog/8da8c109-8f4f-4fe9-8516-ede5822bb4ab.png",
+    "status": "done",
+    "migratedAt": 1783979245801
+  },
+  {
+    "docId": "jx73fn6kf41ky8xab4259zkrnd85xjss",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg28sm0f14ypsenk3grn48h7yx85xdye",
+    "newRef": "r2:public/catalog/62e3698e-a0c1-4d70-8ed4-2719dee09519.png",
+    "status": "done",
+    "migratedAt": 1783979248696
+  },
+  {
+    "docId": "jx73fn6kf41ky8xab4259zkrnd85xjss",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg27grhpz4qcyzwk1fzw3sgk3s85wj1t",
+    "newRef": "r2:public/catalog/5889d064-cca9-4a0c-aba1-bbe20b884930.png",
+    "status": "done",
+    "migratedAt": 1783979253978
+  },
+  {
+    "docId": "jx78md50d7zh2xw1bf1j5fkxss85xavp",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg2d2jktjjc9rh3yaf21fx4j3985wewj",
+    "newRef": "r2:public/catalog/35287935-871e-4a9b-8d07-c20287359309.png",
+    "status": "done",
+    "migratedAt": 1783979254849
+  },
+  {
+    "docId": "jx73fn6kf41ky8xab4259zkrnd85xjss",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg2587yg3be1bd57e15kx516fh85w9gc",
+    "newRef": "r2:public/catalog/87eebd68-8136-4d76-98ef-87e1c61de04e.png",
+    "status": "done",
+    "migratedAt": 1783979258650
+  },
+  {
+    "docId": "jx73fn6kf41ky8xab4259zkrnd85xjss",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg2433fzjhdz65zt22p1mm3tn585wnxb",
+    "newRef": "r2:public/catalog/e445422f-9908-4108-bb3e-0d7329b153c2.png",
+    "status": "done",
+    "migratedAt": 1783979260440
+  },
+  {
+    "docId": "jx73fn6kf41ky8xab4259zkrnd85xjss",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg2f1etxrdxypywhs2cjtxd6y585w991",
+    "newRef": "r2:public/catalog/bb822d80-0a03-4942-81a3-7fd6cec1596a.png",
+    "status": "done",
+    "migratedAt": 1783979262452
+  },
+  {
+    "docId": "jx73fn6kf41ky8xab4259zkrnd85xjss",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg2977t4s4hr8akeb3f3f3k2px85xr09",
+    "newRef": "r2:public/catalog/7cea9740-f402-4159-953d-23a99c9ac9db.png",
+    "status": "done",
+    "migratedAt": 1783979263595
+  },
+  {
+    "docId": "jx73fn6kf41ky8xab4259zkrnd85xjss",
+    "table": "products",
+    "field": "images[7]",
+    "oldRef": "kg22pd71qjz34hz4zajexh3dqs85xr2a",
+    "newRef": "r2:public/catalog/23df8336-221c-41e0-95c5-d986e925f434.png",
+    "status": "done",
+    "migratedAt": 1783979273744
+  },
+  {
+    "docId": "jx79qc21gc8w109xawhdwesgsd85xfjw",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg2688gc3wbec6tfnzbjtq2x0185xm8s",
+    "newRef": "r2:public/catalog/019dfb7e-b034-45a7-a942-d21b78916de8.png",
+    "status": "done",
+    "migratedAt": 1783979278287
+  },
+  {
+    "docId": "jx73fn6kf41ky8xab4259zkrnd85xjss",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg292h34ceyznjspr713x4h52d85wbd4",
+    "newRef": "r2:public/catalog/5b259f8d-a638-4b5d-b366-f5c5cf901949.png",
+    "status": "done",
+    "migratedAt": 1783979280510
+  },
+  {
+    "docId": "jx79qc21gc8w109xawhdwesgsd85xfjw",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg2688gc3wbec6tfnzbjtq2x0185xm8s",
+    "newRef": "r2:public/catalog/ae995599-5985-43d6-9e6b-86ba7b9cb146.png",
+    "status": "done",
+    "migratedAt": 1783979280803
+  },
+  {
+    "docId": "jx79qc21gc8w109xawhdwesgsd85xfjw",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg2cj1tg61dw4p6wvcrd4grsbx85x1xd",
+    "newRef": "r2:public/catalog/a0a7d5e0-fd6f-44a6-903c-df220aecc39e.png",
+    "status": "done",
+    "migratedAt": 1783979292074
+  },
+  {
+    "docId": "jx79qc21gc8w109xawhdwesgsd85xfjw",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg2df3hs5y8nrb6hvrkgq5wv6n85wz4f",
+    "newRef": "r2:public/catalog/38a96d8f-4c00-4afb-842c-eba8bb27fabc.png",
+    "status": "done",
+    "migratedAt": 1783979292954
+  },
+  {
+    "docId": "jx79qc21gc8w109xawhdwesgsd85xfjw",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg2393mxxcfqvpmr4y4mk4prc585wtga",
+    "newRef": "r2:public/catalog/a2acad73-57d5-4617-9993-1d9798495f85.png",
+    "status": "done",
+    "migratedAt": 1783979294040
+  },
+  {
+    "docId": "jx79qc21gc8w109xawhdwesgsd85xfjw",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg27fars68dbd7dj4g7xw2saf185x609",
+    "newRef": "r2:public/catalog/7737c071-8ba4-4345-ae67-bb4f9209dcd4.png",
+    "status": "done",
+    "migratedAt": 1783979297744
+  },
+  {
+    "docId": "jx79qc21gc8w109xawhdwesgsd85xfjw",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg28mqf4z1902xdxq4q7rhtt7585xmyz",
+    "newRef": "r2:public/catalog/0a5f947f-db50-4fb7-a2e8-2ca3d33def77.png",
+    "status": "done",
+    "migratedAt": 1783979305657
+  },
+  {
+    "docId": "jx79qc21gc8w109xawhdwesgsd85xfjw",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg2a55ppvrt0hwx83vnaapqq5n85wf55",
+    "newRef": "r2:public/catalog/fd98cde3-2da4-45e0-8c29-852341c69c23.png",
+    "status": "done",
+    "migratedAt": 1783979309020
+  },
+  {
+    "docId": "jx7b6s6bqpantnp3j2ssff39k585xne5",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg29mh2h9fxf96znesnkz1pbdd85w8gm",
+    "newRef": "r2:public/catalog/8b5001cc-8ad4-4f20-bab9-26ac544d9270.png",
+    "status": "done",
+    "migratedAt": 1783979312993
+  },
+  {
+    "docId": "jx79qc21gc8w109xawhdwesgsd85xfjw",
+    "table": "products",
+    "field": "images[7]",
+    "oldRef": "kg21haag13v8wh7d1a9amyzas985x4dz",
+    "newRef": "r2:public/catalog/ad5cc3b9-1067-4086-b219-bb3d00bfbc59.png",
+    "status": "done",
+    "migratedAt": 1783979317054
+  },
+  {
+    "docId": "jx7b6s6bqpantnp3j2ssff39k585xne5",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg269ac0wtqr60hywfvwq40m5d85x9v2",
+    "newRef": "r2:public/catalog/4721c002-fb53-44d3-b9e2-b9db87367c0d.png",
+    "status": "done",
+    "migratedAt": 1783979324833
+  },
+  {
+    "docId": "jx7b6s6bqpantnp3j2ssff39k585xne5",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg29mh2h9fxf96znesnkz1pbdd85w8gm",
+    "newRef": "r2:public/catalog/45516762-866e-4eb4-9f8b-93f485444c67.png",
+    "status": "done",
+    "migratedAt": 1783979328977
+  },
+  {
+    "docId": "jx7b6s6bqpantnp3j2ssff39k585xne5",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg29nxfdjrmqgtjw9jc9xm7dtd85xpdp",
+    "newRef": "r2:public/catalog/8f129c87-29e6-43d0-bd59-d11e7c8b8f4e.png",
+    "status": "done",
+    "migratedAt": 1783979330734
+  },
+  {
+    "docId": "jx7b6s6bqpantnp3j2ssff39k585xne5",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg2bjwxcpkwa49m8tcybr6j36s85x061",
+    "newRef": "r2:public/catalog/94b3dd43-1e6b-4ff0-89a5-6bd9022891fb.png",
+    "status": "done",
+    "migratedAt": 1783979332100
+  },
+  {
+    "docId": "jx7b6s6bqpantnp3j2ssff39k585xne5",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg23x2ket3j25a90e218by6g1x85ww8n",
+    "newRef": "r2:public/catalog/9b591a82-28de-46ab-8455-bdeefee8651c.png",
+    "status": "done",
+    "migratedAt": 1783979340359
+  },
+  {
+    "docId": "jx7b6s6bqpantnp3j2ssff39k585xne5",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg2a3hs02dtn4n8hga24q0rw8185whp4",
+    "newRef": "r2:public/catalog/e1c43ea2-3731-4931-9e7a-f2a1cfe4eec3.png",
+    "status": "done",
+    "migratedAt": 1783979342106
+  },
+  {
+    "docId": "jx7f05r3rs4b56ptnwq6ejnp1585w7mr",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg22wp8eztphvvt60xp77bgfbs85xrdw",
+    "newRef": "r2:public/catalog/0b6376dc-1a38-4336-9fb0-9affdfb011b0.png",
+    "status": "done",
+    "migratedAt": 1783979343862
+  },
+  {
+    "docId": "jx7b6s6bqpantnp3j2ssff39k585xne5",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg2fw4wfgqr85a6zx1qz6sasfs85xwps",
+    "newRef": "r2:public/catalog/02d2c036-50e4-4fca-b456-a0234ad74da5.png",
+    "status": "done",
+    "migratedAt": 1783979344481
+  },
+  {
+    "docId": "jx7f05r3rs4b56ptnwq6ejnp1585w7mr",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg23m1fyzyr77s3b0kfyqm9ad185wbc8",
+    "newRef": "r2:public/catalog/02334238-0710-4741-9591-8ae3ddc0083f.png",
+    "status": "done",
+    "migratedAt": 1783979349710
+  },
+  {
+    "docId": "jx7f05r3rs4b56ptnwq6ejnp1585w7mr",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg25vacj56xgpdx391w1p34sn585xp75",
+    "newRef": "r2:public/catalog/d6225eb9-4276-4007-a788-68a4cb51a013.png",
+    "status": "done",
+    "migratedAt": 1783979353341
+  },
+  {
+    "docId": "jx7f05r3rs4b56ptnwq6ejnp1585w7mr",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg22wp8eztphvvt60xp77bgfbs85xrdw",
+    "newRef": "r2:public/catalog/a18c0f19-c8a2-478e-b6ef-c5836abfec1e.png",
+    "status": "done",
+    "migratedAt": 1783979353432
+  },
+  {
+    "docId": "jx7f05r3rs4b56ptnwq6ejnp1585w7mr",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg20zbc3bykfxt27hf2qrx2f6h85x0ja",
+    "newRef": "r2:public/catalog/60cce93a-c1c5-4b2d-aa2e-d96468af3f60.png",
+    "status": "done",
+    "migratedAt": 1783979357042
+  },
+  {
+    "docId": "jx7f05r3rs4b56ptnwq6ejnp1585w7mr",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg2c9x1sx9cy0rg54r5p8vxyf985w1fs",
+    "newRef": "r2:public/catalog/781b48ad-d976-4b03-9a79-e708d6b19dc2.png",
+    "status": "done",
+    "migratedAt": 1783979361776
+  },
+  {
+    "docId": "jx7f05r3rs4b56ptnwq6ejnp1585w7mr",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg216mgq6f5d96w5jsyty4qa9h85xhbv",
+    "newRef": "r2:public/catalog/0f793de6-2de1-4a86-bd51-e6a13db3be4d.png",
+    "status": "done",
+    "migratedAt": 1783979364030
+  },
+  {
+    "docId": "jx7f05r3rs4b56ptnwq6ejnp1585w7mr",
+    "table": "products",
+    "field": "images[7]",
+    "oldRef": "kg21kepwrbstyjz3q926tavmsd85ws56",
+    "newRef": "r2:public/catalog/35663fd2-221e-46a0-81de-9a507d934232.png",
+    "status": "done",
+    "migratedAt": 1783979367545
+  },
+  {
+    "docId": "jx7f05r3rs4b56ptnwq6ejnp1585w7mr",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg29tcgfzhvx8c51qgbxpdhk9585x917",
+    "newRef": "r2:public/catalog/fe0673aa-7939-4e56-96c1-56234d43dc5e.png",
+    "status": "done",
+    "migratedAt": 1783979368635
+  },
+  {
+    "docId": "jx7f05r3rs4b56ptnwq6ejnp1585w7mr",
+    "table": "products",
+    "field": "images[8]",
+    "oldRef": "kg217jnva5zzyq4t5s6t6vprps85xhc7",
+    "newRef": "r2:public/catalog/6171d221-cb0f-460d-9ab7-b294b78f9c8e.png",
+    "status": "done",
+    "migratedAt": 1783979375776
+  },
+  {
+    "docId": "jx72wnsvfmpvz3b1aev3crjqhd85wbaf",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg27j029dqaktjm6r8j7k3eg9d85wsja",
+    "newRef": "r2:public/catalog/8d60787a-c66c-413b-b628-ab8bed29ae87.png",
+    "status": "done",
+    "migratedAt": 1783979378609
+  },
+  {
+    "docId": "jx72wnsvfmpvz3b1aev3crjqhd85wbaf",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg27j029dqaktjm6r8j7k3eg9d85wsja",
+    "newRef": "r2:public/catalog/dcd6860e-2123-4474-880a-38ef22600728.png",
+    "status": "done",
+    "migratedAt": 1783979379920
+  },
+  {
+    "docId": "jx7f05r3rs4b56ptnwq6ejnp1585w7mr",
+    "table": "products",
+    "field": "images[9]",
+    "oldRef": "kg29zx0e4gxj1px3d7kzb70nk585wyzx",
+    "newRef": "r2:public/catalog/48a443af-2138-4f72-ba05-8b049a9bfd73.png",
+    "status": "done",
+    "migratedAt": 1783979382918
+  },
+  {
+    "docId": "jx72wnsvfmpvz3b1aev3crjqhd85wbaf",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg22ddjt37sw4gs1m78xg7jwy185wtmv",
+    "newRef": "r2:public/catalog/8d30c550-afb2-46f0-9bed-b5f9c1db9406.png",
+    "status": "done",
+    "migratedAt": 1783979386131
+  },
+  {
+    "docId": "jx72wnsvfmpvz3b1aev3crjqhd85wbaf",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg27vykcphezrkkg0mrhybjqdd85wgd4",
+    "newRef": "r2:public/catalog/26bdd514-760b-43c3-bef2-6781850a73da.png",
+    "status": "done",
+    "migratedAt": 1783979393007
+  },
+  {
+    "docId": "jx72wnsvfmpvz3b1aev3crjqhd85wbaf",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg26mzd7vtmqdzeczdt541y88985wx4t",
+    "newRef": "r2:public/catalog/143e3f7f-a531-44c2-889a-e7d54e5cc945.png",
+    "status": "done",
+    "migratedAt": 1783979393388
+  },
+  {
+    "docId": "jx72wnsvfmpvz3b1aev3crjqhd85wbaf",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg2c8x8k8aypketcjpnvnr9gqd85xkrs",
+    "newRef": "r2:public/catalog/459a3796-9441-4bc5-910c-f895385ab8ed.png",
+    "status": "done",
+    "migratedAt": 1783979396807
+  },
+  {
+    "docId": "jx72wnsvfmpvz3b1aev3crjqhd85wbaf",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg27ff4hkckej6hateaykt9e4585x2cd",
+    "newRef": "r2:public/catalog/8ee0b6a9-1fdb-4454-838d-0cbd033b5a32.png",
+    "status": "done",
+    "migratedAt": 1783979406703
+  },
+  {
+    "docId": "jx72wnsvfmpvz3b1aev3crjqhd85wbaf",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg26yw2nhgfxsqc57xdkcjwpwn85w0fa",
+    "newRef": "r2:public/catalog/d882be08-f558-49cf-8ba3-9fe28eaaf8cc.png",
+    "status": "done",
+    "migratedAt": 1783979410067
+  },
+  {
+    "docId": "jx72wnsvfmpvz3b1aev3crjqhd85wbaf",
+    "table": "products",
+    "field": "images[7]",
+    "oldRef": "kg27pk92030y9hd1tpphexk5pd85wtk4",
+    "newRef": "r2:public/catalog/79008d36-013b-41a9-b6f2-b58fbe668759.png",
+    "status": "done",
+    "migratedAt": 1783979414647
+  },
+  {
+    "docId": "jx7186ds377w2az4g1zqfzjbfx85wvvq",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg22x9dt8g4n3qsrdhxqsnvvpx85xz73",
+    "newRef": "r2:public/catalog/a9798619-ab6c-49dd-a84e-229e52c4e417.png",
+    "status": "done",
+    "migratedAt": 1783979414664
+  },
+  {
+    "docId": "jx7186ds377w2az4g1zqfzjbfx85wvvq",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg2e7qf7qh5y80q1yvqq1sgjvx85xvrm",
+    "newRef": "r2:public/catalog/7b3a15dc-3f41-41e9-8b8d-4e69690dec90.png",
+    "status": "done",
+    "migratedAt": 1783979423747
+  },
+  {
+    "docId": "jx7186ds377w2az4g1zqfzjbfx85wvvq",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg22x9dt8g4n3qsrdhxqsnvvpx85xz73",
+    "newRef": "r2:public/catalog/a7081f90-4c73-4736-b1ef-69ed3dabf838.png",
+    "status": "done",
+    "migratedAt": 1783979429007
+  },
+  {
+    "docId": "jx7186ds377w2az4g1zqfzjbfx85wvvq",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg269ne4s5pxwty876ss8xs1s985wx0r",
+    "newRef": "r2:public/catalog/1cd1d410-ba3e-4da3-bb57-dd5cf509d29a.png",
+    "status": "done",
+    "migratedAt": 1783979430283
+  },
+  {
+    "docId": "jx7186ds377w2az4g1zqfzjbfx85wvvq",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg21y4tpkj9emhrhjparqqksan85x9v2",
+    "newRef": "r2:public/catalog/d9207084-c1c0-486e-b960-29899907eb8e.png",
+    "status": "done",
+    "migratedAt": 1783979431022
+  },
+  {
+    "docId": "jx7186ds377w2az4g1zqfzjbfx85wvvq",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg2cfwyqr1m54bcrqb2t05s0d585xq8a",
+    "newRef": "r2:public/catalog/e3139a17-4fcc-46e2-8a6b-03049a1396cc.png",
+    "status": "done",
+    "migratedAt": 1783979435304
+  },
+  {
+    "docId": "jx7186ds377w2az4g1zqfzjbfx85wvvq",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg29v168wneg07ge9dnjqfgv8h85x8wj",
+    "newRef": "r2:public/catalog/0f662bac-6041-410f-83c5-de5f33739342.png",
+    "status": "done",
+    "migratedAt": 1783979439450
+  },
+  {
+    "docId": "jx7186ds377w2az4g1zqfzjbfx85wvvq",
+    "table": "products",
+    "field": "images[7]",
+    "oldRef": "kg20xjc2aa0m1g0f2n6hpz6s3585wx3t",
+    "newRef": "r2:public/catalog/be2d373f-1cef-4c49-bffd-e4edb9743d22.png",
+    "status": "done",
+    "migratedAt": 1783979445687
+  },
+  {
+    "docId": "jx7186ds377w2az4g1zqfzjbfx85wvvq",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg28qnsntbz38j483698w5q92985w0sh",
+    "newRef": "r2:public/catalog/ca2d6493-ada5-48cd-8758-e647141e5054.png",
+    "status": "done",
+    "migratedAt": 1783979445711
+  },
+  {
+    "docId": "jx79qts1pmfdfakb9f2306v6dn85w9m4",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg240skmvs5rcbk06rnxtmk7b185xx4d",
+    "newRef": "r2:public/catalog/88f95639-381d-4857-887f-e1fe9d763e99.png",
+    "status": "done",
+    "migratedAt": 1783979450779
+  },
+  {
+    "docId": "jx79qts1pmfdfakb9f2306v6dn85w9m4",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg29bvbdaj4npayg74c534nj8985x65r",
+    "newRef": "r2:public/catalog/4496cd4a-23cf-4953-b2d5-d6c830301f8d.png",
+    "status": "done",
+    "migratedAt": 1783979454562
+  },
+  {
+    "docId": "jx79qts1pmfdfakb9f2306v6dn85w9m4",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg29bvbdaj4npayg74c534nj8985x65r",
+    "newRef": "r2:public/catalog/797fd528-c1c0-428d-b7fb-612dc1907953.png",
+    "status": "done",
+    "migratedAt": 1783979455836
+  },
+  {
+    "docId": "jx79qts1pmfdfakb9f2306v6dn85w9m4",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg2ezpbh2ppz2jhy49hzhzfkvx85w3mr",
+    "newRef": "r2:public/catalog/da9337e3-6861-44a2-aa2b-7f168c105ce5.png",
+    "status": "done",
+    "migratedAt": 1783979457654
+  },
+  {
+    "docId": "jx79qts1pmfdfakb9f2306v6dn85w9m4",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg2epnfnsrd55k819z5ezn9pxn85x2za",
+    "newRef": "r2:public/catalog/d746230a-c9a4-4046-a3a8-091c4fceefc9.png",
+    "status": "done",
+    "migratedAt": 1783979466559
+  },
+  {
+    "docId": "jx79qts1pmfdfakb9f2306v6dn85w9m4",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg2ccksda86tcephhwfh9gr1as85wz6m",
+    "newRef": "r2:public/catalog/9654ef1e-ff94-4ca3-bffc-7a4027acfd67.png",
+    "status": "done",
+    "migratedAt": 1783979469869
+  },
+  {
+    "docId": "jx71mnxfmjm90djb5a7d0c8ybd85wgp8",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg292fnhhe566gvhg5pxpec75585xb6j",
+    "newRef": "r2:public/catalog/ca17c2cb-9ba1-4317-a64b-6bbd320d42cf.png",
+    "status": "done",
+    "migratedAt": 1783979473967
+  },
+  {
+    "docId": "jx79qts1pmfdfakb9f2306v6dn85w9m4",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg2ak7b6zw9srhqzjkwk5w4z6185wts6",
+    "newRef": "r2:public/catalog/4c8590ba-270a-4904-992b-446762e72a5f.png",
+    "status": "done",
+    "migratedAt": 1783979476691
+  },
+  {
+    "docId": "jx71mnxfmjm90djb5a7d0c8ybd85wgp8",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg292fnhhe566gvhg5pxpec75585xb6j",
+    "newRef": "r2:public/catalog/626944a8-7df9-44ab-aac8-97524bb077fb.png",
+    "status": "done",
+    "migratedAt": 1783979487949
+  },
+  {
+    "docId": "jx71mnxfmjm90djb5a7d0c8ybd85wgp8",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg263vm3new2qxntknyxm23zx585xgg2",
+    "newRef": "r2:public/catalog/1567fae9-95c7-497a-8dd0-1cc09995d311.png",
+    "status": "done",
+    "migratedAt": 1783979492701
+  },
+  {
+    "docId": "jx71mnxfmjm90djb5a7d0c8ybd85wgp8",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg20xk764hk7hvxmcqrzn93b1d85w7dc",
+    "newRef": "r2:public/catalog/c36a3ac7-e0ab-4b05-980e-455873d52c45.png",
+    "status": "done",
+    "migratedAt": 1783979494082
+  },
+  {
+    "docId": "jx71mnxfmjm90djb5a7d0c8ybd85wgp8",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg29j0w50k6ct65dj47t0pawa185w5n3",
+    "newRef": "r2:public/catalog/6d3de4f8-e697-42c1-9966-37a2b92b2c4c.png",
+    "status": "done",
+    "migratedAt": 1783979494946
+  },
+  {
+    "docId": "jx72x8k80k8gsygh3yfxtmeayx85ws6t",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg21y2vh91bh4xkw04zy78vvgx85wn1t",
+    "newRef": "r2:public/catalog/ccb7fc7b-bc9e-403c-9dc9-19779226d695.png",
+    "status": "done",
+    "migratedAt": 1783979502885
+  },
+  {
+    "docId": "jx72x8k80k8gsygh3yfxtmeayx85ws6t",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg21y2vh91bh4xkw04zy78vvgx85wn1t",
+    "newRef": "r2:public/catalog/b08a37c2-62c9-4f75-a7f6-204c94486264.png",
+    "status": "done",
+    "migratedAt": 1783979506840
+  },
+  {
+    "docId": "jx71mnxfmjm90djb5a7d0c8ybd85wgp8",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg284zw26pa6pq2jw988nyq07985x0s7",
+    "newRef": "r2:public/catalog/2ce8f9b0-d9ec-4f98-9bd6-3ad5bd280422.png",
+    "status": "done",
+    "migratedAt": 1783979508699
+  },
+  {
+    "docId": "jx71mnxfmjm90djb5a7d0c8ybd85wgp8",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg219fwf8zjhb2ejhcg1w59k7585x5j3",
+    "newRef": "r2:public/catalog/8cb1dea3-4b1e-4d0d-b807-ba7e2d929821.png",
+    "status": "done",
+    "migratedAt": 1783979509606
+  },
+  {
+    "docId": "jx72x8k80k8gsygh3yfxtmeayx85ws6t",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg2fhvs2cq2tkmn07whz5c869x85xxgy",
+    "newRef": "r2:public/catalog/7e01f745-b6c0-40b0-9599-7c40be715217.png",
+    "status": "done",
+    "migratedAt": 1783979518983
+  },
+  {
+    "docId": "jx72x8k80k8gsygh3yfxtmeayx85ws6t",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg207dm3jfwaykt87kj1nhtz2985xke5",
+    "newRef": "r2:public/catalog/b8eb88b7-f2bc-4436-9048-0a0eb8557b5d.png",
+    "status": "done",
+    "migratedAt": 1783979522195
+  },
+  {
+    "docId": "jx72x8k80k8gsygh3yfxtmeayx85ws6t",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg2cvr02263dq8w75tthtssx8585wznw",
+    "newRef": "r2:public/catalog/6c82c4a4-e3e1-4df6-b7e4-5b2389c1b97f.png",
+    "status": "done",
+    "migratedAt": 1783979522757
+  },
+  {
+    "docId": "jx72x8k80k8gsygh3yfxtmeayx85ws6t",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg28f1xv8mfjkvqmsk5gcf4c7185w8vt",
+    "newRef": "r2:public/catalog/e8a4542d-d66b-45e1-b9af-11799c135868.png",
+    "status": "done",
+    "migratedAt": 1783979523004
+  },
+  {
+    "docId": "jx72x8k80k8gsygh3yfxtmeayx85ws6t",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg2fq0epaxjcrzjsvtw2dx2jz585xyfc",
+    "newRef": "r2:public/catalog/6f136279-8e7a-45ea-92c1-29e10a08e4ab.png",
+    "status": "done",
+    "migratedAt": 1783979533575
+  },
+  {
+    "docId": "jx72x8k80k8gsygh3yfxtmeayx85ws6t",
+    "table": "products",
+    "field": "images[7]",
+    "oldRef": "kg24mwaxh6w03gmvr3cv20z8yx85wcez",
+    "newRef": "r2:public/catalog/ac3b7824-0732-4dec-a222-90b1ed54406a.png",
+    "status": "done",
+    "migratedAt": 1783979534779
+  },
+  {
+    "docId": "jx72x8k80k8gsygh3yfxtmeayx85ws6t",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg21sehwrvafhsxxhemp4st88h85w7xb",
+    "newRef": "r2:public/catalog/f62a8928-1421-475c-8afe-67d16bc2b23d.png",
+    "status": "done",
+    "migratedAt": 1783979538143
+  },
+  {
+    "docId": "jx77ej39m7ej2x1x1fn1s7qf8585xtpc",
+    "table": "products",
+    "field": "thumbnail",
+    "oldRef": "kg2apzqj179zv8cwpjrxdtyk2s85x3h6",
+    "newRef": "r2:public/catalog/5b8c1397-7d58-4301-af9f-757e40892f46.png",
+    "status": "done",
+    "migratedAt": 1783979540434
+  },
+  {
+    "docId": "jx77ej39m7ej2x1x1fn1s7qf8585xtpc",
+    "table": "products",
+    "field": "images[2]",
+    "oldRef": "kg272tnawsym5bj7d8kgzqfvds85wmxs",
+    "newRef": "r2:public/catalog/82d60a89-90fc-43d6-90dd-732a95024887.png",
+    "status": "done",
+    "migratedAt": 1783979549440
+  },
+  {
+    "docId": "jx77ej39m7ej2x1x1fn1s7qf8585xtpc",
+    "table": "products",
+    "field": "images[0]",
+    "oldRef": "kg2apzqj179zv8cwpjrxdtyk2s85x3h6",
+    "newRef": "r2:public/catalog/fa86a86f-8c1e-46ab-85ed-e78a3147d1f7.png",
+    "status": "done",
+    "migratedAt": 1783979549996
+  },
+  {
+    "docId": "jx77ej39m7ej2x1x1fn1s7qf8585xtpc",
+    "table": "products",
+    "field": "images[1]",
+    "oldRef": "kg2bpkyx7zezegatwsr77wkb1185w4fh",
+    "newRef": "r2:public/catalog/8b171043-f498-4a70-b2d2-a4a1d562c0cd.png",
+    "status": "done",
+    "migratedAt": 1783979554478
+  },
+  {
+    "docId": "jx77ej39m7ej2x1x1fn1s7qf8585xtpc",
+    "table": "products",
+    "field": "images[3]",
+    "oldRef": "kg277pr0hxy8dxt6tbxzvb1ft985xr8s",
+    "newRef": "r2:public/catalog/35bb9f24-c6b7-408b-a86c-34f9b3acd54e.png",
+    "status": "done",
+    "migratedAt": 1783979554890
+  },
+  {
+    "docId": "jx77ej39m7ej2x1x1fn1s7qf8585xtpc",
+    "table": "products",
+    "field": "images[4]",
+    "oldRef": "kg2dxe2fz6ns92mjr0g1v6cvyx85xbwv",
+    "newRef": "r2:public/catalog/1547e93e-427f-4bf6-b7f0-d87c92381cd1.png",
+    "status": "done",
+    "migratedAt": 1783979563986
+  },
+  {
+    "docId": "jx77ej39m7ej2x1x1fn1s7qf8585xtpc",
+    "table": "products",
+    "field": "images[6]",
+    "oldRef": "kg2b94gyaff4y6zgfrz309920n85wxa0",
+    "newRef": "r2:public/catalog/bcbab822-1909-4ca4-915b-516ecffc9d90.png",
+    "status": "done",
+    "migratedAt": 1783979565590
+  },
+  {
+    "docId": "jx77ej39m7ej2x1x1fn1s7qf8585xtpc",
+    "table": "products",
+    "field": "images[5]",
+    "oldRef": "kg27yjqb7q4qjawg2124ak4fjd85wgsv",
+    "newRef": "r2:public/catalog/421bd743-57df-4442-a96b-6b38927dbbb9.png",
+    "status": "done",
+    "migratedAt": 1783979568609
+  },
+  {
+    "docId": "jx77ej39m7ej2x1x1fn1s7qf8585xtpc",
+    "table": "products",
+    "field": "images[7]",
+    "oldRef": "kg2a1g504me0scbw7bak1b9vxx85xqgj",
+    "newRef": "r2:public/catalog/7cd6c7f3-1aa8-410c-b9b4-0a6de86c07eb.png",
+    "status": "done",
+    "migratedAt": 1783979570568
+  },
+  {
+    "docId": "jx77ej39m7ej2x1x1fn1s7qf8585xtpc",
+    "table": "products",
+    "field": "images[9]",
+    "oldRef": "kg271zpz8ka2ft8m3swpzg4x0h85wfj6",
+    "newRef": "r2:public/catalog/84fe35ba-44b7-4afa-99c6-65a67f914090.png",
+    "status": "done",
+    "migratedAt": 1783979574526
+  },
+  {
+    "docId": "jx77ej39m7ej2x1x1fn1s7qf8585xtpc",
+    "table": "products",
+    "field": "images[8]",
+    "oldRef": "kg24ar21mnq879gqt4s66dthds85xrr6",
+    "newRef": "r2:public/catalog/2f364cf6-ae9f-4f6f-b870-cf97047dfd9a.png",
+    "status": "done",
+    "migratedAt": 1783979574656
+  },
+  {
+    "docId": "js755eaa6nqhwgw0b26cxakz4983egqx",
+    "table": "orders",
+    "field": "paymentReceiptRef",
+    "oldRef": "kg26p6zqtbesfs827kgm358h7983e3y9",
+    "newRef": "",
+    "status": "failed",
+    "migratedAt": 1783979575071
   }
 ]

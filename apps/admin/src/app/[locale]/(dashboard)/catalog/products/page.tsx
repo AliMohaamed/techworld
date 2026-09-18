@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
-import { Button, Input, cn } from "@techworld/ui";
+import { Button, Input, cn, ColorSwatch } from "@techworld/ui";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { ProductFormSheet } from "@/components/catalog/products/ProductFormSheet";
@@ -47,7 +47,7 @@ type AdminProduct = {
   skus?: Array<{
     _id: Id<"skus">;
     variantName: string;
-    variantAttributes?: { color?: string; size?: string; type?: string };
+    variantAttributes?: { color?: string; size?: string; type?: string; colorCode?: string };
     real_stock: number;
     display_stock: number;
     price: number;
@@ -370,9 +370,14 @@ export default function AdminProductsPage() {
                         {product.skus?.slice(0, 3).map((sku) => (
                           <span
                             key={sku._id}
-                            className="text-xs font-bold border border-border bg-background px-1.5 py-0.5 rounded text-muted-foreground/60"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold border border-border bg-background px-2 py-0.5 rounded text-muted-foreground/80"
                           >
-                            {sku.variantName}
+                            <ColorSwatch
+                              color={sku.variantAttributes?.colorCode || sku.variantAttributes?.color || sku.variantName}
+                              fallbackName={sku.variantName}
+                              size="xs"
+                            />
+                            <span>{sku.variantName}</span>
                           </span>
                         )) || (
                             <span className="text-[9px] font-bold border border-border bg-background px-1.5 py-0.5 rounded uppercase tracking-wide text-muted-foreground/60">
@@ -437,10 +442,17 @@ export default function AdminProductsPage() {
                     {product.skus && product.skus.length > 0 ? (
                       <div className="flex flex-col gap-2">
                         {product.skus.map((sku) => (
-                          <div key={sku._id} className="flex items-center justify-between gap-3 min-w-[120px]">
-                            <span className="text-xs font-bold text-muted-foreground/40 truncate max-w-[60px]">
-                              {sku.variantName}
-                            </span>
+                          <div key={sku._id} className="flex items-center justify-between gap-3 min-w-[130px]">
+                            <div className="flex items-center gap-1.5 truncate max-w-[70px]">
+                              <ColorSwatch
+                                color={sku.variantAttributes?.colorCode || sku.variantAttributes?.color || sku.variantName}
+                                fallbackName={sku.variantName}
+                                size="xs"
+                              />
+                              <span className="text-xs font-bold text-muted-foreground/50 truncate">
+                                {sku.variantName}
+                              </span>
+                            </div>
                             <div className="flex items-center bg-accent/30 rounded-lg p-0.5 border border-border/50">
                               <Button
                                 size="icon"

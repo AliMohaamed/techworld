@@ -84,6 +84,7 @@ export default defineSchema({
       color: v.optional(v.string()),
       size: v.optional(v.string()),
       type: v.optional(v.string()),
+      colorCode: v.optional(v.string()),
     }),
     real_stock: v.number(),
     display_stock: v.number(),

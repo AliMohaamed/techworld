@@ -22,3 +22,11 @@ Uncaught ConvexError: {"code":"CONFIGURATION_ERROR","message":"Backend MIGRATION
     at file:///D:/Freelance/techworld/website/scripts/migrate-convex-to-r2.ts:243:23
     at async Promise.all (index 1)
     at async run (file:///D:/Freelance/techworld/website/scripts/migrate-convex-to-r2.ts:218:9)
+2026-07-13T21:44:08.238Z - Failed to migrate categories.thumbnailImageId (jh7cekbjz3nks13p3sphwevfqh83e5yg) - Error: Failed to resolve storage URL for ref kg20pw80p5qcrgqwxcnfy8vjad83fj53
+    at file:///D:/Freelance/techworld/website/scripts/migrate-convex-to-r2.ts:255:23
+    at async Promise.all (index 0)
+    at async run (file:///D:/Freelance/techworld/website/scripts/migrate-convex-to-r2.ts:230:9)
+2026-07-13T21:52:55.029Z - Failed to migrate orders.paymentReceiptRef (js755eaa6nqhwgw0b26cxakz4983egqx) - Error: Failed to resolve storage URL for ref kg26p6zqtbesfs827kgm358h7983e3y9
+    at file:///D:/Freelance/techworld/website/scripts/migrate-convex-to-r2.ts:255:23
+    at async Promise.all (index 0)
+    at async run (file:///D:/Freelance/techworld/website/scripts/migrate-convex-to-r2.ts:230:9)

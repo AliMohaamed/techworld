@@ -37,6 +37,9 @@ import {
   SheetTitle,
   SheetDescription,
   Switch,
+  ColorSwatch,
+  resolveColor,
+  COLOR_PRESETS,
 } from "@techworld/ui";
 import { ConvexStorageUpload } from "./ConvexStorageUpload";
 import {
@@ -44,7 +47,7 @@ import {
   type ProductFormSubmitValues,
   type ProductFormValues,
 } from "./product-zod-schemas";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 type CategoryOption = {
   _id: Id<"categories">;
@@ -69,7 +72,7 @@ type ProductRecord = {
   skus?: Array<{
     _id: Id<"skus">;
     variantName: string;
-    variantAttributes?: { color?: string; size?: string; type?: string };
+    variantAttributes?: { color?: string; size?: string; type?: string; colorCode?: string };
     real_stock: number;
     display_stock: number;
     price: number;
@@ -82,6 +85,7 @@ type ProductRecord = {
 const emptyVariant = {
   variantName: "Default",
   color: "",
+  colorCode: "",
   size: "",
   type: "",
   real_stock: 0,
@@ -123,6 +127,7 @@ export function ProductFormSheet({
   onSaved: (label: string) => void;
 }) {
   const t = useTranslations("Catalog.products");
+  const locale = useLocale();
   const createAdvancedProduct = useMutation(api.products.createAdvancedProduct);
   const updateAdvancedProduct = useMutation(api.products.updateAdvancedProduct);
   const restockItem = useMutation(api.skus.restockItem);
@@ -219,6 +224,7 @@ export function ProductFormSheet({
               id: sku._id,
               variantName: sku.variantName,
               color: sku.variantAttributes?.color ?? "",
+              colorCode: sku.variantAttributes?.colorCode ?? "",
               size: sku.variantAttributes?.size ?? "",
               type: sku.variantAttributes?.type ?? "",
               real_stock: sku.real_stock,
@@ -594,53 +600,120 @@ export function ProductFormSheet({
                 </Button>
               </div>
               <div className="space-y-6">
-                {fields.map((field, index) => (
-                  <div
-                    key={field.id}
-                    className="group rounded-[40px] border border-border bg-card p-10 transition-all hover:border-[#ffc105]/20   overflow-hidden relative"
-                  >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#ffc105]/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-[#ffc105]/10 transition-colors" />
+                {fields.map((field, index) => {
+                  const currentVariant = watch(`variants.${index}`);
+                  const resolvedColor = resolveColor(
+                    currentVariant?.colorCode || currentVariant?.color,
+                    currentVariant?.variantName
+                  );
 
-                    <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between relative z-10">
-                      <div className="flex items-center gap-3">
-                        <div className="h-2 w-2 rounded-full bg-[#ffc105]" />
-                        <p className="text-xs font-bold text-foreground">
-                          {t("form.fields.variant", { index: index + 1 })}
-                        </p>
+                  return (
+                    <div
+                      key={field.id}
+                      className="group rounded-[40px] border border-border bg-card p-10 transition-all hover:border-[#ffc105]/20   overflow-hidden relative"
+                    >
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-[#ffc105]/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-[#ffc105]/10 transition-colors" />
+
+                      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between relative z-10">
+                        <div className="flex items-center gap-3">
+                          <ColorSwatch color={resolvedColor} size="sm" />
+                          <p className="text-xs font-bold text-foreground">
+                            {t("form.fields.variant", { index: index + 1 })}
+                          </p>
+                          {currentVariant?.variantName ? (
+                            <span className="text-[11px] font-semibold text-muted-foreground/70 border border-border/60 bg-accent/40 px-2 py-0.5 rounded-full">
+                              {currentVariant.variantName}
+                            </span>
+                          ) : null}
+                        </div>
+                        {fields.length > 1 ? (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="h-9 px-4 rounded-full text-destructive/60 hover:text-destructive hover:bg-destructive/10 text-xs font-semibold"
+                            onClick={() => remove(index)}
+                          >
+                            <Trash2 size={12} className="mr-2" />
+                            {t("buttons.remove")}
+                          </Button>
+                        ) : null}
                       </div>
-                      {fields.length > 1 ? (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          className="h-9 px-4 rounded-full text-destructive/60 hover:text-destructive hover:bg-destructive/10 text-xs font-semibold"
-                          onClick={() => remove(index)}
+                      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 relative z-10">
+                        <Field
+                          label={t("form.fields.skus.name")}
+                          error={errors.variants?.[index]?.variantName?.message}
                         >
-                          <Trash2 size={12} className="mr-2" />
-                          {t("buttons.remove")}
-                        </Button>
-                      ) : null}
-                    </div>
-                    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 relative z-10">
-                      <Field
-                        label={t("form.fields.skus.name")}
-                        error={errors.variants?.[index]?.variantName?.message}
-                      >
-                        <Input
-                          {...register(`variants.${index}.variantName`)}
-                          placeholder={t("form.placeholders.variantName")}
-                          className="rounded-xl border-border bg-background h-11 text-sm font-semibold"
-                        />
-                      </Field>
-                      <Field
-                        label={t("form.fields.skus.color")}
-                        error={errors.variants?.[index]?.color?.message}
-                      >
-                        <Input
-                          {...register(`variants.${index}.color`)}
-                          placeholder={t("form.placeholders.color")}
-                          className="rounded-xl border-border bg-background h-11 text-xs font-bold"
-                        />
-                      </Field>
+                          <Input
+                            {...register(`variants.${index}.variantName`)}
+                            placeholder={t("form.placeholders.variantName")}
+                            className="rounded-xl border-border bg-background h-11 text-sm font-semibold"
+                          />
+                        </Field>
+                        <Field
+                          label={t("form.fields.skus.color")}
+                          error={errors.variants?.[index]?.color?.message}
+                        >
+                          <div className="space-y-2.5">
+                            <div className="relative flex items-center">
+                              <label
+                                htmlFor={`color-picker-${index}`}
+                                className="absolute left-3 z-10 cursor-pointer flex items-center justify-center p-0.5 rounded-full hover:scale-110 transition-transform"
+                                title={locale === "ar" ? "اختر لوناً مخصصاً" : "Pick a custom color"}
+                              >
+                                <ColorSwatch
+                                  color={resolvedColor}
+                                  size="md"
+                                  className="shadow-sm"
+                                />
+                                <input
+                                  id={`color-picker-${index}`}
+                                  type="color"
+                                  value={resolvedColor || "#2563eb"}
+                                  onChange={(e) => {
+                                    const hex = e.target.value;
+                                    setValue(`variants.${index}.colorCode`, hex);
+                                    if (!getValues(`variants.${index}.color`)) {
+                                      setValue(`variants.${index}.color`, hex);
+                                    }
+                                  }}
+                                  className="sr-only"
+                                />
+                              </label>
+                              <Input
+                                {...register(`variants.${index}.color`)}
+                                placeholder={t("form.placeholders.color")}
+                                className="rounded-xl border-border bg-background h-11 text-xs font-bold pl-10"
+                              />
+                            </div>
+
+                            {/* Quick color preset swatches */}
+                            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                              <span className="text-[10px] font-bold text-muted-foreground/50 mr-1">
+                                {locale === "ar" ? "ألوان سريعة:" : "Presets:"}
+                              </span>
+                              {COLOR_PRESETS.slice(0, 10).map((preset) => (
+                                <button
+                                  key={preset.hex}
+                                  type="button"
+                                  onClick={() => {
+                                    setValue(
+                                      `variants.${index}.color`,
+                                      locale === "ar" ? preset.nameAr : preset.nameEn
+                                    );
+                                    setValue(`variants.${index}.colorCode`, preset.hex);
+                                  }}
+                                  title={`${preset.nameEn} / ${preset.nameAr}`}
+                                  className="p-0.5 rounded-full hover:scale-125 transition-transform"
+                                >
+                                  <span
+                                    className="block h-3.5 w-3.5 rounded-full border border-black/20 dark:border-white/20 shadow-xs"
+                                    style={{ backgroundColor: preset.hex }}
+                                  />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </Field>
                       <Field
                         label={t("form.fields.skus.size")}
                         error={errors.variants?.[index]?.size?.message}
@@ -773,8 +846,9 @@ export function ProductFormSheet({
                       </Field>
                     </div>
                   </div>
-                ))}
-              </div>
+                );
+              })}
+            </div>
             </section>
           </form>
 
@@ -857,6 +931,7 @@ function buildPayload(values: ProductFormSubmitValues) {
       variantName: variant.variantName,
       variantAttributes: {
         color: variant.color || undefined,
+        colorCode: variant.colorCode || undefined,
         size: variant.size || undefined,
         type: variant.type || undefined,
       },

@@ -9,7 +9,7 @@ import Image from "next/image";
 import { Link } from "@/navigation";
 import { Id } from "@backend/convex/_generated/dataModel";
 import { useState } from "react";
-import { PromoCodeInput } from "@techworld/ui";
+import { PromoCodeInput, ColorSwatch } from "@techworld/ui";
 import { useTranslations, useLocale } from "next-intl";
 import { toast } from "sonner";
 
@@ -154,8 +154,13 @@ export default function CartDrawer() {
                         </button>
                       </div>
                       {item.sku?.variantName && item.sku.variantName !== "Default" && (
-                        <p className="text-[11px] font-medium text-label-muted bg-secondary px-2 py-0.5 rounded w-fit">
-                          {item.sku.variantName}
+                        <p className="text-[11px] font-medium text-label-muted bg-secondary px-2 py-0.5 rounded w-fit inline-flex items-center gap-1.5">
+                          <ColorSwatch
+                            color={item.sku.variantAttributes?.colorCode || item.sku.variantAttributes?.color || item.sku.variantName}
+                            fallbackName={item.sku.variantName}
+                            size="xs"
+                          />
+                          <span>{item.sku.variantName}</span>
                         </p>
                       )}
                     </div>
