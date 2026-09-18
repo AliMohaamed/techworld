@@ -634,7 +634,7 @@ export function ProductFormSheet({
                             onClick={() => remove(index)}
                           >
                             <Trash2 size={12} className="mr-2" />
-                            {t("buttons.remove")}
+                            {t("form.buttons.remove")}
                           </Button>
                         ) : null}
                       </div>

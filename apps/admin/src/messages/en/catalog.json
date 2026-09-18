@@ -134,7 +134,11 @@
         "publicationFailed": "Publication update failed.",
         "publicationBlocked": "Publication blocked.",
         "updated": "Product updated.",
-        "created": "Product created."
+        "created": "Product created.",
+        "validationError": "Please fix the errors in the form before submitting."
+      },
+      "buttons": {
+        "remove": "Remove"
       },
       "form": {
         "createTitle": "Create advanced product",
