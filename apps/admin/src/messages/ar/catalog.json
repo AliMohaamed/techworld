@@ -134,7 +134,11 @@
         "publicationFailed": "فشل تحديث حالة النشر.",
         "publicationBlocked": "تم حظر النشر.",
         "updated": "تم تحديث المنتج.",
-        "created": "تم إنشاء المنتج."
+        "created": "تم إنشاء المنتج.",
+        "validationError": "يرجى تصحيح الأخطاء في النموذج قبل الإرسال."
+      },
+      "buttons": {
+        "remove": "حذف"
       },
       "form": {
         "createTitle": "إنشاء منتج متقدم",
