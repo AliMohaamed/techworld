@@ -1,6 +1,6 @@
 ﻿# website Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-03-21
+Auto-generated from all feature plans. Last updated: 2026-09-26
 
 ## Active Technologies
 - TypeScript, React 18, Next.js 15 + Convex, Tailwind CSS, shadcn/ui (nuqs for URL sync) (005-catalog-explorer)
@@ -17,6 +17,8 @@ Auto-generated from all feature plans. Last updated: 2026-03-21
 - Client-side Cookies (for locale and theme persistence to avoid hydration mismatches). (012-system-i18n-theming)
 - React (Next.js 15), TypeScript + `next-intl` (for locale routing and SSR dictionary loading) (013-implement-localization)
 - JSON flat files (`messages/en.json`, `messages/ar.json`) inside the codebase. (013-implement-localization)
+- TypeScript / Next.js + React, Next.js, Convex, Tailwind CSS (015-related-products)
+- Convex Database (fetching from `products` table) (015-related-products)
 
 - [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION] (005-catalog-explorer)
 
@@ -37,9 +39,9 @@ cd src; pytest; ruff check .
 [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]: Follow standard conventions
 
 ## Recent Changes
+- 015-related-products: Added TypeScript / Next.js + React, Next.js, Convex, Tailwind CSS
 - 013-implement-localization: Added React (Next.js 15), TypeScript + `next-intl` (for locale routing and SSR dictionary loading)
 - 012-system-i18n-theming: Added TypeScript, React 18, Next.js 14+ (App Router) + `next-intl` (routing & translations), `next-themes` (theme management), `sonner` (toast notifications), `lucide-react`, standard React Suspense.
-- 011-marketing-seo: Added TypeScript (Next.js 14+, Convex)
 
 
 <!-- MANUAL ADDITIONS START -->

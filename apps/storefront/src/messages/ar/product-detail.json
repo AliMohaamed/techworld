@@ -36,7 +36,7 @@
     "actions": {
       "addToCart": "إضافة للسلة",
       "addCountToCart": "إضافة {count} للسلة",
-      "buyNow": "اشترِ الآن"
+      "buyNow": "اشتري الآن"
     },
     "features": {
       "shipping": "شحن سريع لجميع أنحاء مصر",
