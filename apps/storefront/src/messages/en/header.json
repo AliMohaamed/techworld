@@ -5,8 +5,10 @@
       "categories": "Categories",
       "deals": "Deals",
       "support": "Support",
+      "viewAllCategories": "View all categories",
       "shopNow": "Shop Now"
     },
-    "cartAria": "Open shopping cart"
+    "cartAria": "Open shopping cart",
+    "favoritesAria": "Favorites"
   }
 }

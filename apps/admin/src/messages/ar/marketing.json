@@ -46,7 +46,7 @@
         "deleteSuccess": "تم حذف كود الخصم",
         "updateFailed": "فشل تحديث الحالة",
         "deleteFailed": "فشل حذف كود الخصم",
-        "updateNotImplemented": "منطق التحديث لم يتم تنفيذه في الخلفية بعد. قم بالحذف وإعادة الإنشاء حالياً.",
+        "updateSuccess": "تم تحديث كود الخصم بنجاح",
         "createSuccess": "تم إنشاء كود الخصم بنجاح",
         "operationFailed": "فشلت العملية",
         "submissionFailed": "فشل الإرسال",
@@ -88,6 +88,79 @@
           "saving": "جار الإنشاء...",
           "cancel": "إلغاء"
         }
+      }
+    },
+    "offers": {
+      "badge": "التسويق",
+      "title": "العروض والتخفيضات",
+      "description": "أطلق تخفيضات على المنتجات تظهر مباشرة في صفحة العروض بالمتجر. يتم تثبيت السعر الأصلي كمرجع، لذلك لا يتراكم الخصم عند تعديل عرض قائم.",
+      "stats": {
+        "activeOffers": "عروض نشطة",
+        "liveOffers": "ظاهرة في المتجر",
+        "deepestDiscount": "أكبر خصم",
+        "averageDiscount": "متوسط الخصم"
+      },
+      "actions": {
+        "start": "بدء عرض",
+        "edit": "تعديل العرض",
+        "clear": "إنهاء العرض",
+        "apply": "تطبيق الخصم",
+        "applying": "جاري التطبيق...",
+        "cancel": "إلغاء",
+        "bulkApply": "خصم جماعي ({count})",
+        "confirmClear": "هل تريد إنهاء هذا العرض واستعادة السعر الأصلي؟"
+      },
+      "table": {
+        "badge": "تسعير الكتالوج",
+        "title": "كل المنتجات",
+        "searchPlaceholder": "ابحث عن منتج...",
+        "selectAll": "تحديد كل المنتجات الظاهرة",
+        "loading": "جاري تحميل العروض...",
+        "empty": "لا توجد منتجات مطابقة لهذا العرض.",
+        "noOffer": "بدون عرض",
+        "outOfStock": "نفدت الكمية",
+        "variantsOnOffer": "{discounted}/{total} من المتغيرات مخفّضة",
+        "filters": {
+          "all": "الكل",
+          "active": "عليها عرض",
+          "inactive": "بدون عرض"
+        },
+        "columns": {
+          "product": "المنتج",
+          "pricing": "التسعير",
+          "discount": "الخصم",
+          "visibility": "الظهور",
+          "actions": "إجراءات"
+        },
+        "visibility": {
+          "live": "ظاهر",
+          "draft": "مسودة",
+          "categoryInactive": "القسم متوقف"
+        }
+      },
+      "form": {
+        "badge": "إعداد العرض",
+        "title": "ضبط العرض",
+        "bulkTitle": "حملة خصم جماعية",
+        "description": "يصبح السعر الحالي هو السعر الأصلي المشطوب، ويُنشر السعر المخفّض فوراً.",
+        "target": "يُطبّق على",
+        "bulkTargets": "{count} منتجات محددة",
+        "variantCount": "{count} متغيرات",
+        "preview": "معاينة المتجر",
+        "saves": "يوفر العميل {amount} جنيه",
+        "fields": {
+          "discount": "نسبة الخصم",
+          "applyToVariants": "تطبيق الخصم على كل المتغيرات",
+          "applyToVariantsHint": "يبقي أسعار المتغيرات متوافقة مع سعر المنتج حتى تتطابق البطاقة وصفحة المنتج والسلة."
+        }
+      },
+      "messages": {
+        "applied": "تم تطبيق العرض",
+        "cleared": "تم إنهاء العرض واستعادة السعر الأصلي",
+        "bulkApplied": "تم تطبيق الخصم على {count} منتجات",
+        "bulkSkipped": "تم تخطي {count} منتجات",
+        "invalidDiscount": "أدخل نسبة خصم بين 1 و 99.",
+        "operationFailed": "فشلت العملية"
       }
     }
   }

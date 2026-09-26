@@ -124,10 +124,7 @@ export default function CatalogExplorer({
 
           <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-secondary/50 px-6 py-4 backdrop-blur-sm">
-              <div className="space-y-0.5">
-                <p className="text-[10px] font-semibold tracking-wider text-label-muted uppercase">
-                  {t("results.eyebrow")}
-                </p>
+              <div>
                 <p className="font-space-grotesk text-lg font-bold tracking-tight text-foreground">
                   {t("results.count", { count: results.length })}
                 </p>

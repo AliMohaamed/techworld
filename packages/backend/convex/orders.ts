@@ -530,3 +530,127 @@ export const getOrderStats = query({
   },
 });
 
+
+/* -------------------------------------------------------------------------- */
+/*                         Public order tracking (storefront)                   */
+/* -------------------------------------------------------------------------- */
+
+function digitsOnly(value: string | undefined | null) {
+  return (value ?? "").replace(/\D/g, "");
+}
+
+/** Audit action types that represent a customer-visible milestone. */
+const TRACKING_ACTION_TYPES = new Set([
+  "ORDER_CREATED_PENDING",
+  "GUEST_ORDER_CREATED",
+  "ORDER_PAYMENT_SUBMITTED",
+  "ORDER_STATUS_UPDATED",
+  "ORDER_STATUS_CHANGED",
+  "ORDER_RTO_TRIGGERED",
+  "ORDER_STALLED_BY_CRON",
+]);
+
+/**
+ * Public, unauthenticated order lookup for the storefront tracking page.
+ *
+ * The storefront has no customer auth, so the order code alone is not a
+ * sufficient credential: it is short and guessable. We require the last four
+ * digits of the phone number used at checkout as a second factor and return a
+ * strictly sanitised projection — never the full phone, address or COGS.
+ */
+export const trackOrderByCode = query({
+  args: {
+    shortCode: v.string(),
+    phoneLast4: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const shortCode = args.shortCode.trim().toUpperCase();
+    const last4 = digitsOnly(args.phoneLast4);
+
+    if (shortCode.length < 4 || last4.length !== 4) {
+      return { status: "INVALID_INPUT" as const, order: null };
+    }
+
+    const candidates = await ctx.db
+      .query("orders")
+      .withIndex("by_shortCode", (q) => q.eq("shortCode", shortCode))
+      .collect();
+
+    const order = candidates.find((candidate) =>
+      digitsOnly(candidate.customerPhone).endsWith(last4)
+    );
+
+    // Same response for "no such code" and "code exists, wrong phone" so the
+    // endpoint cannot be used to enumerate valid order codes.
+    if (!order) {
+      return { status: "NOT_FOUND" as const, order: null };
+    }
+
+    const product = await ctx.db.get(order.productId);
+    const sku = await ctx.db.get(order.skuId);
+    const governorate = order.governorateId
+      ? await ctx.db.get(order.governorateId)
+      : null;
+
+    const thumbnailRef =
+      sku?.linkedImageId ?? product?.thumbnail ?? product?.images?.[0];
+    let thumbnail: string | null = null;
+    if (thumbnailRef) {
+      try {
+        thumbnail = await resolveRef(ctx, thumbnailRef);
+      } catch {
+        thumbnail = null;
+      }
+    }
+
+    const logs = await ctx.db
+      .query("audit_logs")
+      .withIndex("by_entityId_timestamp", (q) => q.eq("entityId", order._id))
+      .order("asc")
+      .collect();
+
+    const timeline = logs
+      .filter((log) => TRACKING_ACTION_TYPES.has(log.actionType))
+      .map((log) => {
+        const changes = (log.changes ?? {}) as { to?: string; from?: string };
+        return {
+          state: changes.to ?? null,
+          actionType: log.actionType,
+          timestamp: log.timestamp,
+        };
+      })
+      .filter((event) => event.state !== null);
+
+    const firstName = (order.customerName ?? "").trim().split(/\s+/)[0] ?? "";
+
+    return {
+      status: "FOUND" as const,
+      order: {
+        shortCode,
+        state: order.state,
+        placedAt: order._creationTime,
+        customerFirstName: firstName,
+        phoneMasked: `•••• ${last4}`,
+        quantity: order.quantity,
+        totalPrice: order.total_price,
+        shippingFee: order.appliedShippingFee ?? null,
+        discountApplied: order.discount_applied ?? null,
+        promoCode: order.promo_code_snapshot ?? null,
+        hasReceipt: Boolean(order.paymentReceiptRef),
+        governorate: governorate
+          ? { name_en: governorate.name_en, name_ar: governorate.name_ar }
+          : null,
+        product: product
+          ? {
+              name_en: product.name_en,
+              name_ar: product.name_ar,
+              slug: product.slug ?? null,
+              thumbnail,
+            }
+          : null,
+        variantName: sku?.variantName ?? null,
+        timeline,
+      },
+    };
+  },
+});

@@ -12,6 +12,20 @@
       "addSimple": "Add",
       "outOfStock": "Out of Stock"
     },
-    "noImage": "No Image"
+    "noImage": "No Image",
+    "stock": {
+      "inStock": "In Stock",
+      "lowStock": "Only {count} left",
+      "outOfStock": "Out of Stock"
+    },
+    "rating": {
+      "reviews": "({count, plural, one {# review} other {# reviews}})",
+      "noReviews": "No reviews yet",
+      "aria": "Rated {rating} out of 5"
+    },
+    "favorite": {
+      "add": "Add to favorites",
+      "remove": "Remove from favorites"
+    }
   }
 }

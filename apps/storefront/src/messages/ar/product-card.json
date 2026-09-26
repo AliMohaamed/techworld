@@ -12,6 +12,20 @@
       "addSimple": "إضافة",
       "outOfStock": "نفدت الكمية"
     },
-    "noImage": "لا توجد صورة"
+    "noImage": "لا توجد صورة",
+    "stock": {
+      "inStock": "متوفر",
+      "lowStock": "متبقي {count} فقط",
+      "outOfStock": "غير متوفر"
+    },
+    "rating": {
+      "reviews": "({count, plural, one {تقييم واحد} two {تقييمان} few {# تقييمات} many {# تقييمًا} other {# تقييم}})",
+      "noReviews": "لا توجد تقييمات بعد",
+      "aria": "التقييم {rating} من 5"
+    },
+    "favorite": {
+      "add": "أضف إلى المفضلة",
+      "remove": "إزالة من المفضلة"
+    }
   }
 }

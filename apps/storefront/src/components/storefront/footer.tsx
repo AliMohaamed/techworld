@@ -1,15 +1,49 @@
 import { Link } from "@/navigation";
-import { Github, Twitter, Instagram } from "lucide-react";
+import { Instagram, Facebook } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { NewsletterForm } from "./NewsletterForm";
+
+function TikTokIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+    </svg>
+  );
+}
 
 export default async function Footer() {
   const t = await getTranslations('Footer');
 
+  const socialLinks = [
+    {
+      name: "TikTok",
+      href: "https://www.tiktok.com/@techworld.1?_t=ZS-8yJQZYbTHOB&_r=1",
+      icon: TikTokIcon,
+    },
+    {
+      name: "Instagram",
+      href: "https://www.instagram.com/tech_world012?igsh=N2hiZGV1d2pxdDR5",
+      icon: Instagram,
+    },
+    {
+      name: "Facebook",
+      href: "https://www.facebook.com/share/1YedGVnzFA/?mibextid=wwXIfr",
+      icon: Facebook,
+    },
+  ];
+
   return (
     <footer className="border-t border-border bg-background pt-20 pb-10 px-4 sm:px-6 md:px-12">
       <div className="container mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-16 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16 mb-16">
           <div className="space-y-6">
             <Link href="/" className="flex items-center gap-2.5 outline-none group w-fit">
               <div className="h-4 w-4 rounded-[4px] bg-primary group-hover:rotate-45 transition-transform" />
@@ -21,15 +55,21 @@ export default async function Footer() {
               {t('tagline')}
             </p>
             <div className="flex items-center gap-3 pt-2">
-              <Link href="#" className="h-10 w-10 rounded-lg border border-border bg-secondary flex items-center justify-center text-label-muted hover:text-primary hover:border-primary/30 hover:scale-105 transition-all">
-                <Github size={18} />
-              </Link>
-              <Link href="#" className="h-10 w-10 rounded-lg border border-border bg-secondary flex items-center justify-center text-label-muted hover:text-primary hover:border-primary/30 hover:scale-105 transition-all">
-                <Twitter size={18} />
-              </Link>
-              <Link href="#" className="h-10 w-10 rounded-lg border border-border bg-secondary flex items-center justify-center text-label-muted hover:text-primary hover:border-primary/30 hover:scale-105 transition-all">
-                <Instagram size={18} />
-              </Link>
+              {socialLinks.map((social) => {
+                const Icon = social.icon;
+                return (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.name}
+                    className="h-10 w-10 rounded-lg border border-border bg-secondary flex items-center justify-center text-label-muted hover:text-primary hover:border-primary/30 hover:scale-105 transition-all"
+                  >
+                    <Icon size={18} />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
@@ -56,10 +96,10 @@ export default async function Footer() {
             <h4 className="font-space-grotesk text-foreground text-xs font-bold uppercase tracking-wider mb-6">{t('sections.support')}</h4>
             <ul className="space-y-3">
               {[
-                { key: 'shippingInfo', href: '/' },
-                { key: 'returns', href: '/' },
-                { key: 'orderTracking', href: '/' },
-                { key: 'helpCenter', href: '/' }
+                { key: 'shippingInfo', href: '/shipping' },
+                { key: 'returns', href: '/returns' },
+                { key: 'orderTracking', href: '/track' },
+                { key: 'helpCenter', href: '/support' }
               ].map((item) => (
                 <li key={item.key}>
                   <Link href={item.href} className="text-label-muted text-sm font-medium hover:text-primary transition-colors flex items-center gap-2 group">
@@ -69,12 +109,6 @@ export default async function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
-
-          <div className="space-y-5">
-            <h4 className="font-space-grotesk text-foreground text-xs font-bold uppercase tracking-wider mb-6">{t('sections.newsletter')}</h4>
-            <p className="text-label-muted text-sm leading-relaxed max-w-xs">{t('newsletter.text')}</p>
-            <NewsletterForm />
           </div>
         </div>
 

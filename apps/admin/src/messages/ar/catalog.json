@@ -178,7 +178,28 @@
             "linkedImage": "الصورة المرتبطة",
             "isDefault": "الاختيار الافتراضي"
           },
-          "imageIndex": "صورة {index}"
+          "imageIndex": "صورة {index}",
+          "features": {
+            "title": "مميزات المنتج",
+            "hint": "قسم اختياري بالمميزات يظهر أسفل الوصف في صفحة المنتج. اتركه فارغاً لإخفاء القسم.",
+            "add": "إضافة ميزة",
+            "empty": "لا توجد مميزات بعد. سيظل هذا القسم مخفياً في المتجر.",
+            "itemLabel": "الميزة {index}",
+            "icon": "الأيقونة",
+            "choosePicker": "اختر أيقونة",
+            "hidePicker": "إخفاء الأيقونات",
+            "moveUp": "تحريك لأعلى",
+            "moveDown": "تحريك لأسفل",
+            "remove": "حذف الميزة",
+            "titleEn": "العنوان (إنجليزي)",
+            "titleAr": "العنوان (عربي)",
+            "subtitleEn": "الوصف (إنجليزي)",
+            "subtitleAr": "الوصف (عربي)",
+            "titleEnPlaceholder": "Compact & Lightweight",
+            "titleArPlaceholder": "تصميم صغير وخفيف",
+            "subtitleEnPlaceholder": "Easy to carry anywhere",
+            "subtitleArPlaceholder": "سهل الحمل في أي مكان"
+          }
         },
         "placeholders": {
           "selectCategory": "اختر قسماً",
@@ -209,10 +230,11 @@
           "required": "هذا الحقل مطلوب.",
           "nonNegative": "يجب أن تكون القيمة صفر أو أكثر.",
           "atLeastOneVariant": "يجب إضافة متغير واحد على الأقل.",
-          "compareAtPriceError": "يجب أن يكون السعر المرجعي أكبر من سعر البيع."
+          "compareAtPriceError": "يجب أن يكون السعر المرجعي أكبر من سعر البيع.",
+          "featureTitleRequired": "أضف عنواناً بالإنجليزية أو العربية.",
+          "tooManyFeatures": "لا يمكن إضافة أكثر من 12 ميزة للمنتج."
         }
       }
     }
   }
 }
-

@@ -1,0 +1,30 @@
+{
+  "SupportShared": {
+    "breadcrumbs": {
+      "home": "Home",
+      "support": "Help Center"
+    },
+    "contact": {
+      "title": "Still need a human?",
+      "description": "Our support desk is staffed by the same team that packs and verifies your order, so you get an answer rather than a ticket number.",
+      "whatsapp": {
+        "label": "WhatsApp",
+        "detail": "Fastest reply, usually under 30 minutes"
+      },
+      "email": {
+        "label": "Email",
+        "detail": "Email us"
+      },
+      "phone": {
+        "label": "Phone",
+        "detail": "Call us"
+      },
+      "prefilled": {
+        "general": "Hi TechWorld, I need help with",
+        "shipping": "Hi TechWorld, I have a question about shipping and delivery",
+        "returns": "Hi TechWorld, I would like to start a return or exchange",
+        "tracking": "Hi TechWorld, I need help tracking my order"
+      }
+    }
+  }
+}

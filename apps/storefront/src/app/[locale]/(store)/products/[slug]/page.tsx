@@ -1,17 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { useParams } from "next/navigation";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
 import { useCart } from "@/providers/cart-provider";
-import { ChevronRight, ShoppingBag, Truck, ShieldCheck } from "lucide-react";
-import { Link } from "@/navigation";
+import { ChevronRight, Heart, Minus, Plus, ShoppingBag, Truck, ShieldCheck, Zap } from "lucide-react";
+import { Link, useRouter } from "@/navigation";
 import { DynamicProductGallery } from "@/components/storefront/DynamicProductGallery";
-import { RelatedProducts, ColorSwatch } from "@techworld/ui";
+import { ProductReviews } from "@/components/storefront/product-reviews";
+import { StarRating } from "@/components/storefront/star-rating";
+import { useFavorites } from "@/lib/use-favorites";
+import { RelatedProducts, ColorSwatch, getColorDisplayName, ProductFeatures, cn } from "@techworld/ui";
 import { useTranslations, useLocale } from "next-intl";
+
+const MAX_QUANTITY = 10;
 
 type ProductSku = {
   _id: Id<"skus">;
@@ -44,10 +49,15 @@ export default function ProductDetailPage() {
   const { slug } = useParams();
   const { sessionId } = useSession();
   const { openCart } = useCart();
-  const addToCart = useMutation(api.cart.addToCart);
+  const router = useRouter();
+  const addItemsToCart = useMutation(api.cart.addItemsToCart);
   const product = useQuery(api.products.getBySlug, slug ? { slug: slug as string } : "skip");
   const [selectedSkuId, setSelectedSkuId] = useState<Id<"skus"> | undefined>(undefined);
   const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
+  const [quantity, setQuantity] = useState(1);
+  const [unitOverrides, setUnitOverrides] = useState<Record<number, Id<"skus">>>({});
+  const [isAdding, setIsAdding] = useState(false);
+  const { isFavorite, toggle: toggleFavorite } = useFavorites();
 
   const defaultSkuId = product?.skus?.find((sku: ProductSku) => sku.isDefault)?._id ?? product?.skus?.[0]?._id;
   if (selectedSkuId === undefined && defaultSkuId !== undefined) {
@@ -68,7 +78,60 @@ export default function ProductDetailPage() {
         return list.findIndex((candidate) => normalizeColorLabel(candidate.variantAttributes?.color ?? "") === normalizeColorLabel(color)) === index;
       },
     ) ?? [];
-  const variantOptions = product?.skus ?? [];
+  const variantOptions: ProductSku[] = product?.skus ?? [];
+
+  // The list the shopper picks from: colorways when the product is colour-based,
+  // otherwise the raw variant list.
+  const hasColorways = variantColorOptions.length > 0;
+  const pickerOptions: ProductSku[] = hasColorways ? variantColorOptions : variantOptions;
+  const allowsPerUnitChoice = pickerOptions.length > 1;
+
+  const optionById = useMemo(() => {
+    const map = new Map<Id<"skus">, ProductSku>();
+    for (const sku of variantOptions) {
+      map.set(sku._id, sku);
+    }
+    return map;
+  }, [variantOptions]);
+
+  // Total units purchasable: across every option when variants can be mixed,
+  // otherwise just the selected one.
+  const totalAvailable = allowsPerUnitChoice
+    ? pickerOptions.reduce((sum, sku) => sum + Math.max(0, sku.display_stock), 0)
+    : Math.max(0, selectedVariant?.display_stock ?? 0);
+  const maxQuantity = Math.max(1, Math.min(MAX_QUANTITY, totalAvailable));
+  const effectiveQuantity = Math.min(quantity, maxQuantity);
+
+  // Assign a SKU to every unit, falling back to the next option with remaining
+  // stock so the shopper can never allocate more units than a variant covers.
+  const unitSkuIds = useMemo(() => {
+    const counts = new Map<Id<"skus">, number>();
+    const result: Id<"skus">[] = [];
+    const capacityOf = (skuId: Id<"skus"> | undefined) =>
+      skuId ? Math.max(0, optionById.get(skuId)?.display_stock ?? 0) : 0;
+
+    for (let index = 0; index < effectiveQuantity; index += 1) {
+      const preferred = index === 0 ? selectedSkuId : unitOverrides[index] ?? selectedSkuId;
+      let chosen = preferred;
+      if (!chosen || (counts.get(chosen) ?? 0) >= capacityOf(chosen)) {
+        chosen =
+          pickerOptions.find((sku) => (counts.get(sku._id) ?? 0) < Math.max(0, sku.display_stock))?._id ?? preferred;
+      }
+      if (!chosen) break;
+      counts.set(chosen, (counts.get(chosen) ?? 0) + 1);
+      result.push(chosen);
+    }
+
+    return result;
+  }, [effectiveQuantity, optionById, pickerOptions, selectedSkuId, unitOverrides]);
+
+  const unitCounts = useMemo(() => {
+    const counts = new Map<Id<"skus">, number>();
+    for (const skuId of unitSkuIds) {
+      counts.set(skuId, (counts.get(skuId) ?? 0) + 1);
+    }
+    return counts;
+  }, [unitSkuIds]);
 
   const galleryImages = product
     ? uniqueImages([selectedVariant?.linkedImageId, product.thumbnail, ...(product.images ?? [])])
@@ -77,26 +140,54 @@ export default function ProductDetailPage() {
   const compareAtPrice = selectedVariant?.compareAtPrice ?? product?.compareAtPrice;
   const hasSalePrice = compareAtPrice !== undefined && compareAtPrice > displayPrice;
   const availableUnits = selectedVariant?.display_stock ?? 0;
+  const totalPrice = unitSkuIds.reduce(
+    (sum, skuId) => sum + (optionById.get(skuId)?.price || displayPrice),
+    0,
+  );
 
   const handleVariantSelect = (skuId: Id<"skus">, linkedImage?: string) => {
     setSelectedSkuId(skuId);
     setSelectedImage(linkedImage ?? product?.thumbnail ?? product?.images?.[0]);
   };
 
-  const handleAddToCart = async () => {
-    if (!product) return;
-    const skuId = selectedSkuId ?? selectedVariant?._id;
-    if (!skuId) return;
+  const handleUnitSelect = (index: number, skuId: Id<"skus">) => {
+    if (index === 0) {
+      const option = optionById.get(skuId);
+      handleVariantSelect(skuId, option?.linkedImageId ?? product?.thumbnail ?? product?.images?.[0]);
+      return;
+    }
+    setUnitOverrides((previous) => ({ ...previous, [index]: skuId }));
+  };
+
+  const handleQuantityChange = (next: number) => {
+    setQuantity(Math.max(1, Math.min(maxQuantity, next)));
+  };
+
+  const handleAddToCart = async (mode: "cart" | "buyNow" = "cart") => {
+    if (!product || unitSkuIds.length === 0 || isAdding) return;
+    const items = Array.from(unitCounts.entries()).map(([skuId, unitQuantity]) => ({
+      skuId,
+      quantity: unitQuantity,
+    }));
+
+    setIsAdding(true);
     try {
-      await addToCart({
+      await addItemsToCart({
         sessionId,
         productId: product._id,
-        skuId,
-        quantity: 1,
+        items,
       });
-      openCart();
+      setQuantity(1);
+      setUnitOverrides({});
+      if (mode === "buyNow") {
+        router.push("/checkout");
+      } else {
+        openCart();
+      }
     } catch (err) {
       console.error("Failed to add to cart", err);
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -130,6 +221,8 @@ export default function ProductDetailPage() {
   const isOutOfStock = availableUnits <= 0;
   const isUnavailable = !product.isCategoryActive;
   const statusLabel = isUnavailable ? t('status.unavailable') : isOutOfStock ? t('status.soldOut') : undefined;
+  const isPurchasable = !isOutOfStock && !isUnavailable && unitSkuIds.length > 0;
+  const showUnitPicker = allowsPerUnitChoice && effectiveQuantity > 1 && isPurchasable;
 
   return (
     <div className="min-h-screen bg-background pb-24 transition-colors">
@@ -170,6 +263,13 @@ export default function ProductDetailPage() {
                 {product.name_en}
               </h1>
               <p className="ltr:text-right rtl:text-right font-arabic text-2xl leading-relaxed text-primary font-light">{product.name_ar}</p>
+              <a href="#reviews" className="inline-flex items-center gap-2 text-sm transition-opacity hover:opacity-80">
+                <StarRating value={product.ratingAverage} size={16} />
+                {product.reviewCount > 0 ? (
+                  <span className="font-bold text-foreground">{product.ratingAverage.toLocaleString(locale)}</span>
+                ) : null}
+                <span className="text-label-muted">{t('reviews.reviewCount', { count: product.reviewCount })}</span>
+              </a>
             </header>
 
             <div className="mb-10 flex flex-wrap items-center gap-8 border-b border-border pb-10">
@@ -196,7 +296,8 @@ export default function ProductDetailPage() {
                 <p className="text-[10px] font-black uppercase text-muted-foreground/30 shadow-sm">{t('variants.colorways')}</p>
                 <div className="flex flex-wrap gap-4">
                   {variantColorOptions.map((sku: ProductSku) => {
-                    const color = sku.variantAttributes?.color ?? sku.variantName;
+                    const colorRaw = sku.variantAttributes?.color ?? sku.variantName;
+                    const color = getColorDisplayName(colorRaw, locale);
                     const colorValue = sku.variantAttributes?.colorCode || sku.variantAttributes?.color || sku.variantName;
                     const isActive = sku._id === selectedVariant?._id;
                     return (
@@ -248,7 +349,7 @@ export default function ProductDetailPage() {
                           size="xs"
                           selected={isActive}
                         />
-                        <span>{sku.variantName}</span>
+                        <span>{getColorDisplayName(sku.variantName, locale)}</span>
                       </button>
                     );
                   })}
@@ -256,46 +357,161 @@ export default function ProductDetailPage() {
               </div>
             ) : null}
 
-            {selectedVariant && (product?.skus?.length ?? 0) > 1 ? (
-              <div className="mb-10 rounded-2xl border border-border bg-accent/30 p-6 backdrop-blur-sm">
-                <p className="text-[10px] font-black uppercase text-label-muted mb-4">{t('variants.selected')}</p>
-                <div className="flex flex-wrap gap-3 text-xs">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-primary font-black uppercase">
-                    <ColorSwatch
-                      color={selectedVariant.variantAttributes?.colorCode || selectedVariant.variantAttributes?.color || selectedVariant.variantName}
-                      fallbackName={selectedVariant.variantName}
-                      size="xs"
-                    />
-                    <span>{selectedVariant.variantName}</span>
-                  </span>
-                  {selectedVariant.variantAttributes?.size ? (
-                    <span className="rounded-full border border-border px-5 py-2 text-muted-foreground font-black uppercase">{t('variants.size', { size: selectedVariant.variantAttributes.size })}</span>
-                  ) : null}
-                  {selectedVariant.variantAttributes?.type ? (
-                    <span className="rounded-full border border-border px-5 py-2 text-muted-foreground font-black uppercase">{t('variants.type', { type: selectedVariant.variantAttributes.type })}</span>
-                  ) : null}
-                </div>
-              </div>
-            ) : null}
+
 
             <div className="mb-12 space-y-6">
-              <p className="text-sm md:text-base leading-8 text-label-muted font-medium">{product.description_en}</p>
-              <div className="border-t border-border pt-8 ltr:text-right rtl:text-right">
-                <p className="font-arabic text-xl md:text-2xl leading-relaxed text-label-muted/60 font-medium">
+              {locale === "ar" ? (
+                <p className="font-arabic text-lg md:text-xl leading-relaxed text-label-muted font-medium">
                   {product.description_ar}
                 </p>
-              </div>
+              ) : (
+                <p className="text-sm md:text-base leading-8 text-label-muted font-medium">{product.description_en}</p>
+              )}
+
+              {/* Optional benefits grid; renders nothing when the product has no features. */}
+              <ProductFeatures
+                features={product.features}
+                locale={locale}
+                className="border-t border-border pt-8"
+              />
             </div>
 
             <div className="mt-auto space-y-8">
-              <button
-                disabled={isOutOfStock || isUnavailable}
-                onClick={handleAddToCart}
-                className="group relative flex w-full items-center justify-center gap-4 rounded-xl bg-primary py-5 font-space-grotesk text-lg font-black uppercase text-primary-foreground transition-all hover:brightness-110 active:scale-[0.97] disabled:grayscale disabled:opacity-30"
-              >
-                <ShoppingBag size={24} className="group-hover:scale-110 transition-transform" />
-                {t('actions.addToCart')}
-              </button>
+              <div className="flex flex-wrap items-center gap-5">
+                <span className="font-space-grotesk text-sm font-black uppercase tracking-tight text-foreground">
+                  {t('quantity.label')}
+                </span>
+                <div className="flex items-center rounded-xl border border-border bg-card">
+                  <button
+                    type="button"
+                    aria-label={t('quantity.decrease')}
+                    disabled={!isPurchasable || effectiveQuantity <= 1}
+                    onClick={() => handleQuantityChange(effectiveQuantity - 1)}
+                    className="flex h-12 w-12 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground"
+                  >
+                    <Minus size={16} />
+                  </button>
+                  <span
+                    aria-live="polite"
+                    className="min-w-[3rem] text-center font-space-grotesk text-lg font-black text-foreground"
+                  >
+                    {effectiveQuantity.toLocaleString(locale)}
+                  </span>
+                  <button
+                    type="button"
+                    aria-label={t('quantity.increase')}
+                    disabled={!isPurchasable || effectiveQuantity >= maxQuantity}
+                    onClick={() => handleQuantityChange(effectiveQuantity + 1)}
+                    className="flex h-12 w-12 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+                {isPurchasable && effectiveQuantity >= maxQuantity ? (
+                  <span className="text-[10px] font-black uppercase text-label-muted">
+                    {t('quantity.maxReached', { count: maxQuantity })}
+                  </span>
+                ) : null}
+              </div>
+
+              {showUnitPicker ? (
+                <div className="space-y-4 rounded-2xl border border-border bg-accent/20 p-6">
+                  <p className="text-[10px] font-black uppercase text-label-muted">
+                    {hasColorways ? t('unitSelection.colorTitle') : t('unitSelection.variantTitle')}
+                  </p>
+                  <div className="space-y-3">
+                    {unitSkuIds.map((unitSkuId, index) => (
+                      <div
+                        key={`unit-${index}`}
+                        className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-border/60 pb-3 last:border-b-0 last:pb-0"
+                      >
+                        <span className="min-w-[4.5rem] text-[10px] font-black uppercase text-muted-foreground">
+                          {t('unitSelection.item', { index: index + 1 })}
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                          {pickerOptions.map((sku: ProductSku) => {
+                            const isActive = sku._id === unitSkuId;
+                            const otherUnitsUsing = (unitCounts.get(sku._id) ?? 0) - (isActive ? 1 : 0);
+                            const isExhausted = otherUnitsUsing >= Math.max(0, sku.display_stock);
+                            const label = getColorDisplayName(sku.variantAttributes?.color ?? sku.variantName, locale);
+                            const colorValue =
+                              sku.variantAttributes?.colorCode || sku.variantAttributes?.color || sku.variantName;
+                            return (
+                              <button
+                                key={`${index}-${sku._id}`}
+                                type="button"
+                                disabled={isExhausted && !isActive}
+                                onClick={() => handleUnitSelect(index, sku._id)}
+                                className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-[10px] font-black uppercase tracking-tight transition-all disabled:cursor-not-allowed disabled:opacity-30 ${isActive
+                                  ? "border-primary bg-primary/10 text-foreground"
+                                  : "border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                                  }`}
+                              >
+                                <ColorSwatch
+                                  color={colorValue}
+                                  fallbackName={sku.variantName}
+                                  size="xs"
+                                  selected={isActive}
+                                />
+                                <span>{label}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {effectiveQuantity > 1 ? (
+                <div className="flex items-center justify-between border-t border-border pt-6">
+                  <span className="text-[10px] font-black uppercase text-label-muted">{t('pricing.total')}</span>
+                  <span className="font-space-grotesk text-2xl font-black tracking-tightest text-foreground">
+                    {totalPrice.toLocaleString(locale)} <span className="text-base text-primary">{t('pricing.currency')}</span>
+                  </span>
+                </div>
+              ) : null}
+
+              <div className="grid grid-cols-[1fr_auto] gap-3 sm:grid-cols-[1fr_1fr_auto]">
+                <button
+                  type="button"
+                  disabled={!isPurchasable || isAdding}
+                  onClick={() => handleAddToCart("cart")}
+                  className="group relative flex items-center justify-center gap-4 rounded-xl bg-primary py-5 font-space-grotesk text-lg font-black uppercase text-primary-foreground transition-all hover:brightness-110 active:scale-[0.97] disabled:grayscale disabled:opacity-30"
+                >
+                  <ShoppingBag size={24} className="group-hover:scale-110 transition-transform" />
+                  {effectiveQuantity > 1
+                    ? t('actions.addCountToCart', { count: effectiveQuantity })
+                    : t('actions.addToCart')}
+                </button>
+                <button
+                  type="button"
+                  disabled={!isPurchasable || isAdding}
+                  onClick={() => handleAddToCart("buyNow")}
+                  className="group relative order-3 col-span-2 flex items-center justify-center gap-4 rounded-xl border border-border bg-card py-5 font-space-grotesk text-lg font-black uppercase text-foreground transition-all hover:border-primary/50 active:scale-[0.97] disabled:grayscale disabled:opacity-30 sm:order-none sm:col-span-1"
+                >
+                  <Zap size={24} className="text-primary group-hover:scale-110 transition-transform" />
+                  {t('actions.buyNow')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleFavorite(product._id).catch((err) => console.error("Failed to update favorites", err));
+                  }}
+                  aria-pressed={isFavorite(product._id)}
+                  aria-label={isFavorite(product._id) ? t('favorite.remove') : t('favorite.add')}
+                  title={isFavorite(product._id) ? t('favorite.remove') : t('favorite.add')}
+                  className={cn(
+                    "flex w-16 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95",
+                    isFavorite(product._id)
+                      ? "border-destructive/40 bg-destructive/10 text-destructive"
+                      : "border-border bg-card text-foreground hover:border-primary/40",
+                  )}
+                >
+                  <Heart size={24} className={isFavorite(product._id) ? "fill-destructive" : ""} />
+                </button>
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex items-center gap-5 rounded-2xl border border-border bg-accent/20 p-5">
@@ -314,6 +530,10 @@ export default function ProductDetailPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="container mx-auto px-4 md:px-8 mt-24">
+        <ProductReviews productId={product._id} />
       </div>
 
       <div className="container mx-auto px-4 md:px-8 mt-24">

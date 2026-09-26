@@ -12,7 +12,19 @@
     },
     "pricing": {
       "currency": "EGP",
-      "unitsLeft": "{count} units left"
+      "unitsLeft": "{count} units left",
+      "total": "Total"
+    },
+    "quantity": {
+      "label": "Quantity",
+      "decrease": "Decrease quantity",
+      "increase": "Increase quantity",
+      "maxReached": "Max {count} available"
+    },
+    "unitSelection": {
+      "colorTitle": "Pick a color for each item",
+      "variantTitle": "Pick an option for each item",
+      "item": "Item {index}"
     },
     "variants": {
       "colorways": "Colorways",
@@ -22,7 +34,9 @@
       "type": "Type: {type}"
     },
     "actions": {
-      "addToCart": "Add To Cart"
+      "addToCart": "Add To Cart",
+      "addCountToCart": "Add {count} To Cart",
+      "buyNow": "Buy Now"
     },
     "features": {
       "shipping": "Fast Shipping Anywhere in Egypt",
@@ -32,6 +46,32 @@
     "status": {
       "unavailable": "Currently Unavailable",
       "soldOut": "Sold Out"
+    },
+    "favorite": {
+      "add": "Add to favorites",
+      "remove": "Remove from favorites"
+    },
+    "reviews": {
+      "title": "Customer Reviews",
+      "summary": "Based on {count, plural, one {# review} other {# reviews}}",
+      "noReviews": "No reviews yet. Be the first to share your experience.",
+      "writeTitle": "Write a review",
+      "editTitle": "Edit your review",
+      "ratingLabel": "Your rating",
+      "starAria": "{count, plural, one {# star} other {# stars}}",
+      "nameLabel": "Your name",
+      "namePlaceholder": "e.g. Ahmed",
+      "commentLabel": "Your review",
+      "commentPlaceholder": "What did you like or dislike?",
+      "submit": "Submit review",
+      "update": "Update review",
+      "submitting": "Submitting...",
+      "success": "Thanks! Your review has been saved.",
+      "error": "Could not save your review. Please try again.",
+      "ratingRequired": "Please choose a rating.",
+      "nameRequired": "Please enter your name.",
+      "yourReview": "Your review",
+      "reviewCount": "({count, plural, one {# review} other {# reviews}})"
     }
   }
 }

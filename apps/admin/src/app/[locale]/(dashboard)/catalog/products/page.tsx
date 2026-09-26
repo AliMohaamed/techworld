@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
-import { Button, Input, cn, ColorSwatch } from "@techworld/ui";
+import { Button, Input, cn, ColorSwatch, getColorDisplayName } from "@techworld/ui";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { ProductFormSheet } from "@/components/catalog/products/ProductFormSheet";
@@ -44,6 +44,13 @@ type AdminProduct = {
   images: string[];
   display_stock?: number;
   real_stock?: number;
+  features?: Array<{
+    icon: string;
+    title_en: string;
+    title_ar: string;
+    subtitle_en?: string;
+    subtitle_ar?: string;
+  }>;
   skus?: Array<{
     _id: Id<"skus">;
     variantName: string;
@@ -377,7 +384,7 @@ export default function AdminProductsPage() {
                               fallbackName={sku.variantName}
                               size="xs"
                             />
-                            <span>{sku.variantName}</span>
+                            <span>{getColorDisplayName(sku.variantName, locale)}</span>
                           </span>
                         )) || (
                             <span className="text-[9px] font-bold border border-border bg-background px-1.5 py-0.5 rounded uppercase tracking-wide text-muted-foreground/60">
@@ -450,7 +457,7 @@ export default function AdminProductsPage() {
                                 size="xs"
                               />
                               <span className="text-xs font-bold text-muted-foreground/50 truncate">
-                                {sku.variantName}
+                                {getColorDisplayName(sku.variantName, locale)}
                               </span>
                             </div>
                             <div className="flex items-center bg-accent/30 rounded-lg p-0.5 border border-border/50">
