@@ -13,6 +13,9 @@ import { Heart, ShoppingCart, Star, Zap } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@techworld/ui";
 
+/** Ratings below this average are hidden on the card. */
+const MIN_VISIBLE_RATING = 4;
+
 interface ProductCardProps {
   product: {
     _id: Id<"products">;
@@ -69,6 +72,8 @@ export default function ProductCard({ product, discountPercent }: ProductCardPro
 
   const reviewCount = product.reviewCount ?? 0;
   const ratingAverage = product.ratingAverage ?? 0;
+  // Only surface ratings that help sell: no "no reviews" placeholder, nothing below 4 stars.
+  const showRating = reviewCount > 0 && ratingAverage >= MIN_VISIBLE_RATING;
   const favorited = isFavorite(product._id);
   const name = locale === "en" ? product.name_en : product.name_ar;
   const imageSrc = product.thumbnail || product.images?.[0];
@@ -166,7 +171,7 @@ export default function ProductCard({ product, discountPercent }: ProductCardPro
         </p>
 
         <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs sm:text-sm">
-          {reviewCount > 0 ? (
+          {showRating ? (
             <span
               className="inline-flex items-center gap-1"
               aria-label={t("rating.aria", { rating: ratingAverage })}
@@ -175,13 +180,8 @@ export default function ProductCard({ product, discountPercent }: ProductCardPro
               <span className="font-bold text-foreground">{ratingAverage.toLocaleString(locale)}</span>
               <span className="text-label-muted">{t("rating.reviews", { count: reviewCount })}</span>
             </span>
-          ) : (
-            <span className="inline-flex items-center gap-1 text-label-muted">
-              <Star size={15} className="text-muted-foreground/40" />
-              {t("rating.noReviews")}
-            </span>
-          )}
-          <span className="hidden h-4 w-px bg-border sm:block" aria-hidden />
+          ) : null}
+          {showRating ? <span className="hidden h-4 w-px bg-border sm:block" aria-hidden /> : null}
           <span
             className={cn(
               "inline-flex items-center gap-1.5 font-medium",

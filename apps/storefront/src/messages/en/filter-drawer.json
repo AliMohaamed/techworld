@@ -11,14 +11,12 @@
       "closeAria": "Close filters"
     },
     "labels": {
-      "search": "Search",
       "category": "Category",
       "minPrice": "Min Price",
       "maxPrice": "Max Price",
       "sort": "Sort"
     },
     "placeholders": {
-      "search": "Search products",
       "maxPrice": "No limit"
     },
     "options": {
