@@ -1,0 +1,34 @@
+{
+  "DealsPage": {
+    "meta": {
+      "title": "Deals & Offers | TechWorld",
+      "description": "Live price drops across the TechWorld catalogue. Limited stock, limited time."
+    },
+    "badge": "Limited time",
+    "title": "Deals",
+    "description": "Every product currently marked down, ranked by how deep the discount runs. Stock moves fast — a deal disappears the moment it sells out.",
+    "hero": {
+      "liveDeals": "{count} live deals",
+      "upTo": "Up to {percent}% off"
+    },
+    "filters": {
+      "loading": "Loading deals...",
+      "resultCount": "{count} deals",
+      "sortLabel": "Sort deals",
+      "allCategories": "All",
+      "sort": {
+        "discount_desc": "Biggest discount",
+        "price_asc": "Price: low to high",
+        "price_desc": "Price: high to low",
+        "newest": "Newest"
+      }
+    },
+    "card": {
+      "savings": "Save {amount} EGP"
+    },
+    "empty": {
+      "title": "No deals right now",
+      "description": "Nothing is marked down at the moment. Check back soon — new offers go live regularly."
+    }
+  }
+}

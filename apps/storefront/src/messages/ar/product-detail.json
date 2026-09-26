@@ -12,7 +12,19 @@
     },
     "pricing": {
       "currency": "جنيه",
-      "unitsLeft": "متبقي {count} قطع"
+      "unitsLeft": "متبقي {count} قطع",
+      "total": "الإجمالي"
+    },
+    "quantity": {
+      "label": "الكمية",
+      "decrease": "تقليل الكمية",
+      "increase": "زيادة الكمية",
+      "maxReached": "الحد الأقصى {count} قطع"
+    },
+    "unitSelection": {
+      "colorTitle": "اختر لون كل قطعة",
+      "variantTitle": "اختر نوع كل قطعة",
+      "item": "القطعة {index}"
     },
     "variants": {
       "colorways": "الألوان المتاحة",
@@ -22,7 +34,9 @@
       "type": "النوع: {type}"
     },
     "actions": {
-      "addToCart": "إضافة للسلة"
+      "addToCart": "إضافة للسلة",
+      "addCountToCart": "إضافة {count} للسلة",
+      "buyNow": "اشترِ الآن"
     },
     "features": {
       "shipping": "شحن سريع لجميع أنحاء مصر",
@@ -32,6 +46,32 @@
     "status": {
       "unavailable": "غير متوفر حالياً",
       "soldOut": "نفذت الكمية"
+    },
+    "favorite": {
+      "add": "أضف إلى المفضلة",
+      "remove": "إزالة من المفضلة"
+    },
+    "reviews": {
+      "title": "آراء العملاء",
+      "summary": "بناءً على {count, plural, one {تقييم واحد} two {تقييمين} few {# تقييمات} many {# تقييمًا} other {# تقييم}}",
+      "noReviews": "لا توجد تقييمات بعد. كن أول من يشارك تجربته.",
+      "writeTitle": "اكتب تقييمًا",
+      "editTitle": "عدّل تقييمك",
+      "ratingLabel": "تقييمك",
+      "starAria": "{count, plural, one {نجمة واحدة} two {نجمتان} few {# نجوم} many {# نجمة} other {# نجمة}}",
+      "nameLabel": "اسمك",
+      "namePlaceholder": "مثال: أحمد",
+      "commentLabel": "تقييمك",
+      "commentPlaceholder": "ما الذي أعجبك أو لم يعجبك؟",
+      "submit": "إرسال التقييم",
+      "update": "تحديث التقييم",
+      "submitting": "جارٍ الإرسال...",
+      "success": "شكرًا! تم حفظ تقييمك.",
+      "error": "تعذر حفظ تقييمك. حاول مرة أخرى.",
+      "ratingRequired": "يرجى اختيار التقييم.",
+      "nameRequired": "يرجى إدخال اسمك.",
+      "yourReview": "تقييمك",
+      "reviewCount": "({count, plural, one {تقييم واحد} two {تقييمان} few {# تقييمات} many {# تقييمًا} other {# تقييم}})"
     }
   }
 }

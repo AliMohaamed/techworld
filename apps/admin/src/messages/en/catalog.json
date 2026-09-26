@@ -178,7 +178,28 @@
             "linkedImage": "Linked image",
             "isDefault": "Default Selection"
           },
-          "imageIndex": "Image {index}"
+          "imageIndex": "Image {index}",
+          "features": {
+            "title": "Product Features",
+            "hint": "Optional benefits grid shown under the description on the product page. Leave empty to hide the section.",
+            "add": "Add feature",
+            "empty": "No features yet. This section stays hidden on the storefront.",
+            "itemLabel": "Feature {index}",
+            "icon": "Icon",
+            "choosePicker": "Choose icon",
+            "hidePicker": "Hide icons",
+            "moveUp": "Move up",
+            "moveDown": "Move down",
+            "remove": "Remove feature",
+            "titleEn": "Title (English)",
+            "titleAr": "Title (Arabic)",
+            "subtitleEn": "Subtitle (English)",
+            "subtitleAr": "Subtitle (Arabic)",
+            "titleEnPlaceholder": "Compact & Lightweight",
+            "titleArPlaceholder": "تصميم صغير وخفيف",
+            "subtitleEnPlaceholder": "Easy to carry anywhere",
+            "subtitleArPlaceholder": "سهل الحمل في أي مكان"
+          }
         },
         "placeholders": {
           "selectCategory": "Select category",
@@ -209,10 +230,11 @@
           "required": "This field is required.",
           "nonNegative": "Value must be zero or more.",
           "atLeastOneVariant": "At least one variant is required.",
-          "compareAtPriceError": "Compare-at price must be higher than selling price."
+          "compareAtPriceError": "Compare-at price must be higher than selling price.",
+          "featureTitleRequired": "Add a title in English or Arabic.",
+          "tooManyFeatures": "A product can have at most 12 features."
         }
       }
     }
   }
 }
-

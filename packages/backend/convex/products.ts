@@ -7,7 +7,9 @@ import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 import { writeAuditLog } from "./lib/audit";
 import { resolveRef, isR2Ref, r2KeyFromRef } from "./lib/storageRef";
+import { productFeatureValidator } from "./schema";
 import * as r2 from "./lib/r2";
+import { ratingSummaryOf } from "./lib/ratings";
 
 type CatalogProduct = {
   _id: Id<"products">;
@@ -27,6 +29,10 @@ type CatalogProduct = {
   slug?: string;
   cogs?: number;
   sort_order?: number;
+  compareAtPrice?: number;
+  isFeatured?: boolean;
+  rating_sum?: number;
+  review_count?: number;
 };
 
 function normalizeOptionalString(value: string | undefined) {
@@ -40,6 +46,46 @@ function slugify(value: string) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
+}
+
+const MAX_PRODUCT_FEATURES = 12;
+
+type ProductFeatureInput = {
+  icon: string;
+  title_en: string;
+  title_ar: string;
+  subtitle_en?: string;
+  subtitle_ar?: string;
+};
+
+/**
+ * Features are optional: rows without a title in either language are dropped so
+ * an admin leaving a blank row behind never ships an empty tile to the PDP.
+ * Returns undefined when nothing survives, which clears the field.
+ */
+function sanitizeProductFeatures(features: ProductFeatureInput[] | undefined) {
+  if (!features?.length) return undefined;
+
+  const cleaned = features
+    .map((feature) => ({
+      icon: feature.icon.trim() || "sparkles",
+      title_en: feature.title_en.trim(),
+      title_ar: feature.title_ar.trim(),
+      subtitle_en: normalizeOptionalString(feature.subtitle_en),
+      subtitle_ar: normalizeOptionalString(feature.subtitle_ar),
+    }))
+    .filter((feature) => feature.title_en || feature.title_ar);
+
+  if (cleaned.length === 0) return undefined;
+
+  if (cleaned.length > MAX_PRODUCT_FEATURES) {
+    throw new ConvexError({
+      code: "TOO_MANY_FEATURES",
+      message: `A product can have at most ${MAX_PRODUCT_FEATURES} features.`,
+    });
+  }
+
+  return cleaned;
 }
 
 function sanitizeNumber(value: number, fieldLabel: string) {
@@ -122,6 +168,9 @@ const mapCatalogProduct = (product: CatalogProduct) => ({
   selling_price: product.selling_price,
   slug: product.slug,
   sort_order: product.sort_order,
+  compareAtPrice: product.compareAtPrice,
+  isFeatured: product.isFeatured,
+  ...ratingSummaryOf(product),
 });
 
 const matchesSearch = (product: CatalogProduct, rawQuery: string) => {
@@ -305,6 +354,7 @@ export const getProduct = query({
       categorySlug: category?.slug,
       isCategoryActive: category?.isActive ?? false,
       skus,
+      ...ratingSummaryOf(product),
       related_products: product.related_product_ids 
         ? (await Promise.all(product.related_product_ids.map(async (id) => {
             const p = await ctx.db.get(id);
@@ -347,6 +397,7 @@ export const getBySlug = query({
       categorySlug: category?.slug,
       isCategoryActive: category?.isActive ?? false,
       skus,
+      ...ratingSummaryOf(product),
       related_products: product.related_product_ids 
         ? (await Promise.all(product.related_product_ids.map(async (id) => {
             const p = await ctx.db.get(id);
@@ -688,6 +739,7 @@ export const getForStorefront = query({
             isFeatured: p.isFeatured,
             categoryName: category?.name_en || "UNKNOWN",
             skus: await resolveSkuMedia(ctx, p._id),
+            ...ratingSummaryOf(p),
           };
         }),
     );
@@ -1077,6 +1129,7 @@ export const createAdvancedProduct = mutation({
     status: v.optional(v.union(v.literal("DRAFT"), v.literal("PUBLISHED"))),
     slug: v.optional(v.string()),
     isFeatured: v.optional(v.boolean()),
+    features: v.optional(v.array(productFeatureValidator)),
     variants: v.array(advancedVariantInputValidator),
   },
   handler: async (ctx, args) => {
@@ -1125,6 +1178,7 @@ export const createAdvancedProduct = mutation({
       price: args.selling_price,
       slug,
       isFeatured: args.isFeatured,
+      features: sanitizeProductFeatures(args.features),
       isActive: args.status === "PUBLISHED",
     };
     const productId = await ctx.db.insert("products", payload);
@@ -1166,6 +1220,7 @@ export const updateAdvancedProduct = mutation({
     status: v.optional(v.union(v.literal("DRAFT"), v.literal("PUBLISHED"))),
     slug: v.optional(v.string()),
     isFeatured: v.optional(v.boolean()),
+    features: v.optional(v.array(productFeatureValidator)),
     variants: v.array(advancedVariantInputValidator),
   },
   handler: async (ctx, args) => {
@@ -1219,6 +1274,7 @@ export const updateAdvancedProduct = mutation({
       price: args.selling_price,
       slug,
       isFeatured: args.isFeatured,
+      features: sanitizeProductFeatures(args.features),
       isActive: args.status === "PUBLISHED",
     };
 

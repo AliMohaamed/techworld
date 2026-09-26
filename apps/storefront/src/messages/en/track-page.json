@@ -1,0 +1,136 @@
+{
+  "TrackPage": {
+    "meta": {
+      "title": "Track Your Order | TechWorld",
+      "description": "Enter your order code and the last four digits of your phone number to see exactly where your TechWorld order is."
+    },
+    "hero": {
+      "badge": "Order status",
+      "title": "Track Your",
+      "accent": "Order",
+      "description": "Live status straight from our system — the same view our support team sees, with the timestamp of every step your order has passed."
+    },
+    "form": {
+      "codeLabel": "Order code",
+      "codePlaceholder": "TW-A1B2C3",
+      "codeHint": "The short code from your order confirmation message.",
+      "phoneLabel": "Phone (last 4 digits)",
+      "phoneHint": "The number you entered at checkout.",
+      "submit": "Track",
+      "validation": "Enter your full order code and the last four digits of your phone number."
+    },
+    "states": {
+      "loading": "Looking up your order",
+      "notFoundTitle": "No order matches those details",
+      "notFoundBody": "Check the order code for typos and make sure the phone digits match the number you used at checkout. We ask for both so nobody else can look up your order with the code alone.",
+      "notFoundCta": "Ask us to find it",
+      "notFoundWhatsapp": "Hi TechWorld, I cannot find my order on the tracking page. My order code is",
+      "labels": {
+        "PENDING_PAYMENT_INPUT": "Awaiting payment",
+        "AWAITING_VERIFICATION": "Verifying payment",
+        "CONFIRMED": "Confirmed",
+        "READY_FOR_SHIPPING": "Ready to ship",
+        "SHIPPED": "Shipped",
+        "DELIVERED": "Delivered",
+        "RTO": "Returned to us",
+        "STALLED_PAYMENT": "Payment expired",
+        "CANCELLED": "Cancelled",
+        "FLAGGED_FRAUD": "On hold"
+      }
+    },
+    "progress": {
+      "heading": "Order progress",
+      "orderRef": "Order code",
+      "current": "Now",
+      "steps": {
+        "PENDING_PAYMENT_INPUT": {
+          "title": "Order placed",
+          "description": "Your order is reserved. Send your payment receipt on WhatsApp to move it forward."
+        },
+        "AWAITING_VERIFICATION": {
+          "title": "Payment received",
+          "description": "We have your receipt and are matching it to this order."
+        },
+        "CONFIRMED": {
+          "title": "Order confirmed",
+          "description": "Payment verified and stock allocated to you."
+        },
+        "READY_FOR_SHIPPING": {
+          "title": "Packed",
+          "description": "Picked, quality-checked and sealed, waiting for the courier collection."
+        },
+        "SHIPPED": {
+          "title": "With the courier",
+          "description": "On its way to you. The courier calls before arriving."
+        },
+        "DELIVERED": {
+          "title": "Delivered",
+          "description": "Handed over and signed for. You have 14 days to return it if something is wrong."
+        }
+      }
+    },
+    "exceptions": {
+      "CANCELLED": {
+        "title": "This order was cancelled",
+        "body": "Nothing further will be shipped. If you already paid, your refund is being processed — message us with your order code if you have not heard from us."
+      },
+      "RTO": {
+        "title": "This order came back to us",
+        "body": "Delivery could not be completed and the parcel returned to our warehouse. Message us and we will arrange a redelivery or a refund."
+      },
+      "STALLED_PAYMENT": {
+        "title": "Payment window expired",
+        "body": "We did not receive a payment receipt within 24 hours, so the reserved stock was released. You can still send your receipt and we will check whether the items are available."
+      },
+      "FLAGGED_FRAUD": {
+        "title": "This order is on hold",
+        "body": "Our team needs to verify a detail before continuing. Message us with your order code and we will clear it up quickly."
+      }
+    },
+    "summary": {
+      "heading": "Order summary",
+      "quantity": "{count, plural, one {# item} other {# items}}",
+      "placedOn": "Placed",
+      "destination": "Delivering to",
+      "phone": "Phone",
+      "shipping": "Shipping",
+      "discount": "Discount",
+      "total": "Total",
+      "currency": "EGP",
+      "contactCta": "Ask about this order",
+      "viewProduct": "View product",
+      "whatsappMessage": "Hi TechWorld, I have a question about order {code}"
+    },
+    "faq": {
+      "title": "Tracking questions",
+      "items": [
+        {
+          "question": "Where do I find my order code?",
+          "answer": "It is shown on the confirmation screen immediately after checkout and in the WhatsApp message we send you. It is short, uppercase, and unique to your order."
+        },
+        {
+          "question": "Why do you ask for my phone digits too?",
+          "answer": "An order code on its own is short enough to guess. Asking for the last four digits of your checkout phone number means nobody but you can pull up your order details."
+        },
+        {
+          "question": "My status has not changed in two days. Is something wrong?",
+          "answer": "Status updates land when an order physically moves, and weekends and public holidays create quiet gaps. If your order has been in the same state for more than three working days, message us with the code and we will look into it."
+        },
+        {
+          "question": "The status says shipped but nobody has called.",
+          "answer": "Couriers typically call on the delivery day rather than the dispatch day. If you are past the estimate for your governorate, send us your order code and we will chase the courier directly."
+        },
+        {
+          "question": "Can I still change my address or cancel?",
+          "answer": "Up until the order reaches the packed stage, yes. Message us with your order code as early as you can — once the parcel is with the courier we can no longer redirect it."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Looking for something else?",
+      "description": "Delivery estimates for your governorate, or what to do if the item is not right.",
+      "shipping": "Shipping info",
+      "returns": "Returns policy"
+    }
+  }
+}

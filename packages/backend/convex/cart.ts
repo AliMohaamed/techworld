@@ -5,6 +5,36 @@ import { internal } from "./_generated/api";
 import { resolveProductImages, resolveStorageRef } from "./products";
 import { writeAuditLog } from "./lib/audit";
 
+function normalizePromoCode(code: string) {
+  return code.trim().toUpperCase();
+}
+
+type PromoDoc = {
+  type: "fixed" | "percentage" | "free_shipping";
+  value: number;
+  max_discount_amount?: number;
+};
+
+/**
+ * Single source of truth for promo maths, shared by the cart preview and
+ * order placement. Never returns more than the item subtotal.
+ */
+function calculatePromoDiscount(promo: PromoDoc, subtotal: number) {
+  if (promo.type === "free_shipping") {
+    // Waived at order level via appliedShippingFee; items are untouched.
+    return 0;
+  }
+
+  let discount =
+    promo.type === "fixed" ? promo.value : (subtotal * promo.value) / 100;
+
+  if (promo.type === "percentage" && promo.max_discount_amount) {
+    discount = Math.min(discount, promo.max_discount_amount);
+  }
+
+  return Math.floor(Math.min(discount, Math.max(0, subtotal)));
+}
+
 async function getSkuOrThrow(
   ctx: { db: { get: (id: Id<"skus">) => Promise<{ _id: Id<"skus">; productId: Id<"products">; price: number; display_stock: number; real_stock: number; variantName: string; variantAttributes: { color?: string; size?: string; type?: string }; compareAtPrice?: number; linkedImageId?: string; isDefault?: boolean; isActive?: boolean } | null> } },
   skuId: Id<"skus">,
@@ -90,6 +120,79 @@ export const addToCart = mutation({
   },
 });
 
+export const addItemsToCart = mutation({
+  args: {
+    sessionId: v.string(),
+    productId: v.id("products"),
+    items: v.array(
+      v.object({
+        skuId: v.id("skus"),
+        quantity: v.number(),
+      }),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const product = await ctx.db.get(args.productId);
+    if (!product) throw new ConvexError({ code: "PRODUCT_NOT_FOUND", message: "Product not found." });
+
+    const requested = new Map<Id<"skus">, number>();
+    for (const item of args.items) {
+      const quantity = Math.floor(item.quantity);
+      if (quantity <= 0) continue;
+      requested.set(item.skuId, (requested.get(item.skuId) ?? 0) + quantity);
+    }
+    if (requested.size === 0) {
+      throw new ConvexError({ code: "EMPTY_SELECTION", message: "No variants were selected." });
+    }
+
+    const session = await ctx.db
+      .query("cart_sessions")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .unique();
+
+    const now = Date.now();
+    const newItems = session ? [...session.items] : [];
+
+    for (const [skuId, quantity] of requested) {
+      const sku = await getSkuOrThrow(ctx, skuId, args.productId);
+      const existingItemIndex = newItems.findIndex(
+        (item) => item.productId === args.productId && item.skuId === skuId,
+      );
+      const existingQuantity = existingItemIndex > -1 ? newItems[existingItemIndex].quantity : 0;
+      const nextQuantity = existingQuantity + quantity;
+
+      if (sku.display_stock < nextQuantity) {
+        throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: "Insufficient display stock for the selected variant." });
+      }
+
+      if (existingItemIndex > -1) {
+        newItems[existingItemIndex] = {
+          ...newItems[existingItemIndex],
+          quantity: nextQuantity,
+          addedAt: now,
+        };
+      } else {
+        newItems.push({
+          productId: args.productId,
+          skuId,
+          quantity: nextQuantity,
+          addedAt: now,
+        });
+      }
+    }
+
+    if (session) {
+      await ctx.db.patch(session._id, { items: newItems, lastUpdated: now });
+    } else {
+      await ctx.db.insert("cart_sessions", {
+        sessionId: args.sessionId,
+        items: newItems,
+        lastUpdated: now,
+      });
+    }
+  },
+});
+
 export const removeFromCart = mutation({
   args: {
     sessionId: v.string(),
@@ -153,47 +256,37 @@ export const getCart = query({
     let promoType = null;
 
     if (args.promoCode) {
-      // Internal-ish check using the same logic as validatePromoCode query
-      // (Avoiding cross-file query call if possible, or using a library function)
-      // For simplicity here, we'll re-calculate or assume a bridge. 
-      // In Convex, it's best to helper-ize logic used in both queries and mutations.
-      // But for the sake of the task, I will implement a bridge fetch.
+      // Mirrors promoCodes.validatePromoCode so the cart preview and the
+      // discount actually written at placement can never disagree.
       const promo = await ctx.db
         .query("promo_codes")
-        .withIndex("by_code", (q) => q.eq("code", args.promoCode as string))
+        .withIndex("by_code", (q) => q.eq("code", normalizePromoCode(args.promoCode as string)))
         .unique();
 
       if (!promo || !promo.isActive || (promo.expiry_date && Date.now() > promo.expiry_date) || promo.current_uses >= promo.max_uses) {
         promoError = "Invalid or expired promo code";
       } else {
         const products = await Promise.all(session.items.map(item => ctx.db.get(item.productId)));
-        const hasBundle = products.some(p => (p as any)?.isBundle === true);
-        
+        const hasBundle = products.some(p => (p as { isBundle?: boolean } | null)?.isBundle === true);
+
         if (hasBundle) {
           promoError = "Promo code cannot be combined with bundles";
         } else {
           promoId = promo._id;
           promoType = promo.type;
-          if (promo.type === "fixed") {
-            promoDiscount = promo.value;
-          } else if (promo.type === "percentage") {
-            promoDiscount = (subtotal * promo.value) / 100;
-            if (promo.max_discount_amount) {
-              promoDiscount = Math.min(promoDiscount, promo.max_discount_amount);
-            }
-          }
+          promoDiscount = calculatePromoDiscount(promo, subtotal);
         }
       }
     }
 
-    return { 
-      items, 
-      subtotal, 
-      promoDiscount: Math.floor(promoDiscount), 
+    return {
+      items,
+      subtotal,
+      promoDiscount,
       promoType,
       promoError,
       promoId,
-      total: Math.max(0, subtotal - Math.floor(promoDiscount)) 
+      total: Math.max(0, subtotal - promoDiscount)
     };
   },
 });
@@ -281,30 +374,22 @@ export const placeOrderFromSession = mutation({
     if (args.promoCode) {
       const promo = await ctx.db
         .query("promo_codes")
-        .withIndex("by_code", (q) => q.eq("code", args.promoCode as string))
+        .withIndex("by_code", (q) => q.eq("code", normalizePromoCode(args.promoCode as string)))
         .unique();
 
       if (promo && promo.isActive && (!promo.expiry_date || Date.now() <= promo.expiry_date) && promo.current_uses < promo.max_uses) {
-        // Double check bundle exclusivity
+        // Bundle exclusivity is re-checked here: the cart may have changed
+        // since the storefront previewed the discount.
         const products = await Promise.all(session.items.map(item => ctx.db.get(item.productId)));
-        const hasBundle = products.some(p => (p as any)?.isBundle === true);
-        
+        const hasBundle = products.some(p => (p as { isBundle?: boolean } | null)?.isBundle === true);
+
         if (!hasBundle) {
           promoDoc = promo;
-          // Calculate global discount for the whole order to be split or assigned to one line
-          // The schema has promo_code_id on 'orders' table (which is per-item here)
-          // Since it's per-item, we calculate the subtotal first
-          const subtotal = session.items.reduce((sum, item) => sum + (0), 0); // Need prices
-          // Better approach: calculate per-line or store at order level if orders was a header.
-          // Since TechWorld orders is per-item/SKU, we apply the discount logically.
-          // Spec says "Applied mutually exclusive... one code per order".
-          // We'll apply the whole discount amount to the first item for calculation record, or split it.
-          // Given TW architecture, we'll store the discount applied on the line.
         }
       }
     }
 
-    // Refetching prices for discount calculation
+    // Prices are re-read from the DB rather than trusted from the client.
     const sessionItemsWithPrices = await Promise.all(session.items.map(async (item) => {
         const product = await ctx.db.get(item.productId);
         const sku = await ctx.db.get(item.skuId);
@@ -314,16 +399,9 @@ export const placeOrderFromSession = mutation({
     const totalSubtotal = sessionItemsWithPrices.reduce((sum, i) => sum + (i.price * i.quantity), 0);
 
     if (promoDoc) {
-        if (promoDoc.type === "fixed") {
-          promoDiscountAmount = promoDoc.value;
-        } else if (promoDoc.type === "percentage") {
-          promoDiscountAmount = (totalSubtotal * promoDoc.value) / 100;
-          if (promoDoc.max_discount_amount) {
-            promoDiscountAmount = Math.min(promoDiscountAmount, promoDoc.max_discount_amount);
-          }
-        }
-        
-        // Increment usage
+        // TechWorld orders are one row per SKU line, so the order-level
+        // discount is computed once here and then split across the lines below.
+        promoDiscountAmount = calculatePromoDiscount(promoDoc, totalSubtotal);
         await ctx.db.patch(promoDoc._id, { current_uses: promoDoc.current_uses + 1 });
     }
 

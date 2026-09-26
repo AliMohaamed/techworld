@@ -55,6 +55,7 @@ export function PromoCodeFormSheet({
 }: PromoCodeFormSheetProps) {
   const t = useTranslations("Marketing.promoCodes");
   const createPromo = useMutation(api.promoCodes.create);
+  const updatePromo = useMutation(api.promoCodes.update);
 
   const {
     register,
@@ -108,20 +109,26 @@ export function PromoCodeFormSheet({
         ? new Date(data.expiry_date).getTime()
         : undefined;
 
-      if (promoCode) {
-        toast.info(t("messages.updateNotImplemented"));
-        return;
-      }
-
-      await createPromo({
+      const payload = {
         code: data.code,
         type: data.type,
         value: data.value,
-        max_discount_amount: data.max_discount_amount || undefined,
+        // The cap is percentage-only; the backend rejects it on other types.
+        max_discount_amount:
+          data.type === "percentage" ? data.max_discount_amount || undefined : undefined,
         max_uses: data.max_uses,
         expiry_date: expiry_date_ms,
         isActive: data.isActive,
-      });
+      };
+
+      if (promoCode) {
+        await updatePromo({ id: promoCode._id, ...payload });
+        toast.success(t("messages.updateSuccess"));
+        onOpenChange(false);
+        return;
+      }
+
+      await createPromo(payload);
 
       toast.success(t("messages.createSuccess"));
       onOpenChange(false);

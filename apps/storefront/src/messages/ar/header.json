@@ -5,8 +5,10 @@
       "categories": "الأقسام",
       "deals": "العروض اليومية",
       "support": "الدعم الفني",
+      "viewAllCategories": "عرض كل الأقسام",
       "shopNow": "تسوق الآن"
     },
-    "cartAria": "فتح سلة التسوق"
+    "cartAria": "فتح سلة التسوق",
+    "favoritesAria": "المفضلة"
   }
 }

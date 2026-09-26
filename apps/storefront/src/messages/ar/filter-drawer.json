@@ -11,14 +11,12 @@
       "closeAria": "إغلاق الفلاتر"
     },
     "labels": {
-      "search": "البحث",
       "category": "القسم",
       "minPrice": "أقل سعر",
       "maxPrice": "أعلى سعر",
       "sort": "الترتيب"
     },
     "placeholders": {
-      "search": "ابحث عن منتجات",
       "maxPrice": "بدون حد"
     },
     "options": {

@@ -3,6 +3,20 @@ import { v } from "convex/values";
 import { permissionValidators } from "./lib/permissions";
 
 const storageRef = v.union(v.string(), v.id("_storage"));
+
+/**
+ * Optional benefits grid rendered under a product's description.
+ * `icon` is a key from the shared picker set in `@techworld/ui`, stored as a
+ * plain string so the catalogue never depends on a component reference.
+ */
+export const productFeatureValidator = v.object({
+  icon: v.string(),
+  title_en: v.string(),
+  title_ar: v.string(),
+  subtitle_en: v.optional(v.string()),
+  subtitle_ar: v.optional(v.string()),
+});
+
 export const orderStateValidator = v.union(
   v.literal("PENDING_PAYMENT_INPUT"),
   v.literal("AWAITING_VERIFICATION"),
@@ -67,6 +81,10 @@ export default defineSchema({
     related_product_ids: v.optional(v.array(v.id("products"))),
     isFeatured: v.optional(v.boolean()),
     sort_order: v.optional(v.number()),
+    features: v.optional(v.array(productFeatureValidator)),
+    // Denormalised review aggregates, maintained by reviews.ts.
+    rating_sum: v.optional(v.number()),
+    review_count: v.optional(v.number()),
   })
     .index("by_category", ["categoryId"])
     .index("by_status", ["status"])
@@ -178,6 +196,25 @@ export default defineSchema({
     addedBy: v.id("users"),
     addedAt: v.number(),
   }).index("by_phone", ["phoneNumber"]),
+
+  product_reviews: defineTable({
+    productId: v.id("products"),
+    sessionId: v.string(),
+    authorName: v.string(),
+    rating: v.number(),
+    comment: v.optional(v.string()),
+    updatedAt: v.number(),
+    isHidden: v.optional(v.boolean()),
+  })
+    .index("by_product", ["productId"])
+    .index("by_product_session", ["productId", "sessionId"]),
+
+  favorites: defineTable({
+    sessionId: v.string(),
+    productId: v.id("products"),
+  })
+    .index("by_session", ["sessionId"])
+    .index("by_session_product", ["sessionId", "productId"]),
 
   promo_codes: defineTable({
     code: v.string(),

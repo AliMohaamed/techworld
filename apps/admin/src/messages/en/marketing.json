@@ -46,11 +46,11 @@
         "deleteSuccess": "Promo code deleted",
         "updateFailed": "Failed to update status",
         "deleteFailed": "Failed to delete promo code",
-        "updateNotImplemented": "Update logic not yet implemented in backend. Delete and re-create for now.",
+        "updateSuccess": "Promo code updated successfully",
         "createSuccess": "Promo code created successfully",
         "operationFailed": "Operation failed",
         "submissionFailed": "Submission failed",
-        "invalidOrExpiredPromoCode": "Invalid or expired promo code"  
+        "invalidOrExpiredPromoCode": "Invalid or expired promo code"
       },
       "form": {
         "createTitle": "New Promo Code",
@@ -88,6 +88,79 @@
           "saving": "Creating...",
           "cancel": "Cancel"
         }
+      }
+    },
+    "offers": {
+      "badge": "Merchandising",
+      "title": "Offers & Deals",
+      "description": "Run product discounts that power the storefront Deals page. Prices are anchored to the original price, so re-pricing a live offer never compounds the discount.",
+      "stats": {
+        "activeOffers": "Active offers",
+        "liveOffers": "Live on storefront",
+        "deepestDiscount": "Deepest discount",
+        "averageDiscount": "Average discount"
+      },
+      "actions": {
+        "start": "Start offer",
+        "edit": "Edit offer",
+        "clear": "End offer",
+        "apply": "Apply discount",
+        "applying": "Applying...",
+        "cancel": "Cancel",
+        "bulkApply": "Bulk discount ({count})",
+        "confirmClear": "End this offer and restore the original price?"
+      },
+      "table": {
+        "badge": "Catalog pricing",
+        "title": "All products",
+        "searchPlaceholder": "Search products...",
+        "selectAll": "Select all visible products",
+        "loading": "Loading offers...",
+        "empty": "No products match this view.",
+        "noOffer": "No offer",
+        "outOfStock": "Out of stock",
+        "variantsOnOffer": "{discounted}/{total} variants discounted",
+        "filters": {
+          "all": "All",
+          "active": "On offer",
+          "inactive": "No offer"
+        },
+        "columns": {
+          "product": "Product",
+          "pricing": "Pricing",
+          "discount": "Discount",
+          "visibility": "Visibility",
+          "actions": "Actions"
+        },
+        "visibility": {
+          "live": "Live",
+          "draft": "Draft",
+          "categoryInactive": "Category off"
+        }
+      },
+      "form": {
+        "badge": "Offer setup",
+        "title": "Configure offer",
+        "bulkTitle": "Bulk discount campaign",
+        "description": "The current price becomes the struck-through original and the discounted price goes live immediately.",
+        "target": "Applies to",
+        "bulkTargets": "{count} selected products",
+        "variantCount": "{count} variants",
+        "preview": "Storefront preview",
+        "saves": "Customer saves EGP {amount}",
+        "fields": {
+          "discount": "Discount percentage",
+          "applyToVariants": "Also discount every variant",
+          "applyToVariantsHint": "Keeps variant prices in step with the product price so the card, PDP and cart agree."
+        }
+      },
+      "messages": {
+        "applied": "Offer applied",
+        "cleared": "Offer ended and original price restored",
+        "bulkApplied": "Discount applied to {count} products",
+        "bulkSkipped": "{count} products were skipped",
+        "invalidDiscount": "Enter a discount between 1 and 99 percent.",
+        "operationFailed": "Operation failed"
       }
     }
   }

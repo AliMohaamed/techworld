@@ -1,18 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import { useQuery } from "convex/react";
-import { Funnel, Search, SlidersHorizontal, X } from "lucide-react";
+import { Funnel, SlidersHorizontal, X } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import { useTranslations, useLocale } from "next-intl";
+import { useCatalogParams } from "@/lib/use-catalog-params";
 
 type FilterDrawerProps = {
   lockedCategoryId?: string;
+  /** Mobile sheet visibility; the trigger lives in the catalog toolbar. */
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 };
 
+// Search is not a drawer field: it's applied live by <CatalogSearch />.
 type DraftFilters = {
-  searchQuery: string;
   categoryId: string;
   minPrice: string;
   maxPrice: string;
@@ -20,25 +24,40 @@ type DraftFilters = {
 };
 
 const getDraftFilters = (
-  searchParams: ReturnType<typeof useSearchParams>,
+  searchParams: ReadonlyURLSearchParams,
   lockedCategoryId?: string,
 ): DraftFilters => ({
-  searchQuery: searchParams.get("searchQuery") ?? "",
   categoryId: lockedCategoryId ?? searchParams.get("categoryId") ?? "",
   minPrice: searchParams.get("minPrice") ?? "",
   maxPrice: searchParams.get("maxPrice") ?? "",
   sortOrder: searchParams.get("sortOrder") ?? "newest",
 });
 
-export default function FilterDrawer({ lockedCategoryId }: FilterDrawerProps) {
+export function FilterDrawerTrigger({ onClick }: { onClick: () => void }) {
+  const t = useTranslations("FilterDrawer");
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex h-12 shrink-0 items-center gap-2.5 rounded-xl border border-border bg-card px-4 font-space-grotesk text-xs font-bold text-foreground transition-all hover:border-primary/30 hover:text-primary active:scale-[0.98] sm:px-5 lg:hidden"
+    >
+      <Funnel size={16} className="text-primary" />
+      {t("mobile.button")}
+    </button>
+  );
+}
+
+export default function FilterDrawer({
+  lockedCategoryId,
+  isOpen,
+  onOpenChange,
+}: FilterDrawerProps) {
   const t = useTranslations("FilterDrawer");
   const locale = useLocale();
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const { searchParams, update } = useCatalogParams();
   const categoryResult = useQuery(api.categories.listActiveCategories);
   const categories = categoryResult?.categories ?? [];
-  const [isOpen, setIsOpen] = useState(false);
   const [draft, setDraft] = useState<DraftFilters>(() =>
     getDraftFilters(searchParams, lockedCategoryId),
   );
@@ -52,46 +71,21 @@ export default function FilterDrawer({ lockedCategoryId }: FilterDrawerProps) {
   };
 
   const pushFilters = (nextDraft: DraftFilters) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    const setOrDelete = (key: string, value: string) => {
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
-    };
-
-    setOrDelete("searchQuery", nextDraft.searchQuery.trim());
-    setOrDelete("minPrice", nextDraft.minPrice.trim());
-    setOrDelete("maxPrice", nextDraft.maxPrice.trim());
-
-    if (nextDraft.sortOrder && nextDraft.sortOrder !== "newest") {
-      params.set("sortOrder", nextDraft.sortOrder);
-    } else {
-      params.delete("sortOrder");
-    }
-
-    if (lockedCategoryId) {
-      params.set("categoryId", lockedCategoryId);
-    } else {
-      setOrDelete("categoryId", nextDraft.categoryId);
-    }
-
-    const queryString = params.toString();
-    router.push(queryString ? `${pathname}?${queryString}` : pathname, {
-      scroll: false,
+    update({
+      categoryId: lockedCategoryId ?? nextDraft.categoryId,
+      minPrice: nextDraft.minPrice,
+      maxPrice: nextDraft.maxPrice,
+      sortOrder: nextDraft.sortOrder !== "newest" ? nextDraft.sortOrder : undefined,
     });
   };
 
   const applyFilters = () => {
     pushFilters(draft);
-    setIsOpen(false);
+    onOpenChange(false);
   };
 
   const clearFilters = () => {
     const cleared = {
-      searchQuery: "",
       categoryId: lockedCategoryId ?? "",
       minPrice: "",
       maxPrice: "",
@@ -100,7 +94,7 @@ export default function FilterDrawer({ lockedCategoryId }: FilterDrawerProps) {
 
     setDraft(cleared);
     pushFilters(cleared);
-    setIsOpen(false);
+    onOpenChange(false);
   };
 
   const desktopPanel = (
@@ -129,17 +123,6 @@ export default function FilterDrawer({ lockedCategoryId }: FilterDrawerProps) {
 
   return (
     <>
-      <div className="lg:hidden">
-        <button
-          type="button"
-          onClick={() => setIsOpen(true)}
-          className="inline-flex items-center gap-2.5 rounded-xl border border-border bg-card px-5 py-3 font-space-grotesk text-xs font-bold text-foreground transition-all hover:border-primary/30 hover:text-primary active:scale-[0.98]"
-        >
-          <Funnel size={16} className="text-primary" />
-          {t("mobile.button")}
-        </button>
-      </div>
-
       {desktopPanel}
 
       {isOpen && (
@@ -148,7 +131,7 @@ export default function FilterDrawer({ lockedCategoryId }: FilterDrawerProps) {
             type="button"
             aria-label={t("mobile.closeAria")}
             className="absolute inset-0"
-            onClick={() => setIsOpen(false)}
+            onClick={() => onOpenChange(false)}
           />
           <div className="absolute inset-x-0 bottom-0 rounded-t-2xl border-t border-border bg-card px-6 pb-10 pt-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
             <div className="mb-6 flex items-center justify-between">
@@ -162,7 +145,7 @@ export default function FilterDrawer({ lockedCategoryId }: FilterDrawerProps) {
               </div>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => onOpenChange(false)}
                 className="rounded-lg border border-border p-2.5 text-label-muted transition-colors hover:bg-accent hover:text-foreground"
               >
                 <X size={18} />
@@ -211,19 +194,6 @@ function FilterFields({
 }) {
   return (
     <div className="space-y-5">
-      <div className="space-y-1.5">
-        <label className="text-[11px] font-semibold text-label-muted block px-1 uppercase tracking-wider">{t("labels.search")}</label>
-        <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3.5 focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10 transition-all">
-          <Search size={16} className="text-label-muted/50" />
-          <input
-            value={draft.searchQuery}
-            onChange={(event) => onChange("searchQuery", event.target.value)}
-            placeholder={t("placeholders.search")}
-            className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-label-muted/30 font-medium"
-          />
-        </div>
-      </div>
-
       <div className="space-y-1.5">
         <label className="text-[11px] font-semibold text-label-muted block px-1 uppercase tracking-wider">{t("labels.category")}</label>
         <div className="relative">

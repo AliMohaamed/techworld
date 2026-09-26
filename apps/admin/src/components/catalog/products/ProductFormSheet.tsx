@@ -17,6 +17,9 @@ import {
   Info,
   Image as ImageIcon,
   Layers,
+  ListChecks,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
@@ -40,8 +43,10 @@ import {
   ColorSwatch,
   resolveColor,
   COLOR_PRESETS,
+  DEFAULT_PRODUCT_FEATURE_ICON,
 } from "@techworld/ui";
 import { ConvexStorageUpload } from "./ConvexStorageUpload";
+import { FeatureIconPicker } from "./FeatureIconPicker";
 import {
   productSchema,
   type ProductFormSubmitValues,
@@ -69,6 +74,13 @@ type ProductRecord = {
   thumbnail?: string;
   images: string[];
   isFeatured?: boolean;
+  features?: Array<{
+    icon: string;
+    title_en: string;
+    title_ar: string;
+    subtitle_en?: string;
+    subtitle_ar?: string;
+  }>;
   skus?: Array<{
     _id: Id<"skus">;
     variantName: string;
@@ -96,6 +108,14 @@ const emptyVariant = {
   isDefault: true,
 };
 
+const emptyFeature = {
+  icon: DEFAULT_PRODUCT_FEATURE_ICON as string,
+  title_en: "",
+  title_ar: "",
+  subtitle_en: "",
+  subtitle_ar: "",
+};
+
 const emptyValues: ProductFormValues = {
   categoryId: "",
   name_en: "",
@@ -110,6 +130,7 @@ const emptyValues: ProductFormValues = {
   images: [],
   status: "DRAFT",
   isFeatured: false,
+  features: [],
   variants: [emptyVariant],
 };
 
@@ -149,6 +170,15 @@ export function ProductFormSheet({
   const { fields, append, remove } = useFieldArray({
     control,
     name: "variants",
+  });
+  const {
+    fields: featureFields,
+    append: appendFeature,
+    remove: removeFeature,
+    move: moveFeature,
+  } = useFieldArray({
+    control,
+    name: "features",
   });
   const images = useWatch({ control, name: "images" }) ?? [];
   const thumbnail = useWatch({ control, name: "thumbnail" });
@@ -218,6 +248,14 @@ export function ProductFormSheet({
       images: product.images,
       status: product.status,
       isFeatured: product.isFeatured ?? false,
+      features:
+        product.features?.map((feature) => ({
+          icon: feature.icon,
+          title_en: feature.title_en ?? "",
+          title_ar: feature.title_ar ?? "",
+          subtitle_en: feature.subtitle_en ?? "",
+          subtitle_ar: feature.subtitle_ar ?? "",
+        })) ?? [],
       variants:
         product.skus && product.skus.length > 0
           ? product.skus.map((sku, index) => ({
@@ -573,6 +611,149 @@ export function ProductFormSheet({
               </div>
             </section>
 
+            {/* Features Section (optional) */}
+            <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                  <ListChecks size={18} className="text-[#ffc105]/60" />
+                  <div>
+                    <h3 className="text-sm font-bold text-foreground">
+                      {t("form.fields.features.title")}
+                    </h3>
+                    <p className="mt-1 text-[11px] font-medium text-muted-foreground/60">
+                      {t("form.fields.features.hint")}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={featureFields.length >= 12}
+                  className="rounded-full border-[#ffc105]/20 text-[#ffc105] font-semibold text-xs h-8 px-4 hover:bg-[#ffc105]/10 disabled:opacity-40"
+                  onClick={() => appendFeature({ ...emptyFeature })}
+                >
+                  <Plus size={14} className="ltr:mr-2 rtl:ml-2" />
+                  {t("form.fields.features.add")}
+                </Button>
+              </div>
+
+              {featureFields.length === 0 ? (
+                <div className="rounded-[40px] border border-dashed border-border bg-card p-10 text-center">
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/40">
+                    {t("form.fields.features.empty")}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {featureFields.map((field, index) => (
+                    <div
+                      key={field.id}
+                      className="rounded-[40px] border border-border bg-card p-8 transition-all hover:border-[#ffc105]/20"
+                    >
+                      <div className="mb-6 flex items-center justify-between gap-3">
+                        <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
+                          {t("form.fields.features.itemLabel", { index: index + 1 })}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            aria-label={t("form.fields.features.moveUp")}
+                            disabled={index === 0}
+                            onClick={() => moveFeature(index, index - 1)}
+                            className="h-9 w-9 rounded-xl p-0 text-muted-foreground/40 hover:text-foreground disabled:opacity-20"
+                          >
+                            <ArrowUp size={14} />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            aria-label={t("form.fields.features.moveDown")}
+                            disabled={index === featureFields.length - 1}
+                            onClick={() => moveFeature(index, index + 1)}
+                            className="h-9 w-9 rounded-xl p-0 text-muted-foreground/40 hover:text-foreground disabled:opacity-20"
+                          >
+                            <ArrowDown size={14} />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            aria-label={t("form.fields.features.remove")}
+                            onClick={() => removeFeature(index)}
+                            className="h-9 w-9 rounded-xl p-0 text-destructive/50 hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="grid gap-6 md:grid-cols-2">
+                        <Field
+                          label={t("form.fields.features.icon")}
+                          error={errors.features?.[index]?.icon?.message?.toString()}
+                          className="md:col-span-2"
+                        >
+                          <Controller
+                            control={control}
+                            name={`features.${index}.icon`}
+                            render={({ field: iconField }) => (
+                              <FeatureIconPicker
+                                value={iconField.value || DEFAULT_PRODUCT_FEATURE_ICON}
+                                onChange={iconField.onChange}
+                              />
+                            )}
+                          />
+                        </Field>
+
+                        <Field
+                          label={t("form.fields.features.titleEn")}
+                          error={errors.features?.[index]?.title_en?.message?.toString()}
+                        >
+                          <Input
+                            {...register(`features.${index}.title_en`)}
+                            placeholder={t("form.fields.features.titleEnPlaceholder")}
+                            className="rounded-xl border-border bg-background h-12 font-semibold"
+                          />
+                        </Field>
+
+                        <Field
+                          label={t("form.fields.features.titleAr")}
+                          error={errors.features?.[index]?.title_ar?.message?.toString()}
+                        >
+                          <Input
+                            dir="rtl"
+                            {...register(`features.${index}.title_ar`)}
+                            placeholder={t("form.fields.features.titleArPlaceholder")}
+                            className="rounded-xl border-border bg-background h-12 font-semibold"
+                          />
+                        </Field>
+
+                        <Field label={t("form.fields.features.subtitleEn")}>
+                          <Input
+                            {...register(`features.${index}.subtitle_en`)}
+                            placeholder={t("form.fields.features.subtitleEnPlaceholder")}
+                            className="rounded-xl border-border bg-background h-12 font-medium"
+                          />
+                        </Field>
+
+                        <Field label={t("form.fields.features.subtitleAr")}>
+                          <Input
+                            dir="rtl"
+                            {...register(`features.${index}.subtitle_ar`)}
+                            placeholder={t("form.fields.features.subtitleArPlaceholder")}
+                            className="rounded-xl border-border bg-background h-12 font-medium"
+                          />
+                        </Field>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
             {/* SKU Section */}
             <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -926,6 +1107,13 @@ function buildPayload(values: ProductFormSubmitValues) {
     images: values.images.filter(id => id && id.trim() !== ""),
     status: values.status,
     isFeatured: values.isFeatured,
+    features: values.features.map((feature) => ({
+      icon: feature.icon,
+      title_en: feature.title_en ?? "",
+      title_ar: feature.title_ar ?? "",
+      subtitle_en: feature.subtitle_en || undefined,
+      subtitle_ar: feature.subtitle_ar || undefined,
+    })),
     variants: values.variants.map((variant, index) => ({
       id: variant.id ? (variant.id as Id<"skus">) : undefined,
       variantName: variant.variantName,

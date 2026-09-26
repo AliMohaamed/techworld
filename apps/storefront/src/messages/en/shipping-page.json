@@ -1,0 +1,151 @@
+{
+  "ShippingPage": {
+    "meta": {
+      "title": "Shipping Information | TechWorld",
+      "description": "Delivery timelines, shipping rates for every Egyptian governorate, and exactly what happens between placing your order and receiving it."
+    },
+    "hero": {
+      "badge": "Delivery",
+      "title": "Shipping",
+      "accent": "Info",
+      "description": "Every rate and timeline on this page is the same data our checkout and our couriers run on. No hidden handling fees, no surprise surcharges at the door."
+    },
+    "highlights": {
+      "dispatch": {
+        "label": "Dispatch window",
+        "value": "Same day before 3 PM"
+      },
+      "coverage": {
+        "label": "Coverage",
+        "value": "{count} governorates"
+      },
+      "from": {
+        "label": "Rates from",
+        "value": "{amount} EGP",
+        "fallback": "See the rate table"
+      }
+    },
+    "process": {
+      "title": "How your order reaches you",
+      "description": "Four stages, each one visible on your tracking page the moment it happens.",
+      "steps": [
+        {
+          "title": "Order placed",
+          "description": "You confirm your cart and immediately receive a short order code. Keep it — it is how we and you refer to the order.",
+          "meta": "Instant"
+        },
+        {
+          "title": "Payment verified",
+          "description": "Send your transfer receipt on WhatsApp. Our team matches it to your order code and confirms it.",
+          "meta": "Usually within 2 hours"
+        },
+        {
+          "title": "Packed and dispatched",
+          "description": "Your items are picked from stock, quality-checked, sealed and handed to our courier partner.",
+          "meta": "Same or next working day"
+        },
+        {
+          "title": "Out for delivery",
+          "description": "The courier calls you before arriving. Have your order code ready and inspect the parcel before you accept it.",
+          "meta": "1 to 6 working days"
+        }
+      ]
+    },
+    "zones": {
+      "title": "Delivery estimates by zone",
+      "description": "Estimates are counted in working days from the moment your payment is verified, not from the moment you place the order.",
+      "items": [
+        {
+          "name": "Greater Cairo",
+          "areas": "Cairo, Giza and Qalyubia, including 6th of October and New Cairo.",
+          "estimate": "1 to 2 working days"
+        },
+        {
+          "name": "Alexandria & Delta",
+          "areas": "Alexandria, Beheira, Gharbia, Dakahlia, Menoufia, Sharqia, Damietta and Kafr El Sheikh.",
+          "estimate": "2 to 3 working days"
+        },
+        {
+          "name": "Canal & Sinai",
+          "areas": "Port Said, Ismailia, Suez, North Sinai and South Sinai.",
+          "estimate": "3 to 4 working days"
+        },
+        {
+          "name": "Upper Egypt & Frontier",
+          "areas": "Beni Suef through Aswan, plus Red Sea, New Valley and Matrouh.",
+          "estimate": "3 to 6 working days"
+        }
+      ],
+      "disclaimer": "Friday is not a working day for our courier partners. Official holidays, extreme weather and address corrections can add a day or two — if an order slips past its estimate we contact you rather than wait for you to ask."
+    },
+    "rates": {
+      "title": "Shipping rates by governorate",
+      "description": "The exact fee added at checkout. It is charged once per order, regardless of how many items are in it.",
+      "caption": "Shipping fee charged per order for each governorate we deliver to",
+      "columns": {
+        "destination": "Governorate",
+        "fee": "Shipping fee"
+      },
+      "currency": "EGP",
+      "bestRate": "Lowest",
+      "searchPlaceholder": "Find your governorate",
+      "searchLabel": "Search governorates",
+      "noMatches": "No governorate matches \"{term}\".",
+      "footnote": "Rates are live from our system. If a governorate is missing, we do not currently deliver there — message us and we will tell you when that changes.",
+      "empty": "Shipping rates are being updated. Please contact us for a quote."
+    },
+    "expectations": {
+      "title": "On delivery day",
+      "description": "A short list that prevents almost every failed delivery we see.",
+      "items": [
+        {
+          "title": "Inspect before you accept",
+          "description": "Open the parcel in front of the courier and check the item matches your order and arrived undamaged. Once you accept it, damage-on-arrival claims become much harder to resolve."
+        },
+        {
+          "title": "Keep your order code to hand",
+          "description": "The courier and our support team both identify your order by its short code. It is in your confirmation message and on your tracking page."
+        },
+        {
+          "title": "Be reachable on the day",
+          "description": "Couriers attempt delivery twice. If nobody answers on the second attempt the parcel returns to us and the order is marked as returned to origin."
+        }
+      ]
+    },
+    "faq": {
+      "title": "Shipping questions",
+      "items": [
+        {
+          "question": "When does the delivery estimate start counting?",
+          "answer": "From the moment your payment receipt is verified, not from the moment you place the order. If you place an order at midnight and send your receipt the next afternoon, the clock starts that afternoon."
+        },
+        {
+          "question": "Do you charge shipping per item or per order?",
+          "answer": "Per order. The fee shown for your governorate is charged once, whether you order one item or ten."
+        },
+        {
+          "question": "Can I change my delivery address after ordering?",
+          "answer": "Yes, as long as the order has not been dispatched. Message us with your order code and the new address. If the new governorate has a different shipping fee, the difference is settled before dispatch."
+        },
+        {
+          "question": "Do you deliver on Fridays or public holidays?",
+          "answer": "No. Our courier partners do not operate on Fridays or official public holidays, and those days are excluded from the working-day estimates above."
+        },
+        {
+          "question": "What if my parcel arrives damaged?",
+          "answer": "Refuse it at the door and tell the courier it is being returned. Then message us with your order code — we will ship a replacement or refund you in full, and you pay nothing extra either way."
+        },
+        {
+          "question": "Can I collect my order myself?",
+          "answer": "We do not operate a walk-in pickup counter. Every order ships through our courier partners so it stays trackable end to end."
+        }
+      ]
+    },
+    "trackCta": {
+      "title": "Already ordered?",
+      "description": "Check exactly where your order is with your order code and the last four digits of your phone number.",
+      "primary": "Track my order",
+      "secondary": "Returns policy"
+    }
+  }
+}

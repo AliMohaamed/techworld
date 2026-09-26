@@ -1,37 +1,62 @@
 {
   "CheckoutForm": {
-    "shipping": "Shipping Information",
-    "labels": {
-      "fullName": "Full Name",
-      "phone": "Phone Number (WhatsApp preferred)",
-      "governorate": "Select governorate",
-      "address": "Complete Delivery Address"
+    "title": "Checkout",
+    "backToShopping": "Continue shopping",
+    "currency": "EGP",
+    "empty": {
+      "title": "Your cart is empty",
+      "back": "Back to store"
+    },
+    "items": {
+      "title": "Your order",
+      "count": "{count, plural, one {# item} other {# items}}",
+      "each": "{price} each",
+      "remove": "Remove {name}",
+      "removed": "{name} removed from your order",
+      "undo": "Undo",
+      "decrease": "Decrease quantity",
+      "increase": "Increase quantity",
+      "stockLimit": "No more stock available for this item",
+      "noImage": "No image"
+    },
+    "delivery": {
+      "title": "Delivery details",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "e.g. Ahmed Mohamed",
+      "phone": "Mobile number",
+      "phoneHint": "We'll confirm your order on WhatsApp",
+      "governorate": "Governorate",
+      "governoratePlaceholder": "Choose your governorate",
+      "address": "Detailed address",
+      "addressPlaceholder": "Area, street, building no., floor, apartment, nearby landmark"
     },
     "promo": {
-      "label": "Discount Code",
+      "toggle": "Have a promo code?",
       "placeholder": "Enter code",
       "apply": "Apply",
-      "applied": "Code Applied",
+      "applied": "Code applied",
       "remove": "Remove"
     },
     "summary": {
-      "subtotal": "Items subtotal",
-      "discount": "Promo Discount",
+      "subtotal": "Subtotal",
+      "discount": "Promo discount",
       "shipping": "Shipping",
-      "total": "Order Total",
-      "loading": "Loading...",
-      "unavailable": "Unavailable",
-      "freeShipping": "Free Shipping"
+      "shippingPending": "Choose governorate",
+      "total": "Total",
+      "freeShipping": "Free shipping"
     },
     "errors": {
-      "deliveryUnavailable": "Delivery is currently unavailable. Please try again later.",
-      "selectGovernorate": "Select your governorate to calculate delivery and continue.",
-      "placeOrderFailed": "Order placement failed.",
+      "fullName": "Please enter your full name",
+      "phone": "Enter a valid Egyptian mobile number, e.g. 01012345678",
+      "governorate": "Please choose your governorate",
+      "address": "Please add more address details so the courier can find you",
+      "placeOrderFailed": "We couldn't place your order. Please check your details and try again.",
       "noGovernorates": "Delivery is currently unavailable because no active governorates are configured."
     },
     "actions": {
-      "confirm": "CONFIRM ORDER"
+      "confirm": "Place order",
+      "placing": "Placing order..."
     },
-    "notice": "By confirming, you agree to receive a confirmation via WhatsApp."
+    "notice": "We'll send your order confirmation on WhatsApp."
   }
 }

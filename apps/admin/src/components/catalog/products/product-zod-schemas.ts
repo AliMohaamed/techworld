@@ -31,6 +31,24 @@ export const variantSchema = z.object({
   }
 });
 
+export const featureSchema = z.object({
+  icon: z.string().trim().min(1, "required"),
+  title_en: z.string().trim().optional(),
+  title_ar: z.string().trim().optional(),
+  subtitle_en: z.string().trim().optional(),
+  subtitle_ar: z.string().trim().optional(),
+}).superRefine((value, ctx) => {
+  // A feature is optional as a whole, but a row that exists needs a label in
+  // at least one language or it would render as an empty tile.
+  if (!value.title_en && !value.title_ar) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["title_en"],
+      message: "featureTitleRequired",
+    });
+  }
+});
+
 export const productSchema = z.object({
   categoryId: z.string().min(1, "required"),
   name_en: z.string().trim().min(1, "required"),
@@ -45,6 +63,7 @@ export const productSchema = z.object({
   images: z.array(z.string()).default([]),
   status: z.union([z.literal("DRAFT"), z.literal("PUBLISHED")]),
   isFeatured: z.boolean().default(false),
+  features: z.array(featureSchema).max(12, "tooManyFeatures").default([]),
   variants: z.array(variantSchema).min(1, "atLeastOneVariant"),
 }).superRefine((value, ctx) => {
   if (

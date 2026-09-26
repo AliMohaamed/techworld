@@ -23,111 +23,159 @@ export const COLOR_PRESETS: ColorPreset[] = [
   { nameEn: "Cyan", nameAr: "سماوي", hex: "#06b6d4" },
 ];
 
-const COLOR_MAP: Array<{ keywords: string[]; hex: string }> = [
+const COLOR_MAP: Array<{ nameEn: string; nameAr: string; keywords: string[]; hex: string }> = [
   // Red shades
   {
+    nameEn: "Crimson",
+    nameAr: "نبيتي",
     keywords: ["crimson", "maroon", "burgundy", "نبيتي", "عنابي", "قرمز"],
     hex: "#991b1b",
   },
   {
+    nameEn: "Red",
+    nameAr: "أحمر",
     keywords: ["red", "احمر", "أحمر", "rouge"],
     hex: "#dc2626",
   },
   // Blue shades
   {
+    nameEn: "Navy",
+    nameAr: "كحلي",
     keywords: ["navy", "كحلي", "نيلي", "dark blue"],
     hex: "#1e3a8a",
   },
   {
+    nameEn: "Cyan",
+    nameAr: "سماوي",
     keywords: ["sky", "سماوي", "light blue", "cyan", "فيروزي", "turquoise"],
     hex: "#0284c7",
   },
   {
+    nameEn: "Blue",
+    nameAr: "أزرق",
     keywords: ["blue", "ازرق", "أزرق", "bleu", "royal blue"],
     hex: "#2563eb",
   },
   // Black & Dark shades
   {
+    nameEn: "Midnight Black",
+    nameAr: "أسود داكن",
     keywords: ["midnight", "charcoal", "فحمي", "dark", "غامق"],
     hex: "#18181b",
   },
   {
+    nameEn: "Black",
+    nameAr: "أسود",
     keywords: ["black", "اسود", "أسود", "noir"],
     hex: "#09090b",
   },
   // White & Light shades
   {
+    nameEn: "White",
+    nameAr: "أبيض",
     keywords: ["white", "ابيض", "أبيض", "snow", "blanc", "فاتح"],
     hex: "#ffffff",
   },
   // Green shades
   {
+    nameEn: "Lime Green",
+    nameAr: "فسفوري",
     keywords: ["lime", "فسفوري", "ليموني", "mint", "نعناعي"],
     hex: "#84cc16",
   },
   {
+    nameEn: "Olive Green",
+    nameAr: "زيتي",
     keywords: ["olive", "زيتي"],
     hex: "#4d7c0f",
   },
   {
+    nameEn: "Emerald",
+    nameAr: "زمردي",
     keywords: ["emerald", "زمردي"],
     hex: "#059669",
   },
   {
+    nameEn: "Green",
+    nameAr: "أخضر",
     keywords: ["green", "اخضر", "أخضر", "vert"],
     hex: "#16a34a",
   },
   // Yellow & Gold shades
   {
+    nameEn: "Gold",
+    nameAr: "ذهبي",
     keywords: ["gold", "ذهبي", "golden"],
     hex: "#d97706",
   },
   {
+    nameEn: "Yellow",
+    nameAr: "أصفر",
     keywords: ["yellow", "اصفر", "أصفر", "jaune"],
     hex: "#eab308",
   },
   // Orange shades
   {
+    nameEn: "Orange",
+    nameAr: "برتقالي",
     keywords: ["orange", "برتقالي", "برتقان"],
     hex: "#ea580c",
   },
   // Purple shades
   {
+    nameEn: "Lavender",
+    nameAr: "موف",
     keywords: ["lavender", "خزامي", "موف", "mauve", "violet", "ارجواني", "أرجواني"],
     hex: "#a855f7",
   },
   {
+    nameEn: "Purple",
+    nameAr: "بنفسجي",
     keywords: ["purple", "بنفسجي", "pourpre"],
     hex: "#9333ea",
   },
   // Pink shades
   {
+    nameEn: "Fuchsia",
+    nameAr: "فوشيا",
     keywords: ["magenta", "fuchsia", "فوشيا"],
     hex: "#d946ef",
   },
   {
+    nameEn: "Pink",
+    nameAr: "وردي",
     keywords: ["rose", "روز", "pink", "وردي", "زهري", "بينك"],
     hex: "#ec4899",
   },
   // Gray & Silver shades
   {
+    nameEn: "Silver",
+    nameAr: "فضي",
     keywords: ["silver", "فضي"],
     hex: "#cbd5e1",
   },
   {
+    nameEn: "Space Gray",
+    nameAr: "رمادي فلكي",
     keywords: ["titanium", "تيتانيوم", "space gray", "رمادي فلكي"],
     hex: "#475569",
   },
   {
+    nameEn: "Gray",
+    nameAr: "رمادي",
     keywords: ["gray", "grey", "رمادي", "رصاصي", "gris"],
     hex: "#64748b",
   },
   // Brown & Warm shades
   {
+    nameEn: "Brown",
+    nameAr: "بني",
     keywords: ["brown", "بني", "قهوة", "عسلي", "chocolate", "شوكولاتة"],
     hex: "#78350f",
   },
   {
+    nameEn: "Beige",
+    nameAr: "بيج",
     keywords: ["beige", "بيج", "كريمي", "cream", "sand", "رملي"],
     hex: "#d4b996",
   },
@@ -145,6 +193,79 @@ function normalizeArabic(text: string): string {
 
 const HEX_REGEX = /^#?([a-f\d]{3,4}|[a-f\d]{6}|[a-f\d]{8})$/i;
 const HEX_SEARCH_REGEX = /#([a-f\d]{6}|[a-f\d]{3})/i;
+
+export function getColorDisplayName(
+  colorInput?: string | null,
+  locale: string = "en"
+): string {
+  if (!colorInput || typeof colorInput !== "string") return "";
+
+  const trimmed = colorInput.trim();
+  if (!trimmed) return "";
+
+  const isAr = locale === "ar";
+
+  // Handle "Default" variant name
+  if (trimmed.toLowerCase() === "default") {
+    return isAr ? "افتراضي" : "Default";
+  }
+
+  // Handle hex string inputs (e.g. "#2563eb")
+  if (HEX_REGEX.test(trimmed)) {
+    const targetHex = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+    const hexMatch = COLOR_MAP.find(
+      (c) => c.hex.toLowerCase() === targetHex.toLowerCase()
+    );
+    if (hexMatch) {
+      return isAr ? hexMatch.nameAr : hexMatch.nameEn;
+    }
+    return trimmed;
+  }
+
+  // Handle composite strings like "Blue - أزرق" or "Red / أحمر"
+  if (trimmed.includes("-") || trimmed.includes("/") || trimmed.includes("|")) {
+    const parts = trimmed.split(/[-/|]/).map((p) => p.trim());
+    const arPart = parts.find((p) => /[\u0600-\u06FF]/.test(p));
+    const enPart = parts.find((p) => /[a-zA-Z]/.test(p));
+    if (isAr && arPart) return arPart;
+    if (!isAr && enPart) return enPart;
+  }
+
+  const normalized = normalizeArabic(trimmed);
+
+  // 1. Exact match in COLOR_MAP
+  for (const entry of COLOR_MAP) {
+    for (const kw of entry.keywords) {
+      if (normalized === normalizeArabic(kw)) {
+        return isAr ? entry.nameAr : entry.nameEn;
+      }
+    }
+  }
+
+  // 2. Exact match in COLOR_PRESETS
+  for (const preset of COLOR_PRESETS) {
+    if (
+      normalized === normalizeArabic(preset.nameEn) ||
+      normalized === normalizeArabic(preset.nameAr)
+    ) {
+      return isAr ? preset.nameAr : preset.nameEn;
+    }
+  }
+
+  // 3. Substring/Token match in COLOR_MAP
+  const tokens = normalized.split(/[\s\-_/,+.]+/).filter(Boolean);
+  for (const entry of COLOR_MAP) {
+    for (const kw of entry.keywords) {
+      const normalizedKw = normalizeArabic(kw);
+      if (tokens.includes(normalizedKw) || normalized.includes(normalizedKw)) {
+        return isAr ? entry.nameAr : entry.nameEn;
+      }
+    }
+  }
+
+  // 4. Fallback if no color match found
+  return trimmed;
+}
 
 export function resolveColor(
   colorInput?: string | null,

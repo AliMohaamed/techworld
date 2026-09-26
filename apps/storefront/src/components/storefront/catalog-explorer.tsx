@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import { useSearchParams } from "next/navigation";
 import { api } from "@backend/convex/_generated/api";
 import { Id } from "@backend/convex/_generated/dataModel";
-import FilterDrawer from "@/components/storefront/filter-drawer";
+import FilterDrawer, { FilterDrawerTrigger } from "@/components/storefront/filter-drawer";
+import CatalogSearch from "@/components/storefront/catalog-search";
 import ProductCard from "@/components/storefront/product-card";
 import { useTranslations, useLocale } from "next-intl";
 import { Loader2 } from "lucide-react";
+import { cn } from "@techworld/ui";
 
 type CatalogExplorerProps = {
   lockedCategoryId?: string;
@@ -22,6 +24,7 @@ export default function CatalogExplorer({
   const searchParams = useSearchParams();
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const searchQuery = searchParams.get("searchQuery") ?? undefined;
   const minPriceValue = searchParams.get("minPrice");
@@ -61,6 +64,13 @@ export default function CatalogExplorer({
     },
     { initialNumItems: 12 },
   );
+
+  // Changing the query resets pagination; keep showing the previous results
+  // (dimmed) until the new first page arrives instead of flashing empty.
+  const isRefreshing = status === "LoadingFirstPage";
+  const [shownResults, setShownResults] = useState(results);
+  if (!isRefreshing && shownResults !== results) setShownResults(results);
+  const visibleResults = isRefreshing ? shownResults : results;
 
   useEffect(() => {
     if (status !== "CanLoadMore") return;
@@ -120,16 +130,22 @@ export default function CatalogExplorer({
         </section>
 
         <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
-          <FilterDrawer lockedCategoryId={lockedCategoryId} />
+          <FilterDrawer
+            lockedCategoryId={lockedCategoryId}
+            isOpen={isFilterDrawerOpen}
+            onOpenChange={setIsFilterDrawerOpen}
+          />
 
           <div className="space-y-6">
+            <div className="flex items-center gap-3">
+              <CatalogSearch isLoading={isRefreshing} />
+              <FilterDrawerTrigger onClick={() => setIsFilterDrawerOpen(true)} />
+            </div>
+
             <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-secondary/50 px-6 py-4 backdrop-blur-sm">
-              <div className="space-y-0.5">
-                <p className="text-[10px] font-semibold tracking-wider text-label-muted uppercase">
-                  {t("results.eyebrow")}
-                </p>
+              <div>
                 <p className="font-space-grotesk text-lg font-bold tracking-tight text-foreground">
-                  {t("results.count", { count: results.length })}
+                  {t("results.count", { count: visibleResults.length })}
                 </p>
               </div>
               {searchQuery && (
@@ -177,8 +193,14 @@ export default function CatalogExplorer({
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
-                  {results.map((product) => (
+                <div
+                  aria-busy={isRefreshing}
+                  className={cn(
+                    "grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3 transition-opacity duration-200",
+                    isRefreshing && "pointer-events-none opacity-50",
+                  )}
+                >
+                  {visibleResults.map((product) => (
                     <ProductCard key={product._id} product={product as any} // eslint-disable-line @typescript-eslint/no-explicit-any -- Convex query return type
                     />
                   ))}

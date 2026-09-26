@@ -12,7 +12,8 @@
     },
     "actions": {
       "verify": "VERIFY ON WHATSAPP",
-      "back": "Return to Homepage"
+      "back": "Return to Homepage",
+      "track": "Track my order"
     },
     "badges": {
       "stock": "Virtual Stock Reserved",

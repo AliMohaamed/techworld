@@ -1,0 +1,205 @@
+{
+  "HelpCenter": {
+    "meta": {
+      "title": "Help Center | TechWorld",
+      "description": "Answers on ordering, payment, delivery, returns and warranty — plus a direct line to the team that actually handles your order."
+    },
+    "hero": {
+      "badge": "Support",
+      "title": "Help",
+      "accent": "Center",
+      "description": "Start with a question. If the answer is not here, one message reaches the same people who pack, verify and ship your order.",
+      "hours": "Support desk open daily, {from}:00 to {to}:00 Cairo time"
+    },
+    "topics": {
+      "title": "Browse by topic",
+      "description": "The four things people ask about most, plus the policies behind them.",
+      "items": [
+        {
+          "id": "tracking",
+          "title": "Track an order",
+          "description": "See where your order is right now, with the timestamp of every step it has passed.",
+          "href": "/track",
+          "cta": "Track my order"
+        },
+        {
+          "id": "shipping",
+          "title": "Shipping & delivery",
+          "description": "Rates for every governorate, delivery estimates by zone, and what happens on delivery day.",
+          "href": "/shipping",
+          "cta": "View shipping info"
+        },
+        {
+          "id": "returns",
+          "title": "Returns & refunds",
+          "description": "What qualifies for a return, how to start one, and how long your refund takes.",
+          "href": "/returns",
+          "cta": "Read the policy"
+        },
+        {
+          "id": "orders",
+          "title": "Ordering",
+          "description": "How checkout works, changing an order, and what your order code is for.",
+          "href": "/products",
+          "cta": "Start shopping"
+        },
+        {
+          "id": "payment",
+          "title": "Payment",
+          "description": "Accepted payment methods, sending your receipt, and how verification works.",
+          "href": "/support#help-answers",
+          "cta": "See payment answers"
+        },
+        {
+          "id": "privacy",
+          "title": "Privacy & security",
+          "description": "What we store, who can see your order, and how we protect your details.",
+          "href": "/support#help-answers",
+          "cta": "See privacy answers"
+        }
+      ]
+    },
+    "browser": {
+      "title": "Answers",
+      "description": "Search across every category, or filter to the one you need.",
+      "placeholder": "Search for an answer — delivery time, refund, payment...",
+      "label": "Search help articles",
+      "clear": "Clear search",
+      "browseHint": "Pick a category, or search to look across all of them.",
+      "resultsCount": "{count, plural, =0 {No answers} one {# answer} other {# answers}} for \"{term}\"",
+      "categoriesLabel": "Help categories",
+      "allCategories": "All",
+      "noResultsTitle": "Nothing matched that",
+      "noResultsBody": "Try a shorter phrase, or message us on WhatsApp — we would rather answer directly than have you keep searching."
+    },
+    "categories": [
+      {
+        "id": "ordering",
+        "title": "Ordering",
+        "description": "Placing an order, changing it, and what happens right after checkout.",
+        "faqs": [
+          {
+            "question": "Do I need an account to order?",
+            "answer": "No. Checkout is guest-only by design — you enter your name, phone, governorate and address, and we identify the order by the short code we issue you. Fewer details stored means less to lose."
+          },
+          {
+            "question": "What is my order code and where do I find it?",
+            "answer": "It is the short uppercase code shown on the confirmation screen and in the WhatsApp message we send. It identifies your order everywhere: tracking, payment verification, returns and support."
+          },
+          {
+            "question": "Can I change or cancel my order after placing it?",
+            "answer": "Yes, until the order is packed. Message us with your order code and what you want changed. Once the parcel is with the courier we can no longer alter or recall it."
+          },
+          {
+            "question": "An item went out of stock after I ordered it.",
+            "answer": "Stock is reserved for you the moment you place the order, so this is rare. If it does happen we contact you within the same day and offer an equivalent item or a full refund — your choice."
+          },
+          {
+            "question": "Can I order by WhatsApp instead of the website?",
+            "answer": "You can. Send us the product links and your delivery details and we will place the order for you and send back the order code. The prices and policies are identical either way."
+          }
+        ]
+      },
+      {
+        "id": "payment",
+        "title": "Payment",
+        "description": "Accepted methods, sending your receipt, and how verification works.",
+        "faqs": [
+          {
+            "question": "How do I pay for my order?",
+            "answer": "After checkout you receive your order code and our payment details. Transfer the total, then send the receipt screenshot on WhatsApp with your order code. Our team matches the two and confirms the order."
+          },
+          {
+            "question": "How long does payment verification take?",
+            "answer": "Usually under two hours during opening hours. Receipts sent late at night are verified the next morning. Your tracking page moves to confirmed the moment it clears."
+          },
+          {
+            "question": "What happens if I do not pay straight away?",
+            "answer": "Your order holds the stock for 24 hours. After that it is automatically marked as an expired payment and the stock is released. You can still message us — if the items are still available we will reinstate the order."
+          },
+          {
+            "question": "Is cash on delivery available?",
+            "answer": "Not at the moment. Every order is paid and verified before dispatch, which is what lets us keep shipping fees where they are."
+          },
+          {
+            "question": "I sent the receipt but the status has not changed.",
+            "answer": "Check that the message included your order code — receipts without one cannot be matched automatically. If it did, reply on the same WhatsApp thread and we will verify it manually."
+          }
+        ]
+      },
+      {
+        "id": "delivery",
+        "title": "Delivery",
+        "description": "Timelines, coverage, and what to do on delivery day.",
+        "faqs": [
+          {
+            "question": "How long will my order take to arrive?",
+            "answer": "One to two working days for Greater Cairo, two to three for Alexandria and the Delta, and three to six for Upper Egypt and the frontier governorates. The count starts when your payment is verified."
+          },
+          {
+            "question": "How much is shipping to my governorate?",
+            "answer": "Rates vary by governorate and are charged once per order. The full live table is on the shipping information page, and the exact fee is shown at checkout before you confirm."
+          },
+          {
+            "question": "Can I open the parcel before paying the courier?",
+            "answer": "Your order is already paid before dispatch, so nothing is owed at the door. Do still open and inspect the parcel while the courier is present — refusing a damaged item there and then is much simpler than claiming afterwards."
+          },
+          {
+            "question": "Nobody was home when the courier came.",
+            "answer": "Couriers attempt delivery twice. If the second attempt also fails the parcel returns to us and your order is marked as returned to origin. Message us and we will arrange a redelivery or refund you."
+          },
+          {
+            "question": "Do you ship outside Egypt?",
+            "answer": "Not yet. We currently deliver only to the Egyptian governorates listed on the shipping information page."
+          }
+        ]
+      },
+      {
+        "id": "returns",
+        "title": "Returns & warranty",
+        "description": "Sending something back, refunds, and faults after the return window.",
+        "faqs": [
+          {
+            "question": "How long do I have to return something?",
+            "answer": "Fourteen days from delivery, with the item complete in its original packaging. Damaged, incomplete or incorrect items should be reported within 48 hours."
+          },
+          {
+            "question": "How do I start a return?",
+            "answer": "Message us on WhatsApp with your order code and what is wrong, plus a photo if the item is damaged or faulty. We confirm eligibility within 24 hours and arrange a pickup from your address."
+          },
+          {
+            "question": "When will I get my money back?",
+            "answer": "Within five working days of the returned item reaching us and passing inspection. Store credit is the fastest option — it is issued within 24 hours."
+          },
+          {
+            "question": "My item stopped working after the return window.",
+            "answer": "That falls under the manufacturer warranty rather than the return policy. Send us your order code and a description of the fault and we will open the claim with the service centre on your behalf."
+          }
+        ]
+      },
+      {
+        "id": "privacy",
+        "title": "Privacy & security",
+        "description": "What we hold, who can see it, and how your order stays yours.",
+        "faqs": [
+          {
+            "question": "What details do you store about me?",
+            "answer": "Only what an order needs: your name, phone number, delivery address and governorate, plus the order itself. There are no customer accounts and no passwords to lose."
+          },
+          {
+            "question": "Can someone else look up my order with just the code?",
+            "answer": "No. The tracking page also requires the last four digits of the phone number used at checkout, and a wrong phone number returns the same response as a code that does not exist."
+          },
+          {
+            "question": "What happens to my payment receipt?",
+            "answer": "It is stored privately, used only to verify your order, and is never visible on any public page. Access is limited to the staff who verify payments."
+          },
+          {
+            "question": "Will you message me about offers?",
+            "answer": "Only if you sign up for the newsletter. Order-related messages are transactional — you will get those because you ordered, not because you subscribed."
+          }
+        ]
+      }
+    ]
+  }
+}

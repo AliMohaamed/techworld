@@ -9,7 +9,7 @@ import Image from "next/image";
 import { Link } from "@/navigation";
 import { Id } from "@backend/convex/_generated/dataModel";
 import { useState } from "react";
-import { PromoCodeInput, ColorSwatch } from "@techworld/ui";
+import { PromoCodeInput, ColorSwatch, getColorDisplayName } from "@techworld/ui";
 import { useTranslations, useLocale } from "next-intl";
 import { toast } from "sonner";
 
@@ -160,7 +160,7 @@ export default function CartDrawer() {
                             fallbackName={item.sku.variantName}
                             size="xs"
                           />
-                          <span>{item.sku.variantName}</span>
+                          <span>{getColorDisplayName(item.sku.variantName, locale)}</span>
                         </p>
                       )}
                     </div>

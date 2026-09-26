@@ -1,0 +1,163 @@
+{
+  "ReturnsPage": {
+    "meta": {
+      "title": "Returns & Refunds | TechWorld",
+      "description": "A 14-day return window, free pickup on faulty items, and refunds processed within five working days. Here is exactly what qualifies and how to start."
+    },
+    "hero": {
+      "badge": "Policy",
+      "title": "Returns &",
+      "accent": "Refunds",
+      "description": "We would rather take an item back than have you stuck with the wrong one. This page tells you what qualifies, what does not, and how long your money takes to come back."
+    },
+    "highlights": {
+      "window": {
+        "label": "Return window",
+        "value": "14 days from delivery"
+      },
+      "exchange": {
+        "label": "Faulty items",
+        "value": "Free pickup and replacement"
+      },
+      "refund": {
+        "label": "Refund processed",
+        "value": "Within 5 working days"
+      }
+    },
+    "eligibility": {
+      "title": "What qualifies",
+      "description": "The single rule behind all of this: the item comes back in a condition we could honestly sell to the next customer, unless it was faulty when it reached you.",
+      "eligible": {
+        "title": "We accept",
+        "items": [
+          "Unopened items in their original sealed packaging, returned within 14 days of delivery.",
+          "Opened items that are unused, complete with every accessory, cable, manual and free gift, and returned within 14 days.",
+          "Items that arrived damaged, incomplete or not matching what you ordered — report these within 48 hours of delivery.",
+          "Items that developed a manufacturing fault inside the manufacturer warranty period."
+        ]
+      },
+      "notEligible": {
+        "title": "We cannot accept",
+        "items": [
+          "Items with physical damage, liquid damage, or damage caused by use, drops or incorrect voltage.",
+          "Items missing their box, accessories, serial-number sticker or any included gift.",
+          "Earphones, in-ear headsets and other hygiene-sensitive items once the seal is broken, unless faulty.",
+          "Software, digital codes, gift cards and any item sold as clearance or final sale.",
+          "Requests made more than 14 days after delivery, unless they fall under the manufacturer warranty."
+        ]
+      }
+    },
+    "process": {
+      "title": "Starting a return",
+      "description": "There is no form to fill in. Message us with your order code and we take it from there.",
+      "steps": [
+        {
+          "title": "Message us",
+          "description": "Send your order code on WhatsApp with a short note on what is wrong and, if the item is damaged or faulty, a photo or a short video.",
+          "meta": "Day 1"
+        },
+        {
+          "title": "We review it",
+          "description": "Our team confirms eligibility against this policy and tells you plainly whether it is approved, and if not, why.",
+          "meta": "Within 24 hours"
+        },
+        {
+          "title": "Pickup is arranged",
+          "description": "A courier collects the item from your address. Pack it as it arrived — box, accessories and all. Faulty items are collected at our cost.",
+          "meta": "1 to 3 working days"
+        },
+        {
+          "title": "Inspection and refund",
+          "description": "We inspect the item on arrival and then issue your refund, replacement or store credit through the method you chose.",
+          "meta": "Within 5 working days"
+        }
+      ]
+    },
+    "refunds": {
+      "title": "Refund methods and timing",
+      "description": "The clock below starts when the returned item reaches our warehouse and passes inspection.",
+      "caption": "Refund method, processing time and conditions",
+      "columns": {
+        "method": "Method",
+        "window": "Processing time",
+        "note": "Notes"
+      },
+      "rows": [
+        {
+          "method": "Bank or wallet transfer",
+          "window": "3 to 5 working days",
+          "note": "Sent back to the account or wallet the payment came from. Your bank may take another working day to show it."
+        },
+        {
+          "method": "Store credit",
+          "window": "Within 24 hours",
+          "note": "The fastest option. Issued as a code against your phone number, with no expiry date."
+        },
+        {
+          "method": "Replacement item",
+          "window": "2 to 6 working days",
+          "note": "Subject to stock. If the exact item is unavailable we offer an equivalent or a full refund — your choice."
+        }
+      ],
+      "disclaimer": "Shipping fees are refunded in full when the return is our fault: a faulty, damaged, incomplete or incorrect item. For a change-of-mind return the original shipping fee is not refunded and the pickup fee for your governorate is deducted from the refund."
+    },
+    "warranty": {
+      "title": "Warranty cover",
+      "description": "Warranty sits alongside this policy, not inside it. It covers manufacturing faults long after the 14-day return window closes.",
+      "items": [
+        {
+          "title": "What is covered",
+          "description": "Manufacturing and component faults that appear under normal use — a battery that stops holding charge, a port that stops responding, a device that fails to power on."
+        },
+        {
+          "title": "What is not covered",
+          "description": "Accidental damage, liquid damage, unauthorised repairs, normal wear on cables and ear tips, and any fault caused by using the wrong charger or adapter."
+        },
+        {
+          "title": "How to claim",
+          "description": "Message us with your order code and a description of the fault. We coordinate with the manufacturer's service centre and keep you updated until it is resolved."
+        }
+      ]
+    },
+    "failedDelivery": {
+      "title": "Refused and undelivered orders",
+      "description": "If you refuse a parcel at the door, or the courier cannot reach you after two attempts, the order is returned to us and marked as returned to origin. You will see that state on your tracking page.",
+      "note": "There is no penalty the first time, and any amount you already paid is refunded in full using the methods above. Repeatedly refusing delivery on paid orders may mean we ask for payment confirmation before dispatching future orders."
+    },
+    "faq": {
+      "title": "Returns questions",
+      "items": [
+        {
+          "question": "How long do I have to return an item?",
+          "answer": "Fourteen days from the day the order was delivered. Damaged, incomplete or incorrect items should be reported within 48 hours so we can act while the courier record is still open."
+        },
+        {
+          "question": "Do I need the original box?",
+          "answer": "Yes. The box, every accessory, the manual and any free gift must come back with the item. A missing accessory either reduces the refund or makes the return ineligible."
+        },
+        {
+          "question": "Who pays for the return shipping?",
+          "answer": "We do, whenever the return is our fault — faulty, damaged, incomplete or wrong item. For a change of mind, the pickup fee for your governorate is deducted from your refund."
+        },
+        {
+          "question": "Can I exchange for a different colour or size instead?",
+          "answer": "Yes, within the same 14-day window and subject to stock. If the replacement costs more you pay the difference; if it costs less we refund it."
+        },
+        {
+          "question": "My item broke after two months. What now?",
+          "answer": "That is a warranty matter rather than a return. Message us with your order code and a description of the fault and we will open a warranty claim with the manufacturer on your behalf."
+        },
+        {
+          "question": "How will I know my refund has been issued?",
+          "answer": "We message you on WhatsApp the moment it is sent, with the method and the reference. If it has not reached you within two working days after that, reply on the same thread and we will chase it."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Need to start a return?",
+      "description": "Find your order first — you will need the order code, and it is on the tracking page along with the current status.",
+      "primary": "Find my order",
+      "secondary": "Shipping info"
+    }
+  }
+}

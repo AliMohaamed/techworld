@@ -112,13 +112,23 @@ function SuccessContent() {
             </div>
           </div>
 
+          <div className="flex flex-col items-center gap-6 pt-10 sm:flex-row sm:gap-10">
+          <Link
+            href={{ pathname: "/track", query: { code: shortCode } }}
+            className="group inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.5em] text-primary hover:text-foreground transition-all"
+          >
+            {t('actions.track')}
+            <ArrowRight size={16} className={`transition-transform group-hover:translate-x-1 ${locale === 'ar' ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
+          </Link>
+
           <Link
             href="/"
-            className="group inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.5em] text-label-muted hover:text-foreground transition-all pt-10"
+            className="group inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.5em] text-label-muted hover:text-foreground transition-all"
           >
             {t('actions.back')}
             <ArrowRight size={16} className={`transition-transform group-hover:translate-x-1 ${locale === 'ar' ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
           </Link>
+          </div>
         </div>
       </div>
     </div>

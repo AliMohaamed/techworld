@@ -2,13 +2,13 @@
 
 import { Link } from "@/navigation";
 import type { Route } from "next";
-import { Boxes, ClipboardList, FolderTree, History as HistoryIcon, Home, MapPinned, Settings, ShieldCheck, Users, type LucideIcon } from "lucide-react";
+import { BadgePercent, Boxes, ClipboardList, FolderTree, History as HistoryIcon, Home, MapPinned, Settings, ShieldCheck, Tag, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@techworld/ui";
 import type { Permission } from "@backend/convex/lib/permissions";
 import { useTranslations } from "next-intl";
 
 type StaffPermissionValue = string | number | bigint | boolean;
-type SidebarRoute = "/" | "/orders" | "/catalog/categories" | "/catalog/products" | "/marketing/promo-codes" | "/settings/governorates" | "/settings/audit" | "/settings" | "/audit" | "/team";
+type SidebarRoute = "/" | "/orders" | "/catalog/categories" | "/catalog/products" | "/marketing/offers" | "/marketing/promo-codes" | "/settings/governorates" | "/settings/audit" | "/settings" | "/audit" | "/team";
 
 type NavItem = {
   href: SidebarRoute;
@@ -22,7 +22,8 @@ const navItems: NavItem[] = [
   { href: "/orders", translationKey: "orders", icon: ClipboardList, requiredPermissions: ["VIEW_ORDERS"] },
   { href: "/catalog/categories", translationKey: "categories", icon: FolderTree, requiredPermissions: ["MANAGE_CATEGORIES"] },
   { href: "/catalog/products", translationKey: "products", icon: Boxes, requiredPermissions: ["MANAGE_PRODUCTS"] },
-  { href: "/marketing/promo-codes", translationKey: "promoCodes", icon: ClipboardList, requiredPermissions: ["MANAGE_SYSTEM_CONFIG"] },
+  { href: "/marketing/offers", translationKey: "offers", icon: BadgePercent, requiredPermissions: ["MANAGE_PRODUCTS"] },
+  { href: "/marketing/promo-codes", translationKey: "promoCodes", icon: Tag, requiredPermissions: ["MANAGE_SYSTEM_CONFIG"] },
   { href: "/settings/governorates", translationKey: "operations", icon: MapPinned, requiredPermissions: ["MANAGE_SYSTEM_CONFIG"] },
   { href: "/settings/audit", translationKey: "auditLedger", icon: ShieldCheck, requiredPermissions: ["VIEW_AUDIT_LOGS"] },
   { href: "/settings", translationKey: "settings", icon: Settings, requiredPermissions: ["MANAGE_SYSTEM_CONFIG"] },
