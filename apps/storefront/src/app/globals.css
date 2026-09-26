@@ -5,6 +5,7 @@
   --color-brand-yellow: #ffc105;
   --font-space-grotesk: var(--font-space-grotesk);
   --font-sans: var(--font-space-grotesk);
+  --font-arabic: var(--font-cairo);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -117,4 +118,24 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .hero-float, .hero-float-delayed, .hero-spin, .hero-spin-fast, .hero-beam, .hero-underline { animation: none; }
+}
+
+/*
+ * Arabic typography. Every font utility (font-space-grotesk, font-sans,
+ * font-arabic) resolves to Cairo, and letter-spacing is removed because any
+ * tracking breaks the joining of Arabic letters.
+ */
+html[dir="rtl"] body {
+  --font-space-grotesk: var(--font-cairo);
+  font-family: var(--font-cairo), sans-serif;
+}
+
+html[dir="rtl"] *,
+html[dir="rtl"] ::before,
+html[dir="rtl"] ::after {
+  letter-spacing: normal !important;
+}
+
+html[dir="rtl"] .font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace, var(--font-cairo);
 }

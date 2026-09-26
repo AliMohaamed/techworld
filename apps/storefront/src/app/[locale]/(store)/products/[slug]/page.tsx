@@ -13,7 +13,8 @@ import { DynamicProductGallery } from "@/components/storefront/DynamicProductGal
 import { ProductReviews } from "@/components/storefront/product-reviews";
 import { StarRating } from "@/components/storefront/star-rating";
 import { useFavorites } from "@/lib/use-favorites";
-import { RelatedProducts, ColorSwatch, getColorDisplayName, ProductFeatures, cn } from "@techworld/ui";
+import { ColorSwatch, getColorDisplayName, ProductFeatures, cn } from "@techworld/ui";
+import { RelatedProducts } from "@/components/storefront/related-products";
 import { useTranslations, useLocale } from "next-intl";
 
 const MAX_QUANTITY = 10;
@@ -533,12 +534,10 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-8 mt-24">
-        <ProductReviews productId={product._id} />
-      </div>
+      <RelatedProducts productId={product._id} />
 
       <div className="container mx-auto px-4 md:px-8 mt-24">
-        <RelatedProducts products={product.related_products || []} />
+        <ProductReviews productId={product._id} />
       </div>
     </div>
   );

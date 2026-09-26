@@ -5,6 +5,7 @@ import { CheckCircle2, MessageSquare, ArrowRight, Package, Truck, ShieldCheck } 
 import { Link } from "@/navigation";
 import { Suspense } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { whatsappLink } from "@/lib/contact";
 
 function SuccessContent() {
   const t = useTranslations('SuccessPage');
@@ -12,13 +13,9 @@ function SuccessContent() {
   const searchParams = useSearchParams();
   const shortCode = searchParams.get("code") || "";
 
-  // Placeholder for real business number
-  const BUSINESS_WHATSAPP = "201099684535"; 
-  
   const generateWhatsAppLink = () => {
     if (!shortCode) return "#";
-    const message = encodeURIComponent(t('whatsappMessage', { code: shortCode }));
-    return `https://wa.me/${BUSINESS_WHATSAPP}?text=${message}`;
+    return whatsappLink(t('whatsappMessage', { code: shortCode }));
   };
 
   if (!shortCode) {

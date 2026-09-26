@@ -9,7 +9,10 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin"],
 });
-const cairo = Cairo({ subsets: ["arabic", "latin"] });
+const cairo = Cairo({
+  variable: "--font-cairo",
+  subsets: ["arabic", "latin"],
+});
 
 export const metadata: Metadata = {
   title: "Tech World",
@@ -26,12 +29,11 @@ export default async function RootLayout({
   const { locale } = await params;
   const messages = await getMessages();
   const direction = locale === 'ar' ? 'rtl' : 'ltr';
-  const bodyFontClassName = locale === "ar" ? cairo.className : spaceGrotesk.variable;
 
   return (
     <html lang={locale} dir={direction} suppressHydrationWarning>
       <body
-        className={`${bodyFontClassName} antialiased`}
+        className={`${spaceGrotesk.variable} ${cairo.variable} antialiased`}
       >
         <ThemeProvider
           attribute="class"

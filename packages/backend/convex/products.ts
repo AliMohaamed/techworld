@@ -4,7 +4,7 @@ import { paginationOptsValidator } from "convex/server";
 import { requirePermission } from "./lib/rbac";
 import { hasPermission } from "./lib/permissions";
 import { internal } from "./_generated/api";
-import { Id } from "./_generated/dataModel";
+import { Id, Doc } from "./_generated/dataModel";
 import { writeAuditLog } from "./lib/audit";
 import { resolveRef, isR2Ref, r2KeyFromRef } from "./lib/storageRef";
 import { productFeatureValidator } from "./schema";
@@ -355,18 +355,6 @@ export const getProduct = query({
       isCategoryActive: category?.isActive ?? false,
       skus,
       ...ratingSummaryOf(product),
-      related_products: product.related_product_ids 
-        ? (await Promise.all(product.related_product_ids.map(async (id) => {
-            const p = await ctx.db.get(id);
-            if (!p || p.status !== "PUBLISHED") return null;
-            return {
-              ...p,
-              thumbnail: await resolveStorageRef(ctx, p.thumbnail),
-              images: await resolveProductImages(ctx, p.images),
-              skus: await resolveSkuMedia(ctx, p._id),
-            };
-          }))).filter((p): p is NonNullable<typeof p> => p !== null)
-        : [],
     };
 
     if (!(await canViewFinancials(ctx))) {
@@ -398,24 +386,143 @@ export const getBySlug = query({
       isCategoryActive: category?.isActive ?? false,
       skus,
       ...ratingSummaryOf(product),
-      related_products: product.related_product_ids 
-        ? (await Promise.all(product.related_product_ids.map(async (id) => {
-            const p = await ctx.db.get(id);
-            if (!p || p.status !== "PUBLISHED") return null;
-            return {
-              ...p,
-              thumbnail: await resolveStorageRef(ctx, p.thumbnail),
-              images: await resolveProductImages(ctx, p.images),
-              skus: await resolveSkuMedia(ctx, p._id),
-            };
-          }))).filter((p): p is NonNullable<typeof p> => p !== null)
-        : [],
     };
 
     if (!(await canViewFinancials(ctx))) {
       delete result.cogs;
     }
     return result;
+  },
+});
+
+const RELATED_PRODUCTS_LIMIT = 4;
+// Upper bound on same-category candidates considered per request. Keeps the
+// query's read set (and therefore reactive invalidation) small on large categories.
+const RELATED_CANDIDATE_POOL = 24;
+
+/**
+ * The SKU a storefront card should price and add to cart: the default SKU when
+ * it is purchasable, otherwise the first active SKU with display stock.
+ */
+async function getPurchasableSku(ctx: Pick<QueryCtx, "db">, productId: Id<"products">) {
+  const skus = await getProductSkus(ctx, productId);
+  const purchasable = skus.filter((sku) => sku.isActive !== false && sku.display_stock > 0);
+  return purchasable.find((sku) => sku.isDefault) ?? purchasable[0] ?? null;
+}
+
+/** Higher is more relevant: close in price, well reviewed, featured. */
+function scoreRelatedCandidate(anchorPrice: number, price: number, product: Doc<"products">) {
+  const priceDistance = anchorPrice > 0 ? Math.min(Math.abs(price - anchorPrice) / anchorPrice, 1) : 1;
+  const { ratingAverage, reviewCount } = ratingSummaryOf(product);
+  const ratingScore = (ratingAverage / 5) * Math.min(reviewCount / 10, 1);
+  return (1 - priceDistance) * 0.6 + ratingScore * 0.25 + (product.isFeatured ? 0.15 : 0);
+}
+
+export const getRelatedProducts = query({
+  args: { productId: v.id("products") },
+  handler: async (ctx, args) => {
+    const product = await ctx.db.get(args.productId);
+    if (!product || product.status !== "PUBLISHED") {
+      return [];
+    }
+
+    const categoryActive = new Map<Id<"categories">, boolean>();
+    const isCategoryActive = async (categoryId: Id<"categories">) => {
+      if (!categoryActive.has(categoryId)) {
+        const category = await ctx.db.get(categoryId);
+        categoryActive.set(categoryId, category?.isActive === true);
+      }
+      return categoryActive.get(categoryId)!;
+    };
+
+    // Every card must link to a working product page and be purchasable.
+    const toCandidate = async (candidate: Doc<"products"> | null) => {
+      if (
+        !candidate ||
+        candidate._id === product._id ||
+        candidate.status !== "PUBLISHED" ||
+        candidate.isActive === false ||
+        !candidate.slug ||
+        !(await isCategoryActive(candidate.categoryId))
+      ) {
+        return null;
+      }
+      const sku = await getPurchasableSku(ctx, candidate._id);
+      return sku ? { product: candidate, sku } : null;
+    };
+
+    type Candidate = NonNullable<Awaited<ReturnType<typeof toCandidate>>>;
+    const isCandidate = (c: Candidate | null): c is Candidate => c !== null;
+
+    // 1. Explicitly curated relations come first, in their curated order.
+    const curatedIds = [...new Set(product.related_product_ids ?? [])];
+    const selected = (
+      await Promise.all(curatedIds.map(async (id) => toCandidate(await ctx.db.get(id))))
+    )
+      .filter(isCandidate)
+      .slice(0, RELATED_PRODUCTS_LIMIT);
+
+    // 2. Top up from the same category, ranked by relevance to this product.
+    if (selected.length < RELATED_PRODUCTS_LIMIT) {
+      const selectedIds = new Set<Id<"products">>(selected.map((c) => c.product._id));
+      const pool = await ctx.db
+        .query("products")
+        .withIndex("by_category_status_sort_order", (q) =>
+          q.eq("categoryId", product.categoryId).eq("status", "PUBLISHED"),
+        )
+        .take(RELATED_CANDIDATE_POOL + selectedIds.size + 1);
+
+      const anchorPrice = (await getPurchasableSku(ctx, product._id))?.price ?? product.selling_price;
+      const ranked = (
+        await Promise.all(
+          pool.filter((p) => !selectedIds.has(p._id)).map((p) => toCandidate(p)),
+        )
+      )
+        .filter(isCandidate)
+        .map((c) => ({ ...c, score: scoreRelatedCandidate(anchorPrice, c.sku.price, c.product) }))
+        .sort((a, b) => b.score - a.score);
+
+      selected.push(...ranked.slice(0, RELATED_PRODUCTS_LIMIT - selected.length));
+    }
+
+    // 3. Shape for the storefront ProductCard. Only public fields leave the server.
+    return await Promise.all(
+      selected.map(async ({ product: p, sku }) => {
+        const category = await ctx.db.get(p.categoryId);
+        const thumbnail =
+          (await resolveStorageRef(ctx, p.thumbnail)) ??
+          (await resolveStorageRef(ctx, p.images[0])) ??
+          null;
+
+        return {
+          _id: p._id,
+          name_en: p.name_en,
+          name_ar: p.name_ar,
+          description_en: p.description_en,
+          description_ar: p.description_ar,
+          slug: p.slug!,
+          thumbnail,
+          images: [] as string[],
+          selling_price: p.selling_price,
+          compareAtPrice: p.compareAtPrice,
+          isFeatured: p.isFeatured,
+          categoryName_en: category?.name_en,
+          categoryName_ar: category?.name_ar,
+          ...ratingSummaryOf(p),
+          // Only the SKU the card prices and adds to cart.
+          skus: [
+            {
+              _id: sku._id,
+              price: sku.price,
+              compareAtPrice: sku.compareAtPrice,
+              display_stock: sku.display_stock,
+              isDefault: true,
+              variantName: sku.variantName,
+            },
+          ],
+        };
+      }),
+    );
   },
 });
 

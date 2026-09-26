@@ -81,7 +81,7 @@ As a shopper, I want the related products to be laid out optimally for my device
 - **FR-003**: System MUST NOT include the currently viewed product in the list of related products.
 - **FR-004**: System MUST present each related product with at minimum its primary image, title, and current price.
 - **FR-005**: System MUST hide the "Related Products" section entirely if there are zero related products available for the current item.
-- **FR-006**: System MUST determine related products by prioritizing products that share the same category and tags as the currently viewed product.
+- **FR-006**: System MUST determine related products by prioritizing explicitly curated relations (`related_product_ids`), then products in the same category ranked by price proximity, rating, and featured status. *(Tag-based matching deferred: the `products` schema has no tags field.)*
 - **FR-007**: System MUST display a maximum of 4 related products in this section.
 - **FR-008**: System MUST exclude out-of-stock products entirely from the related products recommendations.
 - **FR-009**: System MUST display a skeleton loader matching the structure of product cards while related products are being fetched asynchronously on scroll.

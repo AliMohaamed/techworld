@@ -72,6 +72,11 @@
       "nameRequired": "Please enter your name.",
       "yourReview": "Your review",
       "reviewCount": "({count, plural, one {# review} other {# reviews}})"
+    },
+    "related": {
+      "badge": "Recommendations",
+      "title": "Related Products",
+      "subtitle": "More picks similar to this item"
     }
   }
 }
