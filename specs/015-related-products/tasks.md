@@ -11,7 +11,7 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Verify Convex schema and Next.js project structure for related products feature.
+- [X] T001 Verify Convex schema and Next.js project structure for related products feature.
 
 ---
 
@@ -21,7 +21,7 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T002 Review `products` and `skus` table schema in `packages/backend/convex/schema.ts` to ensure necessary indices exist for querying related items.
+- [X] T002 Review `products` and `skus` table schema in `packages/backend/convex/schema.ts` to ensure necessary indices exist for querying related items.
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -35,10 +35,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Implement `getRelatedProducts` query in `packages/backend/convex/products.ts` to fetch products using `related_product_ids` and `categoryId` as fallbacks, ensuring they are published and in-stock.
-- [ ] T004 [P] [US1] Create the `<RelatedProducts />` component skeleton and basic layout in `apps/storefront/src/components/storefront/related-products.tsx`.
-- [ ] T005 [US1] Integrate `useQuery(api.products.getRelatedProducts)` into `<RelatedProducts />` and render the product information.
-- [ ] T006 [US1] Add the `<RelatedProducts />` component at the bottom of the page in `apps/storefront/src/app/[locale]/(store)/products/[slug]/page.tsx`.
+- [X] T003 [US1] Implement `getRelatedProducts` query in `packages/backend/convex/products.ts` to fetch products using `related_product_ids` and `categoryId` as fallbacks, ensuring they are published and in-stock.
+- [X] T004 [P] [US1] Create the `<RelatedProducts />` component skeleton and basic layout in `apps/storefront/src/components/storefront/related-products.tsx`.
+- [X] T005 [US1] Integrate `useQuery(api.products.getRelatedProducts)` into `<RelatedProducts />` and render the product information.
+- [X] T006 [US1] Add the `<RelatedProducts />` component at the bottom of the page in `apps/storefront/src/app/[locale]/(store)/products/[slug]/page.tsx`.
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -52,7 +52,7 @@
 
 ### Implementation for User Story 2
 
-- [ ] T007 [US2] Update product cards in `apps/storefront/src/components/storefront/related-products.tsx` to include Next.js `<Link>` wrappers pointing to `/products/[slug]`.
+- [X] T007 [US2] Update product cards in `apps/storefront/src/components/storefront/related-products.tsx` to include Next.js `<Link>` wrappers pointing to `/products/[slug]`.
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -66,9 +66,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T008 [P] [US3] Apply CSS flexbox with `overflow-x-auto snap-x snap-mandatory` for mobile and CSS Grid `md:grid-cols-4` for desktop in `apps/storefront/src/components/storefront/related-products.tsx`.
-- [ ] T009 [US3] Add a skeleton loader state (matching the responsive layout) while the Convex query is loading in `apps/storefront/src/components/storefront/related-products.tsx`.
-- [ ] T010 [US3] Implement the failure handling (retry once, then return `null` to hide the section silently) in `apps/storefront/src/components/storefront/related-products.tsx`.
+- [X] T008 [P] [US3] Apply CSS flexbox with `overflow-x-auto snap-x snap-mandatory` for mobile and CSS Grid `md:grid-cols-4` for desktop in `apps/storefront/src/components/storefront/related-products.tsx`.
+- [X] T009 [US3] Add a skeleton loader state (matching the responsive layout) while the Convex query is loading in `apps/storefront/src/components/storefront/related-products.tsx`.
+- [X] T010 [US3] Implement the failure handling (retry once, then return `null` to hide the section silently) in `apps/storefront/src/components/storefront/related-products.tsx`.
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -78,9 +78,9 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T011 [P] Ensure UI component styling matches the overall storefront aesthetics.
-- [ ] T012 Run performance profiling to ensure related products load in < 300ms.
-- [ ] T013 Update translations for any new text (e.g., "Related Products" heading).
+- [X] T011 [P] Ensure UI component styling matches the overall storefront aesthetics.
+- [ ] T012 Run performance profiling to ensure related products load in < 300ms. *(Not yet measured; query read set is now bounded — see contracts/api.md.)*
+- [X] T013 Update translations for any new text (e.g., "Related Products" heading).
 
 ---
 

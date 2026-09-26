@@ -16,24 +16,41 @@ This query fetches up to 4 related products for a given product ID.
 
 ### Response
 
-Returns an array of up to 4 serialized product objects.
+Returns up to 4 products shaped for the storefront `ProductCard`. Only public fields are returned (no `cogs`, no `real_stock`).
 
 ```typescript
 Array<{
   _id: Id<"products">,
   name_en: string,
   name_ar: string,
+  description_en?: string,
+  description_ar?: string,
+  slug: string,                 // products without a slug are excluded
+  thumbnail: string | null,     // thumbnail, falling back to images[0]
+  images: string[],             // always [] — the card uses `thumbnail`
   selling_price: number,
   compareAtPrice?: number,
-  thumbnailUrl: string | null,
-  slug: string
+  isFeatured?: boolean,
+  categoryName_en?: string,
+  categoryName_ar?: string,
+  ratingAverage: number,
+  reviewCount: number,
+  skus: [{                      // exactly one: the purchasable SKU the card prices and adds to cart
+    _id: Id<"skus">,
+    price: number,
+    compareAtPrice?: number,
+    display_stock: number,
+    isDefault: true,
+    variantName: string,
+  }],
 }>
 ```
 
 ### Logic
 
-1. Look up the original product by `productId`.
-2. Extract its `related_product_ids` and `categoryId`.
-3. First, fetch any products explicitly listed in `related_product_ids` that are `PUBLISHED` and have `real_stock > 0` (or `isActive` depending on how stock is checked). Since stock is in `skus` table, it might just check `status === "PUBLISHED"`. Wait, the spec says "exclude out-of-stock products". So we must query `skus` for each candidate product to verify `real_stock > 0`.
-4. If fewer than 4 products are found, query `products` by `categoryId`, excluding the original `productId`, ensuring they are `PUBLISHED` and in-stock, until 4 products are collected.
-5. Return the mapped results.
+A candidate is eligible when it is not the current product, is `PUBLISHED`, not deactivated, has a slug, belongs to an active category, and has at least one active SKU with `display_stock > 0` (the same availability signal the product page uses).
+
+1. Look up the current product; return `[]` if it is missing or not `PUBLISHED`.
+2. Take eligible products from `related_product_ids`, in curated order.
+3. If fewer than 4, read at most 24 same-category `PUBLISHED` products via `by_category_status_sort_order`, drop ineligible ones, and rank by: price proximity to the current product (60%), rating weighted by review count (25%), featured (15%).
+4. Price each card from its purchasable SKU (default SKU if in stock, else the first in-stock active SKU).

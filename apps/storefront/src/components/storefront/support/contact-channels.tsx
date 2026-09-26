@@ -1,5 +1,5 @@
 import { Mail, MessageSquare, Phone } from "lucide-react";
-import { SUPPORT_EMAIL, SUPPORT_PHONE_DISPLAY, whatsappLink } from "@/lib/contact";
+import { SUPPORT_EMAIL, SUPPORT_PHONES, SUPPORT_WHATSAPP_DISPLAY, telLink, whatsappLink } from "@/lib/contact";
 
 type Labels = {
   title: string;
@@ -19,31 +19,25 @@ export default function ContactChannels({ labels }: { labels: Labels }) {
     {
       key: "whatsapp",
       icon: MessageSquare,
-      href: whatsappLink(labels.prefilledMessage),
-      external: true,
       label: labels.whatsapp.label,
-      detail: labels.whatsapp.detail,
-      ltr: false,
+      note: labels.whatsapp.detail,
+      links: [{ href: whatsappLink(labels.prefilledMessage), text: SUPPORT_WHATSAPP_DISPLAY, external: true }],
     },
     {
       key: "email",
       icon: Mail,
-      href: `mailto:${SUPPORT_EMAIL}`,
-      external: false,
       label: labels.email.label,
-      detail: SUPPORT_EMAIL,
-      ltr: true,
+      note: undefined,
+      links: [{ href: `mailto:${SUPPORT_EMAIL}`, text: SUPPORT_EMAIL, external: false }],
     },
     {
       key: "phone",
       icon: Phone,
-      href: `tel:${SUPPORT_PHONE_DISPLAY.replace(/\s/g, "")}`,
-      external: false,
       label: labels.phone.label,
-      detail: SUPPORT_PHONE_DISPLAY,
-      ltr: true,
+      note: undefined,
+      links: SUPPORT_PHONES.map((phone) => ({ href: telLink(phone), text: phone, external: false })),
     },
-  ] as const;
+  ];
 
   return (
     <section aria-labelledby="contact-channels-heading" className="space-y-8">
@@ -60,28 +54,29 @@ export default function ContactChannels({ labels }: { labels: Labels }) {
       </div>
 
       <div className="grid gap-5 md:grid-cols-3">
-        {channels.map(({ key, icon: Icon, href, external, label, detail, ltr }) => (
-          <a
-            key={key}
-            href={href}
-            {...(external
-              ? { target: "_blank", rel: "noopener noreferrer" }
-              : {})}
-            className={cardClass}
-          >
+        {channels.map(({ key, icon: Icon, label, note, links }) => (
+          <div key={key} className={cardClass}>
             <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary transition-transform group-hover:scale-110">
               <Icon size={20} aria-hidden="true" />
             </span>
             <span className="font-space-grotesk text-sm font-bold uppercase tracking-[0.2em] text-foreground">
               {label}
             </span>
-            <span
-              className="text-sm font-medium text-label-muted"
-              {...(ltr ? { dir: "ltr" as const } : {})}
-            >
-              {detail}
+            {note ? <span className="text-sm text-label-muted">{note}</span> : null}
+            <span className="flex flex-col items-start gap-1">
+              {links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  dir="ltr"
+                  {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  className="break-all py-1 text-base font-semibold text-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"
+                >
+                  {link.text}
+                </a>
+              ))}
             </span>
-          </a>
+          </div>
         ))}
       </div>
     </section>

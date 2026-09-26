@@ -47,7 +47,7 @@
         {
           "title": "Out for delivery",
           "description": "The courier calls you before arriving. Have your order code ready and inspect the parcel before you accept it.",
-          "meta": "1 to 6 working days"
+          "meta": "1 to 4 working days"
         }
       ]
     },
@@ -73,7 +73,7 @@
         {
           "name": "Upper Egypt & Frontier",
           "areas": "Beni Suef through Aswan, plus Red Sea, New Valley and Matrouh.",
-          "estimate": "3 to 6 working days"
+          "estimate": "3 to 4 working days"
         }
       ],
       "disclaimer": "Friday is not a working day for our courier partners. Official holidays, extreme weather and address corrections can add a day or two — if an order slips past its estimate we contact you rather than wait for you to ask."

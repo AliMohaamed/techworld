@@ -72,6 +72,11 @@
       "nameRequired": "يرجى إدخال اسمك.",
       "yourReview": "تقييمك",
       "reviewCount": "({count, plural, one {تقييم واحد} two {تقييمان} few {# تقييمات} many {# تقييمًا} other {# تقييم}})"
+    },
+    "related": {
+      "badge": "ترشيحات",
+      "title": "منتجات ذات صلة",
+      "subtitle": "منتجات مشابهة قد تعجبك أيضًا"
     }
   }
 }

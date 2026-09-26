@@ -23,7 +23,6 @@ export * from "./components/ui/color-swatch";
 // Storefront Components
 export * from "./components/storefront/PromoCodeInput";
 export * from "./components/storefront/ProductFeatures";
-export * from "./components/storefront/RelatedProducts";
 export * from "./components/storefront/LanguageSwitcher";
 
 // Core Layout components
