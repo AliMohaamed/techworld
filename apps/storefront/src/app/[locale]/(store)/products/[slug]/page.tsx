@@ -263,13 +263,14 @@ export default function ProductDetailPage() {
                 {product.name_en}
               </h1>
               <p className="ltr:text-right rtl:text-right font-arabic text-2xl leading-relaxed text-primary font-light">{product.name_ar}</p>
-              <a href="#reviews" className="inline-flex items-center gap-2 text-sm transition-opacity hover:opacity-80">
-                <StarRating value={product.ratingAverage} size={16} />
-                {product.reviewCount > 0 ? (
+              {/* The rating line only appears once there are enough reviews to be credible. */}
+              {product.reviewCount >= 3 ? (
+                <a href="#reviews" className="inline-flex items-center gap-2 text-sm transition-opacity hover:opacity-80">
+                  <StarRating value={product.ratingAverage} size={16} />
                   <span className="font-bold text-foreground">{product.ratingAverage.toLocaleString(locale)}</span>
-                ) : null}
-                <span className="text-label-muted">{t('reviews.reviewCount', { count: product.reviewCount })}</span>
-              </a>
+                  <span className="text-label-muted">{t('reviews.reviewCount', { count: product.reviewCount })}</span>
+                </a>
+              ) : null}
             </header>
 
             <div className="mb-10 flex flex-wrap items-center gap-8 border-b border-border pb-10">

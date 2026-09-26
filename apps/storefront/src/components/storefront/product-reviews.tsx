@@ -40,8 +40,12 @@ export function ProductReviews({ productId }: { productId: Id<"products"> }) {
                 {data.reviewCount > 0 ? data.ratingAverage.toLocaleString(locale) : "–"}
               </span>
               <div className="space-y-1">
-                <StarRating value={data.ratingAverage} size={18} />
-                <p className="text-xs text-label-muted">{t("summary", { count: data.reviewCount })}</p>
+                {data.reviewCount > 0 ? (
+                  <>
+                    <StarRating value={data.ratingAverage} size={18} />
+                    <p className="text-xs text-label-muted">{t("summary", { count: data.reviewCount })}</p>
+                  </>
+                ) : null}
               </div>
             </div>
             <div className="mt-6 space-y-2">
