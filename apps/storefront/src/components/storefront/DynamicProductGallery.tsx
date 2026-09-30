@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Thumbs, Pagination, Navigation } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import "swiper/css";
 import "swiper/css/free-mode";
@@ -44,10 +45,28 @@ export function DynamicProductGallery({
     }
   }, [selectedImage, mainSwiper, galleryImages]);
 
+  const handlePrev = () => {
+    if (!mainSwiper) return;
+    if (mainSwiper.isBeginning || mainSwiper.activeIndex === 0) {
+      mainSwiper.slideTo(galleryImages.length - 1, 300);
+    } else {
+      mainSwiper.slidePrev();
+    }
+  };
+
+  const handleNext = () => {
+    if (!mainSwiper) return;
+    if (mainSwiper.isEnd || mainSwiper.activeIndex >= galleryImages.length - 1) {
+      mainSwiper.slideTo(0, 300);
+    } else {
+      mainSwiper.slideNext();
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Main Swiper */}
-      <div className="relative">
+      <div className="relative group">
         <div className="relative aspect-square overflow-hidden bg-card transition-colors">
           {galleryImages.length > 0 ? (
             <Swiper
@@ -94,6 +113,28 @@ export function DynamicProductGallery({
               </span>
             </div>
           ) : null}
+
+          {/* Navigation Arrows */}
+          {galleryImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={handlePrev}
+                aria-label="Previous image"
+                className="absolute start-2 sm:start-4 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-background/80 text-foreground border border-border/80 shadow-md backdrop-blur-md transition-all duration-200 hover:bg-background hover:text-primary hover:border-primary/50 hover:scale-105 active:scale-95"
+              >
+                <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 rtl:rotate-180" />
+              </button>
+              <button
+                type="button"
+                onClick={handleNext}
+                aria-label="Next image"
+                className="absolute end-2 sm:end-4 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-background/80 text-foreground border border-border/80 shadow-md backdrop-blur-md transition-all duration-200 hover:bg-background hover:text-primary hover:border-primary/50 hover:scale-105 active:scale-95"
+              >
+                <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 rtl:rotate-180" />
+              </button>
+            </>
+          )}
         </div>
         
         {/* Pagination below the image */}

@@ -15,6 +15,7 @@ export default async function CategoriesPage() {
     slug: string;
     description_en?: string;
     description_ar?: string;
+    thumbnailUrl?: string | null;
   };
 
   return (
@@ -40,7 +41,7 @@ export default async function CategoriesPage() {
           </div>
         </section>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
           {categories.map((category: CategoryItem) => (
             <CategoryGridCard key={category._id} category={category} />
           ))}

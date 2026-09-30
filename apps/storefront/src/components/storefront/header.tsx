@@ -11,7 +11,7 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@techworld/ui";
-import { LanguageSwitcher, ThemeToggle } from "@techworld/ui";
+import { BrandLogo, LanguageSwitcher, ThemeToggle } from "@techworld/ui";
 
 const CartDrawer = dynamic(() => import("./cart-drawer"), { ssr: false });
 
@@ -53,12 +53,10 @@ export default function Header() {
           <div className="flex">
             <Link
               href="/"
-              className="group flex items-center gap-2.5 min-h-[44px] outline-none"
+              aria-label="TechWorld"
+              className="flex items-center min-h-[44px] rounded-lg outline-none transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-primary"
             >
-              <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-sm bg-primary transition-transform group-hover:rotate-12 group-hover:scale-110" />
-              <span className="font-space-grotesk text-xl sm:text-2xl font-bold tracking-tight text-foreground uppercase">
-                TECH<span className="text-primary">WORLD</span>
-              </span>
+              <BrandLogo className="h-9 sm:h-11" />
             </Link>
           </div>
 

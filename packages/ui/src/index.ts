@@ -28,3 +28,4 @@ export * from "./components/storefront/LanguageSwitcher";
 // Core Layout components
 export * from "./components/ThemeProvider";
 export * from "./components/ThemeToggle";
+export * from "./components/BrandLogo";

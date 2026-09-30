@@ -860,6 +860,82 @@ export const getForStorefront = query({
 
 
 
+const MAX_NEW_ARRIVALS = 12;
+const MAX_RECENTLY_VIEWED = 12;
+
+/** Card-shaped payload shared by the landing-page product rows. */
+async function toStorefrontCard(
+  ctx: Pick<QueryCtx, "db" | "storage">,
+  product: Doc<"products">,
+) {
+  const skus = await resolveSkuMedia(ctx, product._id);
+  return {
+    _id: product._id,
+    _creationTime: product._creationTime,
+    name_ar: product.name_ar,
+    name_en: product.name_en,
+    description_ar: product.description_ar,
+    description_en: product.description_en,
+    selling_price: product.selling_price,
+    compareAtPrice: product.compareAtPrice,
+    thumbnail: await resolveStorageRef(ctx, product.thumbnail),
+    images: await resolveProductImages(ctx, product.images),
+    slug: product.slug,
+    isFeatured: product.isFeatured,
+    skus: skus.filter((sku) => sku.isActive !== false),
+    ...ratingSummaryOf(product),
+  };
+}
+
+/** Newest published products in active categories, newest first. */
+export const listNewArrivals = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const limit = Math.min(Math.max(1, Math.floor(args.limit ?? 8)), MAX_NEW_ARRIVALS);
+    const activeCategories = await ctx.db
+      .query("categories")
+      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .collect();
+    const activeCategoryIds = new Set(activeCategories.map((c) => c._id));
+
+    const picked: Doc<"products">[] = [];
+    // by_status is ordered by _creationTime within a status, so desc = newest first.
+    for await (const product of ctx.db
+      .query("products")
+      .withIndex("by_status", (q) => q.eq("status", "PUBLISHED"))
+      .order("desc")) {
+      if (!activeCategoryIds.has(product.categoryId)) continue;
+      picked.push(product);
+      if (picked.length >= limit) break;
+    }
+
+    return await Promise.all(picked.map((product) => toStorefrontCard(ctx, product)));
+  },
+});
+
+/**
+ * Resolves the shopper's locally stored "recently viewed" ids, preserving their
+ * order and silently dropping anything no longer sellable.
+ */
+export const listByIds = query({
+  args: { ids: v.array(v.string()) },
+  handler: async (ctx, args) => {
+    const ids = [...new Set(args.ids)].slice(0, MAX_RECENTLY_VIEWED);
+    const products = await Promise.all(
+      ids.map(async (rawId) => {
+        const id = ctx.db.normalizeId("products", rawId);
+        if (!id) return null;
+        const product = await ctx.db.get(id);
+        if (!product || product.status !== "PUBLISHED") return null;
+        const category = await ctx.db.get(product.categoryId);
+        if (!category?.isActive) return null;
+        return await toStorefrontCard(ctx, product);
+      }),
+    );
+    return products.filter((product): product is NonNullable<typeof product> => product !== null);
+  },
+});
+
 const advancedVariantInputValidator = v.object({
   id: v.optional(v.id("skus")),
   variantName: v.string(),

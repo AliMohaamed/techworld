@@ -38,6 +38,10 @@
       "addCountToCart": "Add {count} To Cart",
       "buyNow": "Buy Now"
     },
+    "description": {
+      "seeMore": "See More",
+      "seeLess": "See Less"
+    },
     "features": {
       "shipping": "Fast Shipping Anywhere in Egypt",
       "cod": "Secure COD Verification",

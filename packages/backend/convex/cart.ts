@@ -347,6 +347,8 @@ export const placeOrderFromSession = mutation({
     sessionId: v.string(),
     customerName: v.string(),
     customerPhone: v.string(),
+    customerAltPhone: v.optional(v.string()),
+    customerEmail: v.optional(v.string()),
     customerAddress: v.string(),
     governorateId: v.id("governorates"),
     promoCode: v.optional(v.string()),
@@ -362,6 +364,16 @@ export const placeOrderFromSession = mutation({
     }
 
     const governorate = await getActiveGovernorateOrThrow(ctx, args.governorateId);
+
+    const customerAltPhone = args.customerAltPhone?.trim() || undefined;
+    const customerEmail = args.customerEmail?.trim().toLowerCase() || undefined;
+    if (customerEmail && (customerEmail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail))) {
+      throw new ConvexError({ code: "INVALID_EMAIL", message: "Invalid email address." });
+    }
+    if (customerAltPhone && !/^01[0125]\d{8}$/.test(customerAltPhone)) {
+      throw new ConvexError({ code: "INVALID_PHONE", message: "Invalid additional phone number." });
+    }
+
     const shortCode = generateShortCode();
     const isBlacklisted = await ctx.db
       .query("blacklist")
@@ -446,6 +458,8 @@ export const placeOrderFromSession = mutation({
         sessionId: args.sessionId,
         customerName: args.customerName,
         customerPhone: args.customerPhone,
+        customerAltPhone,
+        customerEmail,
         customerAddress: args.customerAddress,
         governorateId: args.governorateId,
         appliedShippingFee: promoDoc?.type === "free_shipping" ? 0 : governorate.shippingFee,

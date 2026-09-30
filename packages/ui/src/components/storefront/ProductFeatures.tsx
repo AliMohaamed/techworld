@@ -41,20 +41,20 @@ export function ProductFeatures({ features, locale, className }: ProductFeatures
   if (visible.length === 0) return null;
 
   return (
-    <ul className={cn("grid gap-x-8 gap-y-6 sm:grid-cols-2", className)}>
+    <ul className={cn("grid grid-cols-2 gap-x-3.5 gap-y-5 sm:gap-x-8 sm:gap-y-6", className)}>
       {visible.map((feature, index) => {
         const title = isArabic ? feature.title_ar : feature.title_en;
         const subtitle = isArabic ? feature.subtitle_ar : feature.subtitle_en;
 
         return (
-          <li key={`${feature.icon}-${index}`} className="flex items-start gap-4">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border bg-accent/40 text-foreground transition-colors">
-              <ProductFeatureIcon icon={feature.icon} />
+          <li key={`${feature.icon}-${index}`} className="flex items-start gap-2.5 sm:gap-4">
+            <span className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl border border-border bg-accent/40 text-foreground transition-colors">
+              <ProductFeatureIcon icon={feature.icon} className="h-4 w-4 sm:h-5 sm:w-5" />
             </span>
             <span className="min-w-0 pt-0.5">
-              <span className="block text-sm font-bold leading-snug text-foreground">{title}</span>
+              <span className="block text-xs sm:text-sm font-bold leading-snug text-foreground">{title}</span>
               {subtitle?.trim() ? (
-                <span className="mt-1 block text-sm leading-snug text-label-muted">{subtitle}</span>
+                <span className="mt-0.5 sm:mt-1 block text-[11px] sm:text-xs leading-snug text-label-muted">{subtitle}</span>
               ) : null}
             </span>
           </li>

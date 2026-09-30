@@ -3,7 +3,7 @@ import { mutation, query, QueryCtx } from "./_generated/server";
 import { requirePermission } from "./lib/rbac";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
-import { isR2Ref, r2KeyFromRef } from "./lib/storageRef";
+import { isR2Ref, r2KeyFromRef, resolveRef } from "./lib/storageRef";
 
 function normalizeOptionalString(value: string | undefined) {
   const normalized = value?.trim();
@@ -51,8 +51,21 @@ export const listActiveCategories = query({
       .withIndex("by_active", (q) => q.eq("isActive", true))
       .collect();
 
+    const withThumbnails = await Promise.all(
+      categories.map(async (category) => {
+        let thumbnailUrl: string | null = null;
+        try {
+          thumbnailUrl = await resolveRef(ctx, category.thumbnailImageId);
+        } catch (error) {
+          // A bad ref shouldn't hide the whole category list; fall back to no image.
+          console.error(`Failed to resolve thumbnail for category ${category._id}:`, error);
+        }
+        return { ...category, thumbnailUrl };
+      }),
+    );
+
     return {
-      categories: categories.sort((a, b) => a.name_en.localeCompare(b.name_en)),
+      categories: withThumbnails.sort((a, b) => a.name_en.localeCompare(b.name_en)),
     };
   },
 });

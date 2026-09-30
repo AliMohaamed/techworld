@@ -142,21 +142,6 @@ export default function CatalogExplorer({
               <FilterDrawerTrigger onClick={() => setIsFilterDrawerOpen(true)} />
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-secondary/50 px-6 py-4 backdrop-blur-sm">
-              <div>
-                <p className="font-space-grotesk text-lg font-bold tracking-tight text-foreground">
-                  {t("results.count", { count: visibleResults.length })}
-                </p>
-              </div>
-              {searchQuery && (
-                <div className="px-4 py-1.5 rounded-md bg-accent border border-border">
-                  <p className="text-[11px] font-semibold tracking-wide text-label-muted uppercase">
-                    {t("results.search", { query: searchQuery })}
-                  </p>
-                </div>
-              )}
-            </div>
-
             {results.length === 0 && status === "Exhausted" ? (
               <div className="space-y-10">
                 <div className="rounded-2xl border border-dashed border-border bg-secondary/30 px-8 py-16 text-center">
