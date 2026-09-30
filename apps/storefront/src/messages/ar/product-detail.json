@@ -38,6 +38,10 @@
       "addCountToCart": "إضافة {count} للسلة",
       "buyNow": "اشتري الآن"
     },
+    "description": {
+      "seeMore": "عرض المزيد",
+      "seeLess": "عرض أقل"
+    },
     "features": {
       "shipping": "شحن سريع لجميع أنحاء مصر",
       "cod": "تحقق آمن من الدفع عند الاستلام",

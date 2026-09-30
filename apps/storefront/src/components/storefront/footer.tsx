@@ -1,6 +1,7 @@
 import { Link } from "@/navigation";
 import { Instagram, Facebook } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { BrandLogo } from "@techworld/ui";
 
 function TikTokIcon({ size = 18 }: { size?: number }) {
   return (
@@ -45,11 +46,12 @@ export default async function Footer() {
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16 mb-16">
           <div className="space-y-6">
-            <Link href="/" className="flex items-center gap-2.5 outline-none group w-fit">
-              <div className="h-4 w-4 rounded-[4px] bg-primary group-hover:rotate-45 transition-transform" />
-              <span className="font-space-grotesk text-xl font-bold tracking-tight text-foreground uppercase">
-                TECH<span className="text-primary">WORLD</span>
-              </span>
+            <Link
+              href="/"
+              aria-label="TechWorld"
+              className="block w-fit rounded-lg outline-none transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <BrandLogo variant="stacked" size="lg" />
             </Link>
             <p className="text-label-muted text-sm leading-relaxed max-w-xs">
               {t('tagline')}

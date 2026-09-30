@@ -18,12 +18,14 @@ const SAVED_DETAILS_KEY = "tw-checkout-details";
 type FormFields = {
   fullName: string;
   phone: string;
+  altPhone: string;
+  email: string;
   governorateId: Id<"governorates"> | "";
   address: string;
 };
 type FieldErrors = Partial<Record<keyof FormFields, string>>;
 
-const EMPTY_FORM: FormFields = { fullName: "", phone: "", governorateId: "", address: "" };
+const EMPTY_FORM: FormFields = { fullName: "", phone: "", altPhone: "", email: "", governorateId: "", address: "" };
 
 /**
  * Normalises what Egyptian customers typically type into a local mobile
@@ -41,6 +43,7 @@ function normalizeEgyptianPhone(raw: string) {
 }
 
 const isValidEgyptianMobile = (phone: string) => /^01[0125]\d{8}$/.test(phone);
+const isValidEmail = (email: string) => email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 export default function CheckoutForm() {
   const t = useTranslations("CheckoutForm");
@@ -158,6 +161,12 @@ export default function CheckoutForm() {
     const next: FieldErrors = {};
     if (form.fullName.trim().length < 3) next.fullName = t("errors.fullName");
     if (!isValidEgyptianMobile(normalizeEgyptianPhone(form.phone))) next.phone = t("errors.phone");
+    const altPhone = normalizeEgyptianPhone(form.altPhone);
+    if (form.altPhone.trim()) {
+      if (!isValidEgyptianMobile(altPhone)) next.altPhone = t("errors.phone");
+      else if (altPhone === normalizeEgyptianPhone(form.phone)) next.altPhone = t("errors.altPhoneSame");
+    }
+    if (form.email.trim() && !isValidEmail(form.email.trim())) next.email = t("errors.email");
     if (!form.governorateId) next.governorateId = t("errors.governorate");
     if (form.address.trim().length < 10) next.address = t("errors.address");
     return next;
@@ -180,6 +189,8 @@ export default function CheckoutForm() {
     const details = {
       fullName: form.fullName.trim(),
       phone: normalizeEgyptianPhone(form.phone),
+      altPhone: form.altPhone.trim() ? normalizeEgyptianPhone(form.altPhone) : "",
+      email: form.email.trim().toLowerCase(),
       governorateId: form.governorateId,
       address: form.address.trim(),
     };
@@ -191,6 +202,8 @@ export default function CheckoutForm() {
         sessionId,
         customerName: details.fullName,
         customerPhone: details.phone,
+        customerAltPhone: details.altPhone || undefined,
+        customerEmail: details.email || undefined,
         governorateId: details.governorateId as Id<"governorates">,
         customerAddress: details.address,
         promoCode: promoCode || undefined,
@@ -409,6 +422,54 @@ export default function CheckoutForm() {
               ) : (
                 <p id="checkout-phone-hint" className="mt-1.5 text-xs text-label-muted">{t("delivery.phoneHint")}</p>
               )}
+            </div>
+            <div>
+              <label htmlFor="checkout-altPhone" className={labelClass}>
+                {t("delivery.altPhone")}{" "}
+                <span className="font-normal text-label-muted">{t("delivery.optional")}</span>
+              </label>
+              <input
+                id="checkout-altPhone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="off"
+                enterKeyHint="next"
+                dir="ltr"
+                placeholder="01xxxxxxxxx"
+                aria-invalid={!!errors.altPhone}
+                aria-describedby="checkout-altPhone-hint"
+                className={cn(inputClass(!!errors.altPhone), "font-mono rtl:text-right")}
+                value={form.altPhone}
+                onChange={(e) => updateField("altPhone", e.target.value)}
+                onBlur={() => form.altPhone && updateField("altPhone", normalizeEgyptianPhone(form.altPhone))}
+              />
+              {errors.altPhone ? (
+                errorText(errors.altPhone)
+              ) : (
+                <p id="checkout-altPhone-hint" className="mt-1.5 text-xs text-label-muted">{t("delivery.altPhoneHint")}</p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="checkout-email" className={labelClass}>
+                {t("delivery.email")}{" "}
+                <span className="font-normal text-label-muted">{t("delivery.optional")}</span>
+              </label>
+              <input
+                id="checkout-email"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                autoCapitalize="none"
+                spellCheck={false}
+                enterKeyHint="next"
+                dir="ltr"
+                placeholder="name@example.com"
+                aria-invalid={!!errors.email}
+                className={cn(inputClass(!!errors.email), "rtl:text-right")}
+                value={form.email}
+                onChange={(e) => updateField("email", e.target.value)}
+              />
+              {errorText(errors.email)}
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="checkout-governorateId" className={labelClass}>{t("delivery.governorate")}</label>

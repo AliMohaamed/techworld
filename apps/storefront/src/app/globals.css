@@ -120,6 +120,21 @@
   .hero-float, .hero-float-delayed, .hero-spin, .hero-spin-fast, .hero-beam, .hero-underline { animation: none; }
 }
 
+/* ── Reviews marquee ─────────────────────────── */
+@keyframes reviews-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.reviews-marquee-track { animation: reviews-marquee 70s linear infinite; }
+.reviews-marquee-reverse { animation-direction: reverse; animation-duration: 80s; }
+.reviews-marquee:hover .reviews-marquee-track,
+.reviews-marquee:focus-within .reviews-marquee-track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  /* No motion: each row becomes a plain horizontal scroller. */
+  .reviews-marquee-track { animation: none; }
+  .reviews-marquee > div { overflow-x: auto; scrollbar-width: none; }
+}
+
 /*
  * Arabic typography. Every font utility (font-space-grotesk, font-sans,
  * font-arabic) resolves to Cairo, and letter-spacing is removed because any

@@ -151,6 +151,8 @@ export default defineSchema({
     sessionId: v.optional(v.string()),
     customerName: v.optional(v.string()),
     customerPhone: v.optional(v.string()),
+    customerAltPhone: v.optional(v.string()),
+    customerEmail: v.optional(v.string()),
     customerAddress: v.optional(v.string()),
     governorateId: v.optional(v.id("governorates")),
     appliedShippingFee: v.optional(v.number()),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { useParams } from "next/navigation";
 import { api } from "@backend/convex/_generated/api";
@@ -13,6 +13,7 @@ import { DynamicProductGallery } from "@/components/storefront/DynamicProductGal
 import { ProductReviews } from "@/components/storefront/product-reviews";
 import { StarRating } from "@/components/storefront/star-rating";
 import { useFavorites } from "@/lib/use-favorites";
+import { recordRecentlyViewed } from "@/lib/recently-viewed";
 import { ColorSwatch, getColorDisplayName, ProductFeatures, cn } from "@techworld/ui";
 import { RelatedProducts } from "@/components/storefront/related-products";
 import { useTranslations, useLocale } from "next-intl";
@@ -44,6 +45,53 @@ function normalizeColorLabel(color: string) {
   return color.trim().toLowerCase();
 }
 
+// Clamps the description to two lines; the toggle only appears when the text overflows.
+function ExpandableDescription({
+  text,
+  className,
+  seeMoreLabel,
+  seeLessLabel,
+}: {
+  text?: string;
+  className: string;
+  seeMoreLabel: string;
+  seeLessLabel: string;
+}) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || isExpanded) return;
+    const measure = () => setIsOverflowing(element.scrollHeight > element.clientHeight + 1);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [text, isExpanded]);
+
+  if (!text) return null;
+
+  return (
+    <div>
+      <p ref={ref} className={cn(className, !isExpanded && "line-clamp-2")}>
+        {text}
+      </p>
+      {isOverflowing || isExpanded ? (
+        <button
+          type="button"
+          aria-expanded={isExpanded}
+          onClick={() => setIsExpanded((previous) => !previous)}
+          className="mt-2 text-xs font-black uppercase text-primary transition-opacity hover:opacity-80"
+        >
+          {isExpanded ? seeLessLabel : seeMoreLabel}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 export default function ProductDetailPage() {
   const t = useTranslations('ProductDetail');
   const locale = useLocale();
@@ -59,6 +107,11 @@ export default function ProductDetailPage() {
   const [unitOverrides, setUnitOverrides] = useState<Record<number, Id<"skus">>>({});
   const [isAdding, setIsAdding] = useState(false);
   const { isFavorite, toggle: toggleFavorite } = useFavorites();
+
+  const viewedProductId = product?._id;
+  useEffect(() => {
+    if (viewedProductId) recordRecentlyViewed(viewedProductId);
+  }, [viewedProductId]);
 
   const defaultSkuId = product?.skus?.find((sku: ProductSku) => sku.isDefault)?._id ?? product?.skus?.[0]?._id;
   if (selectedSkuId === undefined && defaultSkuId !== undefined) {
@@ -134,8 +187,14 @@ export default function ProductDetailPage() {
     return counts;
   }, [unitSkuIds]);
 
+  // The main image always leads and the order stays stable; picking a variant
+  // slides the gallery to its linked image instead of reordering it.
   const galleryImages = product
-    ? uniqueImages([selectedVariant?.linkedImageId, product.thumbnail, ...(product.images ?? [])])
+    ? uniqueImages([
+        product.thumbnail,
+        ...(product.images ?? []),
+        ...variantOptions.map((sku) => sku.linkedImageId),
+      ])
     : [];
   const displayPrice = selectedVariant?.price || product?.selling_price || 0;
   const compareAtPrice = selectedVariant?.compareAtPrice ?? product?.compareAtPrice;
@@ -362,13 +421,16 @@ export default function ProductDetailPage() {
 
 
             <div className="mb-12 space-y-6">
-              {locale === "ar" ? (
-                <p className="font-arabic text-lg md:text-xl leading-relaxed text-label-muted font-medium">
-                  {product.description_ar}
-                </p>
-              ) : (
-                <p className="text-sm md:text-base leading-8 text-label-muted font-medium">{product.description_en}</p>
-              )}
+              <ExpandableDescription
+                text={locale === "ar" ? product.description_ar : product.description_en}
+                className={
+                  locale === "ar"
+                    ? "font-arabic text-lg md:text-xl leading-relaxed text-label-muted font-medium"
+                    : "text-sm md:text-base leading-8 text-label-muted font-medium"
+                }
+                seeMoreLabel={t('description.seeMore')}
+                seeLessLabel={t('description.seeLess')}
+              />
 
               {/* Optional benefits grid; renders nothing when the product has no features. */}
               <ProductFeatures

@@ -534,6 +534,12 @@ export default function OrderDetailsPage() {
                 label={t("cards.phone")}
                 value={order.customerPhone ?? t("notProvided")}
               />
+              {order.customerAltPhone && (
+                <InfoCard label={t("cards.altPhone")} value={order.customerAltPhone} />
+              )}
+              {order.customerEmail && (
+                <InfoCard label={t("cards.email")} value={order.customerEmail} />
+              )}
 
               {order.state === "SHIPPED" && (
                 <Button

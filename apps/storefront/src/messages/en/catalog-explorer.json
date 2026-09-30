@@ -10,11 +10,6 @@
       "heading": "Catalog Explorer",
       "description": "Search, filter, and page through the live storefront catalog without losing your place."
     },
-    "results": {
-      "eyebrow": "Current Results",
-      "count": "{count} products loaded",
-      "search": "Search: {query}"
-    },
     "empty": {
       "eyebrow": "Empty State",
       "title": "No products found",

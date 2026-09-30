@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { ratingSummaryOf } from "./lib/ratings";
+import { resolveStorageRef } from "./products";
 
 const MAX_NAME_LENGTH = 60;
 const MAX_COMMENT_LENGTH = 1000;
@@ -129,5 +130,83 @@ export const submitReview = mutation({
 
     await ctx.db.patch(args.productId, { rating_sum: ratingSum, review_count: reviewCount });
     return { success: true };
+  },
+});
+
+const MAX_HIGHLIGHTS = 24;
+const HIGHLIGHT_SCAN_LIMIT = 300;
+const HIGHLIGHT_MIN_RATING = 4;
+const HIGHLIGHT_MIN_COMMENT_LENGTH = 12;
+
+/**
+ * Landing-page testimonials: recent, visible, well-rated reviews with a real
+ * comment, on products that are still for sale. Also returns the store-wide
+ * rating so the section can show an honest overall score.
+ */
+export const listHighlights = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const limit = Math.min(Math.max(1, Math.floor(args.limit ?? 12)), MAX_HIGHLIGHTS);
+
+    const publishedProducts = await ctx.db
+      .query("products")
+      .withIndex("by_status", (q) => q.eq("status", "PUBLISHED"))
+      .collect();
+    const activeCategoryIds = new Set(
+      (
+        await ctx.db
+          .query("categories")
+          .withIndex("by_active", (q) => q.eq("isActive", true))
+          .collect()
+      ).map((c) => c._id),
+    );
+    const sellable = new Map(
+      publishedProducts.filter((p) => activeCategoryIds.has(p.categoryId)).map((p) => [p._id, p]),
+    );
+
+    let ratingSum = 0;
+    let reviewCount = 0;
+    for (const product of sellable.values()) {
+      ratingSum += product.rating_sum ?? 0;
+      reviewCount += product.review_count ?? 0;
+    }
+
+    const recent = await ctx.db.query("product_reviews").order("desc").take(HIGHLIGHT_SCAN_LIMIT);
+    const picked = recent
+      .filter(
+        (review) =>
+          !review.isHidden &&
+          review.rating >= HIGHLIGHT_MIN_RATING &&
+          (review.comment?.length ?? 0) >= HIGHLIGHT_MIN_COMMENT_LENGTH &&
+          sellable.has(review.productId),
+      )
+      .slice(0, limit);
+
+    const reviews = await Promise.all(
+      picked.map(async (review) => {
+        const product = sellable.get(review.productId)!;
+        return {
+          _id: review._id,
+          authorName: review.authorName,
+          rating: review.rating,
+          comment: review.comment!,
+          updatedAt: review.updatedAt,
+          product: {
+            _id: product._id,
+            slug: product.slug,
+            name_en: product.name_en,
+            name_ar: product.name_ar,
+            image:
+              (await resolveStorageRef(ctx, product.thumbnail ?? product.images[0])) ?? null,
+          },
+        };
+      }),
+    );
+
+    return {
+      reviews,
+      reviewCount,
+      ratingAverage: reviewCount > 0 ? Math.round((ratingSum / reviewCount) * 10) / 10 : 0,
+    };
   },
 });

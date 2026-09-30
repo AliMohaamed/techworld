@@ -1,0 +1,41 @@
+{
+  "ProductRail": {
+    "previous": "المنتجات السابقة",
+    "next": "المنتجات التالية"
+  },
+  "DealsSection": {
+    "badge": "عروض ساخنة",
+    "eyebrow": "وفّر حتى",
+    "off": "خصم الآن",
+    "description": "أسعار لفترة محدودة على منتجات مختارة، وينتهي العرض بنفاد الكمية.",
+    "stats": {
+      "liveDeals": "عروض متاحة",
+      "saveUpTo": "وفّر حتى"
+    },
+    "cta": "تسوق كل العروض"
+  },
+  "NewArrivals": {
+    "badge": "وصل حديثاً",
+    "title": "أحدث",
+    "accentTitle": "المنتجات",
+    "viewAll": "عرض كل الجديد",
+    "spotlight": {
+      "label": "أحدث إضافة",
+      "cta": "تسوق الآن"
+    }
+  },
+  "RecentlyViewed": {
+    "title": "شاهدتها مؤخراً",
+    "description": "تابع من حيث توقفت",
+    "clear": "مسح",
+    "soldOut": "نفدت الكمية"
+  },
+  "CustomerReviews": {
+    "badge": "آراء العملاء",
+    "title": "ماذا يقول عملاؤنا",
+    "accentTitle": "عنّا",
+    "description": "آراء حقيقية من عملاء طلبوا من TechWorld.",
+    "basedOn": "بناءً على {count, plural, one {تقييم واحد} two {تقييمين} few {# تقييمات} many {# تقييماً} other {# تقييم}}",
+    "ratingLabel": "التقييم {rating} من 5"
+  }
+}

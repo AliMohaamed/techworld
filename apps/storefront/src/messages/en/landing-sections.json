@@ -1,0 +1,41 @@
+{
+  "ProductRail": {
+    "previous": "Previous products",
+    "next": "Next products"
+  },
+  "DealsSection": {
+    "badge": "Hot deals",
+    "eyebrow": "Save up to",
+    "off": "off right now",
+    "description": "Limited-time prices on selected gear. Once stock runs out, the offer ends.",
+    "stats": {
+      "liveDeals": "Live deals",
+      "saveUpTo": "Save up to"
+    },
+    "cta": "Shop all deals"
+  },
+  "NewArrivals": {
+    "badge": "Just landed",
+    "title": "New",
+    "accentTitle": "Arrivals",
+    "viewAll": "View all new",
+    "spotlight": {
+      "label": "Newest drop",
+      "cta": "Shop now"
+    }
+  },
+  "RecentlyViewed": {
+    "title": "Recently viewed",
+    "description": "Pick up where you left off",
+    "clear": "Clear",
+    "soldOut": "Sold out"
+  },
+  "CustomerReviews": {
+    "badge": "Customer reviews",
+    "title": "What our customers",
+    "accentTitle": "are saying",
+    "description": "Honest feedback from shoppers who ordered from TechWorld.",
+    "basedOn": "Based on {count, plural, one {# review} other {# reviews}}",
+    "ratingLabel": "Rated {rating} out of 5"
+  }
+}

@@ -79,6 +79,8 @@
       "notFound": "Order not found.",
       "cards": {
         "phone": "Phone",
+        "altPhone": "Additional phone",
+        "email": "Email",
         "address": "Address",
         "state": "Order State",
         "revenue": "Total Revenue",

@@ -11,7 +11,7 @@ import {
   useQuery,
 } from "convex/react";
 import { useForm } from "react-hook-form";
-import { ShieldCheck, ShieldX, LogOut, Menu, Languages, Loader2 } from "lucide-react";
+import { ShieldX, LogOut, Menu, Languages, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@techworld/ui/button";
@@ -24,6 +24,7 @@ import {
   SheetContent,
   cn,
   ThemeToggle,
+  BrandLogo,
 } from "@techworld/ui";
 
 const signInSchema = z.object({
@@ -112,7 +113,11 @@ function LoginScreen() {
       {/* Decorative gradients for light mode */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -z-10 dark:hidden" />
 
-      <div className="w-full max-w-md rounded-[28px] border border-border bg-card p-8   transition-all">
+      <div className="w-full max-w-md space-y-8">
+      <div className="flex justify-center">
+        <BrandLogo variant="stacked" size="lg" />
+      </div>
+      <div className="rounded-[28px] border border-border bg-card p-8   transition-all">
         <div className="mb-8 space-y-3">
           <p className="text-xs font-bold text-[#ffc105]">
             Internal Admin Access
@@ -161,6 +166,7 @@ function LoginScreen() {
             {isSubmitting ? "Signing in..." : "Sign In"}
           </button>
         </form>
+      </div>
       </div>
     </main>
   );
@@ -292,18 +298,11 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
                 className="p-0 border-r border-border w-72 bg-card"
               >
                 <div className="flex flex-col h-full p-6">
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="rounded-xl bg-[#ffc105] p-2 text-black   shadow-[#ffc105]/20">
-                      <ShieldCheck size={18} />
-                    </div>
-                    <div className="min-w-0 text-left">
-                       <p className="text-xs font-semibold text-muted-foreground">
-                         TechWorld Ops
-                       </p>
-                        <h1 className="text-lg font-bold truncate text-foreground">
-                          Admin Panel
-                        </h1>
-                    </div>
+                  <div className="mb-8 space-y-2">
+                    <BrandLogo className="h-9" />
+                    <p className="text-xs font-semibold text-muted-foreground">
+                      Admin Panel
+                    </p>
                   </div>
                   <Sidebar
                     pathname={pathname}
@@ -333,19 +332,13 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
                 </div>
               </SheetContent>
             </Sheet>
-            <div className="flex items-center gap-3">
-              <div className="rounded-xl bg-[#ffc105] p-2 text-black hidden sm:block   shadow-[#ffc105]/10">
-                <ShieldCheck size={18} />
-              </div>
-              <div className="min-w-0">
-                 <p className="text-xs font-bold text-[#ffc105]">
-                   TechWorld Ops
-                 </p>
-                 <h1 className="text-lg font-bold truncate max-w-[150px] sm:max-w-none text-foreground">
-                  Admin Dashboard{" "}
-                 
-                </h1>
-              </div>
+            <div className="flex min-w-0 items-center gap-3">
+              <BrandLogo variant="mark" className="h-9 shrink-0 sm:hidden" />
+              <BrandLogo className="hidden h-9 sm:inline-block" />
+              <span className="hidden h-6 w-px bg-border sm:block" aria-hidden />
+              <h1 className="truncate text-sm font-bold text-foreground sm:text-base">
+                Admin Dashboard
+              </h1>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground font-medium">

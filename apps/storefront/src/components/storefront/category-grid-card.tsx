@@ -1,5 +1,6 @@
+import Image from "next/image";
 import { Link } from "@/navigation";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, LayoutGrid } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 
 type CategoryGridCardProps = {
@@ -10,44 +11,48 @@ type CategoryGridCardProps = {
     slug: string;
     description_en?: string;
     description_ar?: string;
+    thumbnailUrl?: string | null;
   };
 };
 
 export default async function CategoryGridCard({ category }: CategoryGridCardProps) {
   const t = await getTranslations("CategoriesPage");
   const locale = await getLocale();
+  const name = locale === "en" ? category.name_en : category.name_ar;
+  const description =
+    (locale === "en" ? category.description_en : category.description_ar) ?? t("card.defaultDescription");
 
   return (
     <Link
       href={`/categories/${category.slug || category._id}`}
-      className="group relative overflow-hidden rounded-2xl border border-border bg-card p-8 sm:p-10 transition-all duration-300 hover:border-primary/30 hover:-translate-y-1"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-2 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <div className="relative flex min-h-[280px] flex-col justify-between gap-10">
-        <div className="flex items-start justify-between">
-          <span className="rounded-md border border-border bg-secondary px-3 py-1 text-[10px] font-semibold text-label-muted uppercase tracking-wider">
-            {category.slug.replaceAll("-", " ")}
-          </span>
-          <span className="rounded-lg border border-border bg-secondary p-2.5 text-label-muted transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:rotate-45">
-            <ArrowUpRight size={18} />
-          </span>
-        </div>
-
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <h2 className="font-space-grotesk text-3xl sm:text-4xl font-bold text-foreground transition-colors duration-300 group-hover:text-primary leading-none tracking-tight">
-              {locale === "en" ? category.name_en : category.name_ar}
-            </h2>
-            <p className="text-sm text-primary/60 font-normal opacity-60 group-hover:opacity-100 transition-opacity">
-              {locale === "en" ? category.name_ar : category.name_en}
-            </p>
+      <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-secondary">
+        {category.thumbnailUrl ? (
+          <Image
+            src={category.thumbnailUrl}
+            alt={name}
+            fill
+            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-primary/5 text-primary">
+            <LayoutGrid size={40} strokeWidth={1.5} />
           </div>
-          <p className="max-w-sm text-xs font-medium leading-relaxed text-label-muted group-hover:text-foreground transition-colors tracking-wide uppercase">
-            {(locale === "en"
-              ? category.description_en
-              : category.description_ar) ?? t("card.defaultDescription")}
-          </p>
-        </div>
+        )}
+        <span className="absolute top-2.5 flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background/80 text-foreground backdrop-blur-md transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground ltr:right-2.5 rtl:left-2.5">
+          <ArrowUpRight size={16} className="rtl:-scale-x-100" />
+        </span>
+      </div>
+
+      <div className="flex flex-1 flex-col gap-1.5 px-2 pb-2 pt-3 sm:px-3 sm:pt-4">
+        <h2 className="line-clamp-1 font-space-grotesk text-base font-bold tracking-tight text-foreground transition-colors group-hover:text-primary sm:text-xl">
+          {name}
+        </h2>
+        <p className="line-clamp-2 text-xs leading-relaxed text-label-muted sm:text-sm">
+          {description}
+        </p>
       </div>
     </Link>
   );
