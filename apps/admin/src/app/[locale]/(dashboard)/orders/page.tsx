@@ -57,6 +57,9 @@ export default function OrdersPage() {
 
   const updateGenericStatus = useMutation(api.orders.updateGenericStatus);
 
+  const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
+  const timeFormatter = new Intl.DateTimeFormat(locale, { timeStyle: "short" });
+
   const [filter, setFilter] = useState<FilterType>("ALL");
   const [updatingId, setUpdatingId] = useState<Id<"orders"> | null>(null);
 
@@ -89,6 +92,8 @@ export default function OrdersPage() {
     const matchesSearch = !search ||
       o.customerName?.toLowerCase().includes(search.toLowerCase()) ||
       o.customerPhone?.includes(search) ||
+      o.customerAltPhone?.includes(search) ||
+      o.customerEmail?.toLowerCase().includes(search.toLowerCase()) ||
       o.shortCode?.toLowerCase().includes(search.toLowerCase());
     const matchesDate = filterByDate(o._creationTime, dateRange);
     const matchesProduct = selectedProductId === "ALL" || o.productId === selectedProductId;
@@ -375,6 +380,9 @@ export default function OrdersPage() {
                     {tQueue("table.columns.customer")}
                   </th>
                   <th className="py-4 px-4 whitespace-nowrap">
+                    {tQueue("table.columns.placedAt")}
+                  </th>
+                  <th className="py-4 px-4 whitespace-nowrap">
                     {tQueue("table.columns.product")}
                   </th>
                   <th className="py-4 px-4 whitespace-nowrap">
@@ -410,6 +418,33 @@ export default function OrdersPage() {
                        <div className="mt-2 text-xs font-semibold text-muted-foreground/40 font-mono">
                          {order.customerPhone ?? tQueue("table.noPhone")}
                        </div>
+                       {order.customerAltPhone && (
+                         <div
+                           className="mt-1 text-xs font-semibold text-muted-foreground/40 font-mono"
+                           title={tQueue("table.altPhone")}
+                         >
+                           {order.customerAltPhone}
+                         </div>
+                       )}
+                       {order.customerEmail && (
+                         <div
+                           className="mt-1 max-w-[14rem] truncate text-xs font-semibold text-muted-foreground/60"
+                           title={order.customerEmail}
+                           dir="ltr"
+                         >
+                           {order.customerEmail}
+                         </div>
+                       )}
+                    </td>
+                    <td className="py-4 px-4 align-middle whitespace-nowrap">
+                       <time dateTime={new Date(order._creationTime).toISOString()}>
+                         <div className="text-xs font-bold text-foreground">
+                           {dateFormatter.format(order._creationTime)}
+                         </div>
+                         <div className="mt-1 text-xs font-semibold text-muted-foreground/60">
+                           {timeFormatter.format(order._creationTime)}
+                         </div>
+                       </time>
                     </td>
                     <td className="py-4 px-4 align-middle">
                        <div className="font-bold text-foreground text-xs max-w-[200px] truncate">

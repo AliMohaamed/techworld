@@ -34,8 +34,8 @@
     "badge": "Customer reviews",
     "title": "What our customers",
     "accentTitle": "are saying",
-    "description": "Honest feedback from shoppers who ordered from TechWorld.",
-    "basedOn": "Based on {count, plural, one {# review} other {# reviews}}",
-    "ratingLabel": "Rated {rating} out of 5"
+    "description": "What shoppers told us after their orders arrived.",
+    "ratingLabel": "Rated {rating} out of 5",
+    "sample": "Sample"
   }
 }

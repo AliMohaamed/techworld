@@ -9,12 +9,11 @@ import { fetchQuery } from "convex/nextjs";
 import { api } from "@backend/convex/_generated/api";
 
 export default async function StorefrontHomePage() {
-  const [products, categoriesResult, deals, newArrivals, reviewHighlights] = await Promise.all([
+  const [products, categoriesResult, deals, newArrivals] = await Promise.all([
     fetchQuery(api.products.getForStorefront),
     fetchQuery(api.categories.listActiveCategories),
     fetchQuery(api.offers.listDeals, { sort: "discount_desc", limit: 10 }),
     fetchQuery(api.products.listNewArrivals, { limit: 8 }),
-    fetchQuery(api.reviews.listHighlights, { limit: 12 }),
   ]);
 
   const featuredProducts = (products as FeaturedProduct[] | null)?.filter((p) => p.isFeatured).slice(0, 4) || [];
@@ -29,11 +28,7 @@ export default async function StorefrontHomePage() {
       <DealsSection deals={deals.items as DealProduct[]} total={deals.total} />
       <FeaturedProducts products={featuredProducts} />
       <NewArrivals products={newArrivals} />
-      <CustomerReviews
-        reviews={reviewHighlights.reviews}
-        ratingAverage={reviewHighlights.ratingAverage}
-        reviewCount={reviewHighlights.reviewCount}
-      />
+      <CustomerReviews />
     </div>
   );
 }
