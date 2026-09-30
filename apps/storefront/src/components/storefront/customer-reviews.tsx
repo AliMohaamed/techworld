@@ -1,30 +1,10 @@
-import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Quote } from "lucide-react";
+import { MapPin, Quote } from "lucide-react";
 import { cn } from "@techworld/ui";
 import { Link } from "@/navigation";
 import { StarRating } from "./star-rating";
-
-type Highlight = {
-  _id: string;
-  authorName: string;
-  rating: number;
-  comment: string;
-  updatedAt: number;
-  product: {
-    _id: string;
-    slug?: string;
-    name_en: string;
-    name_ar: string;
-    image: string | null;
-  };
-};
-
-interface CustomerReviewsProps {
-  reviews: Highlight[];
-  ratingAverage: number;
-  reviewCount: number;
-}
+import { testimonials, type Testimonial } from "@/content/testimonials";
+import { previewTestimonials } from "@/content/testimonials.preview";
 
 /** Below this many reviews a moving marquee looks sparse, so show a static grid. */
 const MARQUEE_MIN = 6;
@@ -36,16 +16,24 @@ function initialsOf(name: string) {
   return (parts[0]?.[0] ?? "") + (parts.length > 1 ? parts[parts.length - 1][0] : "");
 }
 
-export default async function CustomerReviews({ reviews, ratingAverage, reviewCount }: CustomerReviewsProps) {
+/** Landing-page testimonials, read only from the curated list in `@/content/testimonials`. */
+export default async function CustomerReviews() {
   const t = await getTranslations("CustomerReviews");
   const locale = await getLocale();
+  // Invented design-preview samples fill the section only under `next dev`; production shows real entries or nothing.
+  // const isPreview = testimonials.length === 0 && process.env.NODE_ENV === "development";
+  const isPreview = testimonials.length === 0 ;
+  const reviews = isPreview ? previewTestimonials : testimonials;
   if (reviews.length === 0) return null;
 
   const dir = locale === "ar" ? "rtl" : "ltr";
-  const dateFormat = new Intl.DateTimeFormat(locale === "ar" ? "ar-EG" : "en-GB", { month: "short", year: "numeric" });
+  const dateFormat = new Intl.DateTimeFormat(locale === "ar" ? "ar-EG" : "en-GB", { month: "short", year: "numeric", timeZone: "UTC" });
 
-  const renderCard = (review: Highlight, className?: string, key: string = review._id) => {
-    const productName = locale === "en" ? review.product.name_en : review.product.name_ar;
+  const isEn = locale === "en";
+  const renderCard = (review: Testimonial, className?: string, key: string = review.id) => {
+    const comment = isEn ? review.comment.en ?? review.comment.ar : review.comment.ar;
+    const city = review.city ? (isEn ? review.city.en : review.city.ar) : undefined;
+    const productName = review.product ? (isEn ? review.product.en : review.product.ar) : undefined;
     return (
       <figure
         key={key}
@@ -58,11 +46,18 @@ export default async function CustomerReviews({ reviews, ratingAverage, reviewCo
         <div className="flex items-center justify-between">
           <StarRating value={review.rating} size={15} />
           <span className="sr-only">{t("ratingLabel", { rating: review.rating })}</span>
-          <Quote size={26} className="text-primary/25 rtl:-scale-x-100" aria-hidden />
+          <div className="flex items-center gap-2">
+            {isPreview ? (
+              <span className="rounded-full border border-dashed border-primary/50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+                {t("sample")}
+              </span>
+            ) : null}
+            <Quote size={26} className="text-primary/25 rtl:-scale-x-100" aria-hidden />
+          </div>
         </div>
 
         <blockquote dir="auto" className="line-clamp-5 flex-1 text-sm leading-relaxed text-foreground/90 md:text-[15px]">
-          {review.comment}
+          {comment}
         </blockquote>
 
         <figcaption className="flex items-center justify-between gap-3 border-t border-border pt-4">
@@ -71,26 +66,32 @@ export default async function CustomerReviews({ reviews, ratingAverage, reviewCo
               aria-hidden
               className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/15 font-space-grotesk text-sm font-bold uppercase text-primary"
             >
-              {initialsOf(review.authorName)}
+              {initialsOf(review.name)}
             </span>
             <div className="min-w-0">
-              <p dir="auto" className="truncate text-sm font-semibold text-foreground">{review.authorName}</p>
-              <p className="text-xs text-label-muted">{dateFormat.format(review.updatedAt)}</p>
+              <p dir="auto" className="truncate text-sm font-semibold text-foreground">{review.name}</p>
+              <p className="flex items-center gap-1 text-xs text-label-muted">
+                {city ? (
+                  <>
+                    <MapPin size={11} className="shrink-0" />
+                    <span className="truncate">{city}</span>
+                    <span aria-hidden>·</span>
+                  </>
+                ) : null}
+                <span className="shrink-0">{dateFormat.format(new Date(`${review.date}-01T00:00:00Z`))}</span>
+              </p>
             </div>
           </div>
 
-          <Link
-            href={`/products/${review.product.slug || review.product._id}`}
-            title={productName}
-            className="flex max-w-[45%] shrink-0 items-center gap-2 rounded-full border border-border bg-secondary/60 py-1 text-xs font-semibold text-foreground transition-colors hover:border-primary/50 hover:text-primary ltr:pl-1 ltr:pr-3 rtl:pl-3 rtl:pr-1"
-          >
-            <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full bg-background">
-              {review.product.image ? (
-                <Image src={review.product.image} alt="" fill sizes="28px" className="object-contain" />
-              ) : null}
-            </span>
-            <span className="truncate">{productName}</span>
-          </Link>
+          {review.product && productName ? (
+            <Link
+              href={`/products/${review.product.slug}`}
+              title={productName}
+              className="max-w-[45%] shrink-0 truncate rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/50 hover:text-primary"
+            >
+              {productName}
+            </Link>
+          ) : null}
         </figcaption>
       </figure>
     );
@@ -100,7 +101,7 @@ export default async function CustomerReviews({ reviews, ratingAverage, reviewCo
   const half = Math.ceil(reviews.length / 2);
   const rows = [reviews.slice(0, half), reviews.slice(half)].map((row) => {
     let filled = row;
-    while (filled.length < MARQUEE_ROW_CARDS) filled = filled.concat(row);
+    while (row.length > 0 && filled.length < MARQUEE_ROW_CARDS) filled = filled.concat(row);
     return filled;
   });
   const marqueeCard = "w-[300px] shrink-0 md:w-[380px]";
@@ -124,17 +125,6 @@ export default async function CustomerReviews({ reviews, ratingAverage, reviewCo
             <p className="text-sm leading-relaxed text-label-muted md:text-base">{t("description")}</p>
           </div>
 
-          {reviewCount > 0 ? (
-            <div className="flex items-center gap-4 self-start rounded-3xl border border-border bg-card px-5 py-4 md:self-auto">
-              <p className="font-space-grotesk text-5xl font-bold leading-none text-foreground">
-                {ratingAverage.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
-              </p>
-              <div className="space-y-1.5">
-                <StarRating value={ratingAverage} size={16} />
-                <p className="text-xs font-medium text-label-muted">{t("basedOn", { count: reviewCount })}</p>
-              </div>
-            </div>
-          ) : null}
         </div>
       </div>
 
@@ -146,10 +136,10 @@ export default async function CustomerReviews({ reviews, ratingAverage, reviewCo
               <div className={cn("reviews-marquee-track flex w-max", rowIndex === 1 && "reviews-marquee-reverse")}>
                 {/* Two identical copies, each padded by one gap, so translating -50% loops seamlessly. */}
                 <div className="flex gap-5 pe-5">
-                  {row.map((review, i) => renderCard(review, marqueeCard, `${review._id}-${i}`))}
+                  {row.map((review, i) => renderCard(review, marqueeCard, `${review.id}-${i}`))}
                 </div>
                 <div aria-hidden inert className="flex gap-5 pe-5">
-                  {row.map((review, i) => renderCard(review, marqueeCard, `${review._id}-${i}`))}
+                  {row.map((review, i) => renderCard(review, marqueeCard, `${review.id}-${i}`))}
                 </div>
               </div>
             </div>

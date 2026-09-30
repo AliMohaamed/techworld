@@ -34,8 +34,8 @@
     "badge": "آراء العملاء",
     "title": "ماذا يقول عملاؤنا",
     "accentTitle": "عنّا",
-    "description": "آراء حقيقية من عملاء طلبوا من TechWorld.",
-    "basedOn": "بناءً على {count, plural, one {تقييم واحد} two {تقييمين} few {# تقييمات} many {# تقييماً} other {# تقييم}}",
-    "ratingLabel": "التقييم {rating} من 5"
+    "description": "ما قاله عملاؤنا بعد استلام طلباتهم.",
+    "ratingLabel": "التقييم {rating} من 5",
+    "sample": "نموذج"
   }
 }

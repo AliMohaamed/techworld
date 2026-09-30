@@ -32,7 +32,9 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} dir={direction} suppressHydrationWarning>
+      {/* Browser extensions inject attributes into <body> before hydration; ignore those diffs. */}
       <body
+        suppressHydrationWarning
         className={`${spaceGrotesk.variable} ${cairo.variable} antialiased`}
       >
         <ThemeProvider
