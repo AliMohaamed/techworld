@@ -83,15 +83,25 @@ function SuccessContent() {
               </ul>
             </div>
 
-            <a
-              href={generateWhatsAppLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full items-center justify-center gap-4 rounded-2xl bg-primary py-6 font-space-grotesk text-xl font-black uppercase tracking-[0.3em] text-primary-foreground transition-all hover:bg-foreground hover:text-background active:scale-[0.98] shadow-lg"
-            >
-              <MessageSquare size={24} className="fill-current" />
-              {t('actions.verify')}
-            </a>
+            <div className="flex flex-col gap-3.5 w-full">
+              <Link
+                href={{ pathname: "/track", query: { code: shortCode } }}
+                className="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary py-5 font-space-grotesk text-lg font-black uppercase tracking-[0.2em] text-primary-foreground transition-all hover:bg-foreground hover:text-background active:scale-[0.98] shadow-lg"
+              >
+                <Truck size={22} />
+                {t('actions.track')}
+              </Link>
+
+              <a
+                href={generateWhatsAppLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-border bg-accent/40 py-3.5 font-space-grotesk text-xs font-bold uppercase tracking-wider text-label-muted hover:text-foreground hover:border-primary/40 hover:bg-accent transition-all"
+              >
+                <MessageSquare size={16} className="text-emerald-500" />
+                {t('actions.supportWhatsapp')}
+              </a>
+            </div>
           </div>
 
           <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-3">
@@ -109,22 +119,14 @@ function SuccessContent() {
             </div>
           </div>
 
-          <div className="flex flex-col items-center gap-6 pt-10 sm:flex-row sm:gap-10">
-          <Link
-            href={{ pathname: "/track", query: { code: shortCode } }}
-            className="group inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.5em] text-primary hover:text-foreground transition-all"
-          >
-            {t('actions.track')}
-            <ArrowRight size={16} className={`transition-transform group-hover:translate-x-1 ${locale === 'ar' ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
-          </Link>
-
-          <Link
-            href="/"
-            className="group inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.5em] text-label-muted hover:text-foreground transition-all"
-          >
-            {t('actions.back')}
-            <ArrowRight size={16} className={`transition-transform group-hover:translate-x-1 ${locale === 'ar' ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
-          </Link>
+          <div className="flex flex-col items-center gap-6 pt-6 sm:flex-row sm:gap-10">
+            <Link
+              href="/"
+              className="group inline-flex items-center gap-3 text-xs font-black uppercase tracking-[0.3em] text-label-muted hover:text-primary transition-all"
+            >
+              {t('actions.back')}
+              <ArrowRight size={16} className={`transition-transform group-hover:translate-x-1 ${locale === 'ar' ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
+            </Link>
           </div>
         </div>
       </div>
