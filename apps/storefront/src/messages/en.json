@@ -31,9 +31,9 @@
   },
   "SuccessPage": {
     "nextSteps": {
-      "step1": "Click the <span class=\"text-white font-bold\">VERIFY ON WHATSAPP</span> button below.",
-      "step2": "Send the pre-filled message without modifying the <span class=\"text-white font-bold\">Order ID</span>.",
-      "step3": "Attach a screenshot of your <span class=\"text-white font-bold\">Instapay / Wallet</span> transfer as proof."
+      "step1": "Your order has been <span class=\"text-primary font-bold\">successfully registered and confirmed</span>.",
+      "step2": "Our team is currently <span class=\"text-primary font-bold\">packing and preparing your items with care</span>.",
+      "step3": "Your package will be dispatched for <span class=\"text-primary font-bold\">delivery within 2-3 business days</span>."
     }
   }
 }
