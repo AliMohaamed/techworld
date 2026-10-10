@@ -135,6 +135,7 @@ export const listAllOrders = query({
         const product = await ctx.db.get(order.productId);
         const sku = await ctx.db.get(order.skuId);
         const category = product ? await ctx.db.get(product.categoryId) : null;
+        const governorate = order.governorateId ? await ctx.db.get(order.governorateId) : null;
         const receiptUrl = await getReceiptUrl(ctx, order.paymentReceiptRef);
 
         return {
@@ -142,6 +143,7 @@ export const listAllOrders = query({
           product,
           sku,
           category,
+          governorate,
           receiptUrl,
         };
       }),
@@ -163,6 +165,7 @@ export const getOrderDetails = query({
     const sku = await ctx.db.get(order.skuId);
     const category = product ? await ctx.db.get(product.categoryId) : null;
     const customer = order.userId ? await ctx.db.get(order.userId) : null;
+    const governorate = order.governorateId ? await ctx.db.get(order.governorateId) : null;
     const receiptUrl = await getReceiptUrl(ctx, order.paymentReceiptRef);
     const viewFinancials = await canViewFinancials(ctx);
     // Cost of goods is per unit on the product, profit margin computed against SKU sale price
@@ -181,6 +184,7 @@ export const getOrderDetails = query({
         : null,
       category,
       customer,
+      governorate,
       receiptUrl,
       canViewFinancials: viewFinancials,
       financials: {
