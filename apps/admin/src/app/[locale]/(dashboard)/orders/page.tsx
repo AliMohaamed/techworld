@@ -435,6 +435,11 @@ export default function OrdersPage() {
                            {order.customerEmail}
                          </div>
                        )}
+                       {order.governorate && (
+                         <div className="mt-1 truncate text-xs font-semibold text-muted-foreground/60">
+                           {locale === "ar" ? order.governorate.name_ar : order.governorate.name_en}
+                         </div>
+                       )}
                     </td>
                     <td className="py-4 px-4 align-middle whitespace-nowrap">
                        <time dateTime={new Date(order._creationTime).toISOString()}>
@@ -453,6 +458,19 @@ export default function OrdersPage() {
                        <div className="mt-1.5 text-xs font-bold text-[#ffc105] truncate max-w-[200px]">
                          {order.category?.name_en ?? tQueue("table.noCategory")}
                        </div>
+                       {order.sku && (
+                         <div className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 max-w-[200px]">
+                           {order.sku.variantAttributes.colorCode && (
+                             <span
+                               className="h-3 w-3 shrink-0 rounded-full border border-border"
+                               style={{ backgroundColor: order.sku.variantAttributes.colorCode }}
+                             />
+                           )}
+                           <span className="truncate">
+                             {order.sku.variantAttributes.color ?? order.sku.variantName}
+                           </span>
+                         </div>
+                       )}
                     </td>
                     <td className="py-4 px-4 align-middle">
                        <span className={cn(

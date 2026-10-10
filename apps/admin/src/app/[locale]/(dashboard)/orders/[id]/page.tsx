@@ -208,6 +208,14 @@ export default function OrderDetailsPage() {
     return value;
   };
 
+  const governorateName = order.governorate
+    ? locale === "ar"
+      ? order.governorate.name_ar
+      : order.governorate.name_en
+    : null;
+  const variantColor = order.sku?.variantAttributes.color;
+  const variantColorCode = order.sku?.variantAttributes.colorCode;
+
   return (
     <main className="space-y-8 pb-10">
       <div className="flex items-center justify-between">
@@ -286,7 +294,9 @@ export default function OrderDetailsPage() {
             <div className="flex flex-wrap items-center gap-4 mt-4">
               <span className="flex items-center gap-2 text-xs font-bold text-muted-foreground/80 bg-accent/50 border border-border px-4 py-2 rounded-full">
                 <MapPin size={12} className="text-[#ffc105]" />
-                {order.customerAddress ?? t("notProvided")}
+                {[governorateName, order.customerAddress]
+                  .filter(Boolean)
+                  .join(" — ") || t("notProvided")}
               </span>
               {order.shortCode && (
                 <span className="flex items-center gap-2 text-xs font-bold text-[#ffc105] bg-[#ffc105]/10 border border-[#ffc105]/20 px-4 py-2 rounded-full">
@@ -366,6 +376,28 @@ export default function OrderDetailsPage() {
                     {order.sku?.real_stock?.toLocaleString(locale) ??
                       t("unknown")}{" "}
                     left
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs font-bold text-muted-foreground/30">
+                    {t("cards.variant")}
+                  </p>
+                  <p className="text-sm font-bold text-foreground">
+                    {order.sku?.variantName ?? t("unknown")}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs font-bold text-muted-foreground/30">
+                    {t("cards.color")}
+                  </p>
+                  <p className="flex items-center gap-2 text-sm font-bold text-foreground">
+                    {variantColorCode && (
+                      <span
+                        className="h-4 w-4 rounded-full border border-border"
+                        style={{ backgroundColor: variantColorCode }}
+                      />
+                    )}
+                    {variantColor ?? t("notProvided")}
                   </p>
                 </div>
               </div>
@@ -540,6 +572,14 @@ export default function OrderDetailsPage() {
               {order.customerEmail && (
                 <InfoCard label={t("cards.email")} value={order.customerEmail} />
               )}
+              <InfoCard
+                label={t("cards.governorate")}
+                value={governorateName ?? t("notProvided")}
+              />
+              <InfoCard
+                label={t("cards.address")}
+                value={order.customerAddress ?? t("notProvided")}
+              />
 
               {order.state === "SHIPPED" && (
                 <Button
