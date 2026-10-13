@@ -14,6 +14,8 @@ const remotePatterns: any[] = [
 const nextConfig: NextConfig = {
   transpilePackages: ["@techworld/ui", "@techworld/backend"],
   images: {
+    // Serve straight from the R2 CDN (zero egress); images are already compressed at upload time.
+    unoptimized: true,
     remotePatterns,
   },
 };

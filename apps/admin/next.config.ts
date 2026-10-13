@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
   transpilePackages: ["@techworld/ui", "@techworld/backend"],
   images: {
+    // Serve straight from the R2 CDN (zero egress); images are already compressed at upload time.
+    unoptimized: true,
     remotePatterns: [
       { protocol: "https", hostname: "cdn.techworldegypt.com", pathname: "/**" },
       { protocol: "https", hostname: "pub-73aedd8a4e824555a4079204e3f4b219.r2.dev", pathname: "/**" },
