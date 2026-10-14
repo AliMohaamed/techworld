@@ -96,8 +96,8 @@ export default function OrdersPage() {
       o.customerEmail?.toLowerCase().includes(search.toLowerCase()) ||
       o.shortCode?.toLowerCase().includes(search.toLowerCase());
     const matchesDate = filterByDate(o._creationTime, dateRange);
-    const matchesProduct = selectedProductId === "ALL" || o.productId === selectedProductId;
-    const matchesCategory = selectedCategoryId === "ALL" || o.product?.categoryId === selectedCategoryId;
+    const matchesProduct = selectedProductId === "ALL" || o.lines.some(l => l.productId === selectedProductId);
+    const matchesCategory = selectedCategoryId === "ALL" || o.lines.some(l => l.product?.categoryId === selectedCategoryId);
 
     return matchesStatus && matchesSearch && matchesDate && matchesProduct && matchesCategory;
   }) : [];
@@ -452,25 +452,34 @@ export default function OrdersPage() {
                        </time>
                     </td>
                     <td className="py-4 px-4 align-middle">
-                       <div className="font-bold text-foreground text-xs max-w-[200px] truncate">
-                         {order.product?.name_en ?? tQueue("table.unknownProduct")}
-                       </div>
-                       <div className="mt-1.5 text-xs font-bold text-[#ffc105] truncate max-w-[200px]">
-                         {order.category?.name_en ?? tQueue("table.noCategory")}
-                       </div>
-                       {order.sku && (
-                         <div className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 max-w-[200px]">
-                           {order.sku.variantAttributes.colorCode && (
-                             <span
-                               className="h-3 w-3 shrink-0 rounded-full border border-border"
-                               style={{ backgroundColor: order.sku.variantAttributes.colorCode }}
-                             />
-                           )}
-                           <span className="truncate">
-                             {order.sku.variantAttributes.color ?? order.sku.variantName}
-                           </span>
-                         </div>
-                       )}
+                      <div className="space-y-3">
+                        {order.lines.map((line) => (
+                          <div key={line._id}>
+                            <div className="font-bold text-foreground text-xs max-w-[200px] truncate">
+                              {order.lines.length > 1 && (
+                                <span className="font-mono text-muted-foreground/60">{line.quantity.toLocaleString(locale)}× </span>
+                              )}
+                              {line.product?.name_en ?? tQueue("table.unknownProduct")}
+                            </div>
+                            <div className="mt-1.5 text-xs font-bold text-[#ffc105] truncate max-w-[200px]">
+                              {line.category?.name_en ?? tQueue("table.noCategory")}
+                            </div>
+                            {line.sku && (
+                              <div className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 max-w-[200px]">
+                                {line.sku.variantAttributes.colorCode && (
+                                  <span
+                                    className="h-3 w-3 shrink-0 rounded-full border border-border"
+                                    style={{ backgroundColor: line.sku.variantAttributes.colorCode }}
+                                  />
+                                )}
+                                <span className="truncate">
+                                  {line.sku.variantAttributes.color ?? line.sku.variantName}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </td>
                     <td className="py-4 px-4 align-middle">
                        <span className={cn(

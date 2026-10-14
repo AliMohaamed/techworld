@@ -354,39 +354,43 @@ export default function OrderTracker() {
                   {t("summary.heading")}
                 </h2>
 
-                <div className="flex items-start gap-4">
-                  {order.product?.thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={order.product.thumbnail}
-                      alt=""
-                      className="h-20 w-20 shrink-0 rounded-xl border border-border object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl border border-border bg-secondary">
-                      <PackageSearch
-                        size={22}
-                        className="text-label-muted/40"
-                        aria-hidden="true"
-                      />
-                    </div>
-                  )}
-                  <div className="min-w-0 space-y-1">
-                    <p className="font-space-grotesk text-sm font-bold leading-snug text-foreground">
-                      {locale === "ar"
-                        ? order.product?.name_ar
-                        : order.product?.name_en}
-                    </p>
-                    {order.variantName && (
-                      <p className="text-xs text-label-muted">
-                        {order.variantName}
-                      </p>
-                    )}
-                    <p className="text-xs text-label-muted">
-                      {t("summary.quantity", { count: order.quantity })}
-                    </p>
-                  </div>
-                </div>
+                <ul className="space-y-4">
+                  {order.items.map((item, index) => (
+                    <li key={index} className="flex items-start gap-4">
+                      {item.product?.thumbnail ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={item.product.thumbnail}
+                          alt=""
+                          className="h-20 w-20 shrink-0 rounded-xl border border-border object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl border border-border bg-secondary">
+                          <PackageSearch
+                            size={22}
+                            className="text-label-muted/40"
+                            aria-hidden="true"
+                          />
+                        </div>
+                      )}
+                      <div className="min-w-0 space-y-1">
+                        <p className="font-space-grotesk text-sm font-bold leading-snug text-foreground">
+                          {locale === "ar"
+                            ? item.product?.name_ar
+                            : item.product?.name_en}
+                        </p>
+                        {item.variantName && (
+                          <p className="text-xs text-label-muted">
+                            {item.variantName}
+                          </p>
+                        )}
+                        <p className="text-xs text-label-muted">
+                          {t("summary.quantity", { count: item.quantity })}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
 
                 <dl className="space-y-3 border-t border-border pt-5 text-sm">
                   <div className="flex items-center justify-between gap-4">
@@ -460,9 +464,9 @@ export default function OrderTracker() {
                   >
                     {t("summary.contactCta")}
                   </a>
-                  {order.product?.slug && (
+                  {order.items.length === 1 && order.items[0].product?.slug && (
                     <Link
-                      href={`/products/${order.product.slug}`}
+                      href={`/products/${order.items[0].product.slug}`}
                       className="flex w-full items-center justify-center rounded-xl border border-border py-4 font-space-grotesk text-[10px] font-black uppercase tracking-[0.3em] text-label-muted transition-all hover:border-primary/30 hover:text-foreground"
                     >
                       {t("summary.viewProduct")}

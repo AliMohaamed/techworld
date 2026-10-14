@@ -213,8 +213,6 @@ export default function OrderDetailsPage() {
       ? order.governorate.name_ar
       : order.governorate.name_en
     : null;
-  const variantColor = order.sku?.variantAttributes.color;
-  const variantColorCode = order.sku?.variantAttributes.colorCode;
 
   return (
     <main className="space-y-8 pb-10">
@@ -344,62 +342,80 @@ export default function OrderDetailsPage() {
                     {tQueue("table.columns.product")}
                   </p>
                   <h2 className="text-2xl font-bold text-foreground mt-1">
-                    {order.product?.name_en ?? tQueue("table.unknownProduct")}
+                    {order.lines
+                      .map((line) => line.product?.name_en ?? tQueue("table.unknownProduct"))
+                      .join(" + ")}
                   </h2>
                 </div>
               </div>
             </div>
 
             <div className="p-10">
-              <div className="grid gap-8 sm:grid-cols-3">
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-muted-foreground/30">
-                    {t("cards.category")}
-                  </p>
-                  <p className="text-sm font-bold text-foreground">
-                    {order.category?.name_en ?? t("unknown")}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-muted-foreground/30">
-                    {t("cards.quantity")}
-                  </p>
-                  <p className="text-sm font-bold text-foreground">
-                    {order.quantity.toLocaleString(locale)} units
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-muted-foreground/30">
-                    {t("cards.realStock")}
-                  </p>
-                  <p className="text-sm font-bold text-[#ffc105]">
-                    {order.sku?.real_stock?.toLocaleString(locale) ??
-                      t("unknown")}{" "}
-                    left
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-muted-foreground/30">
-                    {t("cards.variant")}
-                  </p>
-                  <p className="text-sm font-bold text-foreground">
-                    {order.sku?.variantName ?? t("unknown")}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-muted-foreground/30">
-                    {t("cards.color")}
-                  </p>
-                  <p className="flex items-center gap-2 text-sm font-bold text-foreground">
-                    {variantColorCode && (
-                      <span
-                        className="h-4 w-4 rounded-full border border-border"
-                        style={{ backgroundColor: variantColorCode }}
-                      />
+              <div className="space-y-8 divide-y divide-border/50 [&>*+*]:pt-8">
+                {order.lines.map((line) => (
+                  <div key={line._id}>
+                    {order.lines.length > 1 && (
+                      <div className="mb-6 flex items-baseline justify-between gap-4">
+                        <h3 className="text-base font-bold text-foreground">
+                          {line.product?.name_en ?? tQueue("table.unknownProduct")}
+                        </h3>
+                        <span className="text-sm font-bold text-foreground tabular-nums">
+                          {line.total_price.toLocaleString(locale)} {t("summary.egp")}
+                        </span>
+                      </div>
                     )}
-                    {variantColor ?? t("notProvided")}
-                  </p>
-                </div>
+                    <div className="grid gap-8 sm:grid-cols-3">
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-muted-foreground/30">
+                          {t("cards.category")}
+                        </p>
+                        <p className="text-sm font-bold text-foreground">
+                          {line.category?.name_en ?? t("unknown")}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-muted-foreground/30">
+                          {t("cards.quantity")}
+                        </p>
+                        <p className="text-sm font-bold text-foreground">
+                          {line.quantity.toLocaleString(locale)} units
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-muted-foreground/30">
+                          {t("cards.realStock")}
+                        </p>
+                        <p className="text-sm font-bold text-[#ffc105]">
+                          {line.sku?.real_stock?.toLocaleString(locale) ??
+                            t("unknown")}{" "}
+                          left
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-muted-foreground/30">
+                          {t("cards.variant")}
+                        </p>
+                        <p className="text-sm font-bold text-foreground">
+                          {line.sku?.variantName ?? t("unknown")}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-muted-foreground/30">
+                          {t("cards.color")}
+                        </p>
+                        <p className="flex items-center gap-2 text-sm font-bold text-foreground">
+                          {line.sku?.variantAttributes.colorCode && (
+                            <span
+                              className="h-4 w-4 rounded-full border border-border"
+                              style={{ backgroundColor: line.sku.variantAttributes.colorCode }}
+                            />
+                          )}
+                          {line.sku?.variantAttributes.color ?? t("notProvided")}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
 
               <div className="mt-10 pt-10 border-t border-border/50">
