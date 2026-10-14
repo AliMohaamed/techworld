@@ -35,7 +35,10 @@ export const dashboardMetrics = query({
       .collect();
 
     // Metrics calculation
-    let totalOrders = orders.length;
+    // Orders are stored one row per product line; rows sharing a short code
+    // are one customer order and are counted once.
+    let totalOrders = 0;
+    const seenShortCodes = new Set<string>();
     let netProfit = 0;
     let totalCogs = 0;
     let courierFees = 0;
@@ -47,8 +50,9 @@ export const dashboardMetrics = query({
     const velocityMap: Record<string, number> = {};
 
     for (const order of orders) {
-      statusBreakdown[order.state] = (statusBreakdown[order.state] || 0) + 1;
-      
+      const isFirstLine = !order.shortCode || !seenShortCodes.has(order.shortCode);
+      if (order.shortCode) seenShortCodes.add(order.shortCode);
+
       totalRevenue += order.total_price;
 
       if (order.state === "DELIVERED") {
@@ -60,8 +64,16 @@ export const dashboardMetrics = query({
       }
 
       if (["SHIPPED", "DELIVERED", "RTO"].includes(order.state)) {
-        shippedCount++;
         courierFees += order.appliedShippingFee || 0;
+      }
+
+      if (!isFirstLine) continue;
+
+      totalOrders++;
+      statusBreakdown[order.state] = (statusBreakdown[order.state] || 0) + 1;
+
+      if (["SHIPPED", "DELIVERED", "RTO"].includes(order.state)) {
+        shippedCount++;
       }
 
       if (order.state === "RTO") {

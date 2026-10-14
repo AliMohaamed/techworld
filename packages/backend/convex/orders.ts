@@ -1,5 +1,5 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query, QueryCtx } from "./_generated/server";
+import { internalMutation, mutation, query, QueryCtx } from "./_generated/server";
 import { requirePermission } from "./lib/rbac";
 import { hasPermission } from "./lib/permissions";
 import { scheduleAuditLog, writeAuditLog } from "./lib/audit";
@@ -14,6 +14,46 @@ async function getOrderOrThrow(ctx: { db: { get: (id: Id<"orders">) => Promise<D
     throw new ConvexError({ code: "ORDER_NOT_FOUND", message: "Order not found" });
   }
   return order;
+}
+
+/**
+ * A checkout writes one row per SKU line, all sharing the short code; together
+ * they are a single customer order. Returned oldest first.
+ */
+async function getOrderLines(ctx: Pick<QueryCtx, "db">, order: Doc<"orders">) {
+  if (!order.shortCode) {
+    return [order];
+  }
+  const shortCode = order.shortCode;
+  return await ctx.db
+    .query("orders")
+    .withIndex("by_shortCode", (q) => q.eq("shortCode", shortCode))
+    .collect();
+}
+
+async function resolveOrderLine(ctx: Pick<QueryCtx, "db">, line: Doc<"orders">) {
+  const product = await ctx.db.get(line.productId);
+  const sku = await ctx.db.get(line.skuId);
+  const category = product ? await ctx.db.get(product.categoryId) : null;
+  return {
+    _id: line._id,
+    productId: line.productId,
+    quantity: line.quantity,
+    total_price: line.total_price,
+    state: line.state,
+    product,
+    sku,
+    category,
+  };
+}
+
+function sumOrderLines(lines: Doc<"orders">[]) {
+  return {
+    quantity: lines.reduce((sum, line) => sum + line.quantity, 0),
+    total_price: lines.reduce((sum, line) => sum + line.total_price, 0),
+    appliedShippingFee: lines.reduce((sum, line) => sum + (line.appliedShippingFee ?? 0), 0),
+    discount_applied: lines.reduce((sum, line) => sum + (line.discount_applied ?? 0), 0),
+  };
 }
 
 async function getActorUserId(ctx: Parameters<typeof requirePermission>[0]) {
@@ -130,19 +170,31 @@ export const listAllOrders = query({
       .order("desc")
       .collect();
 
+    // One entry per customer order: lines sharing a short code are merged,
+    // keeping the position of the newest line.
+    const groups = new Map<string, Doc<"orders">[]>();
+    for (const order of orders) {
+      const key = order.shortCode ?? order._id;
+      const group = groups.get(key);
+      if (group) {
+        group.unshift(order);
+      } else {
+        groups.set(key, [order]);
+      }
+    }
+
     return Promise.all(
-      orders.map(async (order) => {
-        const product = await ctx.db.get(order.productId);
-        const sku = await ctx.db.get(order.skuId);
-        const category = product ? await ctx.db.get(product.categoryId) : null;
+      Array.from(groups.values()).map(async (group) => {
+        const order = group[0];
+        const lines = await Promise.all(group.map((line) => resolveOrderLine(ctx, line)));
         const governorate = order.governorateId ? await ctx.db.get(order.governorateId) : null;
-        const receiptUrl = await getReceiptUrl(ctx, order.paymentReceiptRef);
+        const receiptRef = group.find((line) => line.paymentReceiptRef)?.paymentReceiptRef;
+        const receiptUrl = await getReceiptUrl(ctx, receiptRef);
 
         return {
           ...order,
-          product,
-          sku,
-          category,
+          ...sumOrderLines(group),
+          lines,
           governorate,
           receiptUrl,
         };
@@ -161,28 +213,35 @@ export const getOrderDetails = query({
       return null;
     }
 
-    const product = await ctx.db.get(order.productId);
-    const sku = await ctx.db.get(order.skuId);
-    const category = product ? await ctx.db.get(product.categoryId) : null;
+    // Any line's id opens the whole customer order.
+    const orderLines = await getOrderLines(ctx, order);
+    const totals = sumOrderLines(orderLines);
+    const resolvedLines = await Promise.all(orderLines.map((line) => resolveOrderLine(ctx, line)));
     const customer = order.userId ? await ctx.db.get(order.userId) : null;
     const governorate = order.governorateId ? await ctx.db.get(order.governorateId) : null;
-    const receiptUrl = await getReceiptUrl(ctx, order.paymentReceiptRef);
+    const receiptRef =
+      order.paymentReceiptRef ?? orderLines.find((line) => line.paymentReceiptRef)?.paymentReceiptRef;
+    const receiptUrl = await getReceiptUrl(ctx, receiptRef);
     const viewFinancials = await canViewFinancials(ctx);
     // Cost of goods is per unit on the product, profit margin computed against SKU sale price
-    const unitCogs = product?.cogs ?? null;
-    const totalCogs = unitCogs === null ? null : unitCogs * order.quantity;
-    const netMargin = totalCogs === null ? null : order.total_price - totalCogs;
+    const unitCogs = resolvedLines.length === 1 ? (resolvedLines[0].product?.cogs ?? null) : null;
+    const totalCogs = resolvedLines.some((line) => !line.product)
+      ? null
+      : resolvedLines.reduce((sum, line) => sum + (line.product?.cogs ?? 0) * line.quantity, 0);
+    const netMargin = totalCogs === null ? null : totals.total_price - totalCogs;
 
     return {
       ...order,
-      sku,
-      product: product
-        ? {
-          ...product,
-          ...(viewFinancials ? {} : { cogs: undefined }),
-        }
-        : null,
-      category,
+      ...totals,
+      lines: resolvedLines.map((line) => ({
+        ...line,
+        product: line.product
+          ? {
+            ...line.product,
+            ...(viewFinancials ? {} : { cogs: undefined }),
+          }
+          : null,
+      })),
       customer,
       governorate,
       receiptUrl,
@@ -190,7 +249,7 @@ export const getOrderDetails = query({
       financials: {
         unit_cogs: viewFinancials ? unitCogs : "***",
         total_cogs: viewFinancials ? totalCogs : "***",
-        total_revenue: viewFinancials ? order.total_price : "***",
+        total_revenue: viewFinancials ? totals.total_price : "***",
         net_margin: viewFinancials ? netMargin : "***",
       },
     };
@@ -381,6 +440,127 @@ export const getOrdersByShortCode = query({
   },
 });
 
+/**
+ * Appends a product line to an order that was already placed, for customers
+ * whose cart was split across browsers. Run from the CLI/dashboard only.
+ * Limited to pre-confirmation orders, where only display_stock is reserved.
+ */
+export const addLineToOrder = internalMutation({
+  args: {
+    shortCode: v.string(),
+    productId: v.id("products"),
+    skuId: v.id("skus"),
+    quantity: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const shortCode = args.shortCode.trim().toUpperCase();
+    const quantity = Math.floor(args.quantity);
+    if (quantity <= 0) {
+      throw new ConvexError({ code: "INVALID_QUANTITY", message: "Quantity must be at least 1." });
+    }
+
+    const existing = await ctx.db
+      .query("orders")
+      .withIndex("by_shortCode", (q) => q.eq("shortCode", shortCode))
+      .first();
+    if (!existing) {
+      throw new ConvexError({ code: "ORDER_NOT_FOUND", message: "Order not found" });
+    }
+    if (existing.state !== "PENDING_PAYMENT_INPUT" && existing.state !== "AWAITING_VERIFICATION") {
+      throw new ConvexError({ code: "INVALID_TRANSITION", message: `Cannot add a line to an order in state ${existing.state}` });
+    }
+
+    const product = await ctx.db.get(args.productId);
+    if (!product) {
+      throw new ConvexError({ code: "PRODUCT_NOT_FOUND", message: "Product not found" });
+    }
+    const sku = await ctx.db.get(args.skuId);
+    if (!sku) {
+      throw new ConvexError({ code: "SKU_NOT_FOUND", message: "Selected variant not found." });
+    }
+    if (sku.productId !== args.productId) {
+      throw new ConvexError({ code: "SKU_PRODUCT_MISMATCH", message: "Variant does not belong to this product." });
+    }
+    if (sku.display_stock < quantity) {
+      throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: "Insufficient display stock available for this order." });
+    }
+
+    await ctx.db.patch(args.skuId, {
+      display_stock: sku.display_stock - quantity,
+    });
+
+    const lineSubtotal = (sku.price || product.selling_price || 0) * quantity;
+
+    const orderId = await ctx.db.insert("orders", {
+      sessionId: existing.sessionId,
+      customerName: existing.customerName,
+      customerPhone: existing.customerPhone,
+      customerAltPhone: existing.customerAltPhone,
+      customerEmail: existing.customerEmail,
+      customerAddress: existing.customerAddress,
+      governorateId: existing.governorateId,
+      // Shipping was already charged on the original line.
+      appliedShippingFee: 0,
+      productId: args.productId,
+      skuId: args.skuId,
+      quantity,
+      total_price: lineSubtotal,
+      state: existing.state,
+      shortCode,
+      unit_cogs: product.cogs,
+      discount_applied: 0,
+    });
+
+    await writeAuditLog(ctx, {
+      entityId: String(orderId),
+      actionType: "ORDER_LINE_ADDED",
+      changes: {
+        productId: args.productId,
+        skuId: args.skuId,
+        variantName: sku.variantName,
+        quantity,
+        shortCode,
+        lineSubtotal,
+        state: existing.state,
+      },
+    });
+
+    return orderId;
+  },
+});
+
+/**
+ * One-off repair for orders placed while every line of a checkout repeated the
+ * full shipping fee: keeps it on the first line of each short code only.
+ */
+export const dedupeShippingFees = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const orders = await ctx.db.query("orders").order("asc").collect();
+    const seen = new Set<string>();
+    let patched = 0;
+
+    for (const order of orders) {
+      if (!order.shortCode) continue;
+      if (!seen.has(order.shortCode)) {
+        seen.add(order.shortCode);
+        continue;
+      }
+      if (!order.appliedShippingFee) continue;
+
+      await ctx.db.patch(order._id, { appliedShippingFee: 0 });
+      await writeAuditLog(ctx, {
+        entityId: String(order._id),
+        actionType: "ORDER_SHIPPING_FEE_DEDUPED",
+        changes: { shortCode: order.shortCode, from: order.appliedShippingFee, to: 0 },
+      });
+      patched++;
+    }
+
+    return { patched };
+  },
+});
+
 export const updateRto = mutation({
   args: { orderId: v.id("orders") },
   handler: async (ctx, args) => {
@@ -396,32 +576,38 @@ export const updateRto = mutation({
       });
     }
 
-    // Atomic Restocking: US4 Requirement
-    // FR-015: "Return to Origin (RTO) or customer returns ... accurately restock the real_stock at the strict SKU level."
-    await ctx.runMutation(internal.skus.incrementSkuRealStock, {
-      skuId: order.skuId,
-      quantity: order.quantity,
-    });
+    // The whole parcel comes back, so every shipped line of the order returns.
+    const lines = (await getOrderLines(ctx, order)).filter((line) => line.state === "SHIPPED");
 
-    await ctx.db.patch(args.orderId, { state: "RTO" });
+    for (const line of lines) {
+      // Atomic Restocking: US4 Requirement
+      // FR-015: "Return to Origin (RTO) or customer returns ... accurately restock the real_stock at the strict SKU level."
+      await ctx.runMutation(internal.skus.incrementSkuRealStock, {
+        skuId: line.skuId,
+        quantity: line.quantity,
+      });
+
+      await ctx.db.patch(line._id, { state: "RTO" });
+
+      await scheduleAuditLog(ctx, {
+        userId: actor._id,
+        entityId: line._id,
+        actionType: "ORDER_RTO_TRIGGERED",
+        changes: { from: line.state, to: "RTO", skuId: line.skuId, quantity: line.quantity },
+      });
+    }
 
     if (order.customerPhone && order.shortCode) {
+      const totals = sumOrderLines(lines);
       ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppMessage, {
         orderId: args.orderId,
         shortCode: order.shortCode,
         customerPhone: order.customerPhone,
         customerName: order.customerName || "Customer",
         newState: "RTO",
-        totalPrice: order.total_price,
+        totalPrice: totals.total_price + totals.appliedShippingFee,
       });
     }
-
-    await scheduleAuditLog(ctx, {
-      userId: actor._id,
-      entityId: args.orderId,
-      actionType: "ORDER_RTO_TRIGGERED",
-      changes: { from: order.state, to: "RTO", skuId: order.skuId, quantity: order.quantity },
-    });
 
     return { success: true };
   },
@@ -444,58 +630,65 @@ export const updateGenericStatus = mutation({
     }
 
     const statesThatDeductStock = ["CONFIRMED", "READY_FOR_SHIPPING", "SHIPPED", "DELIVERED"];
-    const wasDeducted = statesThatDeductStock.includes(order.state);
     const willBeDeducted = statesThatDeductStock.includes(args.newState);
 
-    if (wasDeducted && !willBeDeducted) {
-      // Returning to a non-deducting state: restore stock
-      await ctx.runMutation(internal.skus.incrementSkuRealStock, {
-        skuId: order.skuId,
-        quantity: order.quantity,
-      });
-    } else if (!wasDeducted && willBeDeducted) {
-      // Moving to a deducting state: deduct stock, but don't block admin if stock is 0
-      const sku = await ctx.db.get(order.skuId);
-      if (sku) {
-        const deductQty = Math.min(order.quantity, sku.real_stock);
-        if (deductQty > 0) {
-          await ctx.runMutation(internal.skus.decrementSkuRealStock, {
-            skuId: order.skuId,
-            quantity: deductQty,
-          });
+    // The status belongs to the customer order, so every line moves together.
+    const lines = await getOrderLines(ctx, order);
+
+    for (const line of lines) {
+      const wasDeducted = statesThatDeductStock.includes(line.state);
+
+      if (wasDeducted && !willBeDeducted) {
+        // Returning to a non-deducting state: restore stock
+        await ctx.runMutation(internal.skus.incrementSkuRealStock, {
+          skuId: line.skuId,
+          quantity: line.quantity,
+        });
+      } else if (!wasDeducted && willBeDeducted) {
+        // Moving to a deducting state: deduct stock, but don't block admin if stock is 0
+        const sku = await ctx.db.get(line.skuId);
+        if (sku) {
+          const deductQty = Math.min(line.quantity, sku.real_stock);
+          if (deductQty > 0) {
+            await ctx.runMutation(internal.skus.decrementSkuRealStock, {
+              skuId: line.skuId,
+              quantity: deductQty,
+            });
+          }
+          // If real_stock was already 0, we skip silently and let the admin proceed
         }
-        // If real_stock was already 0, we skip silently and let the admin proceed
       }
-    }
 
-    const patch: any = { state: args.newState };
-    if (args.manualReceiptId !== undefined) {
-      patch.paymentReceiptRef = args.manualReceiptId;
-    }
+      const patch: any = { state: args.newState };
+      if (line._id === args.orderId && args.manualReceiptId !== undefined) {
+        patch.paymentReceiptRef = args.manualReceiptId;
+      }
 
-    await ctx.db.patch(args.orderId, patch);
+      await ctx.db.patch(line._id, patch);
+
+      await scheduleAuditLog(ctx, {
+        userId: actor._id,
+        entityId: line._id,
+        actionType: "ORDER_STATUS_CHANGED",
+        changes: {
+          from: line.state,
+          to: args.newState,
+          manualReceiptId: line._id === args.orderId ? args.manualReceiptId : undefined,
+        },
+      });
+    }
 
     if (order.customerPhone && order.shortCode) {
+      const totals = sumOrderLines(lines);
       ctx.scheduler.runAfter(0, internal.webhooks.dispatchWhatsAppMessage, {
         orderId: args.orderId,
         shortCode: order.shortCode,
         customerPhone: order.customerPhone,
         customerName: order.customerName || "Customer",
         newState: args.newState,
-        totalPrice: order.total_price,
+        totalPrice: totals.total_price + totals.appliedShippingFee,
       });
     }
-
-    await scheduleAuditLog(ctx, {
-      userId: actor._id,
-      entityId: args.orderId,
-      actionType: "ORDER_STATUS_CHANGED",
-      changes: { 
-        from: order.state, 
-        to: args.newState,
-        manualReceiptId: args.manualReceiptId,
-      },
-    });
 
     return { success: true };
   },
@@ -580,9 +773,11 @@ export const trackOrderByCode = query({
       .withIndex("by_shortCode", (q) => q.eq("shortCode", shortCode))
       .collect();
 
-    const order = candidates.find((candidate) =>
+    // A checkout writes one row per SKU line, all sharing the short code.
+    const lines = candidates.filter((candidate) =>
       digitsOnly(candidate.customerPhone).endsWith(last4)
     );
+    const order = lines[0];
 
     // Same response for "no such code" and "code exists, wrong phone" so the
     // endpoint cannot be used to enumerate valid order codes.
@@ -590,22 +785,43 @@ export const trackOrderByCode = query({
       return { status: "NOT_FOUND" as const, order: null };
     }
 
-    const product = await ctx.db.get(order.productId);
-    const sku = await ctx.db.get(order.skuId);
     const governorate = order.governorateId
       ? await ctx.db.get(order.governorateId)
       : null;
 
-    const thumbnailRef =
-      sku?.linkedImageId ?? product?.thumbnail ?? product?.images?.[0];
-    let thumbnail: string | null = null;
-    if (thumbnailRef) {
-      try {
-        thumbnail = await resolveRef(ctx, thumbnailRef);
-      } catch {
-        thumbnail = null;
-      }
-    }
+    const items = await Promise.all(
+      lines.map(async (line) => {
+        const product = await ctx.db.get(line.productId);
+        const sku = await ctx.db.get(line.skuId);
+
+        const thumbnailRef =
+          sku?.linkedImageId ?? product?.thumbnail ?? product?.images?.[0];
+        let thumbnail: string | null = null;
+        if (thumbnailRef) {
+          try {
+            thumbnail = await resolveRef(ctx, thumbnailRef);
+          } catch {
+            thumbnail = null;
+          }
+        }
+
+        return {
+          quantity: line.quantity,
+          variantName: sku?.variantName ?? null,
+          product: product
+            ? {
+                name_en: product.name_en,
+                name_ar: product.name_ar,
+                slug: product.slug ?? null,
+                thumbnail,
+              }
+            : null,
+        };
+      }),
+    );
+
+    const hasShippingFee = lines.some((line) => line.appliedShippingFee !== undefined);
+    const discountApplied = lines.reduce((sum, line) => sum + (line.discount_applied ?? 0), 0);
 
     const logs = await ctx.db
       .query("audit_logs")
@@ -635,24 +851,17 @@ export const trackOrderByCode = query({
         placedAt: order._creationTime,
         customerFirstName: firstName,
         phoneMasked: `•••• ${last4}`,
-        quantity: order.quantity,
-        totalPrice: order.total_price,
-        shippingFee: order.appliedShippingFee ?? null,
-        discountApplied: order.discount_applied ?? null,
+        items,
+        totalPrice: lines.reduce((sum, line) => sum + line.total_price, 0),
+        shippingFee: hasShippingFee
+          ? lines.reduce((sum, line) => sum + (line.appliedShippingFee ?? 0), 0)
+          : null,
+        discountApplied: discountApplied || null,
         promoCode: order.promo_code_snapshot ?? null,
-        hasReceipt: Boolean(order.paymentReceiptRef),
+        hasReceipt: lines.some((line) => Boolean(line.paymentReceiptRef)),
         governorate: governorate
           ? { name_en: governorate.name_en, name_ar: governorate.name_ar }
           : null,
-        product: product
-          ? {
-              name_en: product.name_en,
-              name_ar: product.name_ar,
-              slug: product.slug ?? null,
-              thumbnail,
-            }
-          : null,
-        variantName: sku?.variantName ?? null,
         timeline,
       },
     };

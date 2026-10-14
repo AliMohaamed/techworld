@@ -417,9 +417,11 @@ export const placeOrderFromSession = mutation({
         await ctx.db.patch(promoDoc._id, { current_uses: promoDoc.current_uses + 1 });
     }
 
+    const orderShippingFee = promoDoc?.type === "free_shipping" ? 0 : governorate.shippingFee;
+
     let totalDiscountAppliedSoFar = 0;
     let aggregatedTotalPrice = 0;
-    let firstOrderId = null;
+    let firstOrderId: Id<"orders"> | null = null;
 
     for (let i = 0; i < session.items.length; i++) {
       const item = session.items[i];
@@ -454,6 +456,10 @@ export const placeOrderFromSession = mutation({
         discountForLine = Math.min(discountForLine, lineSubtotal);
       }
 
+      // Shipping is charged once per checkout, so only the first line carries
+      // it; repeating it on every line double-counts revenue and courier fees.
+      const lineShippingFee: number = firstOrderId ? 0 : orderShippingFee;
+
       const orderId = await ctx.db.insert("orders", {
         sessionId: args.sessionId,
         customerName: args.customerName,
@@ -462,7 +468,7 @@ export const placeOrderFromSession = mutation({
         customerEmail,
         customerAddress: args.customerAddress,
         governorateId: args.governorateId,
-        appliedShippingFee: promoDoc?.type === "free_shipping" ? 0 : governorate.shippingFee,
+        appliedShippingFee: lineShippingFee,
         productId: item.productId,
         skuId: item.skuId,
         quantity: item.quantity,
@@ -486,7 +492,7 @@ export const placeOrderFromSession = mutation({
           shortCode,
           customerName: args.customerName,
           governorateId: args.governorateId,
-          appliedShippingFee: promoDoc?.type === "free_shipping" ? 0 : governorate.shippingFee,
+          appliedShippingFee: lineShippingFee,
           lineSubtotal,
           promoCode: args.promoCode,
           discountApplied: discountForLine,
@@ -506,7 +512,7 @@ export const placeOrderFromSession = mutation({
         customerPhone: args.customerPhone,
         customerName: args.customerName || "Customer",
         newState: "PENDING_PAYMENT_INPUT",
-        totalPrice: aggregatedTotalPrice + (promoDoc?.type === "free_shipping" ? 0 : governorate.shippingFee),
+        totalPrice: aggregatedTotalPrice + orderShippingFee,
       });
     }
 
