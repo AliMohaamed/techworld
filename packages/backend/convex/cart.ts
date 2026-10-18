@@ -4,9 +4,30 @@ import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import { resolveProductImages, resolveStorageRef } from "./products";
 import { writeAuditLog } from "./lib/audit";
+import { metaAttributionValidator } from "./schema";
+import { toPublicSku } from "./lib/publicSku";
 
 function normalizePromoCode(code: string) {
   return code.trim().toUpperCase();
+}
+
+type MetaAttribution = typeof metaAttributionValidator.type;
+
+/** The values come from the shopper's browser, so keep only well-formed, bounded ones. */
+function sanitizeMetaAttribution(input: MetaAttribution | undefined): MetaAttribution | undefined {
+  if (!input) return undefined;
+  const fbCookie = (value?: string) =>
+    value && value.length <= 500 && /^fb\.\d\.\d+\.\S+$/.test(value) ? value : undefined;
+  const attribution: MetaAttribution = {
+    fbp: fbCookie(input.fbp),
+    fbc: fbCookie(input.fbc),
+    clientUserAgent: input.clientUserAgent?.slice(0, 512) || undefined,
+    eventSourceUrl:
+      input.eventSourceUrl && /^https?:\/\//.test(input.eventSourceUrl)
+        ? input.eventSourceUrl.slice(0, 2048)
+        : undefined,
+  };
+  return Object.values(attribution).some(Boolean) ? attribution : undefined;
 }
 
 type PromoDoc = {
@@ -36,7 +57,7 @@ function calculatePromoDiscount(promo: PromoDoc, subtotal: number) {
 }
 
 async function getSkuOrThrow(
-  ctx: { db: { get: (id: Id<"skus">) => Promise<{ _id: Id<"skus">; productId: Id<"products">; price: number; display_stock: number; real_stock: number; variantName: string; variantAttributes: { color?: string; size?: string; type?: string }; compareAtPrice?: number; linkedImageId?: string; isDefault?: boolean; isActive?: boolean } | null> } },
+  ctx: { db: { get: (id: Id<"skus">) => Promise<{ _id: Id<"skus">; productId: Id<"products">; price: number; real_stock: number; variantName: string; variantAttributes: { color?: string; size?: string; type?: string }; compareAtPrice?: number; linkedImageId?: string; isDefault?: boolean; isActive?: boolean } | null> } },
   skuId: Id<"skus">,
   productId?: Id<"products">,
 ) {
@@ -76,8 +97,8 @@ export const addToCart = mutation({
     if (!product) throw new ConvexError({ code: "PRODUCT_NOT_FOUND", message: "Product not found." });
 
     const sku = await getSkuOrThrow(ctx, args.skuId, args.productId);
-    if (sku.display_stock < args.quantity) {
-      throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: "Insufficient display stock for the selected variant." });
+    if (sku.real_stock < args.quantity) {
+      throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: "Insufficient stock for the selected variant." });
     }
 
     const session = await ctx.db
@@ -161,8 +182,8 @@ export const addItemsToCart = mutation({
       const existingQuantity = existingItemIndex > -1 ? newItems[existingItemIndex].quantity : 0;
       const nextQuantity = existingQuantity + quantity;
 
-      if (sku.display_stock < nextQuantity) {
-        throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: "Insufficient display stock for the selected variant." });
+      if (sku.real_stock < nextQuantity) {
+        throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: "Insufficient stock for the selected variant." });
       }
 
       if (existingItemIndex > -1) {
@@ -233,7 +254,7 @@ export const getCart = query({
           const { cogs, ...publicProduct } = product;
           return {
             ...item,
-            sku,
+            sku: sku ? toPublicSku(sku) : null,
             product: {
               ...publicProduct,
               images: await resolveProductImages(ctx, publicProduct.images),
@@ -327,12 +348,11 @@ export const validateCart = query({
         continue;
       }
 
-      if (sku.display_stock < item.quantity) {
+      if (sku.real_stock < item.quantity) {
         failedItems.push({
           productId: item.productId,
           skuId: item.skuId,
           reason: "INSUFFICIENT_STOCK",
-          available: sku.display_stock,
         });
         continue;
       }
@@ -352,6 +372,7 @@ export const placeOrderFromSession = mutation({
     customerAddress: v.string(),
     governorateId: v.id("governorates"),
     promoCode: v.optional(v.string()),
+    metaAttribution: v.optional(metaAttributionValidator),
   },
   handler: async (ctx, args) => {
     const session = await ctx.db
@@ -375,6 +396,7 @@ export const placeOrderFromSession = mutation({
     }
 
     const shortCode = generateShortCode();
+    const metaAttribution = sanitizeMetaAttribution(args.metaAttribution);
     const isBlacklisted = await ctx.db
       .query("blacklist")
       .withIndex("by_phone", (q) => q.eq("phoneNumber", args.customerPhone))
@@ -433,13 +455,10 @@ export const placeOrderFromSession = mutation({
         throw new ConvexError({ code: "SKU_NOT_FOUND", message: `Variant not found for product: ${product.name_en}` });
       }
 
-      if (sku.display_stock < item.quantity) {
+      // Stock is checked here but only deducted once the order is CONFIRMED.
+      if (sku.real_stock < item.quantity) {
         throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: `Insufficient stock for: ${product.name_en} (${sku.variantName})` });
       }
-
-      await ctx.db.patch(item.skuId, {
-        display_stock: sku.display_stock - item.quantity,
-      });
 
       const effectivePrice = sku.price || product.selling_price || 0;
       const lineSubtotal = effectivePrice * item.quantity;
@@ -479,6 +498,7 @@ export const placeOrderFromSession = mutation({
         promo_code_id: promoDoc?._id,
         promo_code_snapshot: promoDoc?.code,
         discount_applied: discountForLine,
+        metaAttribution,
       });
 
       await writeAuditLog(ctx, {

@@ -2,11 +2,13 @@ import { ConvexError, v } from "convex/values";
 import { internalMutation, mutation, query, QueryCtx } from "./_generated/server";
 import { requirePermission } from "./lib/rbac";
 import { hasPermission } from "./lib/permissions";
+import { canTransition, statusChangePermission } from "./lib/orderTransitions";
 import { scheduleAuditLog, writeAuditLog } from "./lib/audit";
 import { Doc, Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import { orderStateValidator } from "./schema";
 import { resolveRef } from "./lib/storageRef";
+import { queueMetaPurchase } from "./lib/metaConversions";
 
 async function getOrderOrThrow(ctx: { db: { get: (id: Id<"orders">) => Promise<Doc<"orders"> | null> } }, orderId: Id<"orders">) {
   const order = await ctx.db.get(orderId);
@@ -230,11 +232,60 @@ export const getOrderDetails = query({
       : resolvedLines.reduce((sum, line) => sum + (line.product?.cogs ?? 0) * line.quantity, 0);
     const netMargin = totalCogs === null ? null : totals.total_price - totalCogs;
 
+    const thumbnails = await Promise.all(
+      resolvedLines.map(async (line) => {
+        const ref = line.sku?.linkedImageId ?? line.product?.thumbnail ?? line.product?.images?.[0];
+        if (!ref) return null;
+        try {
+          return await resolveRef(ctx, ref);
+        } catch {
+          return null;
+        }
+      }),
+    );
+
+    // Activity across every line of the customer order, oldest first, with the acting staff member.
+    const lineLogs = await Promise.all(
+      orderLines.map((line) =>
+        ctx.db
+          .query("audit_logs")
+          .withIndex("by_entityId_timestamp", (q) => q.eq("entityId", line._id))
+          .collect(),
+      ),
+    );
+    const actorNames = new Map<string, string | null>();
+    const activity = await Promise.all(
+      lineLogs
+        .flat()
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .map(async (log) => {
+          let actorName: string | null = null;
+          if (log.userId) {
+            if (!actorNames.has(log.userId)) {
+              const actor = await ctx.db.get(log.userId);
+              actorNames.set(log.userId, actor?.name ?? null);
+            }
+            actorName = actorNames.get(log.userId) ?? null;
+          }
+          const changes = (log.changes ?? {}) as { from?: string; to?: string };
+          return {
+            _id: log._id,
+            actionType: log.actionType,
+            timestamp: log.timestamp,
+            from: typeof changes.from === "string" ? changes.from : null,
+            to: typeof changes.to === "string" ? changes.to : null,
+            actorName,
+          };
+        }),
+    );
+
     return {
       ...order,
       ...totals,
-      lines: resolvedLines.map((line) => ({
+      activity,
+      lines: resolvedLines.map((line, index) => ({
         ...line,
+        thumbnailUrl: thumbnails[index],
         product: line.product
           ? {
             ...line.product,
@@ -267,14 +318,11 @@ export const updateOrderStatus = mutation({
     manualReceiptId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const requiredPermission =
-      args.newState === "CONFIRMED" ? "VERIFY_PAYMENTS" : "VIEW_ORDERS";
-    const actor = await requirePermission(ctx, requiredPermission);
-
     const order = await ctx.db.get(args.orderId);
     if (!order) {
       throw new ConvexError({ code: "ORDER_NOT_FOUND", message: "Order not found" });
     }
+    const actor = await requirePermission(ctx, statusChangePermission([order.state], args.newState));
 
     if (order.state !== "AWAITING_VERIFICATION") {
       throw new ConvexError({ code: "INVALID_TRANSITION", message: `Invalid transition from ${order.state}` });
@@ -292,7 +340,7 @@ export const updateOrderStatus = mutation({
 
     if (args.newState === "CONFIRMED") {
       // C2 FIX: Deduct real_stock from the specific SKU, not the product root.
-      // Uses the internal decrementSkuRealStock which enforces the Zero Floor guard.
+      // Uses the internal decrementSkuRealStock which enforces the overselling floor.
       await ctx.runMutation(internal.skus.decrementSkuRealStock, {
         skuId: order.skuId,
         quantity: order.quantity,
@@ -363,14 +411,10 @@ export const createOrder = mutation({
     if (sku.productId !== args.productId) {
       throw new ConvexError({ code: "SKU_PRODUCT_MISMATCH", message: "Variant does not belong to this product." });
     }
-    if (sku.display_stock < args.quantity) {
-      throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: "Insufficient display stock available for this order." });
+    // real_stock is only deducted once the order reaches CONFIRMED.
+    if (sku.real_stock < args.quantity) {
+      throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: "Insufficient stock available for this order." });
     }
-
-    // Deduct display_stock at SKU level (does not touch real_stock — deferred to CONFIRMED state)
-    await ctx.db.patch(args.skuId, {
-      display_stock: sku.display_stock - args.quantity,
-    });
 
     const orderId = await ctx.db.insert("orders", {
       userId: user._id,
@@ -443,7 +487,7 @@ export const getOrdersByShortCode = query({
 /**
  * Appends a product line to an order that was already placed, for customers
  * whose cart was split across browsers. Run from the CLI/dashboard only.
- * Limited to pre-confirmation orders, where only display_stock is reserved.
+ * Limited to pre-confirmation orders, where real_stock has not been deducted yet.
  */
 export const addLineToOrder = internalMutation({
   args: {
@@ -481,13 +525,9 @@ export const addLineToOrder = internalMutation({
     if (sku.productId !== args.productId) {
       throw new ConvexError({ code: "SKU_PRODUCT_MISMATCH", message: "Variant does not belong to this product." });
     }
-    if (sku.display_stock < quantity) {
-      throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: "Insufficient display stock available for this order." });
+    if (sku.real_stock < quantity) {
+      throw new ConvexError({ code: "INSUFFICIENT_STOCK", message: "Insufficient stock available for this order." });
     }
-
-    await ctx.db.patch(args.skuId, {
-      display_stock: sku.display_stock - quantity,
-    });
 
     const lineSubtotal = (sku.price || product.selling_price || 0) * quantity;
 
@@ -620,20 +660,39 @@ export const updateGenericStatus = mutation({
     manualReceiptId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // Manual override only requires VIEW_ORDERS — any admin who can see orders can override status.
-    // Stock and audit safety is enforced by the handler itself.
-    const actor = await requirePermission(ctx, "VIEW_ORDERS");
-
     const order = await getOrderOrThrow(ctx, args.orderId);
     if (!order) {
       throw new ConvexError({ code: "ORDER_NOT_FOUND", message: "Order not found" });
     }
 
-    const statesThatDeductStock = ["CONFIRMED", "READY_FOR_SHIPPING", "SHIPPED", "DELIVERED"];
-    const willBeDeducted = statesThatDeductStock.includes(args.newState);
-
     // The status belongs to the customer order, so every line moves together.
     const lines = await getOrderLines(ctx, order);
+
+    // Manual override only requires VIEW_ORDERS, except moves that assert payment was
+    // verified (see statusChangePermission). Stock and audit safety is enforced below.
+    const actor = await requirePermission(
+      ctx,
+      statusChangePermission(
+        lines.map((line) => line.state),
+        args.newState,
+      ),
+    );
+
+    // CONFIRMED is the mandatory gateway into fulfilment: an unconfirmed order can be
+    // cancelled or flagged, but never made ready, shipped or delivered. Delivery is the
+    // sale (reported to Meta); Ready and Shipped may be skipped once confirmed.
+    if (!canTransition(lines.map((line) => line.state), args.newState)) {
+      throw new ConvexError({
+        code: "INVALID_TRANSITION",
+        message:
+          args.newState === "DELIVERED"
+            ? "Only confirmed orders can be marked as delivered."
+            : "Only confirmed orders can move to shipping. Confirm the order first.",
+      });
+    }
+
+    const statesThatDeductStock = ["CONFIRMED", "READY_FOR_SHIPPING", "SHIPPED", "DELIVERED"];
+    const willBeDeducted = statesThatDeductStock.includes(args.newState);
 
     for (const line of lines) {
       const wasDeducted = statesThatDeductStock.includes(line.state);
@@ -645,18 +704,13 @@ export const updateGenericStatus = mutation({
           quantity: line.quantity,
         });
       } else if (!wasDeducted && willBeDeducted) {
-        // Moving to a deducting state: deduct stock, but don't block admin if stock is 0
-        const sku = await ctx.db.get(line.skuId);
-        if (sku) {
-          const deductQty = Math.min(line.quantity, sku.real_stock);
-          if (deductQty > 0) {
-            await ctx.runMutation(internal.skus.decrementSkuRealStock, {
-              skuId: line.skuId,
-              quantity: deductQty,
-            });
-          }
-          // If real_stock was already 0, we skip silently and let the admin proceed
-        }
+        // Moving to a deducting state: deduct the full quantity, exactly what a later
+        // restore gives back. Stock may dip into the overselling buffer; past it, the
+        // whole change is rejected with OUT_OF_STOCK and nothing is written.
+        await ctx.runMutation(internal.skus.decrementSkuRealStock, {
+          skuId: line.skuId,
+          quantity: line.quantity,
+        });
       }
 
       const patch: any = { state: args.newState };
@@ -677,6 +731,16 @@ export const updateGenericStatus = mutation({
         },
       });
     }
+
+    // Reports the Meta Purchase on delivery (the only path that can deliver an order).
+    // Every line moved to the new state together, so all of them form the purchase.
+    await queueMetaPurchase(ctx, {
+      order,
+      lines,
+      fromState: order.state,
+      toState: args.newState,
+      actorId: actor._id,
+    });
 
     if (order.customerPhone && order.shortCode) {
       const totals = sumOrderLines(lines);

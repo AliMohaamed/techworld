@@ -70,3 +70,14 @@ textarea[dir="rtl"],
 [dir="rtl"] {
   text-align: right;
 }
+/* Horizontal rails that scroll on touch without a visible bar */
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+::selection {
+  background-color: color-mix(in oklch, #ffc105 35%, transparent);
+}

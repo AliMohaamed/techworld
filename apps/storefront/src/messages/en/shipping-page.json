@@ -35,8 +35,8 @@
           "meta": "Instant"
         },
         {
-          "title": "Payment verified",
-          "description": "Send your transfer receipt on WhatsApp. Our team matches it to your order code and confirms it.",
+          "title": "Order confirmed",
+          "description": "Our team contacts you on WhatsApp to confirm your order and delivery details.",
           "meta": "Usually within 2 hours"
         },
         {
@@ -46,14 +46,14 @@
         },
         {
           "title": "Out for delivery",
-          "description": "The courier calls you before arriving. Have your order code ready and inspect the parcel before you accept it.",
+          "description": "The courier calls you before arriving. Have your order code ready, inspect the parcel, then pay the courier in cash.",
           "meta": "1 to 4 working days"
         }
       ]
     },
     "zones": {
       "title": "Delivery estimates by zone",
-      "description": "Estimates are counted in working days from the moment your payment is verified, not from the moment you place the order.",
+      "description": "Estimates are counted in working days from the moment your order is confirmed, not from the moment you place it.",
       "items": [
         {
           "name": "Greater Cairo",
@@ -117,7 +117,7 @@
       "items": [
         {
           "question": "When does the delivery estimate start counting?",
-          "answer": "From the moment your payment receipt is verified, not from the moment you place the order. If you place an order at midnight and send your receipt the next afternoon, the clock starts that afternoon."
+          "answer": "From the moment your order is confirmed, not from the moment you place it. If you place an order at midnight and we confirm it with you the next afternoon, the clock starts that afternoon."
         },
         {
           "question": "Do you charge shipping per item or per order?",
@@ -133,7 +133,7 @@
         },
         {
           "question": "What if my parcel arrives damaged?",
-          "answer": "Refuse it at the door and tell the courier it is being returned. Then message us with your order code — we will ship a replacement or refund you in full, and you pay nothing extra either way."
+          "answer": "Refuse it at the door and tell the courier it is being returned. Then message us with your order code — you pay nothing for a refused parcel, and we will ship a replacement or cancel the order, whichever you prefer."
         },
         {
           "question": "Can I collect my order myself?",

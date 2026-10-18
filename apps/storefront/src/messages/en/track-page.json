@@ -26,14 +26,14 @@
       "notFoundCta": "Ask us to find it",
       "notFoundWhatsapp": "Hi TechWorld, I cannot find my order on the tracking page. My order code is",
       "labels": {
-        "PENDING_PAYMENT_INPUT": "Awaiting payment",
-        "AWAITING_VERIFICATION": "Verifying payment",
+        "PENDING_PAYMENT_INPUT": "Awaiting confirmation",
+        "AWAITING_VERIFICATION": "Being confirmed",
         "CONFIRMED": "Confirmed",
         "READY_FOR_SHIPPING": "Ready to ship",
         "SHIPPED": "Shipped",
         "DELIVERED": "Delivered",
         "RTO": "Returned to us",
-        "STALLED_PAYMENT": "Payment expired",
+        "STALLED_PAYMENT": "Confirmation expired",
         "CANCELLED": "Cancelled",
         "FLAGGED_FRAUD": "On hold"
       }
@@ -45,15 +45,15 @@
       "steps": {
         "PENDING_PAYMENT_INPUT": {
           "title": "Order placed",
-          "description": "Your order is reserved. Send your payment receipt on WhatsApp to move it forward."
+          "description": "We have your order. Our team will contact you on WhatsApp to confirm it."
         },
         "AWAITING_VERIFICATION": {
-          "title": "Payment received",
-          "description": "We have your receipt and are matching it to this order."
+          "title": "Being confirmed",
+          "description": "Our team is finalising the confirmation of this order with you."
         },
         "CONFIRMED": {
           "title": "Order confirmed",
-          "description": "Payment verified and stock allocated to you."
+          "description": "Confirmed with you and stock allocated. You pay in cash on delivery."
         },
         "READY_FOR_SHIPPING": {
           "title": "Packed",
@@ -72,15 +72,15 @@
     "exceptions": {
       "CANCELLED": {
         "title": "This order was cancelled",
-        "body": "Nothing further will be shipped. If you already paid, your refund is being processed — message us with your order code if you have not heard from us."
+        "body": "Nothing further will be shipped. Message us with your order code if you have any questions."
       },
       "RTO": {
         "title": "This order came back to us",
-        "body": "Delivery could not be completed and the parcel returned to our warehouse. Message us and we will arrange a redelivery or a refund."
+        "body": "Delivery could not be completed and the parcel returned to our warehouse. Message us and we will arrange a redelivery."
       },
       "STALLED_PAYMENT": {
-        "title": "Payment window expired",
-        "body": "We did not receive a payment receipt within 24 hours, so the reserved stock was released. You can still send your receipt and we will check whether the items are available."
+        "title": "Confirmation window expired",
+        "body": "We could not confirm this order with you within 24 hours, so it was closed. Message us with your order code and we will check whether the items are still available."
       },
       "FLAGGED_FRAUD": {
         "title": "This order is on hold",

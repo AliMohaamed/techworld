@@ -46,7 +46,7 @@
         {
           "id": "payment",
           "title": "Payment",
-          "description": "Accepted payment methods, sending your receipt, and how verification works.",
+          "description": "How cash on delivery works and how your order is confirmed.",
           "href": "/support#help-answers",
           "cta": "See payment answers"
         },
@@ -84,7 +84,7 @@
           },
           {
             "question": "What is my order code and where do I find it?",
-            "answer": "It is the short uppercase code shown on the confirmation screen and in the WhatsApp message we send. It identifies your order everywhere: tracking, payment verification, returns and support."
+            "answer": "It is the short uppercase code shown on the confirmation screen and in the WhatsApp message we send. It identifies your order everywhere: tracking, confirmation, returns and support."
           },
           {
             "question": "Can I change or cancel my order after placing it?",
@@ -103,27 +103,27 @@
       {
         "id": "payment",
         "title": "Payment",
-        "description": "Accepted methods, sending your receipt, and how verification works.",
+        "description": "Cash on delivery, and how your order is confirmed.",
         "faqs": [
           {
             "question": "How do I pay for my order?",
-            "answer": "After checkout you receive your order code and our payment details. Transfer the total, then send the receipt screenshot on WhatsApp with your order code. Our team matches the two and confirms the order."
+            "answer": "In cash, to the courier, when your order arrives. After checkout you receive your order code on WhatsApp, and our team contacts you there to confirm the order before it ships."
           },
           {
-            "question": "How long does payment verification take?",
-            "answer": "Usually under two hours during opening hours. Receipts sent late at night are verified the next morning. Your tracking page moves to confirmed the moment it clears."
+            "question": "How long does it take to confirm my order?",
+            "answer": "Usually under two hours during opening hours. Orders placed late at night are confirmed the next morning. Your tracking page moves to confirmed as soon as it is done."
           },
           {
-            "question": "What happens if I do not pay straight away?",
-            "answer": "Your order holds the stock for 24 hours. After that it is automatically marked as an expired payment and the stock is released. You can still message us — if the items are still available we will reinstate the order."
+            "question": "What happens if you cannot reach me to confirm?",
+            "answer": "Your order stays open for 24 hours while we try to confirm it. After that it is automatically marked as expired. You can still message us — if the items are still available we will reinstate the order."
           },
           {
             "question": "Is cash on delivery available?",
-            "answer": "Not at the moment. Every order is paid and verified before dispatch, which is what lets us keep shipping fees where they are."
+            "answer": "Yes. Every order is cash on delivery — you pay the courier when the parcel reaches you."
           },
           {
-            "question": "I sent the receipt but the status has not changed.",
-            "answer": "Check that the message included your order code — receipts without one cannot be matched automatically. If it did, reply on the same WhatsApp thread and we will verify it manually."
+            "question": "I placed my order but the status has not changed.",
+            "answer": "Our team confirms every order on WhatsApp. If you have not heard from us within a couple of hours during opening hours, reply on the same WhatsApp thread with your order code and we will follow up."
           }
         ]
       },
@@ -134,7 +134,7 @@
         "faqs": [
           {
             "question": "How long will my order take to arrive?",
-            "answer": "One to two working days for Greater Cairo, two to three for Alexandria and the Delta, and three to four for Canal, Sinai, Upper Egypt and the frontier governorates. The count starts when your payment is verified."
+            "answer": "One to two working days for Greater Cairo, two to three for Alexandria and the Delta, and three to four for Canal, Sinai, Upper Egypt and the frontier governorates. The count starts when your order is confirmed."
           },
           {
             "question": "How much is shipping to my governorate?",
@@ -142,7 +142,7 @@
           },
           {
             "question": "Can I open the parcel before paying the courier?",
-            "answer": "Your order is already paid before dispatch, so nothing is owed at the door. Do still open and inspect the parcel while the courier is present — refusing a damaged item there and then is much simpler than claiming afterwards."
+            "answer": "Inspect the parcel while the courier is present, before you hand over the cash. Refusing a damaged item there and then is much simpler than claiming afterwards."
           },
           {
             "question": "Nobody was home when the courier came.",
@@ -189,10 +189,6 @@
           {
             "question": "Can someone else look up my order with just the code?",
             "answer": "No. The tracking page also requires the last four digits of the phone number used at checkout, and a wrong phone number returns the same response as a code that does not exist."
-          },
-          {
-            "question": "What happens to my payment receipt?",
-            "answer": "It is stored privately, used only to verify your order, and is never visible on any public page. Access is limited to the staff who verify payments."
           },
           {
             "question": "Will you message me about offers?",

@@ -13,7 +13,6 @@ export const variantSchema = z.object({
   size: z.string().trim().optional(),
   type: z.string().trim().optional(),
   real_stock: z.coerce.number().min(0, "nonNegative"),
-  display_stock: z.coerce.number().min(0, "nonNegative"),
   price: z.coerce.number().min(0, "nonNegative"),
   compareAtPrice: optionalNonNegative,
   linkedImageId: z.string().optional(),

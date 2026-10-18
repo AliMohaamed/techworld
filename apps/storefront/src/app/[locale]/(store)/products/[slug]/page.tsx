@@ -13,12 +13,19 @@ import { DynamicProductGallery } from "@/components/storefront/DynamicProductGal
 import { ProductReviews } from "@/components/storefront/product-reviews";
 import { StarRating } from "@/components/storefront/star-rating";
 import { useFavorites } from "@/lib/use-favorites";
+import { productEventParams, trackMetaEvent } from "@/lib/meta-pixel";
 import { recordRecentlyViewed } from "@/lib/recently-viewed";
 import { ColorSwatch, getColorDisplayName, ProductFeatures, cn } from "@techworld/ui";
 import { RelatedProducts } from "@/components/storefront/related-products";
 import { useTranslations, useLocale } from "next-intl";
+import { toast } from "sonner";
 
 const MAX_QUANTITY = 10;
+
+/** Units of a SKU a shopper may pick. Stock counts are never sent to the storefront. */
+function unitCapacity(sku: Pick<ProductSku, "inStock"> | undefined) {
+  return sku?.inStock ? MAX_QUANTITY : 0;
+}
 
 type ProductSku = {
   _id: Id<"skus">;
@@ -29,8 +36,7 @@ type ProductSku = {
     type?: string;
     colorCode?: string;
   };
-  real_stock: number;
-  display_stock: number;
+  inStock: boolean;
   price: number;
   compareAtPrice?: number;
   linkedImageId?: string;
@@ -113,6 +119,19 @@ export default function ProductDetailPage() {
     if (viewedProductId) recordRecentlyViewed(viewedProductId);
   }, [viewedProductId]);
 
+  // Once per product: price changes from live updates or variant picks are not new views.
+  const viewContentSentFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!product || viewContentSentFor.current === product._id) return;
+    viewContentSentFor.current = product._id;
+    const defaultSku = product.skus?.find((sku: ProductSku) => sku.isDefault) ?? product.skus?.[0];
+    const price = defaultSku?.price || product.selling_price || 0;
+    trackMetaEvent("ViewContent", {
+      ...productEventParams([{ id: product._id, quantity: 1, item_price: price }], price),
+      content_name: product.name_en,
+    });
+  }, [product]);
+
   const defaultSkuId = product?.skus?.find((sku: ProductSku) => sku.isDefault)?._id ?? product?.skus?.[0]?._id;
   if (selectedSkuId === undefined && defaultSkuId !== undefined) {
     setSelectedSkuId(defaultSkuId);
@@ -148,28 +167,27 @@ export default function ProductDetailPage() {
     return map;
   }, [variantOptions]);
 
-  // Total units purchasable: across every option when variants can be mixed,
-  // otherwise just the selected one.
+  // Purchasable units: any in-stock option when variants can be mixed, otherwise
+  // just the selected one. The server rejects quantities beyond real stock.
   const totalAvailable = allowsPerUnitChoice
-    ? pickerOptions.reduce((sum, sku) => sum + Math.max(0, sku.display_stock), 0)
-    : Math.max(0, selectedVariant?.display_stock ?? 0);
+    ? Math.max(0, ...pickerOptions.map(unitCapacity))
+    : unitCapacity(selectedVariant);
   const maxQuantity = Math.max(1, Math.min(MAX_QUANTITY, totalAvailable));
   const effectiveQuantity = Math.min(quantity, maxQuantity);
 
-  // Assign a SKU to every unit, falling back to the next option with remaining
-  // stock so the shopper can never allocate more units than a variant covers.
+  // Assign a SKU to every unit, falling back to the next in-stock option when the
+  // preferred one is unavailable.
   const unitSkuIds = useMemo(() => {
     const counts = new Map<Id<"skus">, number>();
     const result: Id<"skus">[] = [];
-    const capacityOf = (skuId: Id<"skus"> | undefined) =>
-      skuId ? Math.max(0, optionById.get(skuId)?.display_stock ?? 0) : 0;
+    const capacityOf = (skuId: Id<"skus"> | undefined) => (skuId ? unitCapacity(optionById.get(skuId)) : 0);
 
     for (let index = 0; index < effectiveQuantity; index += 1) {
       const preferred = index === 0 ? selectedSkuId : unitOverrides[index] ?? selectedSkuId;
       let chosen = preferred;
       if (!chosen || (counts.get(chosen) ?? 0) >= capacityOf(chosen)) {
         chosen =
-          pickerOptions.find((sku) => (counts.get(sku._id) ?? 0) < Math.max(0, sku.display_stock))?._id ?? preferred;
+          pickerOptions.find((sku) => (counts.get(sku._id) ?? 0) < unitCapacity(sku))?._id ?? preferred;
       }
       if (!chosen) break;
       counts.set(chosen, (counts.get(chosen) ?? 0) + 1);
@@ -199,7 +217,6 @@ export default function ProductDetailPage() {
   const displayPrice = selectedVariant?.price || product?.selling_price || 0;
   const compareAtPrice = selectedVariant?.compareAtPrice ?? product?.compareAtPrice;
   const hasSalePrice = compareAtPrice !== undefined && compareAtPrice > displayPrice;
-  const availableUnits = selectedVariant?.display_stock ?? 0;
   const totalPrice = unitSkuIds.reduce(
     (sum, skuId) => sum + (optionById.get(skuId)?.price || displayPrice),
     0,
@@ -237,6 +254,14 @@ export default function ProductDetailPage() {
         productId: product._id,
         items,
       });
+      const addedQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+      trackMetaEvent("AddToCart", {
+        ...productEventParams(
+          [{ id: product._id, quantity: addedQuantity, item_price: totalPrice / Math.max(1, addedQuantity) }],
+          totalPrice,
+        ),
+        content_name: product.name_en,
+      });
       setQuantity(1);
       setUnitOverrides({});
       if (mode === "buyNow") {
@@ -246,6 +271,7 @@ export default function ProductDetailPage() {
       }
     } catch (err) {
       console.error("Failed to add to cart", err);
+      toast.error(t("actions.addFailed"));
     } finally {
       setIsAdding(false);
     }
@@ -278,7 +304,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  const isOutOfStock = availableUnits <= 0;
+  const isOutOfStock = !selectedVariant?.inStock;
   const isUnavailable = !product.isCategoryActive;
   const statusLabel = isUnavailable ? t('status.unavailable') : isOutOfStock ? t('status.soldOut') : undefined;
   const isPurchasable = !isOutOfStock && !isUnavailable && unitSkuIds.length > 0;
@@ -344,12 +370,6 @@ export default function ProductDetailPage() {
                   </s>
                 ) : null}
               </div>
-              {/* <div className={`flex items-center gap-2 rounded-full px-4 py-2 border ${isOutOfStock ? "border-destructive/20 bg-destructive/5 text-destructive" : "border-[#ffc105]/20 bg-[#ffc105]/5 text-[#ffc105]"}`}>
-                <Zap size={14} className={isOutOfStock ? "text-destructive" : "text-[#ffc105]"} />
-                <span className="font-space-grotesk text-xs font-black uppercase leading-none">
-                  {t('pricing.unitsLeft', { count: availableUnits })}
-                </span>
-              </div> */}
             </div>
 
             {variantColorOptions.length > 0 ? (
@@ -496,7 +516,7 @@ export default function ProductDetailPage() {
                           {pickerOptions.map((sku: ProductSku) => {
                             const isActive = sku._id === unitSkuId;
                             const otherUnitsUsing = (unitCounts.get(sku._id) ?? 0) - (isActive ? 1 : 0);
-                            const isExhausted = otherUnitsUsing >= Math.max(0, sku.display_stock);
+                            const isExhausted = otherUnitsUsing >= unitCapacity(sku);
                             const label = getColorDisplayName(sku.variantAttributes?.color ?? sku.variantName, locale);
                             const colorValue =
                               sku.variantAttributes?.colorCode || sku.variantAttributes?.color || sku.variantName;

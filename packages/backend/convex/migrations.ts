@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 
 /**
@@ -242,5 +242,33 @@ export const deleteLegacyConvexFile = mutation({
       console.error(`Failed to delete legacy storage ID ${args.storageId}:`, error);
       throw error;
     }
+  },
+});
+
+/**
+ * One-off cleanup after display_stock was retired: strips the field from every
+ * SKU and the MANAGE_DISPLAY_STOCK permission from every staff user.
+ * Run with `npx convex run migrations:stripDisplayStock`, then remove the
+ * legacy entries from schema.ts.
+ */
+export const stripDisplayStock = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    let skusPatched = 0;
+    for (const sku of await ctx.db.query("skus").collect()) {
+      if (sku.display_stock === undefined) continue;
+      await ctx.db.patch(sku._id, { display_stock: undefined });
+      skusPatched++;
+    }
+
+    let usersPatched = 0;
+    for (const user of await ctx.db.query("users").collect()) {
+      const permissions = user.permissions.filter((permission) => permission !== "MANAGE_DISPLAY_STOCK");
+      if (permissions.length === user.permissions.length) continue;
+      await ctx.db.patch(user._id, { permissions });
+      usersPatched++;
+    }
+
+    return { skusPatched, usersPatched };
   },
 });

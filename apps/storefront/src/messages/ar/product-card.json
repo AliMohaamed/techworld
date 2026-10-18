@@ -15,7 +15,6 @@
     "noImage": "لا توجد صورة",
     "stock": {
       "inStock": "متوفر",
-      "lowStock": "متبقي {count} فقط",
       "outOfStock": "غير متوفر"
     },
     "rating": {

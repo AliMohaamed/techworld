@@ -30,12 +30,28 @@ export const orderStateValidator = v.union(
   v.literal("FLAGGED_FRAUD"),
 );
 
+export const metaAttributionValidator = v.object({
+  fbp: v.optional(v.string()),
+  fbc: v.optional(v.string()),
+  clientUserAgent: v.optional(v.string()),
+  eventSourceUrl: v.optional(v.string()),
+});
+
+export const metaEventStatusValidator = v.union(
+  v.literal("PENDING"),
+  v.literal("SENT"),
+  v.literal("FAILED"),
+  v.literal("EXPIRED"),
+);
+
 export default defineSchema({
   users: defineTable({
     name: v.string(),
     email: v.string(),
     identifier: v.optional(v.string()),
-    permissions: v.array(v.union(...permissionValidators)),
+    // "MANAGE_DISPLAY_STOCK" is a retired permission, accepted only until
+    // migrations.stripDisplayStock has run. Remove it from this union afterwards.
+    permissions: v.array(v.union(...permissionValidators, v.literal("MANAGE_DISPLAY_STOCK"))),
     isActive: v.optional(v.boolean()),
   })
     .index("by_email", ["email"])
@@ -105,7 +121,9 @@ export default defineSchema({
       colorCode: v.optional(v.string()),
     }),
     real_stock: v.number(),
-    display_stock: v.number(),
+    // Legacy field, kept optional only until migrations.stripDisplayStock has run.
+    // Delete this line afterwards.
+    display_stock: v.optional(v.number()),
     price: v.number(),
     compareAtPrice: v.optional(v.number()),
     linkedImageId: v.optional(storageRef),
@@ -167,12 +185,37 @@ export default defineSchema({
     promo_code_id: v.optional(v.id("promo_codes")),
     promo_code_snapshot: v.optional(v.string()),
     discount_applied: v.optional(v.number()),
+    // Browser context captured at checkout so the server-side Purchase sent on
+    // delivery can be matched to the shopper's Meta ad click.
+    metaAttribution: v.optional(metaAttributionValidator),
   })
     .index("by_shortCode", ["shortCode"])
     .index("by_session", ["sessionId"])
     .index("by_state", ["state"])
     .index("by_governorate", ["governorateId"])
     .index("by_customerPhone", ["customerPhone"]),
+
+  /**
+   * Outbox for Meta Conversions API events. One row per event_id is the
+   * guarantee that a customer order is reported as a Purchase at most once.
+   */
+  meta_events: defineTable({
+    eventId: v.string(),
+    eventName: v.literal("Purchase"),
+    shortCode: v.optional(v.string()),
+    orderId: v.id("orders"),
+    eventTime: v.number(), // Unix seconds, the moment payment was confirmed
+    value: v.number(),
+    currency: v.string(),
+    contents: v.array(v.object({ id: v.string(), quantity: v.number(), item_price: v.number() })),
+    status: metaEventStatusValidator,
+    attempts: v.number(),
+    lastError: v.optional(v.string()),
+    sentAt: v.optional(v.number()),
+    leaseUntil: v.optional(v.number()), // set while a send is in flight
+  })
+    .index("by_eventId", ["eventId"])
+    .index("by_status", ["status"]),
 
   audit_logs: defineTable({
     userId: v.optional(v.id("users")),

@@ -35,7 +35,7 @@ type OfferRow = {
   savings: number;
   variantCount: number;
   discountedVariantCount: number;
-  totalDisplayStock: number;
+  totalRealStock: number;
   isOnOffer: boolean;
 };
 
@@ -358,7 +358,7 @@ export default function OffersPage() {
                             : t("table.visibility.categoryInactive")}
                         </span>
                       )}
-                      {row.totalDisplayStock <= 0 && (
+                      {row.totalRealStock <= 0 && (
                         <p className="mt-2 text-[9px] font-black uppercase tracking-widest text-destructive">
                           {t("table.outOfStock")}
                         </p>

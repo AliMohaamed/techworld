@@ -9,6 +9,7 @@ import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
 import { useCart } from "@/providers/cart-provider";
 import { useFavorites } from "@/lib/use-favorites";
+import { productEventParams, trackMetaEvent } from "@/lib/meta-pixel";
 import { Heart, ShoppingCart, Star, Zap } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@techworld/ui";
@@ -25,7 +26,6 @@ interface ProductCardProps {
     description_en?: string;
     selling_price: number;
     compareAtPrice?: number;
-    display_stock?: number;
     images: string[];
     thumbnail?: string | null;
     slug?: string;
@@ -37,7 +37,7 @@ interface ProductCardProps {
       _id: Id<"skus">;
       price: number;
       compareAtPrice?: number;
-      display_stock: number;
+      inStock: boolean;
       isDefault?: boolean;
       variantName: string;
     }>;
@@ -57,9 +57,8 @@ export default function ProductCard({ product, discountPercent }: ProductCardPro
 
   const defaultSku =
     product.skus?.find((s) => s.isDefault) ?? product.skus?.[0];
-  const displayStock = defaultSku?.display_stock ?? product.display_stock ?? 0;
   const displayPrice = defaultSku?.price || product.selling_price;
-  const isOutOfStock = displayStock <= 0;
+  const isOutOfStock = !defaultSku?.inStock;
   // The struck-through price follows whichever price is actually shown: a
   // variant-level offer must not be compared against the product root price.
   const compareAtPrice = defaultSku
@@ -89,6 +88,10 @@ export default function ProductCard({ product, discountPercent }: ProductCardPro
         productId: product._id,
         skuId: defaultSku._id,
         quantity: 1,
+      });
+      trackMetaEvent("AddToCart", {
+        ...productEventParams([{ id: product._id, quantity: 1, item_price: displayPrice }], displayPrice),
+        content_name: product.name_en,
       });
       openCart();
     } catch (err) {

@@ -84,9 +84,9 @@
       },
       "rows": [
         {
-          "method": "Bank or wallet transfer",
+          "method": "Mobile wallet or InstaPay",
           "window": "3 to 5 working days",
-          "note": "Sent back to the account or wallet the payment came from. Your bank may take another working day to show it."
+          "note": "Sent to your mobile wallet or InstaPay once we have inspected the returned item."
         },
         {
           "method": "Store credit",
@@ -122,7 +122,7 @@
     "failedDelivery": {
       "title": "Refused and undelivered orders",
       "description": "If you refuse a parcel at the door, or the courier cannot reach you after two attempts, the order is returned to us and marked as returned to origin. You will see that state on your tracking page.",
-      "note": "There is no penalty the first time, and any amount you already paid is refunded in full using the methods above. Repeatedly refusing delivery on paid orders may mean we ask for payment confirmation before dispatching future orders."
+      "note": "There is no penalty the first time. Repeatedly refusing delivery may mean we ask for extra confirmation before dispatching future orders."
     },
     "faq": {
       "title": "Returns questions",

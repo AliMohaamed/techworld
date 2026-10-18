@@ -52,7 +52,7 @@ export default function RecentlyViewed() {
             const price = sku?.price || product.selling_price;
             const compareAt = sku?.compareAtPrice ?? product.compareAtPrice;
             const onSale = compareAt !== undefined && compareAt > price;
-            const soldOut = !sku || sku.display_stock <= 0;
+            const soldOut = !sku?.inStock;
             const imageSrc = product.thumbnail || product.images[0];
 
             return (

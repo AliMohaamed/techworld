@@ -12,14 +12,13 @@
     },
     "pricing": {
       "currency": "EGP",
-      "unitsLeft": "{count} units left",
       "total": "Total"
     },
     "quantity": {
       "label": "Quantity",
       "decrease": "Decrease quantity",
       "increase": "Increase quantity",
-      "maxReached": "Max {count} available"
+      "maxReached": "Max {count} per order"
     },
     "unitSelection": {
       "colorTitle": "Pick a color for each item",
@@ -36,7 +35,8 @@
     "actions": {
       "addToCart": "Add To Cart",
       "addCountToCart": "Add {count} To Cart",
-      "buyNow": "Buy Now"
+      "buyNow": "Buy Now",
+      "addFailed": "Couldn't add to cart. The selected quantity may not be available."
     },
     "description": {
       "seeMore": "See More",

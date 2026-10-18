@@ -12,14 +12,13 @@
     },
     "pricing": {
       "currency": "جنيه",
-      "unitsLeft": "متبقي {count} قطع",
       "total": "الإجمالي"
     },
     "quantity": {
       "label": "الكمية",
       "decrease": "تقليل الكمية",
       "increase": "زيادة الكمية",
-      "maxReached": "الحد الأقصى {count} قطع"
+      "maxReached": "الحد الأقصى {count} قطع لكل طلب"
     },
     "unitSelection": {
       "colorTitle": "اختر لون كل قطعة",
@@ -36,7 +35,8 @@
     "actions": {
       "addToCart": "إضافة للسلة",
       "addCountToCart": "إضافة {count} للسلة",
-      "buyNow": "اشتري الآن"
+      "buyNow": "اشتري الآن",
+      "addFailed": "تعذّرت الإضافة إلى السلة. قد لا تكون الكمية المختارة متاحة."
     },
     "description": {
       "seeMore": "عرض المزيد",

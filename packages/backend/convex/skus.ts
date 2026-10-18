@@ -4,6 +4,9 @@ import { Doc, Id } from "./_generated/dataModel";
 import { requirePermission } from "./lib/rbac";
 import { writeAuditLog } from "./lib/audit";
 
+/** How far below zero real_stock may go when confirming orders (overselling buffer). */
+export const OVERSELL_BUFFER = 5;
+
 function sanitizeStock(value: number, label: string) {
   if (!Number.isFinite(value) || value < 0) {
     throw new ConvexError({
@@ -30,6 +33,7 @@ async function getSkuOrThrow(
 export const listByProduct = query({
   args: { productId: v.id("products") },
   handler: async (ctx, args) => {
+    await requirePermission(ctx, "MANAGE_PRODUCTS");
     return await ctx.db
       .query("skus")
       .withIndex("by_product", (q) => q.eq("productId", args.productId))
@@ -72,7 +76,8 @@ export const decrementSkuRealStock = internalMutation({
       return { success: true, real_stock: sku.real_stock };
     }
 
-    if (sku.real_stock < quantity) {
+    // real_stock may go down to -OVERSELL_BUFFER to absorb overselling; never further.
+    if (sku.real_stock - quantity < -OVERSELL_BUFFER) {
       throw new ConvexError({
         code: "OUT_OF_STOCK",
         message: "SKU does not have enough real stock for this deduction.",

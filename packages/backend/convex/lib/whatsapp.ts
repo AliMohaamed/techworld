@@ -8,7 +8,8 @@ export function formatChatId(rawPhone: string): string {
 
 // Returns Arabic copy for states that send a customer notification, null for states that don't.
 // STALLED_PAYMENT, FLAGGED_FRAUD, CANCELLED, READY_FOR_SHIPPING are handled manually by agents.
-// Wallet number is hardcoded for now — will move to system_configs.COLLECTION_WALLETS in a later slice.
+// Payment is cash on delivery. The shipping deposit is arranged by the team
+// directly with the customer, so these automated messages never mention it.
 export function buildMessageForState(args: {
   state: string;
   shortCode: string;
@@ -16,35 +17,34 @@ export function buildMessageForState(args: {
   totalPrice: number;
 }): string | null {
   const { state, shortCode, customerName, totalPrice } = args;
-  const walletNumber = "01012345678";
 
   switch (state) {
     case "PENDING_PAYMENT_INPUT":
       return (
         `مرحباً ${customerName}! 👋\n` +
         `تم استلام طلبك بنجاح.\n` +
-        `كود طلبك: ${shortCode}\n\n` +
-        `لإتمام الطلب، برجاء تحويل ${totalPrice} جنيه على:\n` +
-        `📱 فودافون كاش / إنستا باي: ${walletNumber}\n\n` +
-        `ثم أرسل لنا صورة إيصال التحويل هنا مع كود طلبك ${shortCode}.`
+        `كود طلبك: ${shortCode}\n` +
+        `إجمالي الطلب: ${totalPrice} جنيه\n` +
+        `💵 الدفع عند الاستلام.\n\n` +
+        `سيتواصل معك أحد أفراد فريقنا هنا قريباً لتأكيد طلبك.`
       );
     case "AWAITING_VERIFICATION":
       return (
         `شكراً ${customerName}! 📸\n` +
-        `استلمنا صورة إيصال الدفع الخاص بطلبك ${shortCode}.\n` +
-        `سيقوم فريقنا بالتحقق منه قريباً وسنعلمك بالتأكيد.`
+        `استلمنا الإيصال الخاص بطلبك ${shortCode}.\n` +
+        `سيقوم فريقنا بمراجعته قريباً وسنعلمك بالتأكيد.`
       );
     case "CONFIRMED":
       return (
         `تهانينا ${customerName}! ✅\n` +
-        `تم تأكيد طلبك ${shortCode} بعد التحقق من الدفع.\n` +
+        `تم تأكيد طلبك ${shortCode}.\n` +
         `سنبدأ التجهيز فوراً.`
       );
     case "SHIPPED":
       return (
         `أهلاً ${customerName}! 🚚\n` +
         `طلبك ${shortCode} في الطريق إليك!\n` +
-        `المندوب استلم الشحنة وستصلك قريباً.`
+        `المندوب استلم الشحنة وستصلك قريباً، والدفع نقداً للمندوب عند الاستلام.`
       );
     case "DELIVERED":
       return (

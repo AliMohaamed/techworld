@@ -18,7 +18,7 @@ import ContactChannels from "@/components/storefront/support/contact-channels";
 import { SUPPORT_HOURS } from "@/lib/contact";
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_STOREFRONT_URL || "https://techworld-store.com";
+  process.env.NEXT_PUBLIC_STOREFRONT_URL || "https://techworldegypt.com";
 
 type Props = { params: Promise<{ locale: string }> };
 

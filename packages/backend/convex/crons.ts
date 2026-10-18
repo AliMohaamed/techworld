@@ -15,4 +15,12 @@ crons.daily(
   internal.sweepJobs.sweepOrphanedCatalogFiles,
 );
 
+// Retries Meta Purchase events and sends any queued before the Conversions API
+// token was configured. No-op while META_CAPI_ACCESS_TOKEN is unset.
+crons.hourly(
+  "flush meta conversions",
+  { minuteUTC: 15 },
+  internal.metaConversions.flushPendingEvents,
+);
+
 export default crons;

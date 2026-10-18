@@ -7,7 +7,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-const BASE_URL = process.env.NEXT_PUBLIC_STOREFRONT_URL || 'https://techworld-store.com';
+const BASE_URL = process.env.NEXT_PUBLIC_STOREFRONT_URL || 'https://techworldegypt.com';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
