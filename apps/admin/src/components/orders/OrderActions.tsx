@@ -7,7 +7,6 @@ import { Button } from "@techworld/ui/button";
 import { cn, Select, SelectContent, SelectItem, SelectTrigger } from "@techworld/ui";
 import { Link } from "@/navigation";
 import { canTransition, statusChangePermission } from "@backend/convex/lib/orderTransitions";
-import { DeliveredConfirmDialog } from "./DeliveredConfirmDialog";
 import {
   ALL_STATES,
   DESTRUCTIVE_STATES,
@@ -19,7 +18,6 @@ import {
 type OrderActionsProps = {
   orderId: string;
   /** Shown in the delivery confirmation. */
-  shortCode?: string | null;
   state: OrderState;
   busy: boolean;
   onChangeState: (newState: OrderState) => Promise<void>;
@@ -28,12 +26,11 @@ type OrderActionsProps = {
   className?: string;
 };
 
-export function OrderActions({ orderId, shortCode, state, busy, onChangeState, canVerifyPayments, className }: OrderActionsProps) {
+export function OrderActions({ orderId, state, busy, onChangeState, canVerifyPayments, className }: OrderActionsProps) {
   const t = useTranslations("Orders.queue.table");
   const tStates = useTranslations("Orders.details.states");
-  const tDelivery = useTranslations("Orders.deliveredConfirm");
+  const tOrders = useTranslations("Orders");
   const [pending, setPending] = useState<OrderState | null>(null);
-  const [confirmingDelivery, setConfirmingDelivery] = useState(false);
 
   const next = nextStepFor(state);
   const href = `/orders/${orderId}`;
@@ -46,10 +43,6 @@ export function OrderActions({ orderId, shortCode, state, busy, onChangeState, c
 
   const requestChange = (newState: OrderState) => {
     if (newState === state || !isAllowed(newState) || !isReachable(newState)) return;
-    if (newState === "DELIVERED") {
-      setConfirmingDelivery(true);
-      return;
-    }
     if (DESTRUCTIVE_STATES.includes(newState)) {
       setPending(newState);
       return;
@@ -97,16 +90,6 @@ export function OrderActions({ orderId, shortCode, state, busy, onChangeState, c
 
   return (
     <div className={cn("flex items-center justify-end gap-2", className)}>
-      <DeliveredConfirmDialog
-        open={confirmingDelivery}
-        shortCode={shortCode}
-        busy={busy}
-        onCancel={() => setConfirmingDelivery(false)}
-        onConfirm={async () => {
-          await onChangeState("DELIVERED");
-          setConfirmingDelivery(false);
-        }}
-      />
       {next?.kind === "advance" && isAllowed(next.to) && (
         <Button
           type="button"
@@ -171,7 +154,7 @@ export function OrderActions({ orderId, shortCode, state, busy, onChangeState, c
             <p className="px-2 pb-1.5 pt-1 text-[11px] font-semibold text-muted-foreground">{t("paymentLocked")}</p>
           )}
           {!isReachable("READY_FOR_SHIPPING") && (
-            <p className="px-2 pb-1.5 pt-1 text-[11px] font-semibold text-muted-foreground">{tDelivery("onlyConfirmed")}</p>
+            <p className="px-2 pb-1.5 pt-1 text-[11px] font-semibold text-muted-foreground">{tOrders("fulfilmentLocked")}</p>
           )}
         </SelectContent>
       </Select>

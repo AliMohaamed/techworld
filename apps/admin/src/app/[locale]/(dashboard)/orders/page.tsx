@@ -608,7 +608,6 @@ function OrdersQueue() {
                       <td className="px-6 py-4">
                         <OrderActions
                           orderId={order._id}
-                          shortCode={order.shortCode}
                           state={order.state as OrderState}
                           busy={updatingId === order._id}
                           onChangeState={(s) => handleStatusChange(order._id, order.state as OrderState, s)}
@@ -654,7 +653,6 @@ function OrdersQueue() {
                     {renderReceipt(order, true)}
                     <OrderActions
                       orderId={order._id}
-                      shortCode={order.shortCode}
                       state={order.state as OrderState}
                       busy={updatingId === order._id}
                       onChangeState={(s) => handleStatusChange(order._id, order.state as OrderState, s)}

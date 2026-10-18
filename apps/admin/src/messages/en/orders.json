@@ -288,12 +288,6 @@
         "stalledByCron": "Automatically marked stalled after 24h"
       }
     },
-    "deliveredConfirm": {
-      "title": "Are you sure this order has been delivered and cash collected?",
-      "body": "This will report the sale to Meta. Only confirm once the customer has received order {code} and paid the courier.",
-      "confirm": "Yes, mark as delivered",
-      "cancel": "Not yet",
-      "onlyConfirmed": "Confirm the order before moving it to shipping or delivery."
-    }
+    "fulfilmentLocked": "Confirm the order before moving it to shipping or delivery."
   }
 }

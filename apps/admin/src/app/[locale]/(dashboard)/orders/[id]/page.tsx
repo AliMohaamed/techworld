@@ -57,7 +57,6 @@ import {
 import { QUEUE_QUERY_KEY } from "@/components/orders/queue-query";
 import { hasPermission } from "@backend/convex/lib/permissions";
 import { canTransition, statusChangePermission } from "@backend/convex/lib/orderTransitions";
-import { DeliveredConfirmDialog } from "@/components/orders/DeliveredConfirmDialog";
 
 type OrderDetails = NonNullable<FunctionReturnType<typeof api.orders.getOrderDetails>>;
 type Confirming = "verify" | "cancel" | "stall" | "rto" | null;
@@ -90,7 +89,6 @@ export default function OrderDetailsPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirming, setConfirming] = useState<Confirming>(null);
-  const [confirmingDelivery, setConfirmingDelivery] = useState(false);
   const [queueHref, setQueueHref] = useState("/orders");
 
   // Return to the queue with the filters the agent left it with.
@@ -242,15 +240,6 @@ export default function OrderDetailsPage() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  /** Delivery reports the sale to Meta, so it is confirmed in a dialog first. */
-  const requestChange = (newState: OrderState, options: { returnToQueue: boolean }) => {
-    if (newState === "DELIVERED") {
-      setConfirmingDelivery(true);
-      return;
-    }
-    void changeState(newState, options);
   };
 
   const handleRto = async () => {
@@ -411,7 +400,7 @@ export default function OrderDetailsPage() {
             <Button
               type="button"
               disabled={isSubmitting || !isAllowed(next.to)}
-              onClick={() => requestChange(next.to, { returnToQueue: false })}
+              onClick={() => void changeState(next.to, { returnToQueue: false })}
               className="h-11 rounded-xl bg-foreground px-6 text-sm font-bold text-background transition-colors hover:bg-[#ffc105] hover:text-black"
             >
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
@@ -968,17 +957,6 @@ export default function OrderDetailsPage() {
         </SheetContent>
       </Sheet>
 
-      <DeliveredConfirmDialog
-        open={confirmingDelivery}
-        shortCode={order.shortCode}
-        busy={isSubmitting}
-        onCancel={() => setConfirmingDelivery(false)}
-        onConfirm={async () => {
-          await changeState("DELIVERED", { returnToQueue: false });
-          setConfirmingDelivery(false);
-        }}
-      />
-
       {/* Manual override */}
       <Sheet open={isManualOverrideOpen} onOpenChange={(isOpen) => !isOpen && setIsManualOverrideOpen(false)}>
         <SheetContent side={locale === "ar" ? "left" : "right"} className="border-border bg-card p-0 sm:max-w-lg">
@@ -1020,7 +998,7 @@ export default function OrderDetailsPage() {
                   <p className="text-xs font-semibold leading-relaxed text-muted-foreground">{t("overrideModal.paymentLocked")}</p>
                 )}
                 {!isReachable("READY_FOR_SHIPPING") && (
-                  <p className="text-xs font-semibold leading-relaxed text-muted-foreground">{tOrders("deliveredConfirm.onlyConfirmed")}</p>
+                  <p className="text-xs font-semibold leading-relaxed text-muted-foreground">{tOrders("fulfilmentLocked")}</p>
                 )}
               </div>
 
@@ -1057,7 +1035,7 @@ export default function OrderDetailsPage() {
                     : "bg-foreground text-background hover:bg-[#ffc105] hover:text-black",
                 )}
                 disabled={isSubmitting || !isOrderState(manualState)}
-                onClick={() => isOrderState(manualState) && requestChange(manualState, { returnToQueue: false })}
+                onClick={() => isOrderState(manualState) && void changeState(manualState, { returnToQueue: false })}
               >
                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Settings2 className="h-4 w-4" />}
                 {isSubmitting ? t("overrideModal.updating") : t("overrideModal.confirm")}
