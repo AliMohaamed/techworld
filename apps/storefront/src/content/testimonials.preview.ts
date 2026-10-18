@@ -91,8 +91,8 @@ export const previewTestimonials: Testimonial[] = [
     city: { ar: "بورسعيد", en: "Port Said" },
     rating: 5,
     comment: {
-      ar: "طلبت سماعة هدية لأخويا ووصلت في معادها بالظبط. الدفع كان سهل بإنستاباي والتأكيد جه على طول.",
-      en: "I ordered headphones as a gift for my brother and they arrived right on time. Paying with InstaPay was easy and confirmation came instantly.",
+      ar: "طلبت سماعة هدية لأخويا ووصلت في معادها بالظبط. الدفع عند الاستلام كان سهل والتأكيد جه على طول.",
+      en: "I ordered headphones as a gift for my brother and they arrived right on time. Paying cash on delivery was easy and confirmation came instantly.",
     },
     date: "2026-07",
   },

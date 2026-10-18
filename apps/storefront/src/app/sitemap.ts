@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { api } from "@backend/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 
-const BASE_URL = process.env.NEXT_PUBLIC_STOREFRONT_URL || 'https://techworld-store.com';
+const BASE_URL = process.env.NEXT_PUBLIC_STOREFRONT_URL || 'https://techworldegypt.com';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const data = await fetchQuery(api.products.getSitemapData);

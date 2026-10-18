@@ -9,6 +9,7 @@ import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
 import { useCart } from "@/providers/cart-provider";
 import { useFavorites } from "@/lib/use-favorites";
+import { productEventParams, trackMetaEvent } from "@/lib/meta-pixel";
 import { Heart, Loader2, ShoppingCart } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@techworld/ui";
@@ -20,7 +21,6 @@ interface FeaturedProductCardProps {
     name_en: string;
     selling_price: number;
     compareAtPrice?: number;
-    display_stock?: number;
     thumbnail?: string | null;
     images: string[];
     slug?: string;
@@ -28,7 +28,7 @@ interface FeaturedProductCardProps {
       _id: Id<"skus">;
       price: number;
       compareAtPrice?: number;
-      display_stock: number;
+      inStock: boolean;
       isDefault?: boolean;
     }>;
   };
@@ -47,8 +47,7 @@ export default function FeaturedProductCard({ product }: FeaturedProductCardProp
 
   const defaultSku = product.skus?.find((s) => s.isDefault) ?? product.skus?.[0];
   const displayPrice = defaultSku?.price || product.selling_price;
-  const displayStock = defaultSku?.display_stock ?? product.display_stock ?? 0;
-  const isOutOfStock = !defaultSku || displayStock <= 0;
+  const isOutOfStock = !defaultSku?.inStock;
   // Compare against the price actually shown: a variant offer must not use the product root price.
   const compareAtPrice = defaultSku
     ? (defaultSku.compareAtPrice ?? (defaultSku.price === product.selling_price ? product.compareAtPrice : undefined))
@@ -67,6 +66,10 @@ export default function FeaturedProductCard({ product }: FeaturedProductCardProp
     setIsAdding(true);
     try {
       await addToCart({ sessionId, productId: product._id, skuId: defaultSku._id, quantity: 1 });
+      trackMetaEvent("AddToCart", {
+        ...productEventParams([{ id: product._id, quantity: 1, item_price: displayPrice }], displayPrice),
+        content_name: product.name_en,
+      });
       openCart();
     } catch (err) {
       console.error("Failed to add to cart", err);

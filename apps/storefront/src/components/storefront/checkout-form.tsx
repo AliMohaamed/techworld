@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import Image from "next/image";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
+import { getMetaAttribution, productEventParams, trackMetaEvent } from "@/lib/meta-pixel";
 import { ChevronLeft, ChevronDown, Loader2, Minus, Plus, ShieldCheck, ShoppingBag, Trash2 } from "lucide-react";
 import { Link, useRouter } from "@/navigation";
 import { useTranslations, useLocale } from "next-intl";
@@ -79,6 +80,19 @@ export default function CheckoutForm() {
     }
   }, []);
 
+  // Once per checkout visit, as soon as the cart is known to have items.
+  const initiateCheckoutSent = useRef(false);
+  useEffect(() => {
+    if (!cart || cart.items.length === 0 || initiateCheckoutSent.current) return;
+    initiateCheckoutSent.current = true;
+    const contents = cart.items.map((item) => ({
+      id: item.productId,
+      quantity: item.quantity,
+      item_price: item.sku?.price || item.product?.selling_price || 0,
+    }));
+    trackMetaEvent("InitiateCheckout", productEventParams(contents, cart.total));
+  }, [cart]);
+
   // Mobile shows a fixed CTA bar until the in-page button scrolls into view.
   useEffect(() => {
     if (!inlineCta) {
@@ -111,12 +125,7 @@ export default function CheckoutForm() {
     productId: Id<"products">,
     skuId: Id<"skus">,
     nextQuantity: number,
-    stock: number,
   ) => {
-    if (nextQuantity > stock) {
-      toast.error(t("items.stockLimit"));
-      return;
-    }
     const key = `${productId}-${skuId}`;
     setBusyItem(key);
     try {
@@ -207,6 +216,7 @@ export default function CheckoutForm() {
         governorateId: details.governorateId as Id<"governorates">,
         customerAddress: details.address,
         promoCode: promoCode || undefined,
+        metaAttribution: getMetaAttribution(),
       });
       try {
         window.localStorage.setItem(SAVED_DETAILS_KEY, JSON.stringify(details));
@@ -301,7 +311,7 @@ export default function CheckoutForm() {
               const key = `${item.productId}-${item.skuId}`;
               const name = (locale === "en" ? item.product?.name_en : item.product?.name_ar) ?? "";
               const unitPrice = item.sku?.price || item.product?.selling_price || 0;
-              const stock = item.sku?.display_stock ?? 0;
+              const inStock = item.sku?.inStock ?? false;
               const imageSrc = item.product?.thumbnail || item.product?.images?.[0];
               const hasVariant = !!item.sku?.variantName && item.sku.variantName !== "Default";
               const isBusy = busyItem === key;
@@ -346,7 +356,7 @@ export default function CheckoutForm() {
                         <button
                           type="button"
                           disabled={isBusy || item.quantity <= 1}
-                          onClick={() => handleQuantity(item.productId, item.skuId, item.quantity - 1, stock)}
+                          onClick={() => handleQuantity(item.productId, item.skuId, item.quantity - 1)}
                           aria-label={t("items.decrease")}
                           className="flex h-9 w-9 items-center justify-center text-label-muted transition-colors hover:text-foreground disabled:opacity-30"
                         >
@@ -357,8 +367,8 @@ export default function CheckoutForm() {
                         </span>
                         <button
                           type="button"
-                          disabled={isBusy || item.quantity >= stock}
-                          onClick={() => handleQuantity(item.productId, item.skuId, item.quantity + 1, stock)}
+                          disabled={isBusy || !inStock}
+                          onClick={() => handleQuantity(item.productId, item.skuId, item.quantity + 1)}
                           aria-label={t("items.increase")}
                           className="flex h-9 w-9 items-center justify-center text-label-muted transition-colors hover:text-foreground disabled:opacity-30"
                         >

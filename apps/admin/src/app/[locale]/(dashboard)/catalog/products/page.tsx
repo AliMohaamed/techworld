@@ -42,7 +42,6 @@ type AdminProduct = {
   status: "DRAFT" | "PUBLISHED";
   thumbnail?: string;
   images: string[];
-  display_stock?: number;
   real_stock?: number;
   features?: Array<{
     icon: string;
@@ -56,7 +55,6 @@ type AdminProduct = {
     variantName: string;
     variantAttributes?: { color?: string; size?: string; type?: string; colorCode?: string };
     real_stock: number;
-    display_stock: number;
     price: number;
     compareAtPrice?: number;
     linkedImageId?: string;
@@ -80,9 +78,6 @@ export default function AdminProductsPage() {
   const [editingId, setEditingId] = useState<Id<"products"> | null>(null);
   const [busyId, setBusyId] = useState<Id<"products"> | null>(null);
   const [updatingSkuId, setUpdatingSkuId] = useState<Id<"skus"> | null>(null);
-  const [displayDrafts, setDisplayDrafts] = useState<Record<string, string>>(
-    {},
-  );
   const [realDrafts, setRealDrafts] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState<"table" | "reorder">("table");
 
@@ -125,26 +120,6 @@ export default function AdminProductsPage() {
   const closeSheet = () => {
     setEditingId(null);
     setIsSheetOpen(false);
-  };
-
-  const saveDisplayStock = async (
-    id: Id<"products">,
-    fallbackValue: number | undefined,
-  ) => {
-    const nextValue = Number(displayDrafts[id] ?? fallbackValue ?? 0);
-    setBusyId(id);
-    try {
-      await updateProduct({ id, display_stock: nextValue });
-      toast.success(t("messages.displayStockUpdated"));
-    } catch (error) {
-      const description =
-        error instanceof Error
-          ? error.message
-          : t("messages.displayStockFailed");
-      toast.error(t("messages.stockUpdateFailed"), { description });
-    } finally {
-      setBusyId(null);
-    }
   };
 
   const saveRealStock = async (
@@ -292,9 +267,6 @@ export default function AdminProductsPage() {
                   {t("table.columns.variants")}
                 </th>
                 <th className="py-4 px-4 whitespace-nowrap">
-                  {t("table.columns.displayStock")}
-                </th>
-                <th className="py-4 px-4 whitespace-nowrap">
                   {t("table.columns.realStock")}
                 </th>
                 <th className="py-4 px-4 whitespace-nowrap">
@@ -398,52 +370,6 @@ export default function AdminProductsPage() {
                         )}
                       </div>
                     </div>
-                  </td>
-                  <td className="py-6 px-4 align-middle">
-                    {product.skus && product.skus.length > 0 ? (
-                      <div className="flex flex-col gap-1">
-                        <p className="text-xs font-bold text-foreground">
-                          {product.skus
-                            .reduce((s, sku) => s + sku.display_stock, 0)
-                            .toLocaleString(locale)}
-                        </p>
-                        <p className="text-xs font-semibold text-muted-foreground/40 leading-none">
-                          {t("table.managedViaSkus")}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2 group/input">
-                        <Input
-                          className="w-20 h-9 rounded-lg bg-background border-border text-xs font-bold uppercase tracking-wide focus:ring-primary/10 transition-all text-center px-2"
-                          type="number"
-                          value={
-                            displayDrafts[product._id] ??
-                            String(product.display_stock ?? 0)
-                          }
-                          onChange={(event) =>
-                            setDisplayDrafts((current) => ({
-                              ...current,
-                              [product._id]: event.target.value,
-                            }))
-                          }
-                        />
-                        <Button
-                          size="sm"
-                          type="button"
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-lg border-border hover:bg-primary/10 hover:text-primary transition-all opacity-0 group-hover/input:opacity-100"
-                          disabled={busyId === product._id}
-                          onClick={() =>
-                            void saveDisplayStock(
-                              product._id,
-                              product.display_stock,
-                            )
-                          }
-                        >
-                          <CheckCircle2 size={14} />
-                        </Button>
-                      </div>
-                    )}
                   </td>
                   <td className="py-6 px-4 align-middle">
                     {product.skus && product.skus.length > 0 ? (
@@ -574,7 +500,7 @@ export default function AdminProductsPage() {
               ))}
               {!products && (
                 <tr>
-                  <td colSpan={8} className="py-20 text-center">
+                  <td colSpan={7} className="py-20 text-center">
                     <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#ffc105] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
                     <p className="mt-4 text-xs font-bold text-muted-foreground/40">
                       {t("table.loading")}
@@ -585,7 +511,7 @@ export default function AdminProductsPage() {
               {products?.length === 0 && (
                 <tr>
                   <td
-                    colSpan={8}
+                    colSpan={7}
                     className="py-20 text-center flex flex-col items-center gap-4"
                   >
                     <div className="h-16 w-16 rounded-full bg-accent/20 flex items-center justify-center">

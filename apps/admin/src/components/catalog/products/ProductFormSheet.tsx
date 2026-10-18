@@ -86,7 +86,6 @@ type ProductRecord = {
     variantName: string;
     variantAttributes?: { color?: string; size?: string; type?: string; colorCode?: string };
     real_stock: number;
-    display_stock: number;
     price: number;
     compareAtPrice?: number;
     linkedImageId?: string;
@@ -101,7 +100,6 @@ const emptyVariant = {
   size: "",
   type: "",
   real_stock: 0,
-  display_stock: 0,
   price: 0,
   compareAtPrice: undefined,
   linkedImageId: "",
@@ -266,7 +264,6 @@ export function ProductFormSheet({
               size: sku.variantAttributes?.size ?? "",
               type: sku.variantAttributes?.type ?? "",
               real_stock: sku.real_stock,
-              display_stock: sku.display_stock,
               price: sku.price,
               compareAtPrice: sku.compareAtPrice,
               linkedImageId: sku.linkedImageId ?? "",
@@ -938,17 +935,6 @@ export function ProductFormSheet({
                         </div>
                       </Field>
                       <Field
-                        label={t("form.fields.skus.displayStock")}
-                        error={errors.variants?.[index]?.display_stock?.message}
-                      >
-                        <Input
-                          type="number"
-                          {...register(`variants.${index}.display_stock`)}
-                          placeholder="0"
-                          className="rounded-xl border-border bg-background h-11 text-sm font-semibold"
-                        />
-                      </Field>
-                      <Field
                         label={t("form.fields.skus.price")}
                         error={errors.variants?.[index]?.price?.message}
                       >
@@ -1124,7 +1110,6 @@ function buildPayload(values: ProductFormSubmitValues) {
         type: variant.type || undefined,
       },
       real_stock: variant.real_stock,
-      display_stock: variant.display_stock,
       price: variant.price,
       compareAtPrice: variant.compareAtPrice,
       linkedImageId: variant.linkedImageId || undefined,

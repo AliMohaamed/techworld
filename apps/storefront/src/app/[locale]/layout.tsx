@@ -3,6 +3,7 @@ import { Cairo, Space_Grotesk } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ThemeProvider, Toaster } from "@techworld/ui";
+import { MetaPixel } from "@/components/storefront/meta-pixel";
 import "../globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -48,6 +49,7 @@ export default async function RootLayout({
             <Toaster />
           </NextIntlClientProvider>
         </ThemeProvider>
+        <MetaPixel />
       </body>
     </html>
   );

@@ -44,17 +44,17 @@ All backend code lives in `packages/backend/convex/`. Convex handles realtime qu
 
 **Authentication** (`auth.ts`, `auth.config.ts`): Admin-only auth via `@convex-dev/better-auth` with email+password. The storefront has no user auth — it uses anonymous `sessionId` (UUID) stored client-side to track cart sessions and orders.
 
-**RBAC** (`lib/permissions.ts`, `lib/rbac.ts`): Permission-flag based (not role based). The `users` table stores an array of `Permission` strings. Every protected mutation/query calls `requirePermission(ctx, "PERMISSION_NAME")`. Available permissions: `VIEW_ORDERS`, `VERIFY_PAYMENTS`, `MANAGE_SHIPPING_STATUS`, `PROCESS_RETURNS`, `MANAGE_PRODUCTS`, `ADJUST_REAL_STOCK`, `MANAGE_DISPLAY_STOCK`, `MANAGE_CATEGORIES`, `VIEW_FINANCIALS`, `MANAGE_SYSTEM_CONFIG`, `RESOLVE_FRAUD`, `VIEW_ANALYTICS`, `VIEW_AUDIT_LOGS`, `MANAGE_USERS`.
+**RBAC** (`lib/permissions.ts`, `lib/rbac.ts`): Permission-flag based (not role based). The `users` table stores an array of `Permission` strings. Every protected mutation/query calls `requirePermission(ctx, "PERMISSION_NAME")`. Available permissions: `VIEW_ORDERS`, `VERIFY_PAYMENTS`, `MANAGE_SHIPPING_STATUS`, `PROCESS_RETURNS`, `MANAGE_PRODUCTS`, `ADJUST_REAL_STOCK`, `MANAGE_CATEGORIES`, `VIEW_FINANCIALS`, `MANAGE_SYSTEM_CONFIG`, `RESOLVE_FRAUD`, `VIEW_ANALYTICS`, `VIEW_AUDIT_LOGS`, `MANAGE_USERS`.
 
 **Audit logging** (`lib/audit.ts`): Use `writeAuditLog()` inside mutations or `scheduleAuditLog()` when inside a query context. Every state transition and inventory change must log to `audit_logs`.
 
-**Order FSM** (`schema.ts`): Strict state machine — `PENDING_PAYMENT_INPUT → AWAITING_VERIFICATION → CONFIRMED → READY_FOR_SHIPPING → SHIPPED → DELIVERED`. Out-of-flow states: `RTO`, `STALLED_PAYMENT`, `CANCELLED`, `FLAGGED_FRAUD`. Invalid transitions must be rejected.
+**Order FSM** (`schema.ts`): Strict state machine — `PENDING_PAYMENT_INPUT → AWAITING_VERIFICATION → CONFIRMED → READY_FOR_SHIPPING → SHIPPED → DELIVERED`. Out-of-flow states: `RTO`, `STALLED_PAYMENT`, `CANCELLED`, `FLAGGED_FRAUD`. Invalid transitions must be rejected. `CONFIRMED` is a mandatory gateway: an unconfirmed order can be cancelled or flagged but never moved to `READY_FOR_SHIPPING`/`SHIPPED`/`DELIVERED` (`canTransition` in `lib/orderTransitions.ts`, shared by backend and admin UI).
 
-**Stock model** (on `skus` table): Two decoupled fields:
-- `display_stock` – decremented when an order is placed (virtual reservation)
-- `real_stock` – decremented only when an order transitions to `CONFIRMED`
-- `real_stock` may drop to `-5` as an overselling buffer; anything below `-5` must throw
-- On cancellation/rejection: do NOT increment `display_stock`; instead apply soft-sync: if `display_stock < real_stock`, set `display_stock = real_stock`
+**Stock model** (on `skus` table): A single `real_stock` field:
+- Checked (not deducted) when items are added to the cart or an order is placed
+- Decremented only when an order transitions to `CONFIRMED`; restored when it leaves a deducting state (cancel, RTO)
+- May drop to `-5` as an overselling buffer; anything below `-5` must throw
+- Never sent to the storefront: public queries pass SKUs through `toPublicSku()` (`lib/publicSku.ts`), which replaces `real_stock` with an `inStock` boolean
 
 **Scheduled crons** (`crons.ts`): Daily at UTC 00:00 — marks `PENDING_PAYMENT_INPUT` orders older than 24h as `STALLED_PAYMENT`. Daily at UTC 01:00 — sweeps orphaned Convex storage files.
 

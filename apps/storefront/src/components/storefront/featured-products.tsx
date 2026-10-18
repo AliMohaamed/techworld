@@ -9,7 +9,6 @@ export type FeaturedProduct = {
   name_en: string;
   selling_price: number;
   compareAtPrice?: number;
-  display_stock?: number;
   thumbnail?: string | null;
   images: string[];
   description_en?: string;
@@ -19,7 +18,7 @@ export type FeaturedProduct = {
     _id: Id<"skus">;
     price: number;
     compareAtPrice?: number;
-    display_stock: number;
+    inStock: boolean;
     isDefault?: boolean;
   }>;
   isFeatured?: boolean;

@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { resolveProductImages, resolveStorageRef } from "./products";
 import { ratingSummaryOf } from "./lib/ratings";
+import { toPublicSku } from "./lib/publicSku";
 
 const MAX_FAVORITES = 200;
 
@@ -56,7 +57,7 @@ export const listProducts = query({
             skus
               .filter((sku) => sku.isActive !== false)
               .map(async (sku) => ({
-                ...sku,
+                ...toPublicSku(sku),
                 linkedImageId: await resolveStorageRef(ctx, sku.linkedImageId),
               })),
           ),

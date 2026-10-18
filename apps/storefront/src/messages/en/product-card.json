@@ -15,7 +15,6 @@
     "noImage": "No Image",
     "stock": {
       "inStock": "In Stock",
-      "lowStock": "Only {count} left",
       "outOfStock": "Out of Stock"
     },
     "rating": {

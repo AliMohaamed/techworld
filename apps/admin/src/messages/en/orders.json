@@ -27,14 +27,16 @@
           "product": "Product",
           "category": "Category",
           "clear": "Clear All"
-        }
+        },
+        "allProducts": "All products",
+        "allCategories": "All categories"
       },
       "table": {
-        "title": "Pending Orders",
+        "title": "All orders",
         "total": "{count} total",
         "loading": "Loading orders...",
         "noPermission": "Your staff account does not have permission to view orders.",
-        "empty": "No orders found.",
+        "empty": "No orders yet.",
         "filters": {
           "ALL": "All Orders",
           "AWAITING_VERIFICATION": "Awaiting",
@@ -52,7 +54,8 @@
           "quantity": "Quantity",
           "total": "Total",
           "receipt": "Receipt",
-          "action": "Action"
+          "action": "Action",
+          "order": "Order"
         },
         "walkInCustomer": "Walk-in customer",
         "noPhone": "No phone",
@@ -70,7 +73,44 @@
           "ship": "Ship",
           "deliver": "Deliver",
           "rto": "RTO"
+        },
+        "noCode": "No code",
+        "copyCode": "Copy order code",
+        "copied": "Copied {code}",
+        "stale": "Waiting longer than 12 hours",
+        "moreItems": "+{count} more",
+        "items": "{count, plural, one {# item} other {# items}}",
+        "noReceipt": "No receipt",
+        "receiptShort": "Receipt",
+        "noMatches": "No orders match these filters.",
+        "noMatchesHint": "Try a wider time period, another status, or clear the filters.",
+        "emptyHint": "New storefront orders appear here in real time.",
+        "showing": "Showing {shown} of {total}",
+        "showMore": "Show {count} more",
+        "changeStatus": "Change status",
+        "paymentLocked": "Paid statuses need Verify Payments",
+        "next": {
+          "verify": "Verify payment",
+          "ready": "Mark ready",
+          "ship": "Mark shipped",
+          "deliver": "Mark delivered"
+        },
+        "confirm": {
+          "title": "Move to {state}?",
+          "yes": "Yes, update",
+          "keep": "Keep"
         }
+      },
+      "pipeline": {
+        "label": "Order pipeline",
+        "all": "All orders",
+        "flow": "Fulfillment flow",
+        "exceptions": "Exceptions"
+      },
+      "messages": {
+        "statusUpdated": "Order moved to {state}.",
+        "statusFailed": "Couldn’t update the order",
+        "statusFailedHint": "The status was not changed. Try again."
       }
     },
     "details": {
@@ -103,7 +143,8 @@
         "title": "Profitability Snapshot",
         "visible": "Visible",
         "masked": "Masked",
-        "redacted": "This staff account can process the order, but financial metrics are redacted server-side."
+        "redacted": "This staff account can process the order, but financial metrics are redacted server-side.",
+        "na": "N/A"
       },
       "summary": {
         "title": "Payment Summary",
@@ -117,7 +158,9 @@
       "receipt": {
         "badge": "Receipt Proof",
         "open": "Open current receipt",
-        "missing": "No receipt is attached yet. Use the manual fallback flow."
+        "missing": "No receipt is attached yet. Use the manual fallback flow.",
+        "openShort": "Open",
+        "alt": "Payment receipt for order {code}"
       },
       "actions": {
         "manualFallback": "Manual Fallback",
@@ -132,7 +175,13 @@
         "title": "Manual Override",
         "description": "Change the order status arbitrarily. You may optionally attach  a receipt.",
         "attach": "Attach Receipt (Optional)",
-        "confirm": "Apply Override"
+        "confirm": "Apply Override",
+        "newStatus": "New status",
+        "placeholder": "Choose a status…",
+        "updating": "Updating…",
+        "stockNote": "Moving into or out of Confirmed, Ready for Shipping, Shipped or Delivered adjusts real stock automatically.",
+        "paymentLocked": "Statuses that confirm payment need the Verify Payments permission.",
+        "destructiveNote": "Moving this order to {state} takes it out of the fulfillment flow."
       },
       "modal": {
         "title": "Manual Fallback",
@@ -142,7 +191,9 @@
         "noFile": "No fallback receipt selected",
         "fileInfo": "{name} ({size} KB)",
         "close": "Close",
-        "confirm": "Confirm Order"
+        "confirm": "Confirm Order",
+        "verifying": "Verifying…",
+        "remove": "Remove"
       },
       "messages": {
         "rtoConfirm": "Are you sure you want to mark this order as Return to Origin? This will automatically restock the SKU.",
@@ -152,7 +203,10 @@
         "updateFailed": "Order update failed.",
         "outOfStock": "Out of stock",
         "outOfStockDescription": "Another agent depleted the remaining stock before confirmation. The order was not confirmed.",
-        "unknown": "Unknown"
+        "unknown": "Unknown",
+        "tryAgain": "Nothing was changed. Try again.",
+        "needsVerifyPayments": "This change confirms payment, so it needs the Verify Payments permission. Nothing was uploaded or changed.",
+        "uploadFailed": "The receipt couldn’t be uploaded. Check the file and try again."
       },
       "states": {
         "PENDING_PAYMENT_INPUT": "Pending Payment",
@@ -165,7 +219,81 @@
         "STALLED_PAYMENT": "Stalled Payment",
         "FLAGGED_FRAUD": "Flagged Fraud",
         "CANCELLED": "Cancelled"
+      },
+      "notFoundHint": "It may have been merged into another order, or the link is wrong.",
+      "copied": "Copied {label}",
+      "journey": {
+        "label": "Order progress",
+        "exitedFrom": "Moved to {state} from {from}.",
+        "exited": "{state} — this order has left the fulfillment flow."
+      },
+      "decision": {
+        "verifyTitle": "Check the payment",
+        "verifyBody": "Compare the receipt with the amount due. The amount and transfer reference should match before you verify.",
+        "noReceipt": "The customer hasn’t sent a receipt yet. Upload one from WhatsApp to verify, or mark the payment stalled.",
+        "verifyRestricted": "Confirming payment needs the Verify Payments permission. Ask a teammate who has it to review this order.",
+        "amountDue": "Amount due",
+        "uploadAndVerify": "Upload receipt & verify",
+        "replaceReceipt": "Use a different receipt",
+        "nextTitle": "Next step",
+        "next": {
+          "CONFIRMED": "Payment is verified. Pack the order, then mark it ready for the courier.",
+          "READY_FOR_SHIPPING": "Hand the parcel to the courier, then mark it shipped.",
+          "SHIPPED": "Mark it delivered once the courier confirms, or return it to origin if it came back."
+        },
+        "idle": {
+          "PENDING_PAYMENT_INPUT": "Waiting for the customer to submit payment. Nothing to do yet.",
+          "STALLED_PAYMENT": "Payment never arrived. Contact the customer, or use Manual Update if they pay later.",
+          "FLAGGED_FRAUD": "Held for review. Don’t ship until it is cleared with Manual Update.",
+          "DELIVERED": "Delivered. No further action needed.",
+          "RTO": "Returned to origin. Stock has been restocked.",
+          "CANCELLED": "Cancelled. No further action needed."
+        }
+      },
+      "confirm": {
+        "verify": "Confirm payment of {amount}?",
+        "verifyBody": "Verifying confirms the order, deducts real stock, and is recorded in the audit log.",
+        "cancel": "Cancel this order?",
+        "cancelBody": "The customer’s order will be closed. You can still restore it later with Manual Update.",
+        "stall": "Mark the payment as stalled?",
+        "stallBody": "Use this when the customer hasn’t paid. The order leaves the verification queue.",
+        "rto": "Return this order to origin?"
+      },
+      "items": {
+        "title": "Items",
+        "unitPrice": "Unit price"
+      },
+      "customer": {
+        "title": "Customer",
+        "call": "Call",
+        "whatsapp": "WhatsApp",
+        "copyAddress": "Copy address"
+      },
+      "activity": {
+        "title": "Activity",
+        "empty": "No recorded activity yet.",
+        "system": "System",
+        "created": "Order placed",
+        "lineAdded": "Item added to order",
+        "paymentSubmitted": "Payment receipt submitted",
+        "rto": "Returned to origin, stock restocked",
+        "shippingDeduped": "Duplicate shipping fee removed",
+        "moved": "{from} → {to}",
+        "movedTo": "Moved to {to}",
+        "receiptMatched": "Receipt matched from WhatsApp",
+        "receiptAttached": "Receipt attached from WhatsApp",
+        "manualReceipt": "Receipt uploaded by staff",
+        "receiptDownloadFailed": "WhatsApp receipt couldn’t be downloaded",
+        "whatsappFailed": "WhatsApp notification failed to send",
+        "stalledByCron": "Automatically marked stalled after 24h"
       }
+    },
+    "deliveredConfirm": {
+      "title": "Are you sure this order has been delivered and cash collected?",
+      "body": "This will report the sale to Meta. Only confirm once the customer has received order {code} and paid the courier.",
+      "confirm": "Yes, mark as delivered",
+      "cancel": "Not yet",
+      "onlyConfirmed": "Confirm the order before moving it to shipping or delivery."
     }
   }
 }

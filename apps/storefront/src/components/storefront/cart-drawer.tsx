@@ -35,18 +35,14 @@ export default function CartDrawer() {
     skuId: Id<"skus">,
     currentQty: number,
     delta: number,
-    displayStock: number,
   ) => {
     const newQty = Math.max(1, currentQty + delta);
-    if (delta > 0 && newQty > displayStock) {
-      toast.error(t("item.stockLimit"));
-      return;
-    }
 
     try {
       await addToCart({ sessionId, productId, skuId, quantity: newQty });
     } catch (e) {
       console.error("Cart update failed", e);
+      if (delta > 0) toast.error(t("item.stockLimit"));
     }
   };
 
@@ -174,7 +170,6 @@ export default function CartDrawer() {
                               item.skuId,
                               item.quantity,
                               -1,
-                              item.sku?.display_stock ?? 0,
                             )
                           }
                           className="p-1.5 text-label-muted hover:text-foreground transition-colors"
@@ -191,12 +186,9 @@ export default function CartDrawer() {
                               item.skuId,
                               item.quantity,
                               1,
-                              item.sku?.display_stock ?? 0,
                             )
                           }
-                          disabled={
-                            item.quantity >= (item.sku?.display_stock ?? 0)
-                          }
+                          disabled={!item.sku?.inStock}
                           className="p-1.5 text-label-muted hover:text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                           <Plus size={13} />

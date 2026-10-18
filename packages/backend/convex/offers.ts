@@ -4,6 +4,7 @@ import { requirePermission } from "./lib/rbac";
 import { writeAuditLog } from "./lib/audit";
 import { Id } from "./_generated/dataModel";
 import { ratingSummaryOf } from "./lib/ratings";
+import { isSkuInStock, toPublicSku } from "./lib/publicSku";
 import { resolveProductImages, resolveStorageRef } from "./products";
 
 /**
@@ -110,7 +111,7 @@ export const listDeals = query({
     const withOffers = await Promise.all(
       discounted.map(async ({ product, skus, offer }) => {
         const category = categoryById.get(product.categoryId);
-        const inStock = skus.some((sku) => sku.isActive !== false && sku.display_stock > 0);
+        const inStock = skus.some(isSkuInStock);
 
         return {
           _id: product._id,
@@ -130,7 +131,7 @@ export const listDeals = query({
           images: await resolveProductImages(ctx, product.images),
           skus: await Promise.all(
             skus.map(async (sku) => ({
-              ...sku,
+              ...toPublicSku(sku),
               linkedImageId: await resolveStorageRef(ctx, sku.linkedImageId),
             })),
           ),
@@ -212,7 +213,7 @@ export const listOffersAdmin = query({
           savings: offer.savings,
           variantCount: skus.length,
           discountedVariantCount: skus.filter((sku) => discountPercentOf(sku) > 0).length,
-          totalDisplayStock: skus.reduce((sum, sku) => sum + sku.display_stock, 0),
+          totalRealStock: skus.reduce((sum, sku) => sum + sku.real_stock, 0),
           isOnOffer: offer.discountPercent > 0,
         };
       }),

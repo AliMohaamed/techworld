@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_STOREFRONT_URL || 'https://techworld-store.com';
+const BASE_URL = process.env.NEXT_PUBLIC_STOREFRONT_URL || 'https://techworldegypt.com';
 
 export default function robots(): MetadataRoute.Robots {
   return {

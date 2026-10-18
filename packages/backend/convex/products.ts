@@ -10,6 +10,7 @@ import { resolveRef, isR2Ref, r2KeyFromRef } from "./lib/storageRef";
 import { productFeatureValidator } from "./schema";
 import * as r2 from "./lib/r2";
 import { ratingSummaryOf } from "./lib/ratings";
+import { isSkuInStock, toPublicSku } from "./lib/publicSku";
 
 type CatalogProduct = {
   _id: Id<"products">;
@@ -21,7 +22,6 @@ type CatalogProduct = {
   description_en?: string;
   images: Array<string | Id<"_storage">>;
   selling_price: number;
-  // display_stock and real_stock are no longer on the product root.
   // They live exclusively on the skus table (Unified SKU Architecture).
   status: "DRAFT" | "PUBLISHED";
   name?: string;
@@ -331,7 +331,7 @@ async function resolveSkuMedia(
 
   return await Promise.all(
     skus.map(async (sku) => ({
-      ...sku,
+      ...toPublicSku(sku),
       linkedImageId: await resolveStorageRef(ctx, sku.linkedImageId),
     })),
   );
@@ -402,11 +402,11 @@ const RELATED_CANDIDATE_POOL = 24;
 
 /**
  * The SKU a storefront card should price and add to cart: the default SKU when
- * it is purchasable, otherwise the first active SKU with display stock.
+ * it is purchasable, otherwise the first active SKU in stock.
  */
 async function getPurchasableSku(ctx: Pick<QueryCtx, "db">, productId: Id<"products">) {
   const skus = await getProductSkus(ctx, productId);
-  const purchasable = skus.filter((sku) => sku.isActive !== false && sku.display_stock > 0);
+  const purchasable = skus.filter(isSkuInStock);
   return purchasable.find((sku) => sku.isDefault) ?? purchasable[0] ?? null;
 }
 
@@ -515,7 +515,7 @@ export const getRelatedProducts = query({
               _id: sku._id,
               price: sku.price,
               compareAtPrice: sku.compareAtPrice,
-              display_stock: sku.display_stock,
+              inStock: true,
               isDefault: true,
               variantName: sku.variantName,
             },
@@ -946,7 +946,6 @@ const advancedVariantInputValidator = v.object({
     colorCode: v.optional(v.string()),
   }),
   real_stock: v.number(),
-  display_stock: v.number(),
   price: v.number(),
   compareAtPrice: v.optional(v.number()),
   linkedImageId: v.optional(v.union(v.string(), v.id("_storage"))),
@@ -967,7 +966,6 @@ function buildNormalizedAdvancedVariants(args: {
     variantName: string;
     variantAttributes: { color?: string; size?: string; type?: string; colorCode?: string };
     real_stock: number;
-    display_stock: number;
     price: number;
     compareAtPrice?: number;
     linkedImageId?: string | Id<"_storage">;
@@ -982,7 +980,6 @@ function buildNormalizedAdvancedVariants(args: {
     variantName: `${args.name_en} Default`,
     variantAttributes: {},
     real_stock: 0,
-    display_stock: 0,
     price: args.selling_price,
     compareAtPrice: args.compareAtPrice,
     linkedImageId: args.images[0],
@@ -997,7 +994,6 @@ function normalizeAdvancedVariant(variant: {
   variantName: string;
   variantAttributes: { color?: string; size?: string; type?: string; colorCode?: string };
   real_stock: number;
-  display_stock: number;
   price: number;
   compareAtPrice?: number;
   linkedImageId?: string | Id<"_storage">;
@@ -1021,7 +1017,6 @@ function normalizeAdvancedVariant(variant: {
       colorCode: normalizeOptionalString(variant.variantAttributes.colorCode),
     },
     real_stock: sanitizeNumber(variant.real_stock, "Variant real stock"),
-    display_stock: sanitizeNumber(variant.display_stock, "Variant display stock"),
     price: sanitizeNumber(variant.price, "Variant price"),
     compareAtPrice: sanitizeOptionalNumber(variant.compareAtPrice, "Variant compare-at price"),
     linkedImageId: variant.linkedImageId,
@@ -1048,7 +1043,6 @@ async function replaceAdvancedProductSkus(
       variantName: variant.variantName,
       variantAttributes: variant.variantAttributes,
       real_stock: variant.real_stock,
-      display_stock: variant.display_stock,
       price: variant.price,
       compareAtPrice: variant.compareAtPrice,
       linkedImageId: variant.linkedImageId,
@@ -1094,7 +1088,6 @@ export const createProduct = mutation({
     images: v.array(v.string()),
     selling_price: v.number(),
     cogs: v.optional(v.number()),
-    display_stock: v.number(),
     real_stock: v.number(),
     status: v.optional(v.union(v.literal("DRAFT"), v.literal("PUBLISHED"))),
     slug: v.optional(v.string()),
@@ -1131,7 +1124,6 @@ export const createProduct = mutation({
       selling_price: sanitizeNumber(args.selling_price, "Selling price"),
       cogs:
         args.cogs !== undefined ? sanitizeNumber(args.cogs, "COGS") : undefined,
-      display_stock: sanitizeNumber(args.display_stock, "Display stock"),
       real_stock: sanitizeNumber(args.real_stock, "Real stock"),
       status: args.status ?? "DRAFT",
       name: name_en,
@@ -1169,7 +1161,6 @@ export const updateProduct = mutation({
     images: v.optional(v.array(v.string())),
     selling_price: v.optional(v.number()),
     cogs: v.optional(v.number()),
-    display_stock: v.optional(v.number()),
     real_stock: v.optional(v.number()),
     status: v.optional(v.union(v.literal("DRAFT"), v.literal("PUBLISHED"))),
     slug: v.optional(v.string()),
@@ -1181,11 +1172,6 @@ export const updateProduct = mutation({
     if (args.real_stock !== undefined) {
       await requirePermission(ctx, "ADJUST_REAL_STOCK");
       sanitizeNumber(args.real_stock, "Real stock");
-    }
-
-    if (args.display_stock !== undefined) {
-      await requirePermission(ctx, "MANAGE_DISPLAY_STOCK");
-      sanitizeNumber(args.display_stock, "Display stock");
     }
 
     const existing = await ctx.db.get(args.id);
@@ -1238,7 +1224,6 @@ export const updateProduct = mutation({
           }
         : {}),
       ...(args.cogs !== undefined ? { cogs: sanitizeNumber(args.cogs, "COGS") } : {}),
-      ...(args.display_stock !== undefined ? { display_stock: args.display_stock } : {}),
       ...(args.real_stock !== undefined ? { real_stock: args.real_stock } : {}),
       ...(args.status !== undefined ? { status: nextStatus } : {}),
       ...(args.isFeatured !== undefined ? { isFeatured: args.isFeatured } : {}),
