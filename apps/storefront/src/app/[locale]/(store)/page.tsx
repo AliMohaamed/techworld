@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Hero from "@/components/storefront/hero";
 import RecentlyViewed from "@/components/storefront/recently-viewed";
 import CategorySection from "@/components/storefront/category-section";
@@ -7,6 +9,13 @@ import NewArrivals from "@/components/storefront/new-arrivals";
 import CustomerReviews from "@/components/storefront/customer-reviews";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@backend/convex/_generated/api";
+
+type PageProps = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  return pageMetadata({ locale, path: "/" });
+}
 
 export default async function StorefrontHomePage() {
   const [products, categoriesResult, deals, newArrivals] = await Promise.all([

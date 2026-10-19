@@ -1,12 +1,10 @@
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { pageMetadata } from "@/lib/seo";
 import { Link } from "@/navigation";
 import SupportHero from "@/components/storefront/support/support-hero";
 import ContactChannels from "@/components/storefront/support/contact-channels";
 import { SUPPORT_EMAIL, SUPPORT_PHONES, SUPPORT_WHATSAPP_DISPLAY } from "@/lib/contact";
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_STOREFRONT_URL || "https://techworldegypt.com";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -35,20 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: t("title"),
     description: t("description"),
-    alternates: {
-      canonical: `${BASE_URL}/${locale}/privacy`,
-      languages: {
-        en: `${BASE_URL}/en/privacy`,
-        ar: `${BASE_URL}/ar/privacy`,
-      },
-    },
-    openGraph: {
-      title: t("title"),
-      description: t("description"),
-      url: `${BASE_URL}/${locale}/privacy`,
-      siteName: "TechWorld",
-      type: "website",
-    },
+    ...pageMetadata({ locale, path: "/privacy", title: t("title"), description: t("description") }),
   };
 }
 

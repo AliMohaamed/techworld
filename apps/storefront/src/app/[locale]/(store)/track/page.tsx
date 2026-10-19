@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
+import { pageMetadata } from "@/lib/seo";
 import { Link } from "@/navigation";
 import SupportHero from "@/components/storefront/support/support-hero";
 import OrderTracker from "@/components/storefront/support/order-tracker";
@@ -8,9 +9,6 @@ import FaqAccordion, {
   FaqItem,
 } from "@/components/storefront/support/faq-accordion";
 import ContactChannels from "@/components/storefront/support/contact-channels";
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_STOREFRONT_URL || "https://techworldegypt.com";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -21,20 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: t("title"),
     description: t("description"),
-    alternates: {
-      canonical: `${BASE_URL}/${locale}/track`,
-      languages: {
-        en: `${BASE_URL}/en/track`,
-        ar: `${BASE_URL}/ar/track`,
-      },
-    },
-    openGraph: {
-      title: t("title"),
-      description: t("description"),
-      url: `${BASE_URL}/${locale}/track`,
-      siteName: "TechWorld",
-      type: "website",
-    },
+    ...pageMetadata({ locale, path: "/track", title: t("title"), description: t("description") }),
     // Lookup results are personal and parameterised; keep them out of indexes.
     robots: { index: true, follow: true, noarchive: true },
   };

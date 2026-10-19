@@ -1,7 +1,16 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { getTranslations } from "next-intl/server";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@backend/convex/_generated/api";
 import CategoryGridCard from "@/components/storefront/category-grid-card";
+
+type PageProps = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  return pageMetadata({ locale, path: "/categories" });
+}
 
 export default async function CategoriesPage() {
   const t = await getTranslations("CategoriesPage");
