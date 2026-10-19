@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ThemeProvider, Toaster } from "@techworld/ui";
 import { MetaPixel } from "@/components/storefront/meta-pixel";
+import { SITE_URL } from "@/lib/seo";
 import "../globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -16,6 +17,7 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Tech World",
   description: "Unified E-Commerce & Operations Engine",
 };

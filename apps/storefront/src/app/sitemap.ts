@@ -1,25 +1,38 @@
 import { MetadataRoute } from 'next';
 import { api } from "@backend/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
+import { LOCALES, localizedUrl } from '@/lib/seo';
 
-const BASE_URL = process.env.NEXT_PUBLIC_STOREFRONT_URL || 'https://techworldegypt.com';
+type Entry = Omit<MetadataRoute.Sitemap[number], 'url' | 'alternates'>;
+
+/** One entry per locale for `path`, each listing its en/ar hreflang siblings. */
+function localizedEntries(path: string, entry: Entry): MetadataRoute.Sitemap {
+  const languages = Object.fromEntries(LOCALES.map((locale) => [locale, localizedUrl(locale, path)]));
+  return LOCALES.map((locale) => ({
+    url: localizedUrl(locale, path),
+    alternates: { languages },
+    ...entry,
+  }));
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const data = await fetchQuery(api.products.getSitemapData);
 
-  const productEntries: MetadataRoute.Sitemap = (data.products || []).map((p) => ({
-    url: `${BASE_URL}/products/${p.slug}`,
-    lastModified: p.lastModified,
-    changeFrequency: 'daily',
-    priority: 0.7,
-  }));
+  const productEntries: MetadataRoute.Sitemap = (data.products || []).flatMap((p) =>
+    localizedEntries(`/products/${p.slug}`, {
+      lastModified: p.lastModified,
+      changeFrequency: 'daily',
+      priority: 0.7,
+    })
+  );
 
-  const categoryEntries: MetadataRoute.Sitemap = (data.categories || []).map((c) => ({
-    url: `${BASE_URL}/categories/${c.slug}`,
-    lastModified: c.lastModified,
-    changeFrequency: 'weekly',
-    priority: 0.6,
-  }));
+  const categoryEntries: MetadataRoute.Sitemap = (data.categories || []).flatMap((c) =>
+    localizedEntries(`/categories/${c.slug}`, {
+      lastModified: c.lastModified,
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    })
+  );
 
   // Support surfaces are static but high-intent; keep them discoverable.
   const supportEntries: MetadataRoute.Sitemap = [
@@ -29,29 +42,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: 'track', priority: 0.5 },
     { path: 'privacy', priority: 0.3 },
   ].flatMap(({ path, priority }) =>
-    ['en', 'ar'].map((locale) => ({
-      url: `${BASE_URL}/${locale}/${path}`,
+    localizedEntries(`/${path}`, {
       lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
+      changeFrequency: 'monthly',
       priority,
-    }))
+    })
   );
 
   // Deals turn over daily, so they get their own crawl cadence.
-  const dealsEntries: MetadataRoute.Sitemap = ['en', 'ar'].map((locale) => ({
-    url: `${BASE_URL}/${locale}/deals`,
+  const dealsEntries = localizedEntries('/deals', {
     lastModified: new Date(),
-    changeFrequency: 'daily' as const,
+    changeFrequency: 'daily',
     priority: 0.8,
-  }));
+  });
 
   return [
-    {
-      url: BASE_URL,
+    ...localizedEntries('/', {
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1,
-    },
+    }),
     ...dealsEntries,
     ...supportEntries,
     ...categoryEntries,

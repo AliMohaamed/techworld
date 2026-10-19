@@ -4,6 +4,7 @@ import { fetchQuery } from "convex/nextjs";
 import { api } from "@backend/convex/_generated/api";
 import DealsExplorer from "@/components/storefront/deals-explorer";
 import { Flame } from "lucide-react";
+import { pageMetadata } from "@/lib/seo";
 
 type DealsPageProps = {
   params: Promise<{ locale: string }>;
@@ -16,11 +17,7 @@ export async function generateMetadata({ params }: DealsPageProps): Promise<Meta
   return {
     title: t("meta.title"),
     description: t("meta.description"),
-    openGraph: {
-      title: t("meta.title"),
-      description: t("meta.description"),
-      type: "website",
-    },
+    ...pageMetadata({ locale, path: "/deals", title: t("meta.title"), description: t("meta.description") }),
   };
 }
 
