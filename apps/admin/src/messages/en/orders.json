@@ -267,7 +267,8 @@
         "title": "Customer",
         "call": "Call",
         "whatsapp": "WhatsApp",
-        "copyAddress": "Copy address"
+        "copyAddress": "Copy address",
+        "addressUnit": "Building {building}, Floor {floor}, Apt {apartment}"
       },
       "activity": {
         "title": "Activity",

@@ -23,10 +23,26 @@ type FormFields = {
   email: string;
   governorateId: Id<"governorates"> | "";
   address: string;
+  buildingNumber: string;
+  floorNumber: string;
+  apartmentNumber: string;
 };
 type FieldErrors = Partial<Record<keyof FormFields, string>>;
 
-const EMPTY_FORM: FormFields = { fullName: "", phone: "", altPhone: "", email: "", governorateId: "", address: "" };
+const EMPTY_FORM: FormFields = {
+  fullName: "",
+  phone: "",
+  altPhone: "",
+  email: "",
+  governorateId: "",
+  address: "",
+  buildingNumber: "",
+  floorNumber: "",
+  apartmentNumber: "",
+};
+
+/** Building, floor and apartment share one row on every screen size. */
+const ADDRESS_UNIT_FIELDS = ["buildingNumber", "floorNumber", "apartmentNumber"] as const;
 
 /**
  * Normalises what Egyptian customers typically type into a local mobile
@@ -178,6 +194,9 @@ export default function CheckoutForm() {
     if (form.email.trim() && !isValidEmail(form.email.trim())) next.email = t("errors.email");
     if (!form.governorateId) next.governorateId = t("errors.governorate");
     if (form.address.trim().length < 10) next.address = t("errors.address");
+    for (const key of ADDRESS_UNIT_FIELDS) {
+      if (!form[key].trim()) next[key] = t("errors.required");
+    }
     return next;
   };
 
@@ -202,6 +221,9 @@ export default function CheckoutForm() {
       email: form.email.trim().toLowerCase(),
       governorateId: form.governorateId,
       address: form.address.trim(),
+      buildingNumber: form.buildingNumber.trim(),
+      floorNumber: form.floorNumber.trim(),
+      apartmentNumber: form.apartmentNumber.trim(),
     };
 
     setSubmitError(null);
@@ -215,6 +237,9 @@ export default function CheckoutForm() {
         customerEmail: details.email || undefined,
         governorateId: details.governorateId as Id<"governorates">,
         customerAddress: details.address,
+        buildingNumber: details.buildingNumber,
+        floorNumber: details.floorNumber,
+        apartmentNumber: details.apartmentNumber,
         promoCode: promoCode || undefined,
         metaAttribution: getMetaAttribution(),
       });
@@ -519,6 +544,28 @@ export default function CheckoutForm() {
               />
               {errorText(errors.address)}
             </div>
+            <div className="grid grid-cols-3 gap-3 sm:col-span-2">
+              {ADDRESS_UNIT_FIELDS.map((key) => (
+                <div key={key} className="min-w-0">
+                  <label htmlFor={`checkout-${key}`} className={cn(labelClass, "truncate")}>
+                    {t(`delivery.${key}`)}
+                  </label>
+                  <input
+                    id={`checkout-${key}`}
+                    type="text"
+                    autoComplete="off"
+                    enterKeyHint="next"
+                    maxLength={20}
+                    placeholder={t(`delivery.${key}Placeholder`)}
+                    aria-invalid={!!errors[key]}
+                    className={cn(inputClass(!!errors[key]), "px-3 text-center")}
+                    value={form[key]}
+                    onChange={(e) => updateField(key, e.target.value)}
+                  />
+                  {errorText(errors[key])}
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -594,6 +641,15 @@ export default function CheckoutForm() {
             <p className="flex items-center justify-center gap-2 text-center text-xs text-label-muted">
               <ShieldCheck size={15} className="flex-shrink-0 text-emerald-500" />
               {t("notice")}
+            </p>
+            <p className="text-center text-xs text-label-muted">
+              {t.rich("privacyNotice", {
+                link: (chunks) => (
+                  <Link href="/privacy" className="font-semibold text-foreground underline underline-offset-2 hover:text-primary">
+                    {chunks}
+                  </Link>
+                ),
+              })}
             </p>
           </div>
         </section>

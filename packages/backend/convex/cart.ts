@@ -370,6 +370,9 @@ export const placeOrderFromSession = mutation({
     customerAltPhone: v.optional(v.string()),
     customerEmail: v.optional(v.string()),
     customerAddress: v.string(),
+    buildingNumber: v.string(),
+    floorNumber: v.string(),
+    apartmentNumber: v.string(),
     governorateId: v.id("governorates"),
     promoCode: v.optional(v.string()),
     metaAttribution: v.optional(metaAttributionValidator),
@@ -393,6 +396,14 @@ export const placeOrderFromSession = mutation({
     }
     if (customerAltPhone && !/^01[0125]\d{8}$/.test(customerAltPhone)) {
       throw new ConvexError({ code: "INVALID_PHONE", message: "Invalid additional phone number." });
+    }
+    const buildingNumber = args.buildingNumber.trim();
+    const floorNumber = args.floorNumber.trim();
+    const apartmentNumber = args.apartmentNumber.trim();
+    for (const part of [buildingNumber, floorNumber, apartmentNumber]) {
+      if (!part || part.length > 20) {
+        throw new ConvexError({ code: "INVALID_ADDRESS", message: "Building, floor and apartment numbers are required." });
+      }
     }
 
     const shortCode = generateShortCode();
@@ -486,6 +497,9 @@ export const placeOrderFromSession = mutation({
         customerAltPhone,
         customerEmail,
         customerAddress: args.customerAddress,
+        buildingNumber,
+        floorNumber,
+        apartmentNumber,
         governorateId: args.governorateId,
         appliedShippingFee: lineShippingFee,
         productId: item.productId,

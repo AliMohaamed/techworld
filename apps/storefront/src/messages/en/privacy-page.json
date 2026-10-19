@@ -1,0 +1,437 @@
+{
+  "PrivacyPage": {
+    "meta": {
+      "title": "Privacy Policy | TechWorld",
+      "description": "What personal data TechWorld collects when you shop with us, how we use it, how we use Meta Pixel and the Conversions API for advertising, and the choices you have."
+    },
+    "hero": {
+      "badge": "Policy",
+      "title": "Privacy",
+      "accent": "Policy",
+      "breadcrumb": "Privacy Policy",
+      "description": "This page explains, in plain language, what information we collect when you visit techworldegypt.com or order from us, why we collect it, who we share it with, including Meta for advertising, and how you can control it."
+    },
+    "lastUpdated": "Last updated: {date}",
+    "effectiveDate": "18 October 2026",
+    "toc": "On this page",
+    "sections": [
+      {
+        "id": "about",
+        "title": "About this policy",
+        "paragraphs": [
+          "TechWorld (\"we\", \"us\") runs the online store at techworldegypt.com and sells electronics and accessories for delivery in Egypt. This policy covers the personal data we handle when you browse the website, place an order, track it, or contact us about it on WhatsApp, by phone or by email.",
+          "You do not need an account to shop with us, and we never ask you for a password. Orders are paid in cash on delivery, so we do not collect bank card details on the website."
+        ]
+      },
+      {
+        "id": "collect",
+        "title": "Information we collect",
+        "paragraphs": [
+          "We collect only what we need to take, deliver and support your order, and to measure our advertising."
+        ],
+        "items": [
+          {
+            "term": "Details you enter at checkout",
+            "text": "Your full name, mobile number, an optional second mobile number, an optional email address, your governorate and your delivery address, plus any promo code you apply."
+          },
+          {
+            "term": "Order details",
+            "text": "The products, quantities, prices, discounts and shipping fee of your order, its order code, and its status history (for example confirmed, shipped, delivered, returned or cancelled)."
+          },
+          {
+            "term": "Messages you send us",
+            "text": "When you contact us on WhatsApp, by phone or by email, we receive your number or address and the content of your messages, including any photos or files you attach, such as a photo of a faulty item. If you ask for a refund, we also receive the mobile wallet or InstaPay details you give us for it."
+          },
+          {
+            "term": "Shopping activity on our servers",
+            "text": "Your cart and saved favourites. These are linked to a random identifier created in your browser, not to your name, until you place an order."
+          },
+          {
+            "term": "Technical details captured at checkout",
+            "text": "Your browser's user-agent string (which describes the browser and device), the page address you ordered from, and the values of the Meta cookies _fbp and _fbc if they are present in your browser. We use these to link the purchase to the ad you came from (see \"Meta Pixel and Conversions API\" below)."
+          },
+          {
+            "term": "Information collected by the Meta Pixel",
+            "text": "Your browsing activity on our site, collected by Meta as described in the next sections."
+          }
+        ]
+      },
+      {
+        "id": "use",
+        "title": "How we use your information",
+        "items": [
+          {
+            "term": "To process and deliver your order",
+            "text": "Confirming your order with you, preparing it, handing your name, phone numbers, address and the amount to collect to the delivery courier, and collecting payment on delivery."
+          },
+          {
+            "term": "To keep you informed",
+            "text": "Sending order confirmations and status updates on WhatsApp, and replying to your questions."
+          },
+          {
+            "term": "To let you track your order",
+            "text": "The tracking page shows your order's status to anyone who enters its order code together with the last four digits of the phone number used for it."
+          },
+          {
+            "term": "For returns, refunds and warranty",
+            "text": "Checking eligibility, arranging pickups, sending refunds and handling warranty claims with manufacturers."
+          },
+          {
+            "term": "To prevent fraud and abuse",
+            "text": "We may keep a list of phone numbers linked to fraudulent orders or repeatedly refused deliveries, and review or decline orders placed from them."
+          },
+          {
+            "term": "To run and improve the website",
+            "text": "Remembering your cart, favourites, recently viewed products, saved checkout details, language and display theme."
+          },
+          {
+            "term": "To measure and improve our advertising",
+            "text": "Using Meta Pixel and the Conversions API, as explained below."
+          },
+          {
+            "term": "To meet legal obligations",
+            "text": "Keeping records required for accounting and tax, and responding to lawful requests from authorities."
+          }
+        ],
+        "after": [
+          "We do not sell your personal data, and we do not use it to make automated decisions that have legal or similarly significant effects on you."
+        ]
+      },
+      {
+        "id": "meta",
+        "title": "Meta Pixel and Conversions API",
+        "paragraphs": [
+          "We advertise on Facebook and Instagram, which are run by Meta Platforms. To learn whether our ads lead to visits and sales, we use two Meta tools: the Meta Pixel in your browser, and the Meta Conversions API on our server."
+        ],
+        "items": [
+          {
+            "term": "Meta Pixel (in your browser)",
+            "text": "A piece of code from Meta that runs on our pages. It tells Meta when you view a page, view a product, add an item to your cart and start checkout, along with the product IDs, quantities, prices and currency involved. Like any content loaded from Meta's servers, it also gives Meta the information your browser sends automatically: your IP address, browser and device details, the page address, and cookie identifiers such as _fbp and _fbc. If you are logged in to Facebook or Instagram in the same browser, Meta may link this activity to your account. We do not send your name, phone number or address through the Pixel."
+          },
+          {
+            "term": "Conversions API (from our server)",
+            "text": "A purchase on our store is only complete once it is delivered and paid for in cash, so we do not report it from your browser. When our team marks your order as delivered, our server sends Meta one \"Purchase\" event containing the order reference, the time, the order value (products after discounts, excluding shipping), the currency, and the product IDs and quantities."
+          },
+          {
+            "term": "Information sent to help Meta match the purchase",
+            "text": "With that Purchase event, our server also sends your phone number(s), your email address (if you gave one), your first and last name, your governorate and your country. Each of these is hashed (converted with SHA-256 into a fixed code that cannot be read back) before it leaves our server. We also send the _fbp and _fbc cookie values and the browser user-agent captured when you checked out. We do not send your street address, your IP address or the content of your messages."
+          }
+        ],
+        "after": [
+          "Hashing means Meta receives a code rather than your readable details. Meta compares that code with codes it creates from the details of its own users to find a match. Hashed data can still identify you to Meta, so we treat it as personal data.",
+          "We do not report purchases from phone numbers on our fraud list.",
+          "Meta processes the data it receives according to its own terms and Privacy Policy, and for some purposes, such as improving its own systems, Meta decides independently how that data is used."
+        ],
+        "links": [
+          {
+            "label": "Meta Privacy Policy",
+            "href": "https://www.facebook.com/privacy/policy/"
+          },
+          {
+            "label": "Meta Cookies Policy",
+            "href": "https://www.facebook.com/privacy/policies/cookies/"
+          }
+        ]
+      },
+      {
+        "id": "advertising",
+        "title": "Advertising: measurement, optimisation and retargeting",
+        "paragraphs": [
+          "We use the data collected through Meta Pixel and the Conversions API for measurement and optimisation, and we may also use it for retargeting and similar audiences:"
+        ],
+        "items": [
+          {
+            "term": "Measurement",
+            "text": "Counting how many visits, carts, checkouts and delivered orders came from our ads, and what they were worth."
+          },
+          {
+            "term": "Optimisation",
+            "text": "Letting Meta show our ads to people who are more likely to be interested in them, based on the actions of people who have bought from us before."
+          },
+          {
+            "term": "Retargeting",
+            "text": "Showing our ads on Facebook and Instagram to people who have visited our website, viewed a product or added something to their cart."
+          },
+          {
+            "term": "Similar audiences",
+            "text": "Asking Meta to find other people with interests similar to those of our visitors and customers."
+          }
+        ],
+        "after": [
+          "Meta does not share with us who you are or which of our ads you personally saw. We only see aggregated reports, such as the number of purchases attributed to a campaign. We do not currently use any other advertising or analytics service on this website."
+        ]
+      },
+      {
+        "id": "cookies",
+        "title": "Cookies and similar technologies",
+        "paragraphs": [
+          "Cookies are small text files stored by your browser. \"Local storage\" is a similar feature that keeps data in your browser and is not sent to any server by itself. The table below lists the ones this website uses."
+        ],
+        "after": [
+          "Necessary items keep the store working and stay in your browser. Advertising cookies are used by Meta as described above.",
+          "You can delete cookies and local storage at any time through your browser settings, and you can block third-party cookies or use an ad or tracker blocker to stop the Meta Pixel from loading. The store will still work, but your cart may be emptied and your saved details forgotten."
+        ]
+      },
+      {
+        "id": "sharing",
+        "title": "Who we share your information with",
+        "items": [
+          {
+            "term": "Meta Platforms",
+            "text": "For advertising, as described above."
+          },
+          {
+            "term": "Delivery couriers",
+            "text": "Your name, phone number(s), governorate and address, and the amount to collect, so they can deliver your order and collect payment."
+          },
+          {
+            "term": "Messaging providers",
+            "text": "We send order messages on WhatsApp, which is owned by Meta, through Green API, a third-party service that connects our WhatsApp number to our order system. Both receive your phone number and the content of those messages."
+          },
+          {
+            "term": "Hosting and technology providers",
+            "text": "The companies that host our website, database and files, which process data only to provide those services to us."
+          },
+          {
+            "term": "Authorities",
+            "text": "When the law requires it, or when it is needed to protect our rights or prevent fraud."
+          },
+          {
+            "term": "A future owner",
+            "text": "If our business is sold or merged, customer records may move to the new owner under the same protections."
+          }
+        ]
+      },
+      {
+        "id": "transfers",
+        "title": "Data stored outside Egypt",
+        "paragraphs": [
+          "Meta and some of our hosting and technology providers store and process data on servers outside Egypt, including in the United States and the European Union. When your data is transferred outside Egypt, we rely on these providers' contractual commitments and security measures to protect it."
+        ]
+      },
+      {
+        "id": "retention",
+        "title": "How long we keep your information",
+        "items": [
+          {
+            "term": "Orders and customer details",
+            "text": "Kept for as long as we need them to deliver your order, handle returns, refunds and warranty claims, and meet our accounting and tax obligations."
+          },
+          {
+            "term": "Messages",
+            "text": "Kept for as long as we need them to resolve your request and any related order."
+          },
+          {
+            "term": "Cart and favourites",
+            "text": "Stored on our servers under your browser's random identifier. They are not linked to your name unless you place an order."
+          },
+          {
+            "term": "Fraud list",
+            "text": "A phone number stays on the list until we review and remove it."
+          },
+          {
+            "term": "Records of Purchase events sent to Meta",
+            "text": "We keep a log of each event (order reference, value, products and whether it was sent), without your contact details, so that we never report the same purchase twice."
+          },
+          {
+            "term": "Data held by Meta",
+            "text": "Retained under Meta's own policies."
+          },
+          {
+            "term": "In your browser",
+            "text": "Cookies and local storage last for the periods shown in the table above, or until you clear them."
+          }
+        ],
+        "after": [
+          "When we no longer need personal data, we delete it or anonymise it."
+        ]
+      },
+      {
+        "id": "rights",
+        "title": "Your privacy rights",
+        "paragraphs": [
+          "Under Egypt's Personal Data Protection Law (Law No. 151 of 2020), and the laws of other countries where they apply to you, you can ask us to:"
+        ],
+        "items": [
+          {
+            "term": "Access",
+            "text": "Tell you what personal data we hold about you and give you a copy."
+          },
+          {
+            "term": "Correct",
+            "text": "Fix details that are wrong or incomplete."
+          },
+          {
+            "term": "Delete",
+            "text": "Erase your personal data, except where we must keep it for legal, accounting or warranty reasons."
+          },
+          {
+            "term": "Object or restrict",
+            "text": "Stop or limit a use of your data, including its use for advertising."
+          },
+          {
+            "term": "Withdraw consent",
+            "text": "Where we rely on your consent, withdraw it at any time. This does not affect anything we did before."
+          }
+        ],
+        "after": [
+          "To make a request, contact us using the details at the bottom of this page. To protect your data, we may ask you to confirm your order code or to message us from the phone number used for the order. We will reply as soon as possible and within the time the law requires.",
+          "We cannot delete data that Meta already holds, but you can manage it directly with Meta (see the next section).",
+          "If you are not satisfied with our answer, you can complain to Egypt's Personal Data Protection Center or to the data protection authority in your country."
+        ]
+      },
+      {
+        "id": "opt-out",
+        "title": "Your choices and how to opt out",
+        "items": [
+          {
+            "term": "Block or clear cookies",
+            "text": "Use your browser's settings to block third-party cookies or delete cookies, or browse in a private window. An ad or tracker blocker will also stop the Meta Pixel."
+          },
+          {
+            "term": "Ad preferences on Facebook and Instagram",
+            "text": "In Meta's Accounts Center, under \"Ad preferences\", you can control how your activity is used to show you ads."
+          },
+          {
+            "term": "Your activity off Meta technologies",
+            "text": "In Meta's Accounts Center you can see the activity that websites such as ours have shared with Meta, disconnect it from your account, and turn off future activity."
+          },
+          {
+            "term": "Industry opt-out tools",
+            "text": "Meta takes part in the Digital Advertising Alliance (US) and the European Interactive Digital Advertising Alliance programmes, whose sites let you opt out of interest-based ads."
+          },
+          {
+            "term": "Ask us",
+            "text": "Contact us if you object to your purchase information being shared with Meta, and we will handle your request as described in \"Your privacy rights\"."
+          }
+        ],
+        "links": [
+          {
+            "label": "Meta ad preferences",
+            "href": "https://accountscenter.facebook.com/ad_preferences"
+          },
+          {
+            "label": "Your activity off Meta technologies",
+            "href": "https://accountscenter.facebook.com/info_and_permissions/off_facebook_activity"
+          },
+          {
+            "label": "YourAdChoices (US)",
+            "href": "https://optout.aboutads.info/"
+          },
+          {
+            "label": "Your Online Choices (EU)",
+            "href": "https://www.youronlinechoices.eu/"
+          }
+        ]
+      },
+      {
+        "id": "security",
+        "title": "How we protect your information",
+        "paragraphs": [
+          "The website is served over an encrypted (HTTPS) connection. Only staff whose role requires it can see order and customer details, and changes they make to orders are logged. Contact details are hashed before they are sent to Meta.",
+          "No method of transmission or storage is completely secure, so we cannot guarantee absolute security. If a breach affects your personal data, we will notify you and the authorities as the law requires."
+        ]
+      },
+      {
+        "id": "children",
+        "title": "Children",
+        "paragraphs": [
+          "Our store is not intended for children under 18, and we do not knowingly collect their personal data. If you believe a child has placed an order or sent us their details, contact us and we will delete the data that we are not required to keep."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Changes to this policy",
+        "paragraphs": [
+          "We will update this policy when our practices or the law change. The date at the top of the page shows when it was last revised. If a change significantly affects how we use your data, we will make it clear on this page before it takes effect."
+        ]
+      },
+      {
+        "id": "contact",
+        "title": "Contact us",
+        "paragraphs": [
+          "For any question about this policy or your personal data, or to make a privacy request, contact TechWorld:"
+        ]
+      }
+    ],
+    "cookies": {
+      "caption": "Cookies and browser storage used on this website",
+      "columns": {
+        "name": "Name",
+        "provider": "Set by",
+        "purpose": "Purpose",
+        "type": "Type",
+        "duration": "Duration"
+      },
+      "rows": [
+        {
+          "name": "_fbp",
+          "provider": "Meta (via our site)",
+          "purpose": "Identifies your browser to Meta, so it can measure visits and purchases and deliver our ads.",
+          "type": "Advertising cookie",
+          "duration": "90 days"
+        },
+        {
+          "name": "_fbc",
+          "provider": "Meta (via our site)",
+          "purpose": "Stores the ad-click identifier when you arrive from a Meta ad, so the visit can be linked to that ad.",
+          "type": "Advertising cookie",
+          "duration": "90 days"
+        },
+        {
+          "name": "Meta cookies on facebook.com",
+          "provider": "Meta",
+          "purpose": "If you are logged in to Facebook or Instagram, Meta may read its own cookies when the Pixel loads, to connect activity to your account.",
+          "type": "Third-party advertising cookie",
+          "duration": "See Meta's Cookies Policy"
+        },
+        {
+          "name": "NEXT_LOCALE",
+          "provider": "TechWorld",
+          "purpose": "Remembers the language you chose (English or Arabic).",
+          "type": "Necessary cookie",
+          "duration": "Until you close the browser"
+        },
+        {
+          "name": "store_session_id",
+          "provider": "TechWorld",
+          "purpose": "A random identifier that links your cart and favourites to your browser. It does not contain your name or contact details.",
+          "type": "Necessary local storage",
+          "duration": "Until you clear browser data"
+        },
+        {
+          "name": "tw-checkout-details",
+          "provider": "TechWorld",
+          "purpose": "Saves the delivery details from your last order on your device so you do not have to type them again. Stays on your device.",
+          "type": "Functional local storage",
+          "duration": "Until you clear browser data"
+        },
+        {
+          "name": "techworld:recently-viewed",
+          "provider": "TechWorld",
+          "purpose": "Remembers the products you viewed recently on your device.",
+          "type": "Functional local storage",
+          "duration": "Until you clear browser data"
+        },
+        {
+          "name": "theme",
+          "provider": "TechWorld",
+          "purpose": "Remembers whether you chose the light or dark display theme.",
+          "type": "Functional local storage",
+          "duration": "Until you clear browser data"
+        }
+      ]
+    },
+    "contactDetails": {
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "phone": "Phone"
+    },
+    "related": {
+      "text": "Related policies:",
+      "returns": "Returns & Refunds",
+      "shipping": "Shipping Info"
+    },
+    "prefilledMessage": "Hi TechWorld, I have a question about my personal data / privacy."
+  }
+}

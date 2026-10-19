@@ -32,7 +32,13 @@
       "governorate": "Governorate",
       "governoratePlaceholder": "Choose your governorate",
       "address": "Detailed address",
-      "addressPlaceholder": "Area, street, building no., floor, apartment, nearby landmark"
+      "addressPlaceholder": "Area, street, building no., floor, apartment, nearby landmark",
+      "buildingNumber": "Building no.",
+      "buildingNumberPlaceholder": "e.g. 12",
+      "floorNumber": "Floor",
+      "floorNumberPlaceholder": "e.g. 3",
+      "apartmentNumber": "Apartment",
+      "apartmentNumberPlaceholder": "e.g. 7"
     },
     "promo": {
       "toggle": "Have a promo code?",
@@ -56,6 +62,7 @@
       "email": "Enter a valid email address, e.g. name@example.com",
       "governorate": "Please choose your governorate",
       "address": "Please add more address details so the courier can find you",
+      "required": "Required",
       "placeOrderFailed": "We couldn't place your order. Please check your details and try again.",
       "noGovernorates": "Delivery is currently unavailable because no active governorates are configured."
     },
@@ -63,6 +70,7 @@
       "confirm": "Place order",
       "placing": "Placing order..."
     },
-    "notice": "We'll send your order confirmation on WhatsApp."
+    "notice": "We'll send your order confirmation on WhatsApp.",
+    "privacyNotice": "See how we use your details in our <link>Privacy Policy</link>."
   }
 }

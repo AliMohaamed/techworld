@@ -120,9 +120,9 @@ export default async function Footer() {
           </p>
           <div className="flex items-center gap-6 flex-wrap justify-center">
             {[
-              { key: 'privacy', href: '/' },
+              { key: 'privacy', href: '/privacy' },
               { key: 'terms', href: '/' },
-              { key: 'cookieSettings', href: '/' }
+              { key: 'cookieSettings', href: '/privacy#cookies' }
             ].map((item) => (
               <Link key={item.key} href={item.href} className="text-label-muted text-xs font-medium hover:text-foreground transition-colors">{t(`links.${item.key}`)}</Link>
             ))}

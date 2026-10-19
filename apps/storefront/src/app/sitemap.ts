@@ -27,6 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: 'shipping', priority: 0.5 },
     { path: 'returns', priority: 0.5 },
     { path: 'track', priority: 0.5 },
+    { path: 'privacy', priority: 0.3 },
   ].flatMap(({ path, priority }) =>
     ['en', 'ar'].map((locale) => ({
       url: `${BASE_URL}/${locale}/${path}`,

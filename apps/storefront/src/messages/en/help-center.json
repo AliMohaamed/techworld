@@ -54,8 +54,8 @@
           "id": "privacy",
           "title": "Privacy & security",
           "description": "What we store, who can see your order, and how we protect your details.",
-          "href": "/support#help-answers",
-          "cta": "See privacy answers"
+          "href": "/privacy",
+          "cta": "Read the privacy policy"
         }
       ]
     },
@@ -184,7 +184,7 @@
         "faqs": [
           {
             "question": "What details do you store about me?",
-            "answer": "Only what an order needs: your name, phone number, delivery address and governorate, plus the order itself. There are no customer accounts and no passwords to lose."
+            "answer": "What an order needs: your name, phone number(s), optional email, delivery address and governorate, plus the order itself. There are no customer accounts and no passwords to lose. We also use Meta Pixel and the Conversions API to measure our Facebook and Instagram ads; our Privacy Policy explains exactly what is shared and how to opt out."
           },
           {
             "question": "Can someone else look up my order with just the code?",

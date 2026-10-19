@@ -538,6 +538,9 @@ export const addLineToOrder = internalMutation({
       customerAltPhone: existing.customerAltPhone,
       customerEmail: existing.customerEmail,
       customerAddress: existing.customerAddress,
+      buildingNumber: existing.buildingNumber,
+      floorNumber: existing.floorNumber,
+      apartmentNumber: existing.apartmentNumber,
       governorateId: existing.governorateId,
       // Shipping was already charged on the original line.
       appliedShippingFee: 0,

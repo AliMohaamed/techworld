@@ -32,7 +32,13 @@
       "governorate": "المحافظة",
       "governoratePlaceholder": "اختر محافظتك",
       "address": "العنوان بالتفصيل",
-      "addressPlaceholder": "المنطقة، الشارع، رقم العمارة، الدور، الشقة، علامة مميزة"
+      "addressPlaceholder": "المنطقة، الشارع، رقم العمارة، الدور، الشقة، علامة مميزة",
+      "buildingNumber": "رقم العمارة",
+      "buildingNumberPlaceholder": "مثال: 12",
+      "floorNumber": "الدور",
+      "floorNumberPlaceholder": "مثال: 3",
+      "apartmentNumber": "رقم الشقة",
+      "apartmentNumberPlaceholder": "مثال: 7"
     },
     "promo": {
       "toggle": "عندك كود خصم؟",
@@ -56,6 +62,7 @@
       "email": "اكتب بريد إلكتروني صحيح، مثال: name@example.com",
       "governorate": "من فضلك اختر محافظتك",
       "address": "من فضلك اكتب العنوان بتفاصيل أكثر عشان المندوب يوصلك",
+      "required": "مطلوب",
       "placeOrderFailed": "لم نتمكن من إتمام طلبك. راجع بياناتك وحاول مرة أخرى.",
       "noGovernorates": "التوصيل غير متاح حالياً لعدم وجود محافظات نشطة."
     },
@@ -63,6 +70,7 @@
       "confirm": "تأكيد الطلب",
       "placing": "جاري تأكيد الطلب..."
     },
-    "notice": "هنبعتلك تأكيد الطلب على واتساب."
+    "notice": "هنبعتلك تأكيد الطلب على واتساب.",
+    "privacyNotice": "اعرف إزاي بنستخدم بياناتك في <link>سياسة الخصوصية</link>."
   }
 }

@@ -267,7 +267,8 @@
         "title": "العميل",
         "call": "اتصال",
         "whatsapp": "واتساب",
-        "copyAddress": "نسخ العنوان"
+        "copyAddress": "نسخ العنوان",
+        "addressUnit": "عمارة {building}، الدور {floor}، شقة {apartment}"
       },
       "activity": {
         "title": "النشاط",

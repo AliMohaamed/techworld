@@ -160,6 +160,15 @@ export default function OrderDetailsPage() {
       ? order.governorate.name_ar
       : order.governorate.name_en
     : null;
+  // Orders placed before these fields existed only have the free-text address.
+  const addressUnit =
+    order.buildingNumber && order.floorNumber && order.apartmentNumber
+      ? t("customer.addressUnit", {
+          building: order.buildingNumber,
+          floor: order.floorNumber,
+          apartment: order.apartmentNumber,
+        })
+      : null;
 
   const placedAt = new Intl.DateTimeFormat(locale, { dateStyle: "full", timeStyle: "short" }).format(
     order._creationTime,
@@ -845,13 +854,19 @@ export default function OrderDetailsPage() {
                     {governorateName && <span className="font-bold">{governorateName}</span>}
                     {governorateName && order.customerAddress && <br />}
                     {order.customerAddress ?? (!governorateName && t("notProvided"))}
+                    {addressUnit && (
+                      <>
+                        <br />
+                        {addressUnit}
+                      </>
+                    )}
                   </span>
                   {(order.customerAddress || governorateName) && (
                     <button
                       type="button"
                       onClick={() =>
                         copy(
-                          [order.customerAddress, governorateName].filter(Boolean).join(", "),
+                          [order.customerAddress, addressUnit, governorateName].filter(Boolean).join(", "),
                           t("cards.address"),
                         )
                       }
