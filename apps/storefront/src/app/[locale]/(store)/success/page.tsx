@@ -4,20 +4,45 @@ import { useSearchParams } from "next/navigation";
 import { CheckCircle2, MessageSquare, ArrowRight, Package, Truck, ShieldCheck } from "lucide-react";
 import { Link } from "@/navigation";
 import { Suspense, useEffect } from "react";
+import { useConvex } from "convex/react";
 import { useTranslations, useLocale } from "next-intl";
+import { api } from "@backend/convex/_generated/api";
 import { whatsappLink } from "@/lib/contact";
-import { trackPendingPurchase } from "@/lib/meta-pixel";
+import { productEventParams, takePendingPurchase, trackMetaEvent } from "@/lib/meta-pixel";
+import { useSession } from "@/providers/session-provider";
+
+/**
+ * Sends the browser Purchase once, from the tab that just placed the order,
+ * with the value and event id read from the stored order, so it matches the
+ * Conversions API copy and Meta deduplicates the two.
+ */
+function usePurchaseEvent(shortCode: string) {
+  const convex = useConvex();
+  const { sessionId } = useSession();
+
+  useEffect(() => {
+    // The marker is consumed here, so StrictMode's second run (or any later
+    // render) does nothing, and the request is deliberately not cancelled.
+    if (!shortCode || !sessionId || !takePendingPurchase(shortCode)) return;
+    convex
+      .query(api.cart.getPurchaseSummary, { sessionId, shortCode })
+      .then((summary) => {
+        if (summary) {
+          trackMetaEvent("Purchase", productEventParams(summary.contents, summary.value), summary.eventId);
+        }
+      })
+      .catch(() => {
+        // The Conversions API copy still reports the sale.
+      });
+  }, [convex, sessionId, shortCode]);
+}
 
 function SuccessContent() {
   const t = useTranslations('SuccessPage');
   const locale = useLocale();
   const searchParams = useSearchParams();
   const shortCode = searchParams.get("code") || "";
-
-  // Reports the Purchase only when this tab just placed this order (see trackPendingPurchase).
-  useEffect(() => {
-    if (shortCode) trackPendingPurchase(shortCode);
-  }, [shortCode]);
+  usePurchaseEvent(shortCode);
 
   const generateWhatsAppLink = () => {
     if (!shortCode) return "#";

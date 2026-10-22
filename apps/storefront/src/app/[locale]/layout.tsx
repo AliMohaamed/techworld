@@ -16,10 +16,16 @@ const cairo = Cairo({
   subsets: ["arabic", "latin"],
 });
 
+// The code Meta Business Settings > Brand safety > Domains gives for the meta-tag method.
+const FB_DOMAIN_VERIFICATION = process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION?.trim();
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Tech World",
   description: "Unified E-Commerce & Operations Engine",
+  ...(FB_DOMAIN_VERIFICATION && {
+    other: { "facebook-domain-verification": FB_DOMAIN_VERIFICATION },
+  }),
 };
 
 export default async function RootLayout({

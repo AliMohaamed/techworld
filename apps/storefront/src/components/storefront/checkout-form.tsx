@@ -6,7 +6,7 @@ import Image from "next/image";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
-import { getMetaAttribution, productEventParams, savePendingPurchase, trackMetaEvent } from "@/lib/meta-pixel";
+import { getMetaAttribution, markPurchasePending, productEventParams, trackMetaEvent } from "@/lib/meta-pixel";
 import { ChevronLeft, ChevronDown, Loader2, Minus, Plus, ShieldCheck, ShoppingBag, Trash2 } from "lucide-react";
 import { Link, useRouter } from "@/navigation";
 import { useTranslations, useLocale } from "next-intl";
@@ -250,10 +250,9 @@ export default function CheckoutForm() {
         floorNumber: details.floorNumber,
         apartmentNumber: details.apartmentNumber,
         promoCode: promoCode || undefined,
-        metaAttribution: getMetaAttribution(),
+        metaAttribution: await getMetaAttribution(),
       });
-      // Value matches the server's Purchase: products after the promo discount, without shipping.
-      savePendingPurchase({ shortCode, contents: metaContents(cart.items), value: cart.total });
+      markPurchasePending(shortCode);
       try {
         window.localStorage.setItem(SAVED_DETAILS_KEY, JSON.stringify(details));
       } catch {

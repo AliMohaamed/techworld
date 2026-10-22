@@ -3,6 +3,7 @@ import { internalMutation, mutation, query, QueryCtx } from "./_generated/server
 import { requirePermission } from "./lib/rbac";
 import { hasPermission } from "./lib/permissions";
 import { canTransition, statusChangePermission } from "./lib/orderTransitions";
+import { queueMetaOrderDelivered } from "./lib/metaConversions";
 import { scheduleAuditLog, writeAuditLog } from "./lib/audit";
 import { Doc, Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
@@ -681,8 +682,8 @@ export const updateGenericStatus = mutation({
     );
 
     // CONFIRMED is the mandatory gateway into fulfilment: an unconfirmed order can be
-    // cancelled or flagged, but never made ready, shipped or delivered. Delivery is the
-    // sale (reported to Meta); Ready and Shipped may be skipped once confirmed.
+    // cancelled or flagged, but never made ready, shipped or delivered. Ready and
+    // Shipped may be skipped once confirmed.
     if (!canTransition(lines.map((line) => line.state), args.newState)) {
       throw new ConvexError({
         code: "INVALID_TRANSITION",
@@ -732,6 +733,11 @@ export const updateGenericStatus = mutation({
           manualReceiptId: line._id === args.orderId ? args.manualReceiptId : undefined,
         },
       });
+    }
+
+    // Delivered revenue for Meta reporting; the Purchase itself was sent at checkout.
+    if (args.newState === "DELIVERED") {
+      await queueMetaOrderDelivered(ctx, { order, lines, actorId: actor._id });
     }
 
     if (order.customerPhone && order.shortCode) {
