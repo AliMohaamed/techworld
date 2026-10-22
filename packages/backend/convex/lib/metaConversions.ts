@@ -2,28 +2,25 @@ import { MutationCtx } from "../_generated/server";
 import { Doc, Id } from "../_generated/dataModel";
 import { internal } from "../_generated/api";
 import { writeAuditLog } from "./audit";
-import { canDeliverFrom } from "./orderTransitions";
 
 export const META_CURRENCY = "EGP";
 
 /** Meta rejects events whose event_time is more than 7 days in the past. */
 export const META_EVENT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
-type OrderState = Doc<"orders">["state"];
-
 export function purchaseEventId(order: Doc<"orders">) {
   return `purchase-${order.shortCode ?? order._id}`;
 }
 
 /**
- * Queues the Meta `Purchase` for a customer order the moment it is delivered
- * and the cash balance collected. Call it from every mutation that can move an
- * order into DELIVERED; it is a no-op for any other transition.
+ * Queues the server-side Meta `Purchase` for a checkout, called once by
+ * placeOrderFromSession after every line is inserted. The storefront fires the
+ * browser Purchase on the success page with the same event id, so Meta counts
+ * the sale once even when both arrive.
  *
  * - Value is the product total after discounts; shipping is excluded.
  * - A checkout is several order rows sharing a short code, so the event is
- *   keyed on the short code and recorded at most once, even if the order is
- *   later moved back and delivered again.
+ *   keyed on the short code and recorded at most once.
  * - Orders from blacklisted phone numbers are never reported.
  */
 export async function queueMetaPurchase(
@@ -31,19 +28,10 @@ export async function queueMetaPurchase(
   args: {
     order: Doc<"orders">;
     lines: Doc<"orders">[];
-    fromState: OrderState;
-    toState: OrderState;
     actorId?: Id<"users">;
   },
 ) {
-  const { order, lines, fromState, toState } = args;
-  // Customers pay a deposit that staff verify (CONFIRMED) and the balance in cash
-  // on delivery, so the sale is only complete at DELIVERED, and only for confirmed
-  // orders. updateGenericStatus already rejects any other route; this is a backstop.
-  if (toState !== "DELIVERED" || !canDeliverFrom(lines.map((line) => line.state))) {
-    return;
-  }
-
+  const { order, lines } = args;
   const eventId = purchaseEventId(order);
   const existing = await ctx.db
     .query("meta_events")
@@ -101,7 +89,7 @@ export async function queueMetaPurchase(
     userId: args.actorId,
     entityId: String(order._id),
     actionType: "META_PURCHASE_QUEUED",
-    changes: { eventId, value, currency: META_CURRENCY, from: fromState, to: toState },
+    changes: { eventId, value, currency: META_CURRENCY, trigger: "CHECKOUT" },
   });
 
   await ctx.scheduler.runAfter(0, internal.metaConversions.sendEvent, { metaEventId });

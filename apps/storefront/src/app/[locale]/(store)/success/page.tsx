@@ -3,15 +3,21 @@
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, MessageSquare, ArrowRight, Package, Truck, ShieldCheck } from "lucide-react";
 import { Link } from "@/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { whatsappLink } from "@/lib/contact";
+import { trackPendingPurchase } from "@/lib/meta-pixel";
 
 function SuccessContent() {
   const t = useTranslations('SuccessPage');
   const locale = useLocale();
   const searchParams = useSearchParams();
   const shortCode = searchParams.get("code") || "";
+
+  // Reports the Purchase only when this tab just placed this order (see trackPendingPurchase).
+  useEffect(() => {
+    if (shortCode) trackPendingPurchase(shortCode);
+  }, [shortCode]);
 
   const generateWhatsAppLink = () => {
     if (!shortCode) return "#";

@@ -6,7 +6,7 @@ import Image from "next/image";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
-import { getMetaAttribution, productEventParams, trackMetaEvent } from "@/lib/meta-pixel";
+import { getMetaAttribution, productEventParams, savePendingPurchase, trackMetaEvent } from "@/lib/meta-pixel";
 import { ChevronLeft, ChevronDown, Loader2, Minus, Plus, ShieldCheck, ShoppingBag, Trash2 } from "lucide-react";
 import { Link, useRouter } from "@/navigation";
 import { useTranslations, useLocale } from "next-intl";
@@ -15,6 +15,20 @@ import { ColorSwatch, PromoCodeInput, cn, getColorDisplayName } from "@techworld
 
 /** Remembers delivery details on this device so repeat customers don't retype them. */
 const SAVED_DETAILS_KEY = "tw-checkout-details";
+
+type MetaCartItem = {
+  productId: string;
+  quantity: number;
+  sku?: { price?: number } | null;
+  product?: { selling_price?: number } | null;
+};
+
+const metaContents = (items: MetaCartItem[]) =>
+  items.map((item) => ({
+    id: item.productId,
+    quantity: item.quantity,
+    item_price: item.sku?.price || item.product?.selling_price || 0,
+  }));
 
 type FormFields = {
   fullName: string;
@@ -101,12 +115,7 @@ export default function CheckoutForm() {
   useEffect(() => {
     if (!cart || cart.items.length === 0 || initiateCheckoutSent.current) return;
     initiateCheckoutSent.current = true;
-    const contents = cart.items.map((item) => ({
-      id: item.productId,
-      quantity: item.quantity,
-      item_price: item.sku?.price || item.product?.selling_price || 0,
-    }));
-    trackMetaEvent("InitiateCheckout", productEventParams(contents, cart.total));
+    trackMetaEvent("InitiateCheckout", productEventParams(metaContents(cart.items), cart.total));
   }, [cart]);
 
   // Mobile shows a fixed CTA bar until the in-page button scrolls into view.
@@ -243,6 +252,8 @@ export default function CheckoutForm() {
         promoCode: promoCode || undefined,
         metaAttribution: getMetaAttribution(),
       });
+      // Value matches the server's Purchase: products after the promo discount, without shipping.
+      savePendingPurchase({ shortCode, contents: metaContents(cart.items), value: cart.total });
       try {
         window.localStorage.setItem(SAVED_DETAILS_KEY, JSON.stringify(details));
       } catch {

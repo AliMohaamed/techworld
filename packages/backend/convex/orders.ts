@@ -8,7 +8,6 @@ import { Doc, Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import { orderStateValidator } from "./schema";
 import { resolveRef } from "./lib/storageRef";
-import { queueMetaPurchase } from "./lib/metaConversions";
 
 async function getOrderOrThrow(ctx: { db: { get: (id: Id<"orders">) => Promise<Doc<"orders"> | null> } }, orderId: Id<"orders">) {
   const order = await ctx.db.get(orderId);
@@ -734,16 +733,6 @@ export const updateGenericStatus = mutation({
         },
       });
     }
-
-    // Reports the Meta Purchase on delivery (the only path that can deliver an order).
-    // Every line moved to the new state together, so all of them form the purchase.
-    await queueMetaPurchase(ctx, {
-      order,
-      lines,
-      fromState: order.state,
-      toState: args.newState,
-      actorId: actor._id,
-    });
 
     if (order.customerPhone && order.shortCode) {
       const totals = sumOrderLines(lines);

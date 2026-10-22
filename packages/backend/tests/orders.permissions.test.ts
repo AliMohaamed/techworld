@@ -254,39 +254,9 @@ async function confirmAndShip(admin: Awaited<ReturnType<typeof asStaff>>, orderI
   }
 }
 
-describe("Meta Purchase is queued only when a deposit-paid order is delivered", () => {
-  test("delivery queues exactly one Purchase for the whole order", async () => {
-    const t = setupConvex();
-    const { firstLineId, productId } = await seedOrder(t);
-    const verifier = await asStaff(t, "verifier", ["VIEW_ORDERS", "VERIFY_PAYMENTS"]);
-    await confirmAndShip(verifier, firstLineId);
-    expect((await readState(t)).metaEvents).toHaveLength(0); // confirmed and shipped: not yet a sale
-
-    await verifier.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" });
-
-    const { metaEvents } = await readState(t);
-    expect(metaEvents).toHaveLength(1);
-    expect(metaEvents[0]).toMatchObject({
-      eventId: `purchase-${SHORT_CODE}`,
-      value: 1500, // products after discount; the 50 EGP shipping is excluded
-      currency: "EGP",
-      status: "PENDING",
-      contents: [{ id: productId, quantity: 3, item_price: 500 }],
-    });
-  });
-
-  test("a fulfilment-only user (VIEW_ORDERS) delivering a confirmed order also queues it", async () => {
-    const t = setupConvex();
-    const { firstLineId } = await seedOrder(t, "SHIPPED");
-    const viewer = await asStaff(t, "viewer", ["VIEW_ORDERS"]);
-
-    await viewer.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" });
-
-    expect((await readState(t)).metaEvents).toHaveLength(1);
-  });
-
+describe("delivery workflow: CONFIRMED is mandatory, later steps may be skipped", () => {
   test.each(["CONFIRMED", "READY_FOR_SHIPPING"] as const)(
-    "delivering straight from %s (skipped steps) still queues the Purchase",
+    "delivering straight from %s (skipped steps) is allowed",
     async (from) => {
       const t = setupConvex();
       const { firstLineId } = await seedOrder(t);
@@ -299,11 +269,9 @@ describe("Meta Purchase is queued only when a deposit-paid order is delivered", 
 
       await viewer.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" });
 
-      const { lines, skus, metaEvents } = await readState(t);
+      const { lines, skus } = await readState(t);
       expect(lines.map((l) => l.state)).toEqual(["DELIVERED", "DELIVERED"]);
       expect(skus.map((s) => s.real_stock)).toEqual([8, 9]); // deducted once, at confirmation
-      expect(metaEvents).toHaveLength(1);
-      expect(metaEvents[0]).toMatchObject({ value: 1500, currency: "EGP" });
     },
   );
 
@@ -318,10 +286,9 @@ describe("Meta Purchase is queued only when a deposit-paid order is delivered", 
         admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" }),
       ).rejects.toThrow(/Only confirmed orders/);
 
-      const { lines, skus, metaEvents } = await readState(t);
+      const { lines, skus } = await readState(t);
       expect(lines.map((l) => l.state)).toEqual([from, from]);
       expect(skus.map((s) => s.real_stock)).toEqual([10, 10]);
-      expect(metaEvents).toHaveLength(0);
     },
   );
 
@@ -336,46 +303,61 @@ describe("Meta Purchase is queued only when a deposit-paid order is delivered", 
     await expect(
       admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" }),
     ).rejects.toThrow(/Only confirmed orders/);
-    expect((await readState(t)).metaEvents).toHaveLength(0);
   });
+});
 
-  test("returned (RTO) and cancelled orders are never counted", async () => {
-    const t = setupConvex();
-    const { firstLineId } = await seedOrder(t);
-    const admin = await asStaff(t, "admin", ["VIEW_ORDERS", "VERIFY_PAYMENTS", "MANAGE_SHIPPING_STATUS"]);
-    await confirmAndShip(admin, firstLineId);
-
-    await admin.mutation(api.orders.updateRto, { orderId: firstLineId });
-
-    expect((await readState(t)).metaEvents).toHaveLength(0);
-  });
-
-  test("placing an order queues nothing", async () => {
-    const t = setupConvex();
-    const { productId, skuA, governorateId } = await seedOrder(t);
-    await t.run(async (ctx) => {
-      await ctx.db.insert("cart_sessions", {
-        sessionId: "shopper",
-        items: [{ productId, skuId: skuA, quantity: 1, addedAt: Date.now() }],
-        lastUpdated: Date.now(),
-      });
-    });
-
-    await t.mutation(api.cart.placeOrderFromSession, {
+/** Puts one unit of each seeded SKU in a cart and places it as `phone`. */
+async function placeCheckout(t: ReturnType<typeof setupConvex>, phone = "01198765432") {
+  const { productId, skuA, skuB, governorateId } = await seedOrder(t);
+  await t.run(async (ctx) => {
+    await ctx.db.insert("cart_sessions", {
       sessionId: "shopper",
-      customerName: "Shopper",
-      customerPhone: "01198765432",
-      customerAddress: "Street 2",
-      governorateId,
-      metaAttribution: { fbp: "fb.1.1700000000000.123", clientUserAgent: "test-agent", eventSourceUrl: "https://techworldegypt.com/en/checkout" },
+      items: [
+        { productId, skuId: skuA, quantity: 1, addedAt: Date.now() },
+        { productId, skuId: skuB, quantity: 2, addedAt: Date.now() },
+      ],
+      lastUpdated: Date.now(),
+    });
+  });
+  const shortCode = await t.mutation(api.cart.placeOrderFromSession, {
+    sessionId: "shopper",
+    customerName: "Shopper",
+    customerPhone: phone,
+    customerAddress: "Street 2",
+    buildingNumber: "5",
+    floorNumber: "2",
+    apartmentNumber: "7",
+    governorateId,
+    metaAttribution: { fbp: "fb.1.1700000000000.123", clientUserAgent: "test-agent", eventSourceUrl: "https://techworldegypt.com/en/checkout" },
+  });
+  const metaEvents = await t.run((ctx) =>
+    ctx.db
+      .query("meta_events")
+      .filter((q) => q.eq(q.field("shortCode"), shortCode))
+      .collect(),
+  );
+  return { shortCode, productId, metaEvents };
+}
+
+describe("Meta Purchase is queued when the checkout is placed", () => {
+  test("placing an order queues exactly one Purchase for the whole checkout", async () => {
+    const t = setupConvex();
+    const { shortCode, productId, metaEvents } = await placeCheckout(t);
+
+    expect(metaEvents).toHaveLength(1);
+    expect(metaEvents[0]).toMatchObject({
+      eventId: `purchase-${shortCode}`, // the success page sends the browser Purchase with this id
+      eventName: "Purchase",
+      value: 1600, // 600 + 2 x 500; the 50 EGP shipping is excluded
+      currency: "EGP",
+      status: "PENDING",
+      contents: [{ id: productId, quantity: 3 }],
     });
 
-    const { metaEvents } = await readState(t);
-    expect(metaEvents).toHaveLength(0);
     const placed = await t.run((ctx) =>
       ctx.db
         .query("orders")
-        .filter((q) => q.eq(q.field("sessionId"), "shopper"))
+        .filter((q) => q.eq(q.field("shortCode"), shortCode))
         .first(),
     );
     expect(placed?.state).toBe("PENDING_PAYMENT_INPUT");
@@ -384,30 +366,28 @@ describe("Meta Purchase is queued only when a deposit-paid order is delivered", 
 
   test("a blacklisted phone queues nothing and is audited", async () => {
     const t = setupConvex();
-    const { firstLineId } = await seedOrder(t, "SHIPPED");
-    const admin = await asStaff(t, "admin", ["VIEW_ORDERS", "VERIFY_PAYMENTS"]);
+    await asStaff(t, "admin", ["MANAGE_USERS"]);
     await t.run(async (ctx) => {
       const user = await ctx.db.query("users").first();
-      await ctx.db.insert("blacklist", { phoneNumber: PHONE, reason: "test", addedBy: user!._id, addedAt: Date.now() });
+      await ctx.db.insert("blacklist", { phoneNumber: "01198765432", reason: "test", addedBy: user!._id, addedAt: Date.now() });
     });
 
-    await admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" });
+    const { metaEvents } = await placeCheckout(t);
 
-    const { metaEvents, audit } = await readState(t);
     expect(metaEvents).toHaveLength(0);
+    const audit = await t.run((ctx) => ctx.db.query("audit_logs").collect());
     expect(audit.some((log) => log.actionType === "META_PURCHASE_SKIPPED")).toBe(true);
   });
 
-  test("re-delivering an order never queues a second Purchase", async () => {
+  test("moving an order through fulfilment, delivery or RTO queues nothing more", async () => {
     const t = setupConvex();
     const { firstLineId } = await seedOrder(t);
-    const admin = await asStaff(t, "admin", ["VIEW_ORDERS", "VERIFY_PAYMENTS"]);
+    const admin = await asStaff(t, "admin", ["VIEW_ORDERS", "VERIFY_PAYMENTS", "MANAGE_SHIPPING_STATUS"]);
     await confirmAndShip(admin, firstLineId);
-
     await admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" });
     await admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "SHIPPED" });
-    await admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" });
+    await admin.mutation(api.orders.updateRto, { orderId: firstLineId });
 
-    expect((await readState(t)).metaEvents).toHaveLength(1);
+    expect((await readState(t)).metaEvents).toHaveLength(0);
   });
 });

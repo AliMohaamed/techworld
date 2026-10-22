@@ -106,11 +106,11 @@
         "items": [
           {
             "term": "Meta Pixel (in your browser)",
-            "text": "A piece of code from Meta that runs on our pages. It tells Meta when you view a page, view a product, add an item to your cart and start checkout, along with the product IDs, quantities, prices and currency involved. Like any content loaded from Meta's servers, it also gives Meta the information your browser sends automatically: your IP address, browser and device details, the page address, and cookie identifiers such as _fbp and _fbc. If you are logged in to Facebook or Instagram in the same browser, Meta may link this activity to your account. We do not send your name, phone number or address through the Pixel."
+            "text": "A piece of code from Meta that runs on our pages. It tells Meta when you view a page, view a product, add an item to your cart, start checkout and place an order, along with the product IDs, quantities, prices and currency involved. Like any content loaded from Meta's servers, it also gives Meta the information your browser sends automatically: your IP address, browser and device details, the page address, and cookie identifiers such as _fbp and _fbc. If you are logged in to Facebook or Instagram in the same browser, Meta may link this activity to your account. We do not send your name, phone number or address through the Pixel."
           },
           {
             "term": "Conversions API (from our server)",
-            "text": "A purchase on our store is only complete once it is delivered and paid for in cash, so we do not report it from your browser. When our team marks your order as delivered, our server sends Meta one \"Purchase\" event containing the order reference, the time, the order value (products after discounts, excluding shipping), the currency, and the product IDs and quantities."
+            "text": "When you place an order, our server also sends Meta a \"Purchase\" event, in addition to the one from your browser; both carry the same order reference so Meta counts the order once. This server event is sent even if the Pixel was blocked in your browser. It contains the order reference, the time, the order value (products after discounts, excluding shipping), the currency, and the product IDs and quantities."
           },
           {
             "term": "Information sent to help Meta match the purchase",
@@ -142,7 +142,7 @@
         "items": [
           {
             "term": "Measurement",
-            "text": "Counting how many visits, carts, checkouts and delivered orders came from our ads, and what they were worth."
+            "text": "Counting how many visits, carts, checkouts and orders came from our ads, and what they were worth."
           },
           {
             "term": "Optimisation",
