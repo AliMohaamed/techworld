@@ -6,7 +6,7 @@ import { META_EVENT_MAX_AGE_MS, normalizePhone, normalizeText, sha256Hex, splitN
 
 /**
  * Meta Conversions API delivery. Purchases are queued in `meta_events` by
- * `queueMetaPurchase` (lib/metaConversions.ts) when an order is delivered, and
+ * `queueMetaPurchase` (lib/metaConversions.ts) when a checkout is placed, and
  * sent from here.
  *
  * Convex env vars:

@@ -2,14 +2,15 @@
  * Browser-side Meta Pixel. Everything is a no-op unless
  * NEXT_PUBLIC_META_PIXEL_ID is set at build time.
  *
- * Purchase is intentionally not tracked here: the sale completes on delivery,
- * when the cash balance is collected, so the backend reports it through the Conversions API
- * (packages/backend/convex/metaConversions.ts).
+ * Purchase fires on the success page once the checkout is placed. The backend
+ * sends the same Purchase through the Conversions API
+ * (packages/backend/convex/metaConversions.ts) with the same event id, so Meta
+ * counts it once.
  */
 export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim() || undefined;
 export const META_CURRENCY = "EGP";
 
-type BrowserEvent = "PageView" | "ViewContent" | "AddToCart" | "InitiateCheckout";
+type BrowserEvent = "PageView" | "ViewContent" | "AddToCart" | "InitiateCheckout" | "Purchase";
 
 type Fbq = ((...args: unknown[]) => void) & {
   callMethod?: (...args: unknown[]) => void;
@@ -49,8 +50,46 @@ function getFbq(): Fbq | null {
   return window.fbq;
 }
 
-export function trackMetaEvent(event: BrowserEvent, params?: Record<string, unknown>) {
-  getFbq()?.("track", event, params);
+/** `eventId` lets Meta deduplicate this event against its server-side copy. */
+export function trackMetaEvent(event: BrowserEvent, params?: Record<string, unknown>, eventId?: string) {
+  if (eventId) getFbq()?.("track", event, params, { eventID: eventId });
+  else getFbq()?.("track", event, params);
+}
+
+/** Must match purchaseEventId() in packages/backend/convex/lib/metaConversions.ts. */
+export const purchaseEventId = (shortCode: string) => `purchase-${shortCode}`;
+
+const PENDING_PURCHASE_KEY = "tw-meta-purchase";
+
+type PendingPurchase = { shortCode: string; contents: MetaContent[]; value: number };
+
+/** Called by checkout right after the order is placed, for the success page to report. */
+export function savePendingPurchase(purchase: PendingPurchase) {
+  if (!META_PIXEL_ID) return;
+  try {
+    window.sessionStorage.setItem(PENDING_PURCHASE_KEY, JSON.stringify(purchase));
+  } catch {
+    // Storage blocked; the server-side Purchase still reports the sale.
+  }
+}
+
+/**
+ * Fires the browser Purchase for `shortCode` if this tab just placed that
+ * order. The pending entry is removed first, so a reload, a shared success
+ * link or another order's code never reports a sale.
+ */
+export function trackPendingPurchase(shortCode: string) {
+  if (!META_PIXEL_ID) return;
+  let purchase: PendingPurchase | null = null;
+  try {
+    const raw = window.sessionStorage.getItem(PENDING_PURCHASE_KEY);
+    window.sessionStorage.removeItem(PENDING_PURCHASE_KEY);
+    purchase = raw ? (JSON.parse(raw) as PendingPurchase) : null;
+  } catch {
+    return;
+  }
+  if (!purchase || purchase.shortCode !== shortCode) return;
+  trackMetaEvent("Purchase", productEventParams(purchase.contents, purchase.value), purchaseEventId(shortCode));
 }
 
 export type MetaContent = { id: string; quantity: number; item_price: number };

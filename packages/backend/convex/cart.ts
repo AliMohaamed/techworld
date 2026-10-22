@@ -4,6 +4,7 @@ import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import { resolveProductImages, resolveStorageRef } from "./products";
 import { writeAuditLog } from "./lib/audit";
+import { queueMetaPurchase } from "./lib/metaConversions";
 import { metaAttributionValidator } from "./schema";
 import { toPublicSku } from "./lib/publicSku";
 
@@ -537,6 +538,16 @@ export const placeOrderFromSession = mutation({
         firstOrderId = orderId;
       }
       aggregatedTotalPrice += (lineSubtotal - discountForLine);
+    }
+
+    // Server half of the Purchase; the success page sends the browser half with
+    // the same event id, so Meta deduplicates them.
+    const lines = await ctx.db
+      .query("orders")
+      .withIndex("by_shortCode", (q) => q.eq("shortCode", shortCode))
+      .collect();
+    if (lines.length > 0) {
+      await queueMetaPurchase(ctx, { order: lines[0], lines });
     }
 
     if (!isBlacklisted && args.customerPhone && firstOrderId) {
