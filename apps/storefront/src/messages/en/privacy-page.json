@@ -48,7 +48,7 @@
           },
           {
             "term": "Technical details captured at checkout",
-            "text": "Your browser's user-agent string (which describes the browser and device), the page address you ordered from, and the values of the Meta cookies _fbp and _fbc if they are present in your browser. We use these to link the purchase to the ad you came from (see \"Meta Pixel and Conversions API\" below)."
+            "text": "Your browser's user-agent string (which describes the browser and device), your IP address, the page address you ordered from, and the values of the Meta cookies _fbp and _fbc if they are present in your browser. We use these to link the purchase to the ad you came from (see \"Meta Pixel and Conversions API\" below)."
           },
           {
             "term": "Information collected by the Meta Pixel",
@@ -114,7 +114,7 @@
           },
           {
             "term": "Information sent to help Meta match the purchase",
-            "text": "With that Purchase event, our server also sends your phone number(s), your email address (if you gave one), your first and last name, your governorate and your country. Each of these is hashed (converted with SHA-256 into a fixed code that cannot be read back) before it leaves our server. We also send the _fbp and _fbc cookie values and the browser user-agent captured when you checked out. We do not send your street address, your IP address or the content of your messages."
+            "text": "With that Purchase event, our server also sends your phone number(s), your email address (if you gave one), your first and last name, your governorate and your country. Each of these is hashed (converted with SHA-256 into a fixed code that cannot be read back) before it leaves our server. We also send the _fbp and _fbc cookie values, and the browser user-agent and IP address captured when you checked out. We do not send your street address or the content of your messages."
           }
         ],
         "after": [

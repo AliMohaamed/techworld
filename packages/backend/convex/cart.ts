@@ -4,7 +4,7 @@ import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import { resolveProductImages, resolveStorageRef } from "./products";
 import { writeAuditLog } from "./lib/audit";
-import { queueMetaPurchase } from "./lib/metaConversions";
+import { META_CURRENCY, purchaseEventId, purchaseTotals, queueMetaPurchase } from "./lib/metaConversions";
 import { metaAttributionValidator } from "./schema";
 import { toPublicSku } from "./lib/publicSku";
 
@@ -23,6 +23,11 @@ function sanitizeMetaAttribution(input: MetaAttribution | undefined): MetaAttrib
     fbp: fbCookie(input.fbp),
     fbc: fbCookie(input.fbc),
     clientUserAgent: input.clientUserAgent?.slice(0, 512) || undefined,
+    // IPv4 or IPv6 characters only; Meta validates the address itself.
+    clientIpAddress:
+      input.clientIpAddress && /^[0-9a-fA-F.:]{3,45}$/.test(input.clientIpAddress)
+        ? input.clientIpAddress
+        : undefined,
     eventSourceUrl:
       input.eventSourceUrl && /^https?:\/\//.test(input.eventSourceUrl)
         ? input.eventSourceUrl.slice(0, 2048)
@@ -586,5 +591,25 @@ export const clearCart = mutation({
     if (session) {
       await ctx.db.delete(session._id);
     }
+  },
+});
+
+/**
+ * What the storefront's success page reports as the browser Purchase. Read from
+ * the stored order lines through purchaseTotals(), the same numbers the
+ * Conversions API sends, and only for the browser session that placed the order.
+ */
+export const getPurchaseSummary = query({
+  args: { sessionId: v.string(), shortCode: v.string() },
+  handler: async (ctx, args) => {
+    const lines = await ctx.db
+      .query("orders")
+      .withIndex("by_shortCode", (q) => q.eq("shortCode", args.shortCode.trim().toUpperCase()))
+      .collect();
+    if (lines.length === 0 || lines.some((line) => line.sessionId !== args.sessionId)) {
+      return null;
+    }
+    const { value, contents } = purchaseTotals(lines);
+    return { eventId: purchaseEventId(lines[0]), value, currency: META_CURRENCY, contents };
   },
 });

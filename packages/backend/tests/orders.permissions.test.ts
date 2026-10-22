@@ -379,15 +379,160 @@ describe("Meta Purchase is queued when the checkout is placed", () => {
     expect(audit.some((log) => log.actionType === "META_PURCHASE_SKIPPED")).toBe(true);
   });
 
-  test("moving an order through fulfilment, delivery or RTO queues nothing more", async () => {
+  test("confirming, shipping, cancelling or returning an order sends nothing to Meta", async () => {
     const t = setupConvex();
     const { firstLineId } = await seedOrder(t);
     const admin = await asStaff(t, "admin", ["VIEW_ORDERS", "VERIFY_PAYMENTS", "MANAGE_SHIPPING_STATUS"]);
     await confirmAndShip(admin, firstLineId);
-    await admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" });
-    await admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "SHIPPED" });
     await admin.mutation(api.orders.updateRto, { orderId: firstLineId });
 
     expect((await readState(t)).metaEvents).toHaveLength(0);
+  });
+});
+
+describe("OrderDelivered is queued when staff mark an order delivered", () => {
+  test("delivery queues one OrderDelivered with its own event id and the order's real value", async () => {
+    const t = setupConvex();
+    const { firstLineId, productId } = await seedOrder(t);
+    const admin = await asStaff(t, "admin", ["VIEW_ORDERS", "VERIFY_PAYMENTS"]);
+    await confirmAndShip(admin, firstLineId);
+
+    await admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" });
+
+    const { metaEvents, audit } = await readState(t);
+    expect(metaEvents).toHaveLength(1);
+    expect(metaEvents[0]).toMatchObject({
+      eventName: "OrderDelivered",
+      eventId: `delivered-${SHORT_CODE}`, // never the Purchase id, so Meta never merges the two
+      value: 1500, // products after discount; the 50 EGP shipping is excluded
+      currency: "EGP",
+      status: "PENDING",
+      contents: [{ id: productId, quantity: 3, item_price: 500 }],
+    });
+    expect(audit.some((log) => log.actionType === "META_DELIVERED_QUEUED")).toBe(true);
+  });
+
+  test("an order with a checkout Purchase gets a separate OrderDelivered on delivery", async () => {
+    const t = setupConvex();
+    const { shortCode } = await placeCheckout(t);
+    const order = await t.run((ctx) =>
+      ctx.db
+        .query("orders")
+        .withIndex("by_shortCode", (q) => q.eq("shortCode", shortCode))
+        .first(),
+    );
+    const admin = await asStaff(t, "admin", ["VIEW_ORDERS", "VERIFY_PAYMENTS"]);
+    await admin.mutation(api.orders.updateGenericStatus, { orderId: order!._id, newState: "CONFIRMED" });
+    await admin.mutation(api.orders.updateGenericStatus, { orderId: order!._id, newState: "DELIVERED" });
+
+    const events = await t.run((ctx) =>
+      ctx.db
+        .query("meta_events")
+        .filter((q) => q.eq(q.field("shortCode"), shortCode))
+        .collect(),
+    );
+    expect(events.map((e) => [e.eventName, e.eventId, e.value])).toEqual([
+      ["Purchase", `purchase-${shortCode}`, 1600],
+      ["OrderDelivered", `delivered-${shortCode}`, 1600],
+    ]);
+  });
+
+  test("re-delivering an order never queues a second OrderDelivered", async () => {
+    const t = setupConvex();
+    const { firstLineId } = await seedOrder(t);
+    const admin = await asStaff(t, "admin", ["VIEW_ORDERS", "VERIFY_PAYMENTS"]);
+    await confirmAndShip(admin, firstLineId);
+
+    await admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" });
+    await admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "SHIPPED" });
+    await admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" });
+
+    expect((await readState(t)).metaEvents).toHaveLength(1);
+  });
+
+  test("a blacklisted phone gets no OrderDelivered, and the skip is audited", async () => {
+    const t = setupConvex();
+    const { firstLineId } = await seedOrder(t, "SHIPPED");
+    const admin = await asStaff(t, "admin", ["VIEW_ORDERS", "VERIFY_PAYMENTS"]);
+    await t.run(async (ctx) => {
+      const user = await ctx.db.query("users").first();
+      await ctx.db.insert("blacklist", { phoneNumber: PHONE, reason: "test", addedBy: user!._id, addedAt: Date.now() });
+    });
+
+    await admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" });
+
+    const { metaEvents, audit } = await readState(t);
+    expect(metaEvents).toHaveLength(0);
+    expect(audit.some((log) => log.actionType === "META_DELIVERED_SKIPPED")).toBe(true);
+  });
+
+  test("a rejected delivery (unconfirmed order) queues nothing", async () => {
+    const t = setupConvex();
+    const { firstLineId } = await seedOrder(t, "AWAITING_VERIFICATION");
+    const admin = await asStaff(t, "admin", ["VIEW_ORDERS", "VERIFY_PAYMENTS"]);
+
+    await expect(
+      admin.mutation(api.orders.updateGenericStatus, { orderId: firstLineId, newState: "DELIVERED" }),
+    ).rejects.toThrow(/Only confirmed orders/);
+    expect((await readState(t)).metaEvents).toHaveLength(0);
+  });
+});
+
+describe("the success page reads the Purchase from the stored order", () => {
+  test("returns the same event id, value and contents as the Conversions API event", async () => {
+    const t = setupConvex();
+    const { shortCode, metaEvents } = await placeCheckout(t);
+
+    const summary = await t.query(api.cart.getPurchaseSummary, { sessionId: "shopper", shortCode });
+
+    expect(summary).toEqual({
+      eventId: metaEvents[0].eventId,
+      value: metaEvents[0].value,
+      currency: "EGP",
+      contents: metaEvents[0].contents,
+    });
+  });
+
+  test("returns nothing to a different browser session or an unknown code", async () => {
+    const t = setupConvex();
+    const { shortCode } = await placeCheckout(t);
+
+    expect(await t.query(api.cart.getPurchaseSummary, { sessionId: "someone-else", shortCode })).toBeNull();
+    expect(await t.query(api.cart.getPurchaseSummary, { sessionId: "shopper", shortCode: "TW-NOPE00" })).toBeNull();
+  });
+
+  test("checkout stores a well-formed client IP for the Conversions API and drops anything else", async () => {
+    const t = setupConvex();
+    const { productId, skuA, governorateId } = await seedOrder(t);
+    const place = async (sessionId: string, clientIpAddress: string) => {
+      await t.run(async (ctx) => {
+        await ctx.db.insert("cart_sessions", {
+          sessionId,
+          items: [{ productId, skuId: skuA, quantity: 1, addedAt: Date.now() }],
+          lastUpdated: Date.now(),
+        });
+      });
+      const shortCode = await t.mutation(api.cart.placeOrderFromSession, {
+        sessionId,
+        customerName: "Shopper",
+        customerPhone: "01198765432",
+        customerAddress: "Street 2",
+        buildingNumber: "5",
+        floorNumber: "2",
+        apartmentNumber: "7",
+        governorateId,
+        metaAttribution: { clientUserAgent: "test-agent", clientIpAddress },
+      });
+      return await t.run((ctx) =>
+        ctx.db
+          .query("orders")
+          .withIndex("by_shortCode", (q) => q.eq("shortCode", shortCode))
+          .first(),
+      );
+    };
+
+    expect((await place("ipv4", "197.45.10.2"))?.metaAttribution?.clientIpAddress).toBe("197.45.10.2");
+    expect((await place("ipv6", "2c0f:fc88::1"))?.metaAttribution?.clientIpAddress).toBe("2c0f:fc88::1");
+    expect((await place("junk", "<script>"))?.metaAttribution?.clientIpAddress).toBeUndefined();
   });
 });

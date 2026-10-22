@@ -220,6 +220,7 @@ async function deliverEvent(
     fbp: attribution?.fbp,
     fbc: attribution?.fbc,
     client_user_agent: attribution?.clientUserAgent,
+    client_ip_address: attribution?.clientIpAddress,
   };
 
   const body = {

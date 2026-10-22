@@ -34,6 +34,7 @@ export const metaAttributionValidator = v.object({
   fbp: v.optional(v.string()),
   fbc: v.optional(v.string()),
   clientUserAgent: v.optional(v.string()),
+  clientIpAddress: v.optional(v.string()),
   eventSourceUrl: v.optional(v.string()),
 });
 
@@ -204,10 +205,10 @@ export default defineSchema({
    */
   meta_events: defineTable({
     eventId: v.string(),
-    eventName: v.literal("Purchase"),
+    eventName: v.union(v.literal("Purchase"), v.literal("OrderDelivered")),
     shortCode: v.optional(v.string()),
     orderId: v.id("orders"),
-    eventTime: v.number(), // Unix seconds, the moment payment was confirmed
+    eventTime: v.number(), // Unix seconds, when the order was placed (Purchase) or delivered (OrderDelivered)
     value: v.number(),
     currency: v.string(),
     contents: v.array(v.object({ id: v.string(), quantity: v.number(), item_price: v.number() })),
