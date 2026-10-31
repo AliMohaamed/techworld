@@ -56,7 +56,7 @@ import {
 } from "@/components/orders/order-state";
 import { QUEUE_QUERY_KEY } from "@/components/orders/queue-query";
 import { hasPermission } from "@backend/convex/lib/permissions";
-import { canTransition, statusChangePermission } from "@backend/convex/lib/orderTransitions";
+import { canTransition, isPaidState, orderAmountDue, statusChangePermission } from "@backend/convex/lib/orderTransitions";
 
 type OrderDetails = NonNullable<FunctionReturnType<typeof api.orders.getOrderDetails>>;
 type Confirming = "verify" | "cancel" | "stall" | "rto" | null;
@@ -139,7 +139,8 @@ export default function OrderDetailsPage() {
   }
 
   const state = order.state as OrderState;
-  const amountDue = order.total_price + (order.appliedShippingFee || 0);
+  const shippingDeducted = isPaidState(state) && (order.appliedShippingFee ?? 0) > 0;
+  const amountDue = orderAmountDue(order);
   const next = nextStepFor(state);
   const isException = EXCEPTION_STATES.includes(state);
   const lineStates = order.lines.map((line) => line.state as OrderState);
@@ -480,6 +481,27 @@ export default function OrderDetailsPage() {
                 <span className={cn("h-1.5 w-1.5 rounded-full", stateTone(state).dot)} aria-hidden />
                 {t(`states.${state}`)}
               </span>
+              {order.whatsappClickedAt ? (
+                <span
+                  title={tQueue("table.whatsappClickedTitle", {
+                    time: new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(
+                      order.whatsappClickedAt,
+                    ),
+                  })}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-400"
+                >
+                  <MessageCircle className="h-3.5 w-3.5 shrink-0" />
+                  {tQueue("table.whatsappClicked")}
+                </span>
+              ) : (
+                <span
+                  title={tQueue("table.whatsappNotClickedTitle")}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/40 px-3 py-1 text-xs font-semibold text-muted-foreground"
+                >
+                  <MessageCircle className="h-3.5 w-3.5 shrink-0 opacity-60" />
+                  {tQueue("table.whatsappNotClicked")}
+                </span>
+              )}
             </div>
             <p className="text-sm text-muted-foreground">
               <span className="font-bold text-foreground">{order.customerName ?? tQueue("table.walkInCustomer")}</span>
@@ -683,6 +705,12 @@ export default function OrderDetailsPage() {
                   {(order.appliedShippingFee ?? 0) > 0 ? money(order.appliedShippingFee ?? 0) : t("summary.freeShipping")}
                 </dd>
               </div>
+              {shippingDeducted && (
+                <div className="flex items-center justify-between gap-4 text-emerald-700 dark:text-emerald-400">
+                  <dt>{t("summary.shippingDeducted")}</dt>
+                  <dd className="font-semibold tabular-nums">−{money(order.appliedShippingFee ?? 0)}</dd>
+                </div>
+              )}
               {((order.discount_applied ?? 0) > 0 || order.promo_code_snapshot) && (
                 <div className="flex items-center justify-between gap-4 text-emerald-700 dark:text-emerald-400">
                   <dt>{t("summary.discount", { code: order.promo_code_snapshot || "" })}</dt>
@@ -1114,6 +1142,8 @@ function activityLabel(event: ActivityEvent, t: Translate) {
       return t("activity.rto");
     case "ORDER_SHIPPING_FEE_DEDUPED":
       return t("activity.shippingDeduped");
+    case "WHATSAPP_CONFIRM_CLICKED":
+      return t("activity.whatsappClicked");
     default:
       if (event.to) {
         return event.from

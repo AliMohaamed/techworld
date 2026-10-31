@@ -192,6 +192,7 @@ export default defineSchema({
     // Browser context captured at checkout so the server-side Purchase sent on
     // delivery can be matched to the shopper's Meta ad click.
     metaAttribution: v.optional(metaAttributionValidator),
+    whatsappClickedAt: v.optional(v.number()),
   })
     .index("by_shortCode", ["shortCode"])
     .index("by_session", ["sessionId"])

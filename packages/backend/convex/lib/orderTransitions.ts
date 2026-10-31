@@ -12,6 +12,21 @@ export const PAID_STATES: readonly OrderState[] = ["CONFIRMED", "READY_FOR_SHIPP
 export const isPaidState = (state: OrderState) => PAID_STATES.includes(state);
 
 /**
+ * Total amount due on an order: includes shipping before confirmation, and
+ * deducts shipping once confirmed (`PAID_STATES`) so only the product total
+ * remains across Confirmed, Ready for Shipping, Shipped and Delivered.
+ */
+export function orderAmountDue(order: {
+  state: OrderState;
+  total_price: number;
+  appliedShippingFee?: number | null;
+}): number {
+  return isPaidState(order.state)
+    ? order.total_price
+    : order.total_price + (order.appliedShippingFee || 0);
+}
+
+/**
  * States an order can be marked DELIVERED from. Confirmation (the verified
  * deposit) is mandatory; READY_FOR_SHIPPING and SHIPPED may be skipped when
  * staff forget them. New, unpaid, cancelled, RTO and fraud orders cannot jump

@@ -3,7 +3,7 @@
  * Values can be overridden per-environment; the defaults keep local dev usable.
  */
 export const SUPPORT_WHATSAPP = (
-  process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "201044467598"
+  process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "201028010095"
 ).replace(/\D/g, "");
 
 export const SUPPORT_EMAIL =

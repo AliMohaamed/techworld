@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import type { FunctionReturnType } from "convex/server";
 import {
-  Calendar, Copy, Image as ImageIcon, Inbox, Layers, Package,
+  Calendar, Copy, Image as ImageIcon, Inbox, Layers, MessageCircle, Package,
   Search, SearchX, ShieldAlert, X,
 } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
@@ -18,6 +18,7 @@ import { Link, usePathname, useRouter } from "@/navigation";
 import { OrdersPipeline } from "@/components/orders/OrdersPipeline";
 import { OrderActions } from "@/components/orders/OrderActions";
 import { hasPermission } from "@backend/convex/lib/permissions";
+import { orderAmountDue } from "@backend/convex/lib/orderTransitions";
 import {
   ATTENTION_STATES,
   STALE_AFTER_MS,
@@ -53,7 +54,7 @@ const matchesDate = (orderTime: number, preset: DateRangePreset, now: number) =>
   }
 };
 
-const orderTotal = (order: OrderRow) => order.total_price + (order.appliedShippingFee || 0);
+const orderTotal = (order: OrderRow) => orderAmountDue(order);
 
 export default function OrdersPage() {
   // useSearchParams needs a Suspense boundary for static rendering.
@@ -248,8 +249,28 @@ function OrdersQueue() {
   const remaining = visibleOrders.length - pageOrders.length;
   const egp = tQueue("stats.egp");
 
-  const controlClass =
-    "h-11 rounded-xl border-border bg-background text-sm font-semibold focus:border-[#ffc105]/60";
+
+
+  const controlClass = "h-11 rounded-xl border-border bg-background text-sm font-semibold focus:border-[#ffc105]/60";
+
+  const renderWhatsAppStatus = (order: OrderRow) =>
+    order.whatsappClickedAt ? (
+      <span
+        title={tQueue("table.whatsappClickedTitle", { time: dateFormatter.format(order.whatsappClickedAt) })}
+        className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400"
+      >
+        <MessageCircle className="h-3 w-3 shrink-0" />
+        {tQueue("table.whatsappClicked")}
+      </span>
+    ) : (
+      <span
+        title={tQueue("table.whatsappNotClickedTitle")}
+        className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-muted/40 px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground"
+      >
+        <MessageCircle className="h-3 w-3 shrink-0 opacity-60" />
+        {tQueue("table.whatsappNotClicked")}
+      </span>
+    );
 
   const renderStatus = (state: string) => (
     <span
@@ -603,7 +624,12 @@ function OrdersQueue() {
                           {tQueue("table.items", { count: order.quantity })}
                         </p>
                       </td>
-                      <td className="px-4 py-4">{renderStatus(order.state)}</td>
+                      <td className="px-4 py-4">
+                        <div className="flex flex-col items-start gap-1.5">
+                          {renderStatus(order.state)}
+                          {renderWhatsAppStatus(order)}
+                        </div>
+                      </td>
                       <td className="hidden px-4 py-4 xl:table-cell">{renderReceipt(order)}</td>
                       <td className="px-6 py-4">
                         <OrderActions
@@ -632,7 +658,10 @@ function OrdersQueue() {
                       {renderCode(order)}
                       <div className="mt-1">{renderTime(order)}</div>
                     </div>
-                    {renderStatus(order.state)}
+                    <div className="flex flex-col items-end gap-1.5">
+                      {renderStatus(order.state)}
+                      {renderWhatsAppStatus(order)}
+                    </div>
                   </div>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">

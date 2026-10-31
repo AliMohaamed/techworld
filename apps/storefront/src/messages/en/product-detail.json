@@ -43,8 +43,10 @@
       "seeLess": "See Less"
     },
     "features": {
-      "shipping": "Fast Shipping Anywhere in Egypt",
-      "cod": "Secure COD Verification",
+      "shipping": "Delivery within 2 to 3 days",
+      "cod": "Cash on Delivery",
+      "warranty": "1-Month Warranty Against Manufacturing Defects",
+      "inspection": "Inspect & test your order before receiving",
       "authentic": "Authentic Tech Inventory"
     },
     "status": {

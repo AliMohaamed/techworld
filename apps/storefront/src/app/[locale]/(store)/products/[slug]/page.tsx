@@ -7,7 +7,7 @@ import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
 import { useCart } from "@/providers/cart-provider";
-import { ChevronRight, Heart, Minus, Plus, ShoppingBag, Truck, ShieldCheck, Zap } from "lucide-react";
+import { ChevronRight, Heart, Minus, Plus, ShoppingBag, Truck, ShieldCheck, Banknote, PackageCheck, Zap } from "lucide-react";
 import { Link, useRouter } from "@/navigation";
 import { DynamicProductGallery } from "@/components/storefront/DynamicProductGallery";
 import { ProductReviews } from "@/components/storefront/product-reviews";
@@ -597,18 +597,30 @@ export default function ProductDetailPage() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex items-center gap-5 rounded-2xl border border-border bg-accent/20 p-5">
-                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="flex items-center gap-4 rounded-2xl border border-border bg-accent/20 p-4">
+                  <div className="h-10 w-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                     <Truck size={20} />
                   </div>
-                  <span className="text-[10px] font-black uppercase text-label-muted leading-relaxed">{t('features.shipping')}</span>
+                  <span className="text-xs font-black uppercase text-label-muted leading-relaxed">{t('features.shipping')}</span>
                 </div>
-                <div className="flex items-center gap-5 rounded-2xl border border-border bg-accent/20 p-5">
-                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <div className="flex items-center gap-4 rounded-2xl border border-border bg-accent/20 p-4">
+                  <div className="h-10 w-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <Banknote size={20} />
+                  </div>
+                  <span className="text-xs font-black uppercase text-label-muted leading-relaxed">{t('features.cod')}</span>
+                </div>
+                <div className="flex items-center gap-4 rounded-2xl border border-border bg-accent/20 p-4">
+                  <div className="h-10 w-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                     <ShieldCheck size={20} />
                   </div>
-                  <span className="text-[10px] font-black uppercase text-label-muted leading-relaxed">{t('features.cod')}</span>
+                  <span className="text-xs font-black uppercase text-label-muted leading-relaxed">{t('features.warranty')}</span>
+                </div>
+                <div className="flex items-center gap-4 rounded-2xl border border-border bg-accent/20 p-4">
+                  <div className="h-10 w-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <PackageCheck size={20} />
+                  </div>
+                  <span className="text-xs font-black uppercase text-label-muted leading-relaxed">{t('features.inspection')}</span>
                 </div>
               </div>
             </div>
