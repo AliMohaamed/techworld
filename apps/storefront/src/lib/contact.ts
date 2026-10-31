@@ -3,7 +3,7 @@
  * Values can be overridden per-environment; the defaults keep local dev usable.
  */
 export const SUPPORT_WHATSAPP = (
-  process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "201028010095"
+  process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "201044467598"
 ).replace(/\D/g, "");
 
 export const SUPPORT_EMAIL =
@@ -14,7 +14,7 @@ export const SUPPORT_WHATSAPP_DISPLAY = `0${SUPPORT_WHATSAPP.replace(/^20/, "")}
 
 /** Call lines, comma-separated when overridden via env. */
 export const SUPPORT_PHONES = (
-  process.env.NEXT_PUBLIC_SUPPORT_PHONES || "01028010095,01044467598"
+  process.env.NEXT_PUBLIC_SUPPORT_PHONES || "01044467598"
 )
   .split(",")
   .map((phone) => phone.trim())
