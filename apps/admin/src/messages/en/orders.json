@@ -82,6 +82,10 @@
         "items": "{count, plural, one {# item} other {# items}}",
         "noReceipt": "No receipt",
         "receiptShort": "Receipt",
+        "whatsappClicked": "Clicked WhatsApp",
+        "whatsappNotClicked": "No WhatsApp click",
+        "whatsappClickedTitle": "Customer clicked the WhatsApp button on the confirmation page ({time})",
+        "whatsappNotClickedTitle": "Customer has not clicked the WhatsApp button yet",
         "noMatches": "No orders match these filters.",
         "noMatchesHint": "Try a wider time period, another status, or clear the filters.",
         "emptyHint": "New storefront orders appear here in real time.",
@@ -150,6 +154,7 @@
         "title": "Payment Summary",
         "subtotal": "Subtotal",
         "shipping": "Shipping Fee",
+        "shippingDeducted": "Shipping fee deducted (paid on confirmation)",
         "discount": "Discount applied: {code}",
         "total": "Final Total",
         "egp": "EGP",
@@ -286,6 +291,7 @@
         "manualReceipt": "Receipt uploaded by staff",
         "receiptDownloadFailed": "WhatsApp receipt couldn’t be downloaded",
         "whatsappFailed": "WhatsApp notification failed to send",
+        "whatsappClicked": "Customer clicked WhatsApp confirmation button",
         "stalledByCron": "Automatically marked stalled after 24h"
       }
     },

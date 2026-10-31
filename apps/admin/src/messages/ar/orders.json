@@ -82,6 +82,10 @@
         "items": "{count, plural, one {منتج واحد} two {منتجان} few {# منتجات} many {# منتجًا} other {# منتج}}",
         "noReceipt": "لا يوجد إيصال",
         "receiptShort": "الإيصال",
+        "whatsappClicked": "ضغط واتساب",
+        "whatsappNotClicked": "لم يضغط واتساب",
+        "whatsappClickedTitle": "ضغط العميل على زر الواتساب في صفحة التأكيد ({time})",
+        "whatsappNotClickedTitle": "لم يضغط العميل على زر الواتساب في صفحة التأكيد بعد",
         "noMatches": "لا توجد طلبات تطابق هذه الفلاتر.",
         "noMatchesHint": "جرّب فترة زمنية أوسع أو حالة أخرى، أو امسح الفلاتر.",
         "emptyHint": "تظهر طلبات المتجر الجديدة هنا مباشرةً.",
@@ -150,6 +154,7 @@
         "title": "ملخص الدفع",
         "subtotal": "المجموع الفرعي",
         "shipping": "رسوم الشحن",
+        "shippingDeducted": "خصم مصاريف الشحن (مدفوعة عند التأكيد)",
         "discount": "خصم مضاف: {code}",
         "total": "الإجمالي النهائي",
         "egp": "ج.م",
@@ -286,6 +291,7 @@
         "manualReceipt": "تم رفع الإيصال بواسطة الموظف",
         "receiptDownloadFailed": "تعذّر تنزيل إيصال واتساب",
         "whatsappFailed": "فشل إرسال إشعار واتساب",
+        "whatsappClicked": "ضغط العميل على زر واتساب لتأكيد الطلب",
         "stalledByCron": "تم تحديده كمتعثر تلقائياً بعد 24 ساعة"
       }
     },

@@ -536,3 +536,48 @@ describe("the success page reads the Purchase from the stored order", () => {
     expect((await place("junk", "<script>"))?.metaAttribution?.clientIpAddress).toBeUndefined();
   });
 });
+
+
+describe("success page order summary & WhatsApp click tracking", () => {
+  test("getSuccessOrderByCode returns full summary and recordWhatsAppClick marks all lines and audits once", async () => {
+    const t = setupConvex();
+    const { shortCode } = await placeCheckout(t);
+    const viewer = await asStaff(t, "viewer", ["VIEW_ORDERS"]);
+
+    const initialSummary = await t.query(api.orders.getSuccessOrderByCode, { shortCode });
+    expect(initialSummary).toMatchObject({
+      shortCode,
+      customerName: "Shopper",
+      customerPhone: "01198765432",
+      customerAddress: "Street 2",
+      buildingNumber: "5",
+      floorNumber: "2",
+      apartmentNumber: "7",
+      subtotal: 1600,
+      shippingFee: 50,
+      totalWithShipping: 1650,
+      whatsappClickedAt: null,
+    });
+    expect(initialSummary?.items).toHaveLength(2);
+
+    const clickResult = await t.mutation(api.orders.recordWhatsAppClick, { shortCode });
+    expect(clickResult.recorded).toBe(true);
+    expect(typeof clickResult.clickedAt).toBe("number");
+
+    // Clicking a second time keeps the original timestamp and does not duplicate audit log
+    const secondClick = await t.mutation(api.orders.recordWhatsAppClick, { shortCode });
+    expect(secondClick.clickedAt).toBe(clickResult.clickedAt);
+
+    const updatedSummary = await t.query(api.orders.getSuccessOrderByCode, { shortCode });
+    expect(updatedSummary?.whatsappClickedAt).toBe(clickResult.clickedAt);
+
+    const allOrders = await viewer.query(api.orders.listAllOrders, {});
+    const listed = allOrders?.find((o) => o.shortCode === shortCode);
+    expect(listed?.whatsappClickedAt).toBe(clickResult.clickedAt);
+
+    const details = await viewer.query(api.orders.getOrderDetails, { orderId: listed!._id });
+    expect(details?.whatsappClickedAt).toBe(clickResult.clickedAt);
+    const whatsappAuditLogs = details?.activity.filter((a) => a.actionType === "WHATSAPP_CONFIRM_CLICKED");
+    expect(whatsappAuditLogs).toHaveLength(1);
+  });
+});

@@ -2,6 +2,8 @@ import { Link } from "@/navigation";
 import { Instagram, Facebook } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { BrandLogo } from "@techworld/ui";
+import { whatsappLink } from "@/lib/contact";
+import { WhatsAppIcon } from "./whatsapp-float";
 
 function TikTokIcon({ size = 18 }: { size?: number }) {
   return (
@@ -38,6 +40,11 @@ export default async function Footer() {
       name: "Facebook",
       href: "https://www.facebook.com/share/1YedGVnzFA/?mibextid=wwXIfr",
       icon: Facebook,
+    },
+    {
+      name: "WhatsApp",
+      href: whatsappLink(),
+      icon: WhatsAppIcon,
     },
   ];
 

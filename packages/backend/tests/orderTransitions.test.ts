@@ -3,6 +3,7 @@ import {
   canDeliverFrom,
   canTransition,
   FULFILMENT_STATES,
+  orderAmountDue,
   PAID_STATES,
   statusChangePermission,
   type OrderState,
@@ -87,5 +88,20 @@ describe("canTransition", () => {
     expect(canTransition(["CONFIRMED", "AWAITING_VERIFICATION"], "READY_FOR_SHIPPING")).toBe(false);
     expect(canTransition(["CONFIRMED", "READY_FOR_SHIPPING"], "SHIPPED")).toBe(true);
     expect(canTransition([], "SHIPPED")).toBe(false);
+  });
+});
+
+describe("orderAmountDue", () => {
+  test.each(UNPAID_STATES)("includes shipping fee when order is in unpaid/exception state %s", (state) => {
+    expect(orderAmountDue({ state, total_price: 500, appliedShippingFee: 60 })).toBe(560);
+  });
+
+  test.each(PAID_STATES)("deducts shipping fee once confirmed in state %s", (state) => {
+    expect(orderAmountDue({ state, total_price: 500, appliedShippingFee: 60 })).toBe(500);
+  });
+
+  test("handles missing or zero shipping fee", () => {
+    expect(orderAmountDue({ state: "AWAITING_VERIFICATION", total_price: 500 })).toBe(500);
+    expect(orderAmountDue({ state: "CONFIRMED", total_price: 500, appliedShippingFee: 0 })).toBe(500);
   });
 });

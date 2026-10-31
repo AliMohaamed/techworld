@@ -2,7 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { internalMutation, mutation, query, QueryCtx } from "./_generated/server";
 import { requirePermission } from "./lib/rbac";
 import { hasPermission } from "./lib/permissions";
-import { canTransition, statusChangePermission } from "./lib/orderTransitions";
+import { canTransition, orderAmountDue, statusChangePermission } from "./lib/orderTransitions";
 import { queueMetaOrderDelivered } from "./lib/metaConversions";
 import { scheduleAuditLog, writeAuditLog } from "./lib/audit";
 import { Doc, Id } from "./_generated/dataModel";
@@ -192,10 +192,12 @@ export const listAllOrders = query({
         const governorate = order.governorateId ? await ctx.db.get(order.governorateId) : null;
         const receiptRef = group.find((line) => line.paymentReceiptRef)?.paymentReceiptRef;
         const receiptUrl = await getReceiptUrl(ctx, receiptRef);
+        const whatsappClickedAt = group.find((line) => line.whatsappClickedAt)?.whatsappClickedAt;
 
         return {
           ...order,
           ...sumOrderLines(group),
+          whatsappClickedAt,
           lines,
           governorate,
           receiptUrl,
@@ -296,6 +298,7 @@ export const getOrderDetails = query({
       customer,
       governorate,
       receiptUrl,
+      whatsappClickedAt: order.whatsappClickedAt ?? orderLines.find((line) => line.whatsappClickedAt)?.whatsappClickedAt,
       canViewFinancials: viewFinancials,
       financials: {
         unit_cogs: viewFinancials ? unitCogs : "***",
@@ -748,7 +751,11 @@ export const updateGenericStatus = mutation({
         customerPhone: order.customerPhone,
         customerName: order.customerName || "Customer",
         newState: args.newState,
-        totalPrice: totals.total_price + totals.appliedShippingFee,
+        totalPrice: orderAmountDue({
+          state: args.newState,
+          total_price: totals.total_price,
+          appliedShippingFee: totals.appliedShippingFee,
+        }),
       });
     }
 
@@ -775,7 +782,7 @@ export const getOrderStats = query({
     }
 
     const totalOrders = filteredOrders.length;
-    const totalRevenue = filteredOrders.reduce((acc, o) => acc + o.total_price + (o.appliedShippingFee || 0), 0);
+    const totalRevenue = filteredOrders.reduce((acc, o) => acc + orderAmountDue(o), 0);
     const totalProductsSold = filteredOrders.reduce((acc, o) => acc + o.quantity, 0);
     const deliveredOrders = filteredOrders.filter(o => o.state === "DELIVERED").length;
     const deliveryRate = totalOrders > 0 ? (deliveredOrders / totalOrders) * 100 : 0;
@@ -927,5 +934,122 @@ export const trackOrderByCode = query({
         timeline,
       },
     };
+  },
+});
+
+
+/**
+ * Fetches order summary for the storefront /success page so the pre-filled
+ * WhatsApp confirmation message and summary card can be populated.
+ */
+export const getSuccessOrderByCode = query({
+  args: { shortCode: v.string() },
+  handler: async (ctx, args) => {
+    const shortCode = args.shortCode.trim().toUpperCase();
+    if (!shortCode) return null;
+
+    const lines = await ctx.db
+      .query("orders")
+      .withIndex("by_shortCode", (q) => q.eq("shortCode", shortCode))
+      .collect();
+
+    if (lines.length === 0) return null;
+
+    const order = lines[0];
+    const governorate = order.governorateId ? await ctx.db.get(order.governorateId) : null;
+
+    const items = await Promise.all(
+      lines.map(async (line) => {
+        const product = await ctx.db.get(line.productId);
+        const sku = await ctx.db.get(line.skuId);
+        const thumbnailRef = sku?.linkedImageId ?? product?.thumbnail ?? product?.images?.[0];
+        let thumbnail: string | null = null;
+        if (thumbnailRef) {
+          try {
+            thumbnail = await resolveRef(ctx, thumbnailRef);
+          } catch {
+            thumbnail = null;
+          }
+        }
+        return {
+          _id: line._id,
+          quantity: line.quantity,
+          total_price: line.total_price,
+          variantName: sku?.variantName ?? null,
+          color: sku?.variantAttributes?.color ?? null,
+          colorCode: sku?.variantAttributes?.colorCode ?? null,
+          productNameAr: product?.name_ar ?? product?.name_en ?? "",
+          productNameEn: product?.name_en ?? product?.name_ar ?? "",
+          thumbnail,
+        };
+      }),
+    );
+
+    const subtotal = lines.reduce((sum, line) => sum + line.total_price, 0);
+    const shippingFee = lines.reduce((sum, line) => sum + (line.appliedShippingFee ?? 0), 0);
+    const discountApplied = lines.reduce((sum, line) => sum + (line.discount_applied ?? 0), 0);
+    const whatsappClickedAt = lines.find((line) => line.whatsappClickedAt)?.whatsappClickedAt ?? null;
+
+    return {
+      shortCode,
+      customerName: order.customerName ?? "",
+      customerPhone: order.customerPhone ?? "",
+      customerAltPhone: order.customerAltPhone ?? null,
+      customerAddress: order.customerAddress ?? "",
+      buildingNumber: order.buildingNumber ?? null,
+      floorNumber: order.floorNumber ?? null,
+      apartmentNumber: order.apartmentNumber ?? null,
+      governorate: governorate
+        ? { name_ar: governorate.name_ar, name_en: governorate.name_en }
+        : null,
+      items,
+      subtotal,
+      shippingFee,
+      discountApplied,
+      totalWithShipping: subtotal + shippingFee,
+      whatsappClickedAt,
+    };
+  },
+});
+
+/**
+ * Records that the customer clicked the WhatsApp confirmation CTA on the
+ * storefront /success page, without relying on any third-party integration.
+ */
+export const recordWhatsAppClick = mutation({
+  args: { shortCode: v.string() },
+  handler: async (ctx, args) => {
+    const shortCode = args.shortCode.trim().toUpperCase();
+    if (!shortCode) return { recorded: false };
+
+    const lines = await ctx.db
+      .query("orders")
+      .withIndex("by_shortCode", (q) => q.eq("shortCode", shortCode))
+      .collect();
+
+    if (lines.length === 0) return { recorded: false };
+
+    const alreadyClicked = lines.some((line) => Boolean(line.whatsappClickedAt));
+    const now = Date.now();
+
+    for (const line of lines) {
+      await ctx.db.patch(line._id, {
+        whatsappClickedAt: line.whatsappClickedAt ?? now,
+      });
+    }
+
+    if (!alreadyClicked) {
+      await writeAuditLog(ctx, {
+        entityId: String(lines[0]._id),
+        actionType: "WHATSAPP_CONFIRM_CLICKED",
+        changes: {
+          shortCode,
+          clickedAt: now,
+          source: "SUCCESS_PAGE_CTA",
+        },
+      });
+    }
+
+    return { recorded: true, clickedAt: lines[0].whatsappClickedAt ?? now };
   },
 });

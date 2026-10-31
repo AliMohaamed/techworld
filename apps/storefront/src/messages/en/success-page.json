@@ -1,30 +1,41 @@
 {
   "SuccessPage": {
-    "title": "Order",
-    "accentTitle": "Confirmed!",
-    "description": "Thank you for shopping with us! Your order has been confirmed and is being prepared for delivery to your address.",
-    "orderRef": "Your Order ID",
-    "nextSteps": {
-      "title": "Next Steps:",
-      "step1": "Your order has been <span class=\"text-primary font-bold\">successfully registered and confirmed</span>.",
-      "step2": "Our team is currently <span class=\"text-primary font-bold\">packing and preparing your items with care</span>.",
-      "step3": "Your package will be dispatched for <span class=\"text-primary font-bold\">delivery within 2-3 business days</span>."
+    "title": "🎉 تم استلام طلبك بنجاح!",
+    "description": "لتأكيد ومتابعة طلبك، اضغط على زر WhatsApp وأرسل الرسالة الجاهزة.",
+    "orderRef": "رقم الطلب / Order ID",
+    "copyCode": "Copy code",
+    "copiedCode": "Order code copied",
+    "copyMessage": "نسخ الرسالة",
+    "copiedMessage": "Order message copied",
+    "whatsappCta": "تأكيد الطلب عبر WhatsApp",
+    "whatsappClickedHint": "تم فتح واتساب — أرسل الرسالة الجاهزة في المحادثة لتأكيد طلبك.",
+    "messagePreviewTitle": "تفاصيل الأوردر الجاهزة للإرسال",
+    "fields": {
+      "orderCode": "رقم الطلب",
+      "customerName": "اسم العميل",
+      "customerPhone": "رقم العميل",
+      "governorate": "المحافظة",
+      "address": "العنوان",
+      "product": "المنتج",
+      "shippingFee": "تكلفة الشحن",
+      "orderTotal": "تكلفة الأوردر",
+      "freeShipping": "مجاني",
+      "currency": "جنيه"
     },
     "actions": {
-      "track": "Track Order Status",
+      "track": "Track Order",
       "back": "Continue Shopping",
-      "supportWhatsapp": "Need help? Contact us on WhatsApp"
+      "supportWhatsapp": "Confirm Order on WhatsApp"
     },
     "badges": {
       "stock": "Items Reserved",
-      "secure": "Order Confirmed",
-      "delivery": "Fast Shipping & Delivery"
+      "secure": "Cash on Delivery",
+      "delivery": "Fast Shipping"
     },
     "errors": {
       "notFound": "Order Not Found",
       "backToStore": "Back to Store"
     },
-    "loading": "Loading order data...",
-    "whatsappMessage": "Hello TechWorld! Question regarding my confirmed order {code}."
+    "loading": "Loading order data..."
   }
 }

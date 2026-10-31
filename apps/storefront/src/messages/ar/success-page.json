@@ -1,30 +1,41 @@
 {
   "SuccessPage": {
-    "title": "تم تأكيد",
-    "accentTitle": "طلبك بنجاح!",
-    "description": "شكراً لتسوقك معنا! تم تأكيد طلبك بنجاح وجاري تجهيزه للشحن والتوصيل إلى عنوانك.",
-    "orderRef": "رقم طلبك الخاص",
-    "nextSteps": {
-      "title": "الخطوات القادمة:",
-      "step1": "تم <span class=\"text-primary font-bold\">تسجيل وتأكيد طلبك</span> في نظامنا بنجاح.",
-      "step2": "فريقنا يعمل حالياً على <span class=\"text-primary font-bold\">تجهيز طلبك وتغليفه بعناية</span>.",
-      "step3": "سيتم تسليم الشحنة للمندوب و<span class=\"text-primary font-bold\">التوصيل خلال ٢-٣ أيام عمل</span>."
+    "title": "🎉 تم استلام طلبك بنجاح!",
+    "description": "لتأكيد ومتابعة طلبك، اضغط على زر WhatsApp وأرسل الرسالة الجاهزة.",
+    "orderRef": "رقم الطلب",
+    "copyCode": "نسخ الكود",
+    "copiedCode": "تم نسخ رقم الطلب",
+    "copyMessage": "نسخ الرسالة",
+    "copiedMessage": "تم نسخ تفاصيل الطلب",
+    "whatsappCta": "تأكيد ومتابعة الطلب عبر WhatsApp",
+    "whatsappClickedHint": "تم فتح واتساب — أرسل الرسالة الجاهزة في المحادثة لتأكيد طلبك.",
+    "messagePreviewTitle": "تفاصيل الأوردر الجاهزة للإرسال",
+    "fields": {
+      "orderCode": "رقم الطلب",
+      "customerName": "اسم العميل",
+      "customerPhone": "رقم العميل",
+      "governorate": "المحافظة",
+      "address": "العنوان",
+      "product": "المنتج",
+      "shippingFee": "تكلفة الشحن",
+      "orderTotal": "تكلفة الأوردر",
+      "freeShipping": "مجاني",
+      "currency": "جنيه"
     },
     "actions": {
       "track": "تتبع حالة الطلب",
       "back": "العودة للتسوق",
-      "supportWhatsapp": "تواصل معنا عبر واتساب للمساعدة"
+      "supportWhatsapp": "تأكيد الطلب عبر WhatsApp"
     },
     "badges": {
       "stock": "تم حجز المنتجات",
-      "secure": "طلب مؤكد بنجاح",
+      "secure": "الدفع عند الاستلام",
       "delivery": "شحن وتوصيل سريع"
     },
     "errors": {
       "notFound": "الطلب غير موجود",
       "backToStore": "العودة للمتجر"
     },
-    "loading": "جار تحميل بيانات الطلب...",
-    "whatsappMessage": "مرحبًا تيك وورلد! استفسار بخصوص طلبي المؤكد رقم {code}."
+    "loading": "جار تحميل بيانات الطلب..."
   }
 }
