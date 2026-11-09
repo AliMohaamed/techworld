@@ -329,6 +329,7 @@ async function placeCheckout(t: ReturnType<typeof setupConvex>, phone = "0119876
     apartmentNumber: "7",
     governorateId,
     metaAttribution: { fbp: "fb.1.1700000000000.123", clientUserAgent: "test-agent", eventSourceUrl: "https://techworldegypt.com/en/checkout" },
+    tiktokAttribution: { ttp: "ttp-cookie-value", ttclid: "E.C.P.click", userAgent: "test-agent", ipAddress: "bad ip!" },
   });
   const metaEvents = await t.run((ctx) =>
     ctx.db
@@ -336,7 +337,13 @@ async function placeCheckout(t: ReturnType<typeof setupConvex>, phone = "0119876
       .filter((q) => q.eq(q.field("shortCode"), shortCode))
       .collect(),
   );
-  return { shortCode, productId, metaEvents };
+  const tiktokEvents = await t.run((ctx) =>
+    ctx.db
+      .query("tiktok_events")
+      .filter((q) => q.eq(q.field("shortCode"), shortCode))
+      .collect(),
+  );
+  return { shortCode, productId, metaEvents, tiktokEvents };
 }
 
 describe("Meta Purchase is queued when the checkout is placed", () => {
@@ -487,6 +494,7 @@ describe("the success page reads the Purchase from the stored order", () => {
 
     expect(summary).toEqual({
       eventId: metaEvents[0].eventId,
+      tiktokEventIds: { placeAnOrder: `tt-order-${shortCode}`, purchase: `tt-purchase-${shortCode}` },
       value: metaEvents[0].value,
       currency: "EGP",
       contents: metaEvents[0].contents,
@@ -579,5 +587,54 @@ describe("success page order summary & WhatsApp click tracking", () => {
     expect(details?.whatsappClickedAt).toBe(clickResult.clickedAt);
     const whatsappAuditLogs = details?.activity.filter((a) => a.actionType === "WHATSAPP_CONFIRM_CLICKED");
     expect(whatsappAuditLogs).toHaveLength(1);
+  });
+});
+
+describe("TikTok order events are queued when the checkout is placed", () => {
+  test("queues one PlaceAnOrder and one Purchase with the stored order's value and product ids", async () => {
+    const t = setupConvex();
+    const { shortCode, productId, metaEvents, tiktokEvents } = await placeCheckout(t);
+
+    expect(tiktokEvents.map((event) => event.eventName).sort()).toEqual(["PlaceAnOrder", "Purchase"]);
+    for (const event of tiktokEvents) {
+      expect(event).toMatchObject({
+        status: "PENDING",
+        currency: "EGP",
+        value: metaEvents[0].value,
+        contents: metaEvents[0].contents,
+      });
+      expect(event.contents.every((item) => item.id === productId)).toBe(true);
+    }
+    expect(tiktokEvents.find((event) => event.eventName === "Purchase")?.eventId).toBe(`tt-purchase-${shortCode}`);
+    expect(tiktokEvents.find((event) => event.eventName === "PlaceAnOrder")?.eventId).toBe(`tt-order-${shortCode}`);
+  });
+
+  test("stores sanitised TikTok attribution on the order", async () => {
+    const t = setupConvex();
+    const { shortCode } = await placeCheckout(t);
+    const line = await t.run((ctx) =>
+      ctx.db
+        .query("orders")
+        .withIndex("by_shortCode", (q) => q.eq("shortCode", shortCode))
+        .first(),
+    );
+    expect(line?.tiktokAttribution).toEqual({
+      ttp: "ttp-cookie-value",
+      ttclid: "E.C.P.click",
+      userAgent: "test-agent",
+      ipAddress: undefined,
+      pageUrl: undefined,
+    });
+  });
+
+  test("blacklisted phones are never reported", async () => {
+    const t = setupConvex();
+    await asStaff(t, "admin", ["MANAGE_USERS"]);
+    await t.run(async (ctx) => {
+      const user = await ctx.db.query("users").first();
+      await ctx.db.insert("blacklist", { phoneNumber: "01198765432", reason: "test", addedBy: user!._id, addedAt: Date.now() });
+    });
+    const { tiktokEvents } = await placeCheckout(t);
+    expect(tiktokEvents).toHaveLength(0);
   });
 });

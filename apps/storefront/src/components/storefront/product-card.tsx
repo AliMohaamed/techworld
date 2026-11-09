@@ -9,7 +9,7 @@ import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
 import { useCart } from "@/providers/cart-provider";
 import { useFavorites } from "@/lib/use-favorites";
-import { productEventParams, trackMetaEvent } from "@/lib/meta-pixel";
+import { trackProductEvent } from "@/lib/tracking";
 import { Heart, ShoppingCart, Star, Zap } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@techworld/ui";
@@ -89,10 +89,7 @@ export default function ProductCard({ product, discountPercent }: ProductCardPro
         skuId: defaultSku._id,
         quantity: 1,
       });
-      trackMetaEvent("AddToCart", {
-        ...productEventParams([{ id: product._id, quantity: 1, item_price: displayPrice }], displayPrice),
-        content_name: product.name_en,
-      });
+      trackProductEvent("AddToCart", [{ id: product._id, quantity: 1, price: displayPrice, name: product.name_en }]);
       openCart();
     } catch (err) {
       console.error("Failed to add to cart", err);
@@ -104,6 +101,9 @@ export default function ProductCard({ product, discountPercent }: ProductCardPro
   const handleToggleFavorite = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
+    if (!favorited) {
+      trackProductEvent("AddToWishlist", [{ id: product._id, quantity: 1, price: displayPrice, name: product.name_en }]);
+    }
     toggle(product._id).catch((err) => console.error("Failed to update favorites", err));
   };
 

@@ -17,7 +17,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { toast } from "sonner";
 import { api } from "@backend/convex/_generated/api";
 import { whatsappLink } from "@/lib/contact";
-import { productEventParams, takePendingPurchase, trackMetaEvent } from "@/lib/meta-pixel";
+import { takePendingPurchase, trackOrderPlaced, trackProductEvent } from "@/lib/tracking";
 import { useSession } from "@/providers/session-provider";
 
 const SAVED_DETAILS_KEY = "tw-checkout-details";
@@ -33,9 +33,10 @@ type SavedCheckoutDetails = {
 };
 
 /**
- * Sends the browser Purchase once, from the tab that just placed the order,
- * with the value and event id read from the stored order, so it matches the
- * Conversions API copy and Meta deduplicates the two.
+ * Sends the browser order events once (Meta Purchase, TikTok PlaceAnOrder and
+ * Purchase), from the tab that just placed the order, with the values and
+ * event ids read from the stored order, so they match the server-side copies
+ * and each platform deduplicates the pair.
  */
 function usePurchaseEvent(shortCode: string) {
   const convex = useConvex();
@@ -48,12 +49,10 @@ function usePurchaseEvent(shortCode: string) {
     convex
       .query(api.cart.getPurchaseSummary, { sessionId, shortCode })
       .then((summary) => {
-        if (summary) {
-          trackMetaEvent("Purchase", productEventParams(summary.contents, summary.value), summary.eventId);
-        }
+        if (summary) trackOrderPlaced(summary, shortCode);
       })
       .catch(() => {
-        // The Conversions API copy still reports the sale.
+        // The server-side copies still report the sale.
       });
   }, [convex, sessionId, shortCode]);
 }
@@ -72,6 +71,8 @@ function SuccessContent() {
   const searchParams = useSearchParams();
   const shortCode = (searchParams.get("code") || "").trim().toUpperCase();
   usePurchaseEvent(shortCode);
+  const convex = useConvex();
+  const { sessionId } = useSession();
 
   const order = useQuery(api.orders.getSuccessOrderByCode, shortCode ? { shortCode } : "skip");
   const recordWhatsAppClick = useMutation(api.orders.recordWhatsAppClick);
@@ -164,6 +165,20 @@ function SuccessContent() {
 
   const handleWhatsAppClick = () => {
     if (!shortCode) return;
+    // Sending the transfer receipt on WhatsApp is this store's payment step.
+    if (!clickedLocal && !order?.whatsappClickedAt && sessionId) {
+      convex
+        .query(api.cart.getPurchaseSummary, { sessionId, shortCode })
+        .then((summary) => {
+          if (!summary) return;
+          trackProductEvent(
+            "AddPaymentInfo",
+            summary.contents.map((item) => ({ id: item.id, quantity: item.quantity, price: item.item_price })),
+            summary.value,
+          );
+        })
+        .catch(() => {});
+    }
     setClickedLocal(true);
     void recordWhatsAppClick({ shortCode }).catch(() => {
       // Non-blocking: opening WhatsApp for the customer always comes first.

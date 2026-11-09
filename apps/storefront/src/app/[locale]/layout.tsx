@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ThemeProvider, Toaster } from "@techworld/ui";
 import { MetaPixel } from "@/components/storefront/meta-pixel";
+import { TikTokPixel } from "@/components/storefront/tiktok-pixel";
 import { SITE_URL } from "@/lib/seo";
 import "../globals.css";
 
@@ -58,6 +59,7 @@ export default async function RootLayout({
           </NextIntlClientProvider>
         </ThemeProvider>
         <MetaPixel />
+        <TikTokPixel />
       </body>
     </html>
   );

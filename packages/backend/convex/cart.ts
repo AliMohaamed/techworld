@@ -5,7 +5,8 @@ import { internal } from "./_generated/api";
 import { resolveProductImages, resolveStorageRef } from "./products";
 import { writeAuditLog } from "./lib/audit";
 import { META_CURRENCY, purchaseEventId, purchaseTotals, queueMetaPurchase } from "./lib/metaConversions";
-import { metaAttributionValidator } from "./schema";
+import { queueTikTokOrderEvents, tiktokEventId } from "./lib/tiktokEvents";
+import { metaAttributionValidator, tiktokAttributionValidator } from "./schema";
 import { toPublicSku } from "./lib/publicSku";
 
 function normalizePromoCode(code: string) {
@@ -32,6 +33,24 @@ function sanitizeMetaAttribution(input: MetaAttribution | undefined): MetaAttrib
       input.eventSourceUrl && /^https?:\/\//.test(input.eventSourceUrl)
         ? input.eventSourceUrl.slice(0, 2048)
         : undefined,
+  };
+  return Object.values(attribution).some(Boolean) ? attribution : undefined;
+}
+
+type TikTokAttribution = typeof tiktokAttributionValidator.type;
+
+function sanitizeTikTokAttribution(input: TikTokAttribution | undefined): TikTokAttribution | undefined {
+  if (!input) return undefined;
+  const token = (value: string | undefined, max: number) =>
+    // Printable ASCII with no spaces; TikTok validates the value itself.
+    value && value.length <= max && /^[\x21-\x7e]+$/.test(value) ? value : undefined;
+  const attribution: TikTokAttribution = {
+    ttp: token(input.ttp, 200),
+    ttclid: token(input.ttclid, 500),
+    userAgent: input.userAgent?.slice(0, 512) || undefined,
+    ipAddress:
+      input.ipAddress && /^[0-9a-fA-F.:]{3,45}$/.test(input.ipAddress) ? input.ipAddress : undefined,
+    pageUrl: input.pageUrl && /^https?:\/\//.test(input.pageUrl) ? input.pageUrl.slice(0, 2048) : undefined,
   };
   return Object.values(attribution).some(Boolean) ? attribution : undefined;
 }
@@ -382,6 +401,7 @@ export const placeOrderFromSession = mutation({
     governorateId: v.id("governorates"),
     promoCode: v.optional(v.string()),
     metaAttribution: v.optional(metaAttributionValidator),
+    tiktokAttribution: v.optional(tiktokAttributionValidator),
   },
   handler: async (ctx, args) => {
     const session = await ctx.db
@@ -414,6 +434,7 @@ export const placeOrderFromSession = mutation({
 
     const shortCode = generateShortCode();
     const metaAttribution = sanitizeMetaAttribution(args.metaAttribution);
+    const tiktokAttribution = sanitizeTikTokAttribution(args.tiktokAttribution);
     const isBlacklisted = await ctx.db
       .query("blacklist")
       .withIndex("by_phone", (q) => q.eq("phoneNumber", args.customerPhone))
@@ -519,6 +540,7 @@ export const placeOrderFromSession = mutation({
         promo_code_snapshot: promoDoc?.code,
         discount_applied: discountForLine,
         metaAttribution,
+        tiktokAttribution,
       });
 
       await writeAuditLog(ctx, {
@@ -546,13 +568,15 @@ export const placeOrderFromSession = mutation({
     }
 
     // Server half of the Purchase; the success page sends the browser half with
-    // the same event id, so Meta deduplicates them.
+    // the same event id, so Meta deduplicates them. TikTok PlaceAnOrder and
+    // Purchase work the same way.
     const lines = await ctx.db
       .query("orders")
       .withIndex("by_shortCode", (q) => q.eq("shortCode", shortCode))
       .collect();
     if (lines.length > 0) {
       await queueMetaPurchase(ctx, { order: lines[0], lines });
+      await queueTikTokOrderEvents(ctx, { order: lines[0], lines });
     }
 
     if (!isBlacklisted && args.customerPhone && firstOrderId) {
@@ -610,6 +634,15 @@ export const getPurchaseSummary = query({
       return null;
     }
     const { value, contents } = purchaseTotals(lines);
-    return { eventId: purchaseEventId(lines[0]), value, currency: META_CURRENCY, contents };
+    return {
+      eventId: purchaseEventId(lines[0]),
+      tiktokEventIds: {
+        placeAnOrder: tiktokEventId("PlaceAnOrder", lines[0]),
+        purchase: tiktokEventId("Purchase", lines[0]),
+      },
+      value,
+      currency: META_CURRENCY,
+      contents,
+    };
   },
 });
