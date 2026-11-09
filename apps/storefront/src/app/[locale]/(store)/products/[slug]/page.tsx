@@ -13,7 +13,7 @@ import { DynamicProductGallery } from "@/components/storefront/DynamicProductGal
 import { ProductReviews } from "@/components/storefront/product-reviews";
 import { StarRating } from "@/components/storefront/star-rating";
 import { useFavorites } from "@/lib/use-favorites";
-import { productEventParams, trackMetaEvent } from "@/lib/meta-pixel";
+import { trackProductEvent } from "@/lib/tracking";
 import { recordRecentlyViewed } from "@/lib/recently-viewed";
 import { ColorSwatch, getColorDisplayName, ProductFeatures, cn } from "@techworld/ui";
 import { RelatedProducts } from "@/components/storefront/related-products";
@@ -126,10 +126,7 @@ export default function ProductDetailPage() {
     viewContentSentFor.current = product._id;
     const defaultSku = product.skus?.find((sku: ProductSku) => sku.isDefault) ?? product.skus?.[0];
     const price = defaultSku?.price || product.selling_price || 0;
-    trackMetaEvent("ViewContent", {
-      ...productEventParams([{ id: product._id, quantity: 1, item_price: price }], price),
-      content_name: product.name_en,
-    });
+    trackProductEvent("ViewContent", [{ id: product._id, quantity: 1, price, name: product.name_en }]);
   }, [product]);
 
   const defaultSkuId = product?.skus?.find((sku: ProductSku) => sku.isDefault)?._id ?? product?.skus?.[0]?._id;
@@ -255,13 +252,18 @@ export default function ProductDetailPage() {
         items,
       });
       const addedQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-      trackMetaEvent("AddToCart", {
-        ...productEventParams(
-          [{ id: product._id, quantity: addedQuantity, item_price: totalPrice / Math.max(1, addedQuantity) }],
-          totalPrice,
-        ),
-        content_name: product.name_en,
-      });
+      trackProductEvent(
+        "AddToCart",
+        [
+          {
+            id: product._id,
+            quantity: addedQuantity,
+            price: Math.round((totalPrice / Math.max(1, addedQuantity)) * 100) / 100,
+            name: product.name_en,
+          },
+        ],
+        totalPrice,
+      );
       setQuantity(1);
       setUnitOverrides({});
       if (mode === "buyNow") {
@@ -581,6 +583,11 @@ export default function ProductDetailPage() {
                 <button
                   type="button"
                   onClick={() => {
+                    if (!isFavorite(product._id)) {
+                      trackProductEvent("AddToWishlist", [
+                        { id: product._id, quantity: 1, price: selectedVariant?.price || product.selling_price || 0, name: product.name_en },
+                      ]);
+                    }
                     toggleFavorite(product._id).catch((err) => console.error("Failed to update favorites", err));
                   }}
                   aria-pressed={isFavorite(product._id)}

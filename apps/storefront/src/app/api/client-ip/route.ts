@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Returns the caller's public IP so checkout can store it for the Meta
- * Conversions API (client_ip_address); Convex mutations cannot see it.
+ * Returns the caller's public IP so checkout can store it for the Meta and TikTok
+ * server-side events (client_ip_address / ip); Convex mutations cannot see it.
  * The site sits behind Cloudflare, then Vercel, so Cloudflare's header wins.
  */
 export function GET(request: NextRequest) {

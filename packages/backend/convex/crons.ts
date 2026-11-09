@@ -23,4 +23,11 @@ crons.hourly(
   internal.metaConversions.flushPendingEvents,
 );
 
+// Same for TikTok Events API order events. No-op while TIKTOK_EVENTS_ACCESS_TOKEN is unset.
+crons.hourly(
+  "flush tiktok events",
+  { minuteUTC: 45 },
+  internal.tiktokEvents.flushPendingEvents,
+);
+
 export default crons;

@@ -6,7 +6,9 @@ import Image from "next/image";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { useSession } from "@/providers/session-provider";
-import { getMetaAttribution, markPurchasePending, productEventParams, trackMetaEvent } from "@/lib/meta-pixel";
+import { getMetaAttribution } from "@/lib/meta-pixel";
+import { getTikTokAttribution, identifyTikTokUser } from "@/lib/tiktok-pixel";
+import { markPurchasePending, trackProductEvent } from "@/lib/tracking";
 import { ChevronLeft, ChevronDown, Loader2, Minus, Plus, ShieldCheck, ShoppingBag, Trash2 } from "lucide-react";
 import { Link, useRouter } from "@/navigation";
 import { useTranslations, useLocale } from "next-intl";
@@ -16,18 +18,19 @@ import { ColorSwatch, PromoCodeInput, cn, getColorDisplayName } from "@techworld
 /** Remembers delivery details on this device so repeat customers don't retype them. */
 const SAVED_DETAILS_KEY = "tw-checkout-details";
 
-type MetaCartItem = {
+type TrackedCartItem = {
   productId: string;
   quantity: number;
   sku?: { price?: number } | null;
-  product?: { selling_price?: number } | null;
+  product?: { selling_price?: number; name_en?: string } | null;
 };
 
-const metaContents = (items: MetaCartItem[]) =>
+const trackedItems = (items: TrackedCartItem[]) =>
   items.map((item) => ({
     id: item.productId,
     quantity: item.quantity,
-    item_price: item.sku?.price || item.product?.selling_price || 0,
+    price: item.sku?.price || item.product?.selling_price || 0,
+    name: item.product?.name_en,
   }));
 
 type FormFields = {
@@ -115,7 +118,7 @@ export default function CheckoutForm() {
   useEffect(() => {
     if (!cart || cart.items.length === 0 || initiateCheckoutSent.current) return;
     initiateCheckoutSent.current = true;
-    trackMetaEvent("InitiateCheckout", productEventParams(metaContents(cart.items), cart.total));
+    trackProductEvent("InitiateCheckout", trackedItems(cart.items), cart.total);
   }, [cart]);
 
   // Mobile shows a fixed CTA bar until the in-page button scrolls into view.
@@ -238,6 +241,13 @@ export default function CheckoutForm() {
     setSubmitError(null);
     setIsSubmitting(true);
     try {
+      // Advanced matching and click ids for the ad platforms; each resolves
+      // quickly (or to undefined) and never blocks the order.
+      const [metaAttribution, tiktokAttribution] = await Promise.all([
+        getMetaAttribution(),
+        getTikTokAttribution(),
+        identifyTikTokUser({ email: details.email, phone: details.phone }),
+      ]);
       const shortCode = await placeOrder({
         sessionId,
         customerName: details.fullName,
@@ -250,7 +260,8 @@ export default function CheckoutForm() {
         floorNumber: details.floorNumber,
         apartmentNumber: details.apartmentNumber,
         promoCode: promoCode || undefined,
-        metaAttribution: await getMetaAttribution(),
+        metaAttribution,
+        tiktokAttribution,
       });
       markPurchasePending(shortCode);
       try {

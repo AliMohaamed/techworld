@@ -38,6 +38,14 @@ export const metaAttributionValidator = v.object({
   eventSourceUrl: v.optional(v.string()),
 });
 
+export const tiktokAttributionValidator = v.object({
+  ttp: v.optional(v.string()),
+  ttclid: v.optional(v.string()),
+  userAgent: v.optional(v.string()),
+  ipAddress: v.optional(v.string()),
+  pageUrl: v.optional(v.string()),
+});
+
 export const metaEventStatusValidator = v.union(
   v.literal("PENDING"),
   v.literal("SENT"),
@@ -192,6 +200,8 @@ export default defineSchema({
     // Browser context captured at checkout so the server-side Purchase sent on
     // delivery can be matched to the shopper's Meta ad click.
     metaAttribution: v.optional(metaAttributionValidator),
+    // Same for the TikTok Events API: _ttp cookie and ttclid click id.
+    tiktokAttribution: v.optional(tiktokAttributionValidator),
     whatsappClickedAt: v.optional(v.number()),
   })
     .index("by_shortCode", ["shortCode"])
@@ -210,6 +220,28 @@ export default defineSchema({
     shortCode: v.optional(v.string()),
     orderId: v.id("orders"),
     eventTime: v.number(), // Unix seconds, when the order was placed (Purchase) or delivered (OrderDelivered)
+    value: v.number(),
+    currency: v.string(),
+    contents: v.array(v.object({ id: v.string(), quantity: v.number(), item_price: v.number() })),
+    status: metaEventStatusValidator,
+    attempts: v.number(),
+    lastError: v.optional(v.string()),
+    sentAt: v.optional(v.number()),
+    leaseUntil: v.optional(v.number()), // set while a send is in flight
+  })
+    .index("by_eventId", ["eventId"])
+    .index("by_status", ["status"]),
+
+  /**
+   * Outbox for TikTok Events API events, one row per event_id. The storefront
+   * sends the browser copy of each event with the same id, so TikTok counts it once.
+   */
+  tiktok_events: defineTable({
+    eventId: v.string(),
+    eventName: v.union(v.literal("PlaceAnOrder"), v.literal("Purchase")),
+    shortCode: v.optional(v.string()),
+    orderId: v.id("orders"),
+    eventTime: v.number(), // Unix seconds, when the order was placed
     value: v.number(),
     currency: v.string(),
     contents: v.array(v.object({ id: v.string(), quantity: v.number(), item_price: v.number() })),

@@ -4,8 +4,11 @@ import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 
 import { Loader2, Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCatalogParams } from "@/lib/use-catalog-params";
+import { trackSearch } from "@/lib/tracking";
 
 const DEBOUNCE_MS = 300;
+// A query counts as a search once it has stayed put this long, not on every pause while typing.
+const SEARCH_EVENT_DELAY_MS = 1500;
 
 type CatalogSearchProps = {
   /** True while results for the current query are still loading. */
@@ -42,6 +45,17 @@ export default function CatalogSearch({ isLoading = false }: CatalogSearchProps)
     return () => clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- debounce keyed on the typed value only
   }, [value]);
+
+  const lastTrackedRef = useRef("");
+  useEffect(() => {
+    const query = urlQuery.trim();
+    if (!query || query === lastTrackedRef.current) return;
+    const timeout = setTimeout(() => {
+      lastTrackedRef.current = query;
+      trackSearch(query);
+    }, SEARCH_EVENT_DELAY_MS);
+    return () => clearTimeout(timeout);
+  }, [urlQuery]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
