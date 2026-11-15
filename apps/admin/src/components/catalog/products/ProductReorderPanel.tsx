@@ -1,13 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation } from "convex/react";
 import { toast } from "sonner";
-import { Button, cn } from "@techworld/ui";
+import {
+  Button,
+  cn,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@techworld/ui";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
+import { byManualOrder } from "@backend/convex/lib/productOrder";
 import { useTranslations, useLocale } from "next-intl";
-import { GripVertical, Save, Loader2, Wand2 } from "lucide-react";
+import { ArrowUpToLine, GripVertical, Save, Loader2, Undo2, Wand2 } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -28,22 +37,34 @@ import { CSS } from "@dnd-kit/utilities";
 
 type ReorderProduct = {
   _id: Id<"products">;
+  _creationTime: number;
+  categoryId: Id<"categories">;
   name_en: string;
   name_ar: string;
   selling_price: number;
   status: "DRAFT" | "PUBLISHED";
   sort_order?: number;
+  category_sort_order?: number;
   categoryName: string;
 };
+
+/** "all" = global listing order; otherwise the order inside one category. */
+type Scope = "all" | Id<"categories">;
 
 function SortableProductRow({
   product,
   index,
   locale,
+  showCategory,
+  onMoveToTop,
+  moveToTopLabel,
 }: {
   product: ReorderProduct;
   index: number;
   locale: string;
+  showCategory: boolean;
+  onMoveToTop: () => void;
+  moveToTopLabel: string;
 }) {
   const {
     attributes,
@@ -94,10 +115,12 @@ function SortableProductRow({
         </p>
       </div>
 
-      {/* Category */}
-      <span className="hidden sm:inline-flex text-xs font-bold text-muted-foreground/40 bg-accent/50 px-3 py-1 rounded-full">
-        {product.categoryName}
-      </span>
+      {/* Category (redundant when already scoped to one category) */}
+      {showCategory && (
+        <span className="hidden sm:inline-flex text-xs font-bold text-muted-foreground/40 bg-accent/50 px-3 py-1 rounded-full">
+          {product.categoryName}
+        </span>
+      )}
 
       {/* Price */}
       <span className="text-sm font-bold text-foreground whitespace-nowrap">
@@ -123,6 +146,21 @@ function SortableProductRow({
         />
         {product.status}
       </span>
+
+      {/* Move to top: quick way to feature a product without long drags */}
+      <button
+        type="button"
+        onClick={onMoveToTop}
+        // Keep pointer/keyboard events from starting a drag on the row.
+        onPointerDown={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+        disabled={index === 0}
+        title={moveToTopLabel}
+        aria-label={moveToTopLabel}
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-muted-foreground/50 transition-colors hover:bg-[#ffc105]/10 hover:text-[#ffc105] disabled:pointer-events-none disabled:opacity-0"
+      >
+        <ArrowUpToLine size={16} />
+      </button>
     </div>
   );
 }
@@ -137,20 +175,41 @@ export function ProductReorderPanel({
   const reorderProducts = useMutation(api.products.reorderProducts);
   const initializeSortOrder = useMutation(api.products.initializeSortOrder);
 
-  const [orderedProducts, setOrderedProducts] = useState<ReorderProduct[]>(products);
+  const [scope, setScope] = useState<Scope>("all");
+  // Unsaved arrangement; null means "show the server order".
+  const [draft, setDraft] = useState<ReorderProduct[] | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
 
-  // Sync when products prop changes (but only if no pending changes)
-  const [lastProductIds, setLastProductIds] = useState(
-    products.map((p) => p._id).join(",")
+  const categories = useMemo(() => {
+    const counts = new Map<Id<"categories">, { name: string; count: number }>();
+    for (const p of products) {
+      const entry = counts.get(p.categoryId);
+      counts.set(p.categoryId, { name: p.categoryName, count: (entry?.count ?? 0) + 1 });
+    }
+    return [...counts.entries()]
+      .map(([id, { name, count }]) => ({ id, name, count }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [products]);
+
+  // A category that lost its last product falls back to the global view.
+  const activeScope: Scope =
+    scope !== "all" && !categories.some((c) => c.id === scope) ? "all" : scope;
+  const isCategoryScope = activeScope !== "all";
+
+  const scopedProducts = useMemo(
+    () =>
+      activeScope === "all"
+        ? [...products].sort(byManualOrder("sort_order"))
+        : products
+            .filter((p) => p.categoryId === activeScope)
+            .sort(byManualOrder("category_sort_order")),
+    [products, activeScope],
   );
-  const currentIds = products.map((p) => p._id).join(",");
-  if (currentIds !== lastProductIds && !hasChanges) {
-    setOrderedProducts(products);
-    setLastProductIds(currentIds);
-  }
+
+  const orderedProducts = draft ?? scopedProducts;
+  const hasChanges = draft !== null;
+  const activeCategoryName = categories.find((c) => c.id === activeScope)?.name;
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -166,9 +225,12 @@ export function ProductReorderPanel({
     if (over && active.id !== over.id) {
       const oldIndex = orderedProducts.findIndex((p) => p._id === active.id);
       const newIndex = orderedProducts.findIndex((p) => p._id === over.id);
-      setOrderedProducts(arrayMove(orderedProducts, oldIndex, newIndex));
-      setHasChanges(true);
+      setDraft(arrayMove(orderedProducts, oldIndex, newIndex));
     }
+  };
+
+  const handleMoveToTop = (index: number) => {
+    setDraft(arrayMove(orderedProducts, index, 0));
   };
 
   const handleSave = async () => {
@@ -178,10 +240,13 @@ export function ProductReorderPanel({
         id: product._id,
         sort_order: index + 1,
       }));
-      await reorderProducts({ updates });
+      await reorderProducts({
+        updates,
+        ...(isCategoryScope ? { categoryId: activeScope } : {}),
+      });
       toast.success(t("saved"));
-      setHasChanges(false);
-    } catch (error) {
+      setDraft(null);
+    } catch {
       toast.error(t("saveFailed"));
     } finally {
       setIsSaving(false);
@@ -193,18 +258,20 @@ export function ProductReorderPanel({
     try {
       await initializeSortOrder({});
       toast.success(t("initSuccess"));
-    } catch (error) {
+    } catch {
       toast.error(t("initFailed"));
     } finally {
       setIsInitializing(false);
     }
   };
 
-  const needsInit = products.some((p) => p.sort_order === undefined || p.sort_order === null);
+  const needsInit = products.some(
+    (p) => p.sort_order == null || p.category_sort_order == null,
+  );
 
   return (
     <section className="overflow-hidden rounded-[40px] border border-border bg-card transition-all">
-      <div className="border-b border-border bg-accent/30 px-10 py-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="border-b border-border bg-accent/30 px-10 py-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
           <div className="h-6 w-1 bg-[#ffc105] rounded-full" />
           <div>
@@ -212,14 +279,45 @@ export function ProductReorderPanel({
               {t("badge")}
             </p>
             <h2 className="text-2xl font-bold text-foreground mt-1">
-              {t("title")}
+              {isCategoryScope
+                ? t("categoryTitle", { category: activeCategoryName ?? "" })
+                : t("title")}
             </h2>
             <p className="text-sm font-medium text-muted-foreground/50 mt-1 max-w-xl">
-              {t("description")}
+              {isCategoryScope
+                ? t("categoryDescription", { category: activeCategoryName ?? "" })
+                : t("description")}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <Select
+            value={activeScope}
+            onValueChange={(value) => setScope(value as Scope)}
+            disabled={hasChanges}
+          >
+            <SelectTrigger
+              aria-label={t("scopeLabel")}
+              title={hasChanges ? t("scopeLocked") : t("scopeLabel")}
+              className="h-11 w-56 rounded-2xl border-border bg-background text-xs font-bold"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-border bg-card">
+              <SelectItem value="all" className="text-xs font-bold cursor-pointer">
+                {t("allProducts", { count: products.length })}
+              </SelectItem>
+              {categories.map((category) => (
+                <SelectItem
+                  key={category.id}
+                  value={category.id}
+                  className="text-xs font-bold cursor-pointer"
+                >
+                  {category.name} ({category.count})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {needsInit && (
             <Button
               type="button"
@@ -234,6 +332,18 @@ export function ProductReorderPanel({
                 <Wand2 className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
               )}
               {t("initOrder")}
+            </Button>
+          )}
+          {hasChanges && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDraft(null)}
+              disabled={isSaving}
+              className="rounded-2xl h-11 px-6 text-xs font-bold border-border transition-all"
+            >
+              <Undo2 className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
+              {t("discard")}
             </Button>
           )}
           <Button
@@ -274,6 +384,9 @@ export function ProductReorderPanel({
                   product={product}
                   index={index}
                   locale={locale}
+                  showCategory={!isCategoryScope}
+                  onMoveToTop={() => handleMoveToTop(index)}
+                  moveToTopLabel={t("moveToTop")}
                 />
               ))}
             </div>

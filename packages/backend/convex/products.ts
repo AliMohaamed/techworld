@@ -1,5 +1,12 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query, MutationCtx, QueryCtx, internalAction } from "./_generated/server";
+import {
+  mutation,
+  query,
+  MutationCtx,
+  QueryCtx,
+  internalAction,
+  internalMutation,
+} from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
 import { requirePermission } from "./lib/rbac";
 import { hasPermission } from "./lib/permissions";
@@ -11,6 +18,7 @@ import { productFeatureValidator } from "./schema";
 import * as r2 from "./lib/r2";
 import { ratingSummaryOf } from "./lib/ratings";
 import { isSkuInStock, toPublicSku } from "./lib/publicSku";
+import { byManualOrder, maxPosition, type ManualOrderKey } from "./lib/productOrder";
 
 type CatalogProduct = {
   _id: Id<"products">;
@@ -29,6 +37,7 @@ type CatalogProduct = {
   slug?: string;
   cogs?: number;
   sort_order?: number;
+  category_sort_order?: number;
   compareAtPrice?: number;
   isFeatured?: boolean;
   rating_sum?: number;
@@ -184,9 +193,38 @@ const matchesSearch = (product: CatalogProduct, rawQuery: string) => {
     .some((value) => value!.toLowerCase().includes(normalizedQuery));
 };
 
+/** Next free slot at the end of a category's manual order. */
+async function nextCategoryPosition(
+  ctx: Pick<MutationCtx, "db">,
+  categoryId: Id<"categories">,
+) {
+  const siblings = await ctx.db
+    .query("products")
+    .withIndex("by_category", (q) => q.eq("categoryId", categoryId))
+    .collect();
+  return maxPosition(siblings, "category_sort_order") + 1;
+}
+
+/** Positions for a brand-new product: last in both the global and its category order. */
+async function initialPositions(
+  ctx: Pick<MutationCtx, "db">,
+  categoryId: Id<"categories">,
+) {
+  const all = await ctx.db.query("products").collect();
+  return {
+    sort_order: maxPosition(all, "sort_order") + 1,
+    category_sort_order:
+      maxPosition(
+        all.filter((p) => p.categoryId === categoryId),
+        "category_sort_order",
+      ) + 1,
+  };
+}
+
 const sortCatalogProducts = (
   products: CatalogProduct[],
   sortOrder?: "price_asc" | "price_desc" | "newest",
+  manualKey: ManualOrderKey = "sort_order",
 ) => {
   const sorted = [...products];
 
@@ -200,14 +238,7 @@ const sortCatalogProducts = (
     return sorted;
   }
 
-  // Default sorting: sort_order ascending, then creationTime descending
-  sorted.sort((a, b) => {
-    const aOrder = a.sort_order ?? Number.MAX_SAFE_INTEGER;
-    const bOrder = b.sort_order ?? Number.MAX_SAFE_INTEGER;
-    if (aOrder !== bOrder) return aOrder - bOrder;
-    return b._creationTime - a._creationTime;
-  });
-  return sorted;
+  return sorted.sort(byManualOrder(manualKey));
 };
 
 const paginateResults = <T>(
@@ -477,7 +508,7 @@ export const getRelatedProducts = query({
       const selectedIds = new Set<Id<"products">>(selected.map((c) => c.product._id));
       const pool = await ctx.db
         .query("products")
-        .withIndex("by_category_status_sort_order", (q) =>
+        .withIndex("by_category_status_category_sort_order", (q) =>
           q.eq("categoryId", product.categoryId).eq("status", "PUBLISHED"),
         )
         .take(RELATED_CANDIDATE_POOL + selectedIds.size + 1);
@@ -616,7 +647,11 @@ export const searchAndFilter = query({
       });
 
       const sorted = await Promise.all(
-        sortCatalogProducts(filtered, args.sortOrder).map(async (p) => {
+        sortCatalogProducts(
+          filtered,
+          args.sortOrder,
+          args.categoryId ? "category_sort_order" : "sort_order",
+        ).map(async (p) => {
           const mapped = mapCatalogProduct(p);
           const category = activeCategories.find((c) => c._id === p.categoryId);
           return {
@@ -642,7 +677,7 @@ export const searchAndFilter = query({
       } else {
         baseQuery = ctx.db
           .query("products")
-          .withIndex("by_category_status_sort_order", (q) =>
+          .withIndex("by_category_status_category_sort_order", (q) =>
             q.eq("categoryId", args.categoryId as Id<"categories">).eq("status", "PUBLISHED"),
           );
       }
@@ -715,12 +750,7 @@ export const getRecommendedProducts = query({
       products: await Promise.all(
         products
           .filter((product) => activeCategoryIds.has(product.categoryId))
-          .sort((a, b) => {
-            const aOrder = a.sort_order ?? Number.MAX_SAFE_INTEGER;
-            const bOrder = b.sort_order ?? Number.MAX_SAFE_INTEGER;
-            if (aOrder !== bOrder) return aOrder - bOrder;
-            return b._creationTime - a._creationTime;
-          })
+          .sort(byManualOrder("sort_order"))
           .slice(0, 4)
           .map(async (product) => {
             const mapped = mapCatalogProduct(product as CatalogProduct);
@@ -763,13 +793,7 @@ export const listAdminProducts = query({
       }),
     );
 
-    // Sort by sort_order ascending (products with sort_order come first, then by creation time)
-    return results.sort((a, b) => {
-      const aOrder = a.sort_order ?? Number.MAX_SAFE_INTEGER;
-      const bOrder = b.sort_order ?? Number.MAX_SAFE_INTEGER;
-      if (aOrder !== bOrder) return aOrder - bOrder;
-      return b._creationTime - a._creationTime;
-    });
+    return results.sort(byManualOrder("sort_order"));
   },
 });
 
@@ -835,12 +859,7 @@ export const getForStorefront = query({
     return await Promise.all(
       publishedProducts
         .filter((p) => activeCategoryIds.has(p.categoryId))
-        .sort((a, b) => {
-          const aOrder = a.sort_order ?? Number.MAX_SAFE_INTEGER;
-          const bOrder = b.sort_order ?? Number.MAX_SAFE_INTEGER;
-          if (aOrder !== bOrder) return aOrder - bOrder;
-          return b._creationTime - a._creationTime;
-        })
+        .sort(byManualOrder("sort_order"))
         .map(async (p) => {
           const category = activeCategories.find((c) => c._id === p.categoryId);
           return {
@@ -1148,10 +1167,8 @@ export const createProduct = mutation({
 
     const productId = await ctx.db.insert("products", payload);
 
-    // Auto-assign sort_order: place new product at the end
-    const allProducts = await ctx.db.query("products").collect();
-    const maxOrder = allProducts.reduce((max, p) => Math.max(max, p.sort_order ?? 0), 0);
-    await ctx.db.patch(productId, { sort_order: maxOrder + 1 });
+    // New products go last in both the global and their category's order.
+    await ctx.db.patch(productId, await initialPositions(ctx, args.categoryId));
 
     await ctx.runMutation(internal.audit.logAudit, {
       userId: user._id,
@@ -1220,8 +1237,14 @@ export const updateProduct = mutation({
 
     nextSlug = await generateUniqueProductSlug(ctx, nextSlug, args.id);
 
+    const categoryChanged = nextCategoryId !== existing.categoryId;
+
     const patch = {
       ...(args.categoryId !== undefined ? { categoryId: nextCategoryId } : {}),
+      // Moving to another category: its old position is meaningless there, append it.
+      ...(categoryChanged
+        ? { category_sort_order: await nextCategoryPosition(ctx, nextCategoryId) }
+        : {}),
       ...(args.name_ar !== undefined ? { name_ar: args.name_ar.trim() } : {}),
       ...(args.name_en !== undefined ? { name_en: nextNameEn, name: nextNameEn } : {}),
       ...(args.description_ar !== undefined
@@ -1369,10 +1392,8 @@ export const createAdvancedProduct = mutation({
     };
     const productId = await ctx.db.insert("products", payload);
 
-    // Auto-assign sort_order: place new product at the end
-    const allProducts = await ctx.db.query("products").collect();
-    const maxOrder = allProducts.reduce((max, p) => Math.max(max, p.sort_order ?? 0), 0);
-    await ctx.db.patch(productId, { sort_order: maxOrder + 1 });
+    // New products go last in both the global and their category's order.
+    await ctx.db.patch(productId, await initialPositions(ctx, args.categoryId));
 
     await replaceAdvancedProductSkus(ctx, productId, normalizedVariants, user._id);
 
@@ -1446,6 +1467,10 @@ export const updateAdvancedProduct = mutation({
     // C1 FIX: Do NOT aggregate stock onto the product root. Stock lives on skus table only.
     const patch = {
       categoryId: args.categoryId,
+      // Moving to another category: its old position is meaningless there, append it.
+      ...(args.categoryId !== existing.categoryId
+        ? { category_sort_order: await nextCategoryPosition(ctx, args.categoryId) }
+        : {}),
       name_ar,
       name_en,
       description_ar: normalizeOptionalString(args.description_ar),
@@ -1519,8 +1544,13 @@ export const updateAdvancedProduct = mutation({
   },
 });
 
+/**
+ * Saves a manual order. Without `categoryId` it sets the global listing order
+ * (`sort_order`); with it, the order inside that category (`category_sort_order`).
+ */
 export const reorderProducts = mutation({
   args: {
+    categoryId: v.optional(v.id("categories")),
     updates: v.array(
       v.object({
         id: v.id("products"),
@@ -1530,18 +1560,32 @@ export const reorderProducts = mutation({
   },
   handler: async (ctx, args) => {
     const user = await requirePermission(ctx, "MANAGE_PRODUCTS");
+    const key: ManualOrderKey = args.categoryId ? "category_sort_order" : "sort_order";
+
+    if (args.categoryId) {
+      await ensureCategoryExists(ctx, args.categoryId);
+    }
 
     for (const update of args.updates) {
       const product = await ctx.db.get(update.id);
       if (!product) continue;
-      await ctx.db.patch(update.id, { sort_order: update.sort_order });
+      if (args.categoryId && product.categoryId !== args.categoryId) {
+        // The admin list is stale (product was moved meanwhile); refuse rather than
+        // silently writing a position that belongs to another category.
+        throw new ConvexError({
+          code: "CATEGORY_MISMATCH",
+          message: "A product no longer belongs to this category. Refresh and try again.",
+        });
+      }
+      await ctx.db.patch(update.id, { [key]: update.sort_order });
     }
 
     await writeAuditLog(ctx, {
       userId: user._id,
-      entityId: "BATCH_REORDER",
-      actionType: "REORDER_PRODUCTS",
+      entityId: args.categoryId ?? "BATCH_REORDER",
+      actionType: args.categoryId ? "REORDER_CATEGORY_PRODUCTS" : "REORDER_PRODUCTS",
       changes: {
+        categoryId: args.categoryId,
         count: args.updates.length,
         updates: args.updates,
       },
@@ -1549,24 +1593,67 @@ export const reorderProducts = mutation({
   },
 });
 
+/**
+ * Fills in missing positions without disturbing existing ones:
+ * - sort_order: by creation time (oldest first), as before
+ * - category_sort_order: per category, seeded from the current global order so
+ *   category pages look unchanged until an admin curates them
+ * Returns the number of products patched.
+ */
+async function backfillPositions(ctx: Pick<MutationCtx, "db">) {
+  const products = await ctx.db.query("products").collect();
+  let patched = 0;
+
+  const byCreation = [...products].sort((a, b) => a._creationTime - b._creationTime);
+  let order = 1;
+  for (const product of byCreation) {
+    if (product.sort_order === undefined) {
+      await ctx.db.patch(product._id, { sort_order: order });
+      product.sort_order = order;
+      patched++;
+    }
+    order++;
+  }
+
+  const byCategory = new Map<Id<"categories">, Doc<"products">[]>();
+  for (const product of products) {
+    byCategory.set(product.categoryId, [...(byCategory.get(product.categoryId) ?? []), product]);
+  }
+  for (const siblings of byCategory.values()) {
+    let next = maxPosition(siblings, "category_sort_order");
+    for (const product of siblings
+      .filter((p) => p.category_sort_order === undefined)
+      .sort(byManualOrder("sort_order"))) {
+      await ctx.db.patch(product._id, { category_sort_order: ++next });
+      patched++;
+    }
+  }
+
+  return patched;
+}
+
 export const initializeSortOrder = mutation({
   args: {},
   handler: async (ctx) => {
-    await requirePermission(ctx, "MANAGE_PRODUCTS");
+    const user = await requirePermission(ctx, "MANAGE_PRODUCTS");
+    const patched = await backfillPositions(ctx);
 
-    const products = await ctx.db.query("products").collect();
-
-    // Sort by creation time (oldest first) to assign sort_order
-    const sorted = [...products].sort((a, b) => a._creationTime - b._creationTime);
-
-    let order = 1;
-    for (const product of sorted) {
-      if (product.sort_order === undefined || product.sort_order === null) {
-        await ctx.db.patch(product._id, { sort_order: order });
-      }
-      order++;
-    }
+    await writeAuditLog(ctx, {
+      userId: user._id,
+      entityId: "BATCH_REORDER",
+      actionType: "INITIALIZE_PRODUCT_ORDER",
+      changes: { patched },
+    });
   },
+});
+
+/**
+ * Deploy-time backfill for category_sort_order (no auth, CLI only):
+ * `npx convex run products:backfillProductPositions`
+ */
+export const backfillProductPositions = internalMutation({
+  args: {},
+  handler: async (ctx) => ({ patched: await backfillPositions(ctx) }),
 });
 
 export const deleteObjectAction = internalAction({
