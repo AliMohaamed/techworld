@@ -11,7 +11,9 @@ import { after, NextRequest, NextResponse } from "next/server";
  * Env (server only): TIKTOK_EVENTS_ACCESS_TOKEN, optional TIKTOK_TEST_EVENT_CODE.
  * The pixel id comes from NEXT_PUBLIC_TIKTOK_PIXEL_ID.
  */
-const TIKTOK_EVENTS_URL = "https://business-api.tiktok.com/open_api/v1.3/event/track/";
+// TIKTOK_EVENTS_API_URL exists only to point local tests at a mock endpoint.
+const TIKTOK_EVENTS_URL =
+  process.env.TIKTOK_EVENTS_API_URL?.trim() || "https://business-api.tiktok.com/open_api/v1.3/event/track/";
 const ALLOWED_EVENTS = new Set(["ViewContent", "Search", "AddToWishlist", "AddToCart", "InitiateCheckout", "AddPaymentInfo"]);
 const MAX_BODY_BYTES = 16 * 1024;
 const MAX_EVENT_AGE_SECONDS = 60 * 60;

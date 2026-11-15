@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button, Input, Label, Switch, cn } from "@techworld/ui";
 import { toast } from "sonner";
+import { hasPermission } from "@backend/convex/lib/permissions";
 
 const governorateFormSchema = z.object({
   name_en: z.string().min(1, "English name is required"),
@@ -31,7 +32,12 @@ const emptyValues: GovernorateFormValues = {
 export default function GovernoratesSettingsPage() {
   const t = useTranslations('Settings.governorates');
   const locale = useLocale();
-  const governorates = useQuery(api.governorates.listGovernoratesForAdmin);
+  const me = useQuery(api.users.getMe);
+  const canManageConfig = hasPermission(me, "MANAGE_SYSTEM_CONFIG");
+  const governorates = useQuery(
+    api.governorates.listGovernoratesForAdmin,
+    canManageConfig ? {} : "skip",
+  );
   const createGovernorate = useMutation(api.governorates.createGovernorate);
   const updateGovernorate = useMutation(api.governorates.updateGovernorate);
   const toggleGovernorateStatus = useMutation(api.governorates.toggleGovernorateStatus);
@@ -126,6 +132,17 @@ export default function GovernoratesSettingsPage() {
       setBusyId(null);
     }
   };
+
+  if (me && !canManageConfig) {
+    return (
+      <main className="flex min-h-[60vh] flex-col items-center justify-center space-y-6 text-center p-12 bg-background">
+        <div className="flex h-20 w-20 items-center justify-center rounded-[28px] border border-border bg-card text-destructive">
+          <AlertTriangle size={40} />
+        </div>
+        <h2 className="text-2xl font-bold text-foreground">Access Restricted</h2>
+      </main>
+    );
+  }
 
   return (
     <main className="space-y-8 pb-10">

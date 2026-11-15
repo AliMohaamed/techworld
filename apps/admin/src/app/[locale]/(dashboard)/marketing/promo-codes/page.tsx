@@ -19,11 +19,14 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
+import { hasPermission } from "@backend/convex/lib/permissions";
 
 export default function PromoCodesPage() {
   const t = useTranslations("Marketing.promoCodes");
   const locale = useLocale();
-  const promoCodes = useQuery(api.promoCodes.list);
+  const me = useQuery(api.users.getMe);
+  const canManageConfig = hasPermission(me, "MANAGE_SYSTEM_CONFIG");
+  const promoCodes = useQuery(api.promoCodes.list, canManageConfig ? {} : "skip");
   const toggleActive = useMutation(api.promoCodes.toggleActive);
   const removePromo = useMutation(api.promoCodes.remove);
 
@@ -79,6 +82,17 @@ export default function PromoCodesPage() {
       setBusyId(null);
     }
   };
+
+  if (me && !canManageConfig) {
+    return (
+      <main className="flex min-h-[60vh] flex-col items-center justify-center space-y-6 text-center p-12 bg-background">
+        <div className="flex h-20 w-20 items-center justify-center rounded-[28px] border border-border bg-card text-destructive">
+          <AlertCircle size={40} />
+        </div>
+        <h2 className="text-2xl font-bold text-foreground">Access Restricted</h2>
+      </main>
+    );
+  }
 
   return (
     <main className="space-y-8 pb-10">

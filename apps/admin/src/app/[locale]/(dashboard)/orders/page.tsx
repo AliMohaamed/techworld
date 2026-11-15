@@ -74,12 +74,13 @@ function OrdersQueue() {
   const searchParams = useSearchParams();
 
   const profile = useQuery(api.auth.getCurrentStaffProfile);
-  const canViewOrders =
-    profile?.permissions?.some((permission) => String(permission) === "VIEW_ORDERS") ?? false;
+  const canViewOrders = hasPermission(profile, "VIEW_ORDERS");
   const canVerifyPayments = hasPermission(profile, "VERIFY_PAYMENTS");
+  const canViewFinancials = hasPermission(profile, "VIEW_FINANCIALS");
+  const canManageProducts = hasPermission(profile, "MANAGE_PRODUCTS");
 
   const orders = useQuery(api.orders.listAllOrders, profile && canViewOrders ? {} : "skip");
-  const products = useQuery(api.products.listAdminProducts, profile && canViewOrders ? {} : "skip");
+  const products = useQuery(api.products.listAdminProducts, profile && canManageProducts ? {} : "skip");
   const categories = useQuery(api.categories.listAll, profile && canViewOrders ? {} : "skip");
   const updateGenericStatus = useMutation(api.orders.updateGenericStatus);
 
@@ -503,7 +504,9 @@ function OrdersQueue() {
           <dl className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-muted-foreground ltr:md:ml-auto rtl:md:mr-auto">
             {[
               { label: tQueue("stats.totalOrders"), value: nf.format(stats.totalOrders) },
-              { label: tQueue("stats.totalRevenue"), value: `${nf.format(stats.totalRevenue)} ${egp}` },
+              ...(canViewFinancials
+                ? [{ label: tQueue("stats.totalRevenue"), value: `${nf.format(stats.totalRevenue)} ${egp}` }]
+                : []),
               { label: tQueue("stats.totalProducts"), value: nf.format(stats.totalProducts) },
               { label: tQueue("stats.deliveryRate"), value: `${nf.format(stats.deliveryRate)}%` },
             ].map((s) => (

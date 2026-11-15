@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
+import { hasPermission } from "@backend/convex/lib/permissions";
 
 const blacklistSchema = z.object({
   phoneNumber: z.string().min(10, "Invalid phone number format"),
@@ -29,8 +30,10 @@ type BlacklistForm = z.infer<typeof blacklistSchema>;
 
 export default function SystemSettingsPage() {
   const t = useTranslations("Settings.system");
-  const configs = useQuery(api.settings.listAllConfigs);
-  const blacklist = useQuery(api.blacklist.listBlacklist);
+  const me = useQuery(api.users.getMe);
+  const canManageConfig = hasPermission(me, "MANAGE_SYSTEM_CONFIG");
+  const configs = useQuery(api.settings.listAllConfigs, canManageConfig ? {} : "skip");
+  const blacklist = useQuery(api.blacklist.listBlacklist, canManageConfig ? {} : "skip");
 
   const updateConfig = useMutation(api.settings.updateSystemConfig);
   const addToBlacklist = useMutation(api.blacklist.addToBlacklist);
@@ -105,6 +108,17 @@ export default function SystemSettingsPage() {
     configs?.find((c) => c.key === "MAINTENANCE_MODE")?.value === true;
   const isCodEnabled =
     configs?.find((c) => c.key === "COD_ENABLED")?.value === true;
+
+  if (me && !canManageConfig) {
+    return (
+      <main className="flex min-h-[60vh] flex-col items-center justify-center space-y-6 text-center p-12 bg-background">
+        <div className="flex h-20 w-20 items-center justify-center rounded-[28px] border border-border bg-card text-destructive">
+          <ShieldAlert size={40} />
+        </div>
+        <h2 className="text-2xl font-bold text-foreground">Access Restricted</h2>
+      </main>
+    );
+  }
 
   return (
     <main className="space-y-8 pb-20 bg-background transition-colors">

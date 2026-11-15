@@ -31,6 +31,11 @@ export default function AdminDashboardPage() {
     return hasPermission(me, "VIEW_ANALYTICS");
   }, [me]);
 
+  const canViewFinancials = React.useMemo(() => {
+    if (!me) return false;
+    return hasPermission(me, "VIEW_FINANCIALS");
+  }, [me]);
+
   const metrics = useQuery(
     api.analytics.dashboardMetrics,
     canViewAnalytics ? { timeWindow } : "skip",
@@ -101,35 +106,43 @@ export default function AdminDashboardPage() {
       </section>
 
       {/* Summary KPI Cards */}
-      <section className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <section
+        className={cn(
+          "grid gap-6 grid-cols-1 sm:grid-cols-2",
+          canViewFinancials ? "lg:grid-cols-4" : "lg:grid-cols-2",
+        )}
+      >
         <KpiCard
           label={t("metrics.totalOrders")}
           value={metrics?.totalOrders ?? "-"}
           icon={<ShoppingCart size={20} />}
           loading={loading}
         />
-        <KpiCard
-          label={t("metrics.netProfit")}
-          value={
-            metrics?.netProfit !== undefined && metrics?.netProfit !== null
-              ? `EGP ${metrics.netProfit.toLocaleString(locale)}`
-              : "***"
-          }
-          icon={<DollarSign size={20} />}
-          mask={metrics?.netProfit === null}
-          loading={loading}
-          accent
-        />
-        <KpiCard
-          label={t("metrics.courierFees")}
-          value={
-            metrics?.courierFees !== undefined
-              ? `EGP ${metrics.courierFees.toLocaleString(locale)}`
-              : "-"
-          }
-          icon={<Truck size={20} />}
-          loading={loading}
-        />
+        {canViewFinancials && (
+          <>
+            <KpiCard
+              label={t("metrics.netProfit")}
+              value={
+                metrics?.netProfit !== undefined && metrics?.netProfit !== null
+                  ? `EGP ${metrics.netProfit.toLocaleString(locale)}`
+                  : "-"
+              }
+              icon={<DollarSign size={20} />}
+              loading={loading}
+              accent
+            />
+            <KpiCard
+              label={t("metrics.courierFees")}
+              value={
+                metrics?.courierFees !== undefined && metrics?.courierFees !== null
+                  ? `EGP ${metrics.courierFees.toLocaleString(locale)}`
+                  : "-"
+              }
+              icon={<Truck size={20} />}
+              loading={loading}
+            />
+          </>
+        )}
         <KpiCard
           label={t("metrics.rtoRate")}
           value={

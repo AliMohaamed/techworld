@@ -27,7 +27,10 @@ import {
 
 type AdminProduct = {
   _id: Id<"products">;
+  _creationTime: number;
   categoryId: Id<"categories">;
+  sort_order?: number;
+  category_sort_order?: number;
   categoryName: string;
   isCategoryActive: boolean;
   publicationBlockedReason?: string | null;

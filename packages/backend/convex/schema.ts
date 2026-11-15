@@ -105,7 +105,11 @@ export default defineSchema({
     slug: v.optional(v.string()),
     related_product_ids: v.optional(v.array(v.id("products"))),
     isFeatured: v.optional(v.boolean()),
+    // Position on the all-products listing (global merchandising order).
     sort_order: v.optional(v.number()),
+    // Position within the product's own category page. Independent of sort_order
+    // so a category can be curated without disturbing the global listing.
+    category_sort_order: v.optional(v.number()),
     features: v.optional(v.array(productFeatureValidator)),
     // Denormalised review aggregates, maintained by reviews.ts.
     rating_sum: v.optional(v.number()),
@@ -114,7 +118,7 @@ export default defineSchema({
     .index("by_category", ["categoryId"])
     .index("by_status", ["status"])
     .index("by_category_status_price", ["categoryId", "status", "selling_price"])
-    .index("by_category_status_sort_order", ["categoryId", "status", "sort_order"])
+    .index("by_category_status_category_sort_order", ["categoryId", "status", "category_sort_order"])
     .index("by_status_price", ["status", "selling_price"])
     .index("by_slug", ["slug"])
     .index("by_status_sort_order", ["status", "sort_order"])

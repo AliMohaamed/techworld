@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
+import { hasPermission } from "@backend/convex/lib/permissions";
 import {
   Button,
   Input,
@@ -147,6 +148,8 @@ export function ProductFormSheet({
 }) {
   const t = useTranslations("Catalog.products");
   const locale = useLocale();
+  const profile = useQuery(api.auth.getCurrentStaffProfile);
+  const canViewFinancials = hasPermission(profile, "VIEW_FINANCIALS");
   const createAdvancedProduct = useMutation(api.products.createAdvancedProduct);
   const updateAdvancedProduct = useMutation(api.products.updateAdvancedProduct);
   const restockItem = useMutation(api.skus.restockItem);
@@ -436,7 +439,12 @@ export function ProductFormSheet({
                   />
                 </Field>
 
-                <div className="grid grid-cols-3 gap-4 md:col-span-2">
+                <div
+                  className={cn(
+                    "grid gap-4 md:col-span-2",
+                    canViewFinancials ? "grid-cols-3" : "grid-cols-2",
+                  )}
+                >
                   <Field
                     label={t("form.fields.sellingPrice")}
                     error={errors.selling_price?.message}
@@ -471,23 +479,25 @@ export function ProductFormSheet({
                       </span>
                     </div>
                   </Field>
-                  <Field
-                    label={t("form.fields.cogs")}
-                    error={errors.cogs?.message?.toString()}
-                  >
-                    <div className="relative">
-                      <Input
-                        type="number"
-                        step="0.01"
-                        {...register("cogs")}
-                        placeholder="0.00"
-                        className="rounded-xl border-border bg-background h-12 font-semibold pr-12 text-primary"
-                      />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground/60">
-                        EGP
-                      </span>
-                    </div>
-                  </Field>
+                  {canViewFinancials && (
+                    <Field
+                      label={t("form.fields.cogs")}
+                      error={errors.cogs?.message?.toString()}
+                    >
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          step="0.01"
+                          {...register("cogs")}
+                          placeholder="0.00"
+                          className="rounded-xl border-border bg-background h-12 font-semibold pr-12 text-primary"
+                        />
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground/60">
+                          EGP
+                        </span>
+                      </div>
+                    </Field>
+                  )}
                 </div>
                 <Field
                   label={t("form.fields.descriptionEn")}

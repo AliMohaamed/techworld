@@ -103,7 +103,7 @@ export const dashboardMetrics = query({
       totalRevenue: canViewFinancials ? totalRevenue : null,
       netProfit: canViewFinancials ? netProfit : null,
       totalCogs: canViewFinancials ? totalCogs : null,
-      courierFees,
+      courierFees: canViewFinancials ? courierFees : null,
       rtoRate,
       statusBreakdown: Object.entries(statusBreakdown).map(([name, value]) => ({ name, value })),
       velocityData,
