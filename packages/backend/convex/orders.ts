@@ -166,6 +166,7 @@ export const listAllOrders = query({
     }
 
     await requirePermission(ctx, "VIEW_ORDERS");
+    const viewFinancials = await canViewFinancials(ctx);
 
     const orders = await ctx.db
       .query("orders")
@@ -196,9 +197,18 @@ export const listAllOrders = query({
 
         return {
           ...order,
+          ...(viewFinancials ? {} : { unit_cogs: undefined }),
           ...sumOrderLines(group),
           whatsappClickedAt,
-          lines,
+          lines: lines.map((line) => ({
+            ...line,
+            product: line.product
+              ? {
+                  ...line.product,
+                  ...(viewFinancials ? {} : { cogs: undefined }),
+                }
+              : null,
+          })),
           governorate,
           receiptUrl,
         };
@@ -786,10 +796,11 @@ export const getOrderStats = query({
     const totalProductsSold = filteredOrders.reduce((acc, o) => acc + o.quantity, 0);
     const deliveredOrders = filteredOrders.filter(o => o.state === "DELIVERED").length;
     const deliveryRate = totalOrders > 0 ? (deliveredOrders / totalOrders) * 100 : 0;
+    const viewFinancials = await canViewFinancials(ctx);
 
     return {
       totalOrders,
-      totalRevenue,
+      totalRevenue: viewFinancials ? totalRevenue : null,
       totalProductsSold,
       deliveryRate,
     };

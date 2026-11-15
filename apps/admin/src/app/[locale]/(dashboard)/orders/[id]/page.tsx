@@ -725,16 +725,11 @@ export default function OrderDetailsPage() {
               </div>
             </dl>
 
-            <div className="mt-8 border-t border-dashed border-border pt-6">
-              <div className="flex items-center justify-between gap-4">
-                <h3 className="text-sm font-bold text-foreground">{t("financials.title")}</h3>
-                {!order.canViewFinancials && (
-                  <span className="rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs font-bold text-muted-foreground">
-                    {t("financials.masked")}
-                  </span>
-                )}
-              </div>
-              {order.canViewFinancials ? (
+            {order.canViewFinancials && (
+              <div className="mt-8 border-t border-dashed border-border pt-6">
+                <div className="flex items-center justify-between gap-4">
+                  <h3 className="text-sm font-bold text-foreground">{t("financials.title")}</h3>
+                </div>
                 <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                   {[
                     { label: t("cards.unitCogs"), value: financial(order.financials.unit_cogs) },
@@ -756,10 +751,8 @@ export default function OrderDetailsPage() {
                     </div>
                   ))}
                 </dl>
-              ) : (
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t("financials.redacted")}</p>
-              )}
-            </div>
+              </div>
+            )}
           </section>
         </div>
 

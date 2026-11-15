@@ -229,12 +229,22 @@ const paginateResults = <T>(
 
 async function canViewFinancials(ctx: Pick<QueryCtx, "auth" | "db">) {
   const identity = await ctx.auth.getUserIdentity();
-  if (!identity?.email) return false;
-  const email = identity.email;
-  const user = await ctx.db
-    .query("users")
-    .withIndex("by_email", (q) => q.eq("email", email))
-    .unique();
+  if (!identity) return false;
+  const identifier = identity.subject ?? null;
+  const email = identity.email ?? null;
+  const user =
+    (identifier
+      ? await ctx.db
+          .query("users")
+          .withIndex("by_identifier", (q) => q.eq("identifier", identifier))
+          .unique()
+      : null) ??
+    (email
+      ? await ctx.db
+          .query("users")
+          .withIndex("by_email", (q) => q.eq("email", email))
+          .unique()
+      : null);
   return hasPermission(user, "VIEW_FINANCIALS");
 }
 
@@ -735,6 +745,7 @@ export const listAdminProducts = query({
     }
 
     await requirePermission(ctx, "MANAGE_PRODUCTS");
+    const viewFinancials = await canViewFinancials(ctx);
 
     const products = await ctx.db.query("products").order("desc").collect();
 
@@ -743,6 +754,7 @@ export const listAdminProducts = query({
         const category = await ctx.db.get(product.categoryId);
         return {
           ...product,
+          ...(viewFinancials ? {} : { cogs: undefined }),
           categoryName: category?.name_en ?? "Missing category",
           isCategoryActive: category?.isActive ?? false,
           publicationBlockedReason: await getPublicationBlocker(ctx, product.categoryId),
@@ -1123,7 +1135,9 @@ export const createProduct = mutation({
       images: args.images,
       selling_price: sanitizeNumber(args.selling_price, "Selling price"),
       cogs:
-        args.cogs !== undefined ? sanitizeNumber(args.cogs, "COGS") : undefined,
+        hasPermission(user, "VIEW_FINANCIALS") && args.cogs !== undefined
+          ? sanitizeNumber(args.cogs, "COGS")
+          : undefined,
       real_stock: sanitizeNumber(args.real_stock, "Real stock"),
       status: args.status ?? "DRAFT",
       name: name_en,
@@ -1223,7 +1237,9 @@ export const updateProduct = mutation({
             price: sanitizeNumber(args.selling_price, "Selling price"),
           }
         : {}),
-      ...(args.cogs !== undefined ? { cogs: sanitizeNumber(args.cogs, "COGS") } : {}),
+      ...(hasPermission(user, "VIEW_FINANCIALS") && args.cogs !== undefined
+        ? { cogs: sanitizeNumber(args.cogs, "COGS") }
+        : {}),
       ...(args.real_stock !== undefined ? { real_stock: args.real_stock } : {}),
       ...(args.status !== undefined ? { status: nextStatus } : {}),
       ...(args.isFeatured !== undefined ? { isFeatured: args.isFeatured } : {}),
@@ -1340,7 +1356,9 @@ export const createAdvancedProduct = mutation({
       images: args.images,
       selling_price: sanitizeNumber(args.selling_price, "Selling price"),
       compareAtPrice: sanitizeOptionalNumber(args.compareAtPrice, "Compare-at price"),
-      cogs: sanitizeOptionalNumber(args.cogs, "COGS"),
+      cogs: hasPermission(user, "VIEW_FINANCIALS")
+        ? sanitizeOptionalNumber(args.cogs, "COGS")
+        : undefined,
       status: args.status ?? "DRAFT",
       name: name_en,
       price: args.selling_price,
@@ -1436,7 +1454,9 @@ export const updateAdvancedProduct = mutation({
       images: args.images,
       selling_price: sanitizeNumber(args.selling_price, "Selling price"),
       compareAtPrice: sanitizeOptionalNumber(args.compareAtPrice, "Compare-at price"),
-      cogs: sanitizeOptionalNumber(args.cogs, "COGS"),
+      cogs: hasPermission(user, "VIEW_FINANCIALS")
+        ? sanitizeOptionalNumber(args.cogs, "COGS")
+        : existing.cogs,
       status: args.status ?? "DRAFT",
       name: name_en,
       price: args.selling_price,
