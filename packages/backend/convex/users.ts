@@ -367,6 +367,17 @@ export const updateStaffPermissions = mutation({
         });
       }
     }
+    for (const existingPerm of oldUser.permissions) {
+      if (
+        !args.permissions.includes(existingPerm as any) &&
+        !actor.permissions.includes(existingPerm)
+      ) {
+        throw new ConvexError({
+          code: "PERMISSION_ESCALATION",
+          message: `You cannot revoke '${existingPerm}' because you do not have it.`,
+        });
+      }
+    }
 
     await ctx.db.patch(args.userId, {
       permissions: args.permissions,
@@ -449,6 +460,7 @@ export const listStaff = query({
 export const getUserPermissions = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
+    await requirePermission(ctx, "MANAGE_USERS");
     const user = await ctx.db.get(args.userId);
     if (!user) {
       throw new Error("User not found");

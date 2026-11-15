@@ -7,6 +7,7 @@ import { Button, Input, Label, cn } from "@techworld/ui";
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import {
+  hasPermission,
   permissionValues,
   type Permission,
 } from "@backend/convex/lib/permissions";
@@ -27,8 +28,9 @@ import { useTranslations, useLocale } from "next-intl";
 export default function TeamManagementPage() {
   const t = useTranslations("Team");
   const locale = useLocale();
-  const staff = useQuery(api.users.listStaff);
   const me = useQuery(api.users.getMe);
+  const canManageUsers = hasPermission(me, "MANAGE_USERS");
+  const staff = useQuery(api.users.listStaff, canManageUsers ? {} : "skip");
   const provisionStaff = useMutation(api.users.provisionStaff);
   const updateStaff = useMutation(api.users.updateStaff);
   const updateStaffPermissions = useMutation(api.users.updateStaffPermissions);
@@ -47,6 +49,10 @@ export default function TeamManagementPage() {
   const [formPermissions, setFormPermissions] = useState<Permission[]>([]);
 
   const myPermissions = useMemo(() => me?.permissions ?? [], [me]);
+  const visiblePermissionValues = useMemo(
+    () => permissionValues.filter((perm) => myPermissions.includes(perm)),
+    [myPermissions],
+  );
 
   const generatePassword = () => {
     const chars =
@@ -163,6 +169,17 @@ export default function TeamManagementPage() {
   const formatPermissionName = (perm: string) => {
     return t(`permissions.${perm as keyof typeof t}` as any);
   };
+
+  if (me && !canManageUsers) {
+    return (
+      <main className="flex min-h-[60vh] flex-col items-center justify-center space-y-6 text-center p-12 bg-background">
+        <div className="flex h-20 w-20 items-center justify-center rounded-[28px] border border-border bg-card text-destructive">
+          <ShieldX size={40} />
+        </div>
+        <h2 className="text-2xl font-bold text-foreground">Access Restricted</h2>
+      </main>
+    );
+  }
 
   return (
     <main className="space-y-8 pb-10">
@@ -292,7 +309,7 @@ export default function TeamManagementPage() {
                 <Shield size={12} /> {t("provision.form.permissions")}
               </Label>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                {permissionValues.map((perm) => {
+                {visiblePermissionValues.map((perm) => {
                   const owned = myPermissions.includes(perm);
                   const selected = formPermissions.includes(perm);
                   return (
@@ -437,7 +454,7 @@ export default function TeamManagementPage() {
                     <div className="flex flex-wrap gap-2.5 max-w-lg">
                       {editingId === user._id ? (
                         <div className="grid gap-2.5 grid-cols-1 sm:grid-cols-2 w-full animate-in fade-in slide-in-from-top-1 duration-300">
-                          {permissionValues.map((perm) => {
+                          {visiblePermissionValues.map((perm) => {
                             const owned = myPermissions.includes(perm);
                             const has = user.permissions.includes(perm);
                             return (
@@ -487,15 +504,17 @@ export default function TeamManagementPage() {
                           })}
                         </div>
                       ) : (
-                        user.permissions.map((perm) => (
-                          <span
-                            key={String(perm)}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-xs font-bold text-muted-foreground/60 shadow-sm transition-all hover:border-[#ffc105]/30 hover:text-foreground"
-                          >
-                            <div className="h-1 w-1 rounded-full bg-emerald-500/40" />{" "}
-                            {formatPermissionName(String(perm))}
-                          </span>
-                        ))
+                        user.permissions
+                          .filter((perm) => myPermissions.includes(perm as Permission))
+                          .map((perm) => (
+                            <span
+                              key={String(perm)}
+                              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-xs font-bold text-muted-foreground/60 shadow-sm transition-all hover:border-[#ffc105]/30 hover:text-foreground"
+                            >
+                              <div className="h-1 w-1 rounded-full bg-emerald-500/40" />{" "}
+                              {formatPermissionName(String(perm))}
+                            </span>
+                          ))
                       )}
                     </div>
                   </td>

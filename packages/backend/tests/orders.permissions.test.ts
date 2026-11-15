@@ -638,3 +638,54 @@ describe("TikTok order events are queued when the checkout is placed", () => {
     expect(tiktokEvents).toHaveLength(0);
   });
 });
+
+describe("VIEW_FINANCIALS and MANAGE_SYSTEM_CONFIG visibility & access control", () => {
+  test("totalRevenue and COGS are hidden from staff without VIEW_FINANCIALS and visible with it", async () => {
+    const t = setupConvex();
+    const { firstLineId, productId } = await seedOrder(t);
+    await t.run(async (ctx) => {
+      await ctx.db.patch(productId, { cogs: 200 });
+      await ctx.db.patch(firstLineId, { unit_cogs: 200 });
+    });
+    const viewer = await asStaff(t, "viewer", ["VIEW_ORDERS", "VIEW_ANALYTICS", "MANAGE_PRODUCTS"]);
+    const superAdmin = await asStaff(t, "super", [
+      "VIEW_ORDERS",
+      "VIEW_ANALYTICS",
+      "MANAGE_PRODUCTS",
+      "VIEW_FINANCIALS",
+      "MANAGE_SYSTEM_CONFIG",
+    ]);
+
+    const viewerStats = await viewer.query(api.orders.getOrderStats, {});
+    expect(viewerStats.totalRevenue).toBeNull();
+
+    const adminStats = await superAdmin.query(api.orders.getOrderStats, {});
+    expect(adminStats.totalRevenue).toBeGreaterThan(0);
+
+    const viewerOrders = await viewer.query(api.orders.listAllOrders, {});
+    expect(viewerOrders?.[0].unit_cogs).toBeUndefined();
+    expect(viewerOrders?.[0].lines[0].product?.cogs).toBeUndefined();
+
+    const adminOrders = await superAdmin.query(api.orders.listAllOrders, {});
+    expect(adminOrders?.[0].lines[0].product?.cogs).toBeDefined();
+
+    const viewerDashboard = await viewer.query(api.analytics.dashboardMetrics, { timeWindow: "last7days" });
+    expect(viewerDashboard.totalRevenue).toBeNull();
+    expect(viewerDashboard.netProfit).toBeNull();
+    expect(viewerDashboard.totalCogs).toBeNull();
+    expect(viewerDashboard.courierFees).toBeNull();
+
+    const adminDashboard = await superAdmin.query(api.analytics.dashboardMetrics, { timeWindow: "last7days" });
+    expect(adminDashboard.totalRevenue).toBeGreaterThan(0);
+
+    const viewerProducts = await viewer.query(api.products.listAdminProducts, {});
+    expect(viewerProducts?.[0].cogs).toBeUndefined();
+
+    const adminProducts = await superAdmin.query(api.products.listAdminProducts, {});
+    expect(adminProducts?.[0].cogs).toBeDefined();
+
+    const viewerDetails = await viewer.query(api.orders.getOrderDetails, { orderId: firstLineId });
+    expect(viewerDetails?.canViewFinancials).toBe(false);
+    expect(viewerDetails?.financials.total_revenue).toBe("***");
+  });
+});
