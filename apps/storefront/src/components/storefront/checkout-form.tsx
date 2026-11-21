@@ -203,7 +203,7 @@ export default function CheckoutForm() {
       if (!isValidEgyptianMobile(altPhone)) next.altPhone = t("errors.phone");
       else if (altPhone === normalizeEgyptianPhone(form.phone)) next.altPhone = t("errors.altPhoneSame");
     }
-    if (form.email.trim() && !isValidEmail(form.email.trim())) next.email = t("errors.email");
+    if (!isValidEmail(form.email.trim())) next.email = t("errors.email");
     if (!form.governorateId) next.governorateId = t("errors.governorate");
     if (form.address.trim().length < 10) next.address = t("errors.address");
     for (const key of ADDRESS_UNIT_FIELDS) {
@@ -506,10 +506,7 @@ export default function CheckoutForm() {
               )}
             </div>
             <div>
-              <label htmlFor="checkout-email" className={labelClass}>
-                {t("delivery.email")}{" "}
-                <span className="font-normal text-label-muted">{t("delivery.optional")}</span>
-              </label>
+              <label htmlFor="checkout-email" className={labelClass}>{t("delivery.email")}</label>
               <input
                 id="checkout-email"
                 type="email"
