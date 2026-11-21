@@ -577,6 +577,8 @@ export const placeOrderFromSession = mutation({
     if (lines.length > 0) {
       await queueMetaPurchase(ctx, { order: lines[0], lines });
       await queueTikTokOrderEvents(ctx, { order: lines[0], lines });
+      // Scheduled, so it only runs if this checkout commits.
+      await ctx.scheduler.runAfter(0, internal.telegram.notifyOrderPlaced, { shortCode });
     }
 
     if (!isBlacklisted && args.customerPhone && firstOrderId) {
